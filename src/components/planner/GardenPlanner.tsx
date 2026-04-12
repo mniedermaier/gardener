@@ -125,10 +125,12 @@ function DroppableCell({
 function BedGrid({ bed, gardenId }: { bed: Bed; gardenId: string }) {
   const { t } = useTranslation();
   const plantMap = usePlantMap();
-  const { removeCell, updateBed } = useStore();
+  const { removeCell, updateBed, gridCellSizeCm } = useStore();
   const [showConfig, setShowConfig] = useState(false);
   const envType = bed.environmentType ?? "outdoor_bed";
   const frostWeeks = getFrostProtectionWeeks(bed);
+  const bedWidthM = ((bed.width * gridCellSizeCm) / 100).toFixed(1);
+  const bedHeightM = ((bed.height * gridCellSizeCm) / 100).toFixed(1);
 
   return (
     <Card className={`overflow-hidden ${ENVIRONMENT_BORDERS[envType]}`}>
@@ -138,6 +140,9 @@ function BedGrid({ bed, gardenId }: { bed: Bed; gardenId: string }) {
             {ENVIRONMENT_ICONS[envType]}
           </span>
           <h3 className="font-semibold">{bed.name}</h3>
+          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+            {bedWidthM} × {bedHeightM} m
+          </span>
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
             {t(`planner.environmentTypes.${envType}`)}
           </span>
@@ -386,7 +391,7 @@ function ContainerConfigPanel({ config, onChange }: { config: ContainerConfig; o
 
 export function GardenPlanner() {
   const { t } = useTranslation();
-  const { gardens, activeGardenId, addGarden, setActiveGarden, addBed, deleteBed, deleteGarden, setCell, archiveSeason, seasonArchives } =
+  const { gardens, activeGardenId, addGarden, setActiveGarden, addBed, deleteBed, deleteGarden, setCell, archiveSeason, seasonArchives, gridCellSizeCm } =
     useStore();
   const plants = usePlants();
   const plantMap = usePlantMap();
@@ -394,8 +399,8 @@ export function GardenPlanner() {
   const [showNewBed, setShowNewBed] = useState(false);
   const [gardenName, setGardenName] = useState("");
   const [bedName, setBedName] = useState("");
-  const [bedWidth, setBedWidth] = useState(6);
-  const [bedHeight, setBedHeight] = useState(4);
+  const [bedWidthM, setBedWidthM] = useState(1.8);
+  const [bedHeightM, setBedHeightM] = useState(1.2);
   const [bedEnvType, setBedEnvType] = useState<EnvironmentType>("outdoor_bed");
   const [ghConfig, setGhConfig] = useState<GreenhouseConfig>({
     material: "glass", heated: false, ventilation: "manual",
@@ -469,12 +474,15 @@ export function GardenPlanner() {
   const handleCreateBed = () => {
     if (!bedName.trim() || !activeGardenId) return;
     const bedCount = activeGarden?.beds.length ?? 0;
+    const cellSizeM = gridCellSizeCm / 100;
+    const width = Math.max(1, Math.round(bedWidthM / cellSizeM));
+    const height = Math.max(1, Math.round(bedHeightM / cellSizeM));
     addBed(activeGardenId, {
       name: bedName.trim(),
       x: 0,
       y: bedCount,
-      width: bedWidth,
-      height: bedHeight,
+      width,
+      height,
       environmentType: bedEnvType,
       ...(bedEnvType === "greenhouse" ? { greenhouseConfig: { ...ghConfig } } : {}),
       ...(bedEnvType === "cold_frame" ? { coldFrameConfig: { ...cfConfig } } : {}),
@@ -717,22 +725,30 @@ export function GardenPlanner() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label={`${t("planner.width")} (cells)`}
+                label={`${t("planner.width")} (m)`}
                 type="number"
-                min={1}
+                min={0.3}
                 max={20}
-                value={bedWidth}
-                onChange={(e) => setBedWidth(Number(e.target.value))}
+                step={0.1}
+                value={bedWidthM}
+                onChange={(e) => setBedWidthM(Number(e.target.value))}
               />
               <Input
-                label={`${t("planner.height")} (cells)`}
+                label={`${t("planner.height")} (m)`}
                 type="number"
-                min={1}
+                min={0.3}
                 max={20}
-                value={bedHeight}
-                onChange={(e) => setBedHeight(Number(e.target.value))}
+                step={0.1}
+                value={bedHeightM}
+                onChange={(e) => setBedHeightM(Number(e.target.value))}
               />
             </div>
+            <p className="text-xs text-gray-400">
+              {t("planner.gridInfo", {
+                cells: `${Math.max(1, Math.round(bedWidthM / (gridCellSizeCm / 100)))} × ${Math.max(1, Math.round(bedHeightM / (gridCellSizeCm / 100)))}`,
+                size: gridCellSizeCm,
+              })}
+            </p>
 
             {bedEnvType === "greenhouse" && (
               <GreenhouseConfigPanel config={ghConfig} onChange={setGhConfig} />

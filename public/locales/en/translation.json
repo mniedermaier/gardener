@@ -48,6 +48,7 @@
     "height": "Height",
     "noGarden": "No garden created yet. Create one to get started!",
     "dragPlant": "Drag a plant from the palette onto a bed cell",
+    "gridInfo": "Grid: {{cells}} cells ({{size}} cm each)",
     "share": "Share garden plan",
     "shareCopied": "Share link copied to clipboard!",
     "importTemplate": "Import Garden Template",
