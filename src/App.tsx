@@ -1,7 +1,9 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { Dashboard } from "@/components/dashboard/Dashboard";
+import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
+import { useStore } from "@/store";
 
 const GardenPlanner = lazy(() => import("@/components/planner/GardenPlanner").then((m) => ({ default: m.GardenPlanner })));
 const PlantList = lazy(() => import("@/components/plants/PlantList").then((m) => ({ default: m.PlantList })));
@@ -23,6 +25,13 @@ function L({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const gardens = useStore((s) => s.gardens);
+  const [onboardingDone, setOnboardingDone] = useState(gardens.length > 0);
+
+  if (!onboardingDone) {
+    return <OnboardingWizard onComplete={() => setOnboardingDone(true)} />;
+  }
+
   return (
     <HashRouter>
       <Routes>
