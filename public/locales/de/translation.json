@@ -47,8 +47,10 @@
     "width": "Breite",
     "height": "H\u00f6he",
     "noGarden": "Noch kein Garten angelegt. Erstelle einen um loszulegen!",
-    "dragPlant": "Ziehe eine Pflanze aus der Palette auf ein Feld",
+    "dragPlant": "Ziehen oder klicken um Pflanzen zu platzieren",
     "gridInfo": "Raster: {{cells}} Felder (je {{size}} cm)",
+    "autoFill": "Beet intelligent bef\u00fcllen",
+    "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
     "share": "Gartenplan teilen",
     "shareCopied": "Teilen-Link in die Zwischenablage kopiert!",
     "importTemplate": "Garten-Vorlage importieren",
@@ -342,6 +344,21 @@
       "advanced": "Fortgeschritten"
     },
     "years": "Jahre Keimf\u00e4higkeit"
+  },
+  "palette": {
+    "recommended": "Empfohlen"
+  },
+  "bedStats": {
+    "types": "Arten",
+    "compatibility": "Vertr\u00e4glichkeit",
+    "conflicts": "Konflikte"
+  },
+  "validation": {
+    "antagonistDirect": "{{neighbor}} sollte nicht direkt neben {{plant}} stehen!",
+    "antagonistNear": "{{neighbor}} ist nah an {{plant}} - keine idealen Nachbarn",
+    "tooClose": "Zu nah an gleicher Pflanze (braucht {{spacing}}cm, nur {{actual}}cm)",
+    "tooMuchSun": "Diese Pflanze bevorzugt Schatten - hier evtl. zu viel Sonne",
+    "containerTooSmall": "Dieser Container k\u00f6nnte zu klein f\u00fcr diese Pflanze sein"
   },
   "advisor": {
     "title": "Was jetzt pflanzen?",

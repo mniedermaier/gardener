@@ -47,8 +47,10 @@
     "width": "Width",
     "height": "Height",
     "noGarden": "No garden created yet. Create one to get started!",
-    "dragPlant": "Drag a plant from the palette onto a bed cell",
+    "dragPlant": "Drag or click to place plants",
     "gridInfo": "Grid: {{cells}} cells ({{size}} cm each)",
+    "autoFill": "Auto-fill with smart recommendations",
+    "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
     "share": "Share garden plan",
     "shareCopied": "Share link copied to clipboard!",
     "importTemplate": "Import Garden Template",
@@ -342,6 +344,21 @@
       "advanced": "Advanced"
     },
     "years": "years viability"
+  },
+  "palette": {
+    "recommended": "Recommended"
+  },
+  "bedStats": {
+    "types": "types",
+    "compatibility": "Compatibility",
+    "conflicts": "conflicts"
+  },
+  "validation": {
+    "antagonistDirect": "{{neighbor}} should not be directly next to {{plant}}!",
+    "antagonistNear": "{{neighbor}} is close to {{plant}} - not ideal neighbors",
+    "tooClose": "Too close to same plant (need {{spacing}}cm, only {{actual}}cm)",
+    "tooMuchSun": "This plant prefers shade - may get too much sun here",
+    "containerTooSmall": "This container might be too small for this plant"
   },
   "advisor": {
     "title": "What to Plant Now",
