@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LayoutGrid, Sprout, Cloud, CalendarDays, Settings, X, Apple, BookOpen, Scale, Wallet } from "lucide-react";
+import { Home, LayoutGrid, Sprout, Cloud, CalendarDays, Settings, X, Apple, BookOpen, Scale, Wallet } from "lucide-react";
 
 const navItems = [
-  { to: "/", icon: LayoutGrid, labelKey: "nav.planner" },
+  { to: "/", icon: Home, labelKey: "nav.dashboard" },
+  { to: "/planner", icon: LayoutGrid, labelKey: "nav.planner" },
   { to: "/plants", icon: Sprout, labelKey: "nav.plants" },
   { to: "/calendar", icon: CalendarDays, labelKey: "nav.calendar" },
   { to: "/harvest", icon: Apple, labelKey: "nav.harvest" },
@@ -48,6 +49,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <NavLink
               key={to}
               to={to}
+              end={to === "/"}
               onClick={onClose}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
