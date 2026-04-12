@@ -80,7 +80,7 @@ export function ExpenseDashboard() {
     setShowAdd(false);
   };
 
-  const formatCents = (cents: number) => `${(cents / 100).toFixed(2)} \u20ac`;
+  const formatCents = (cents: number) => `${(cents / 100).toFixed(2)} €`;
 
   return (
     <div>

@@ -369,7 +369,7 @@
     "title": "Kosten & ROI",
     "add": "Ausgabe hinzuf\u00fcgen",
     "description": "Beschreibung",
-    "amount": "Betrag (\u20ac)",
+    "amount": "Betrag (€)",
     "category": "Kategorie",
     "totalExpenses": "Gesamtausgaben",
     "harvestValue": "Erntewert (Marktpreis)",

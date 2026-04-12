@@ -369,7 +369,7 @@
     "title": "Costs & ROI",
     "add": "Add Expense",
     "description": "Description",
-    "amount": "Amount (\u20ac)",
+    "amount": "Amount (€)",
     "category": "Category",
     "totalExpenses": "Total expenses",
     "harvestValue": "Harvest value (market price)",

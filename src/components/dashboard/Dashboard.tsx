@@ -199,7 +199,7 @@ export function Dashboard() {
             </div>
             <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
               <span className="text-sm text-gray-600 dark:text-gray-400">{t("dashboard.totalExpenses")}</span>
-              <span className="text-sm font-bold">{totalExpenseEur.toFixed(2)} \u20ac</span>
+              <span className="text-sm font-bold">{totalExpenseEur.toFixed(2)} €</span>
             </div>
             <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
               <span className="text-sm text-gray-600 dark:text-gray-400">{t("dashboard.harvestEntries")}</span>
