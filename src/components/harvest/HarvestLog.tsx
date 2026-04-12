@@ -72,19 +72,19 @@ export function HarvestLog() {
       </div>
 
       {harvests.length > 0 && (
-        <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
           <Card className="text-center">
-            <p className="text-3xl font-bold text-garden-600">{harvests.length}</p>
+            <p className="text-xl font-bold text-garden-600 sm:text-3xl">{harvests.length}</p>
             <p className="text-xs text-gray-500">{t("harvest.entries")}</p>
           </Card>
           <Card className="text-center">
-            <p className="text-3xl font-bold text-garden-600">
+            <p className="text-xl font-bold text-garden-600 sm:text-3xl">
               {totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)} kg` : `${totalWeight} g`}
             </p>
             <p className="text-xs text-gray-500">{t("harvest.totalWeight")}</p>
           </Card>
           <Card className="text-center">
-            <p className="text-3xl font-bold text-amber-500">
+            <p className="text-xl font-bold text-amber-500 sm:text-3xl">
               {(harvests.reduce((s, h) => s + h.quality, 0) / harvests.length).toFixed(1)}
             </p>
             <p className="text-xs text-gray-500">{t("harvest.avgQuality")}</p>
@@ -150,7 +150,7 @@ export function HarvestLog() {
                   <p className="text-xs text-gray-400">{h.date}</p>
                   {h.notes && <p className="mt-0.5 text-xs text-gray-500">{h.notes}</p>}
                 </div>
-                <div className="flex items-center gap-3 text-sm">
+                <div className="flex shrink-0 flex-wrap items-center gap-2 text-xs sm:gap-3 sm:text-sm">
                   {h.weightGrams && (
                     <span className="font-medium">
                       {h.weightGrams >= 1000 ? `${(h.weightGrams / 1000).toFixed(1)} kg` : `${h.weightGrams} g`}
@@ -158,8 +158,8 @@ export function HarvestLog() {
                   )}
                   {h.count && <span className="text-gray-500">{h.count} St.</span>}
                   <div className="flex text-amber-400">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <Star key={i} size={12} fill={i < h.quality ? "currentColor" : "none"} />
+                    {Array.from({ length: h.quality }, (_, i) => (
+                      <Star key={i} size={10} fill="currentColor" />
                     ))}
                   </div>
                   <button

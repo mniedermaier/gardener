@@ -145,7 +145,7 @@ export function TaskCalendar() {
                 <p className={`text-sm font-medium ${task.completedDate ? "line-through" : ""}`}>{task.title}</p>
                 <p className="text-xs text-gray-400">{task.dueDate}</p>
               </div>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${taskTypeColors[task.type]}`}>
+              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium sm:text-xs ${taskTypeColors[task.type]}`}>
                 {t(`calendar.taskTypes.${task.type}`)}
               </span>
             </div>

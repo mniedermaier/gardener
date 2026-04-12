@@ -56,7 +56,7 @@ export function PlantInfoPanel({ plant, onClose }: Props) {
         </button>
       </div>
 
-      <div className="mb-3 grid grid-cols-3 gap-2 text-xs">
+      <div className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
         <div className="flex items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 dark:bg-gray-800">
           <Sun size={12} className="text-amber-500" />
           <span>{t(`plants.sun.${plant.sunRequirement}`)}</span>

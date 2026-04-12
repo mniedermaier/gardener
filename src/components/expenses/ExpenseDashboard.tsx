@@ -85,27 +85,27 @@ export function ExpenseDashboard() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("expenses.title")}</h1>
+        <h1 className="text-lg font-bold sm:text-2xl">{t("expenses.title")}</h1>
         <Button size="sm" onClick={() => setShowAdd(true)}>
           <Plus size={16} />
           {t("expenses.add")}
         </Button>
       </div>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
         <Card className="text-center">
           <TrendingDown size={20} className="mx-auto mb-1 text-red-500" />
-          <p className="text-2xl font-bold text-red-600">{formatCents(totalExpenses)}</p>
+          <p className="text-lg font-bold sm:text-2xl text-red-600">{formatCents(totalExpenses)}</p>
           <p className="text-xs text-gray-500">{t("expenses.totalExpenses")}</p>
         </Card>
         <Card className="text-center">
           <TrendingUp size={20} className="mx-auto mb-1 text-garden-500" />
-          <p className="text-2xl font-bold text-garden-600">{formatCents(harvestValue)}</p>
+          <p className="text-lg font-bold sm:text-2xl text-garden-600">{formatCents(harvestValue)}</p>
           <p className="text-xs text-gray-500">{t("expenses.harvestValue")}</p>
         </Card>
         <Card className="text-center">
           <Euro size={20} className={`mx-auto mb-1 ${roi >= 0 ? "text-garden-500" : "text-red-500"}`} />
-          <p className={`text-2xl font-bold ${roi >= 0 ? "text-garden-600" : "text-red-600"}`}>
+          <p className={`text-lg font-bold sm:text-2xl ${roi >= 0 ? "text-garden-600" : "text-red-600"}`}>
             {roi >= 0 ? "+" : ""}{roi}%
           </p>
           <p className="text-xs text-gray-500">{t("expenses.roi")}</p>

@@ -194,6 +194,7 @@ function BedGrid({
         />
       )}
 
+      <div className="overflow-x-auto pb-2">
       <div
         className={`inline-grid gap-0.5 rounded-lg border p-1 ${ENVIRONMENT_COLORS[envType]} ${ENVIRONMENT_BORDERS[envType]}`}
         style={{ gridTemplateColumns: `repeat(${bed.width}, 2.5rem)` }}
@@ -225,6 +226,7 @@ function BedGrid({
             );
           })
         )}
+      </div>
       </div>
 
       {bed.cells.length === 0 && (
@@ -580,9 +582,9 @@ export function GardenPlanner() {
         )}
 
         {activeGarden ? (
-          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="grid gap-6 md:grid-cols-[1fr_280px]">
             {/* Main area: beds */}
-            <div>
+            <div className="min-w-0">
               {/* Placement feedback */}
               {placementFeedback && (
                 <div className="mb-3 flex items-center gap-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
@@ -661,8 +663,8 @@ export function GardenPlanner() {
               )}
             </div>
 
-            {/* Right sidebar: plant palette + info */}
-            <div className="space-y-4">
+            {/* Plant palette + info (top on mobile, right sidebar on desktop) */}
+            <div className="order-first space-y-4 md:order-last">
               <Card>
                 <PlantPalette
                   selectedPlantId={selectedPlant?.id ?? null}

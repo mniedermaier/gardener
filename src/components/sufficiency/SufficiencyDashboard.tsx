@@ -75,13 +75,13 @@ export function SufficiencyDashboard() {
         </Card>
       ) : (
         <>
-          <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <div className="mb-6 grid grid-cols-2 gap-2 sm:gap-4">
             <Card className="text-center">
-              <p className="text-4xl font-bold text-garden-600">{result.totalYieldKg.toFixed(0)} kg</p>
+              <p className="text-2xl font-bold text-garden-600 sm:text-4xl">{result.totalYieldKg.toFixed(0)} kg</p>
               <p className="text-sm text-gray-500">{t("sufficiency.estimatedYield")}</p>
             </Card>
             <Card className="text-center">
-              <p className="text-4xl font-bold text-garden-600">{result.plantYields.length}</p>
+              <p className="text-2xl font-bold text-garden-600 sm:text-4xl">{result.plantYields.length}</p>
               <p className="text-sm text-gray-500">{t("sufficiency.plantTypes")}</p>
             </Card>
           </div>

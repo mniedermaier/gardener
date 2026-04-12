@@ -20,11 +20,11 @@ function StatCard({ icon: Icon, value, label, color, onClick }: {
       onClick={onClick}
       className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-900"
     >
-      <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${color}`}>
-        <Icon size={20} className="text-white" />
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10 ${color}`}>
+        <Icon size={18} className="text-white" />
       </div>
-      <div>
-        <p className="text-xl font-bold">{value}</p>
+      <div className="min-w-0">
+        <p className="truncate text-lg font-bold sm:text-xl">{value}</p>
         <p className="text-xs text-gray-500">{label}</p>
       </div>
     </button>
@@ -73,7 +73,7 @@ export function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <StatCard icon={LayoutGrid} value={totalBeds} label={t("dashboard.beds")} color="bg-garden-600" onClick={() => navigate("/planner")} />
         <StatCard icon={Sprout} value={uniquePlantIds.size} label={t("dashboard.plantTypes")} color="bg-emerald-600" onClick={() => navigate("/plants")} />
         <StatCard icon={CalendarDays} value={upcomingTasks.length} label={t("dashboard.tasksDue")} color="bg-blue-600" onClick={() => navigate("/calendar")} />

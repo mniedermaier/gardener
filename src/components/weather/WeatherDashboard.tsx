@@ -202,7 +202,7 @@ export function WeatherDashboard() {
           </Card>
 
           <h2 className="mb-4 text-lg font-semibold">{t("weather.forecast")}</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-5">
             {weather.forecast.map((day) => (
               <Card key={day.date} className="text-center">
                 <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
