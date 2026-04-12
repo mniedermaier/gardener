@@ -43,7 +43,12 @@ export function WeatherDashboard() {
   const { t } = useTranslation();
   const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore();
   const plantMap = usePlantMap();
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weather, setWeather] = useState<WeatherData | null>(() => {
+    try {
+      const cached = sessionStorage.getItem("gardener-weather");
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,7 +110,7 @@ export function WeatherDashboard() {
         humidity: current.main.humidity,
       });
 
-      setWeather({
+      const weatherData: WeatherData = {
         current: {
           temp: Math.round(current.main.temp),
           feelsLike: Math.round(current.main.feels_like),
@@ -117,7 +122,9 @@ export function WeatherDashboard() {
         forecast: forecastItems,
         locationName: locationName || current.name,
         fetchedAt: new Date().toISOString(),
-      });
+      };
+      setWeather(weatherData);
+      try { sessionStorage.setItem("gardener-weather", JSON.stringify(weatherData)); } catch {}
     } catch {
       setError("Failed to fetch weather data. Check your API key.");
     } finally {

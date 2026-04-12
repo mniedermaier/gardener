@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,6 +10,7 @@ import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { Card } from "@/components/ui/Card";
 import { PlantingAdvisor } from "./PlantingAdvisor";
+import { OnboardingWizard } from "./OnboardingWizard";
 import { isAfter, isBefore, parseISO, startOfWeek, endOfWeek, format } from "date-fns";
 
 function StatCard({ icon: Icon, value, label, color, onClick }: {
@@ -37,6 +38,11 @@ export function Dashboard() {
   const { gardens, tasks, harvests, expenses } = useStore();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
+  const [showOnboarding, setShowOnboarding] = useState(gardens.length === 0);
+
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={() => setShowOnboarding(false)} />;
+  }
 
   const now = new Date();
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });

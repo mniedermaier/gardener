@@ -11,6 +11,7 @@ export interface SeedSavingInfo {
 
 export interface Plant {
   id: string;
+  displayName?: string; // for custom plants (built-in use i18n)
   category: PlantCategory;
   sowIndoorsWeeks: number | null;
   sowOutdoorsWeeks: number | null;

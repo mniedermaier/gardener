@@ -37,6 +37,20 @@
     "totalExpenses": "Ausgaben gesamt",
     "harvestEntries": "Ernteeintr\u00e4ge"
   },
+  "onboarding": {
+    "welcome": "Willkommen bei Gardener!",
+    "welcomeDesc": "Dein Gartenplaner f\u00fcr Selbstversorger. Lass uns deinen Garten in wenigen Schritten einrichten.",
+    "getStarted": "Los geht's",
+    "locationTitle": "Wo ist dein Garten?",
+    "locationDesc": "Dein Standort hilft bei Sonnenlicht-, Frost- und Wetterberechnungen.",
+    "frostTitle": "Wann ist dein letzter Frost?",
+    "frostDesc": "Dieses Datum bestimmt Aussaat-, Pflanz- und Erntezeitpunkte. Du kannst es sp\u00e4ter \u00e4ndern.",
+    "gardenTitle": "Benenne deinen ersten Garten",
+    "gardenDesc": "Du kannst sp\u00e4ter weitere G\u00e4rten anlegen (z.B. Vorgarten, Hinterhof, Balkon).",
+    "gardenPlaceholder": "z.B. Mein Garten",
+    "next": "Weiter",
+    "finish": "Ab ins Beet!"
+  },
   "planner": {
     "title": "Gartenplaner",
     "newGarden": "Neuer Garten",
@@ -50,6 +64,7 @@
     "dragPlant": "Ziehen oder klicken um Pflanzen zu platzieren",
     "gridInfo": "Raster: {{cells}} Felder (je {{size}} cm)",
     "autoFill": "Beet intelligent bef\u00fcllen",
+    "clearBed": "Alle entfernen",
     "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
     "share": "Gartenplan teilen",
     "shareCopied": "Teilen-Link in die Zwischenablage kopiert!",

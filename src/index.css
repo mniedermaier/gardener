@@ -7,3 +7,40 @@
 body {
   @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
 }
+
+@media print {
+  /* Hide non-essential UI for printing */
+  nav,
+  header,
+  aside,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Remove dark mode for print */
+  .dark body,
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Make cards print-friendly */
+  [class*="Card"],
+  [class*="card"],
+  [class*="rounded-xl"] {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Ensure bed grids print fully */
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+}

@@ -111,6 +111,8 @@ function BedGrid({
   const plantMap = usePlantMap();
   const { removeCell, updateBed, gridCellSizeCm } = useStore();
   const [showConfig, setShowConfig] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [newName, setNewName] = useState(bed.name);
   const envType = bed.environmentType ?? "outdoor_bed";
   const frostWeeks = getFrostProtectionWeeks(bed);
   const bedWidthM = ((bed.width * gridCellSizeCm) / 100).toFixed(1);
@@ -146,7 +148,20 @@ function BedGrid({
           <span className="text-lg" title={t(`planner.environmentTypes.${envType}`)}>
             {ENVIRONMENT_ICONS[envType]}
           </span>
-          <h3 className="font-semibold">{bed.name}</h3>
+          {editingName ? (
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onBlur={() => { updateBed(gardenId, bed.id, { name: newName.trim() || bed.name }); setEditingName(false); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { updateBed(gardenId, bed.id, { name: newName.trim() || bed.name }); setEditingName(false); } }}
+              className="w-32 rounded border border-garden-400 bg-transparent px-1 text-sm font-semibold focus:outline-none"
+              autoFocus
+            />
+          ) : (
+            <h3 className="cursor-pointer font-semibold hover:text-garden-600" onClick={() => { setNewName(bed.name); setEditingName(true); }} title={t("common.edit")}>
+              {bed.name}
+            </h3>
+          )}
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
             {bedWidthM} × {bedHeightM} m
           </span>
@@ -159,6 +174,20 @@ function BedGrid({
             </span>
           )}
         </div>
+        <div className="flex items-center gap-1">
+          {bed.cells.length > 0 && (
+            <button
+              onClick={() => {
+                for (const cell of [...bed.cells]) {
+                  removeCell(gardenId, bed.id, cell.cellX, cell.cellY);
+                }
+              }}
+              className="rounded-lg p-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+              title={t("planner.clearBed")}
+            >
+              {t("planner.clearBed")}
+            </button>
+          )}
         {(envType === "greenhouse" || envType === "cold_frame" || envType === "raised_bed" || envType === "container") && (
           <button
             onClick={() => setShowConfig(!showConfig)}
@@ -167,6 +196,7 @@ function BedGrid({
             <Settings size={14} />
           </button>
         )}
+        </div>
       </div>
 
       {showConfig && envType === "greenhouse" && (
@@ -397,6 +427,17 @@ export function GardenPlanner() {
     }
   }, [placementFeedback]);
 
+  const getPlantName = usePlantName();
+
+  // Resolve plant IDs to names in validation params
+  const resolveParams = useCallback((params?: Record<string, string | number>) => {
+    if (!params) return params;
+    const resolved = { ...params };
+    if (typeof resolved.plant === "string") resolved.plant = getPlantName(resolved.plant);
+    if (typeof resolved.neighbor === "string") resolved.neighbor = getPlantName(resolved.neighbor);
+    return resolved;
+  }, [getPlantName]);
+
   const handleSelectPlant = useCallback((plant: Plant) => {
     setSelectedPlant((prev) => prev?.id === plant.id ? null : plant);
   }, []);
@@ -410,13 +451,13 @@ export function GardenPlanner() {
     const result = validatePlacement(selectedPlant.id, cellX, cellY, bed, plantMap, gridCellSizeCm);
     const errors = result.issues.filter((i) => i.severity === "error");
     if (errors.length > 0) {
-      setPlacementFeedback(t(errors[0].messageKey, errors[0].messageParams));
+      setPlacementFeedback(t(errors[0].messageKey, resolveParams(errors[0].messageParams)));
       return;
     }
 
     setCell(activeGardenId, bedId, { cellX, cellY, plantId: selectedPlant.id });
     if (result.issues.length > 0) {
-      setPlacementFeedback(t(result.issues[0].messageKey, result.issues[0].messageParams));
+      setPlacementFeedback(t(result.issues[0].messageKey, resolveParams(result.issues[0].messageParams)));
     }
   }, [selectedPlant, activeGardenId, activeGarden, plantMap, gridCellSizeCm, setCell, t]);
 
@@ -445,11 +486,11 @@ export function GardenPlanner() {
       if (bed) {
         const result = validatePlacement(plantId, x, y, bed, plantMap, gridCellSizeCm);
         if (result.issues.some((i) => i.severity === "error")) {
-          setPlacementFeedback(t(result.issues[0].messageKey, result.issues[0].messageParams));
+          setPlacementFeedback(t(result.issues[0].messageKey, resolveParams(result.issues[0].messageParams)));
           return;
         }
         if (result.issues.length > 0) {
-          setPlacementFeedback(t(result.issues[0].messageKey, result.issues[0].messageParams));
+          setPlacementFeedback(t(result.issues[0].messageKey, resolveParams(result.issues[0].messageParams)));
         }
       }
       setCell(activeGardenId, bedId, { cellX: x, cellY: y, plantId });
@@ -595,7 +636,7 @@ export function GardenPlanner() {
 
               {selectedPlant && (
                 <div className="mb-3 rounded-lg bg-garden-50 px-3 py-1.5 text-xs text-garden-700 dark:bg-garden-900/20 dark:text-garden-400">
-                  {t("planner.placeMode", { plant: selectedPlant.icon + " " + (selectedPlant.id.startsWith("custom-") ? localStorage.getItem(`plant-name-${selectedPlant.id}`) : t(`plants.catalog.${selectedPlant.id}.name`)) })}
+                  {t("planner.placeMode", { plant: selectedPlant.icon + " " + (selectedPlant.displayName ?? t(`plants.catalog.${selectedPlant.id}.name`)) })}
                   <button onClick={() => setSelectedPlant(null)} className="ml-2 font-medium underline">ESC</button>
                 </div>
               )}

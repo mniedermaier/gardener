@@ -30,6 +30,7 @@ export function CustomPlantForm({ open, onClose }: Props) {
     const id = `custom-${name.trim().toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`;
     addCustomPlant({
       id,
+      displayName: name.trim(),
       category,
       sowIndoorsWeeks: null,
       sowOutdoorsWeeks: 0,
@@ -45,10 +46,6 @@ export function CustomPlantForm({ open, onClose }: Props) {
       color: "#6b7280",
       icon,
     });
-    // Store the display name in a simple convention: use the name as-is
-    // Since custom plants don't have i18n keys, we handle them specially in the UI
-    // We store the name in a way the app can find it
-    localStorage.setItem(`plant-name-${id}`, name.trim());
     setName("");
     onClose();
   };

@@ -37,6 +37,20 @@
     "totalExpenses": "Total expenses",
     "harvestEntries": "Harvest entries"
   },
+  "onboarding": {
+    "welcome": "Welcome to Gardener!",
+    "welcomeDesc": "Your self-sufficiency garden planner. Let's set up your garden in a few quick steps.",
+    "getStarted": "Get Started",
+    "locationTitle": "Where is your garden?",
+    "locationDesc": "Your location helps us calculate sunlight, frost dates, and weather alerts.",
+    "frostTitle": "When is your last frost?",
+    "frostDesc": "This date determines when to sow, transplant, and harvest. You can change it later in settings.",
+    "gardenTitle": "Name your first garden",
+    "gardenDesc": "You can create multiple gardens later (e.g. front yard, back yard, balcony).",
+    "gardenPlaceholder": "e.g. My Garden",
+    "next": "Next",
+    "finish": "Let's grow!"
+  },
   "planner": {
     "title": "Garden Planner",
     "newGarden": "New Garden",
@@ -50,6 +64,7 @@
     "dragPlant": "Drag or click to place plants",
     "gridInfo": "Grid: {{cells}} cells ({{size}} cm each)",
     "autoFill": "Auto-fill with smart recommendations",
+    "clearBed": "Clear all",
     "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
     "share": "Share garden plan",
     "shareCopied": "Share link copied to clipboard!",
