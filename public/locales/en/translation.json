@@ -37,6 +37,9 @@
     "totalExpenses": "Total expenses",
     "harvestEntries": "Harvest entries"
   },
+  "search": {
+    "placeholder": "Search plants, tasks, journal..."
+  },
   "onboarding": {
     "welcome": "Welcome to Gardener!",
     "welcomeDesc": "Your self-sufficiency garden planner. Let's set up your garden in a few quick steps.",
@@ -65,6 +68,7 @@
     "gridInfo": "Grid: {{cells}} cells ({{size}} cm each)",
     "autoFill": "Auto-fill with smart recommendations",
     "clearBed": "Clear all",
+    "confirmDeleteGarden": "Delete this garden and all its beds? This cannot be undone.",
     "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
     "share": "Share garden plan",
     "shareCopied": "Share link copied to clipboard!",

@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2 } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -24,6 +24,8 @@ import { PlantPalette } from "./PlantPalette";
 import { PlantInfoPanel } from "./PlantInfoPanel";
 import { BedStats } from "./BedStats";
 import { generateShareUrl } from "@/lib/sharing";
+import { useToast } from "@/components/ui/Toast";
+import { useUndo } from "@/hooks/useUndo";
 import { validatePlacement, getCompanionHighlights, getAntagonistHighlights } from "@/lib/placementValidation";
 import { recommendBedPlanting, getRecommendedPlants } from "@/lib/bedRecommendation";
 
@@ -58,12 +60,12 @@ const ENVIRONMENT_BORDERS: Record<EnvironmentType, string> = {
 
 function DroppableCell({
   bedId, x, y, plant, variety, isCompanionHighlight, isAntagonistHighlight,
-  isPlaceMode, onRemove, onClick, validationWarning,
+  isPlaceMode, onRemove, onClick, onSelectPlant, validationWarning, notes,
 }: {
   bedId: string; x: number; y: number; plant?: Plant; variety?: string;
   isCompanionHighlight: boolean; isAntagonistHighlight: boolean;
   isPlaceMode: boolean; onRemove: () => void; onClick: () => void;
-  validationWarning?: string;
+  onSelectPlant: () => void; validationWarning?: string; notes?: string;
 }) {
   const getPlantName = usePlantName();
   const { setNodeRef, isOver } = useDroppable({
@@ -72,18 +74,21 @@ function DroppableCell({
   });
 
   const plantName = plant ? getPlantName(plant.id) : "";
-  const tooltip = validationWarning
-    ? validationWarning
-    : variety ? `${plantName} (${variety})` : plantName;
+  const tooltip = [
+    plantName,
+    variety ? `(${variety})` : "",
+    notes ? `- ${notes}` : "",
+    validationWarning ? `⚠ ${validationWarning}` : "",
+  ].filter(Boolean).join(" ");
 
   return (
     <div
       ref={setNodeRef}
-      onClick={plant ? onRemove : onClick}
+      onClick={plant ? onSelectPlant : onClick}
       title={tooltip}
-      className={`flex h-10 w-10 items-center justify-center rounded text-lg transition-all ${
+      className={`group relative flex h-10 w-10 items-center justify-center rounded text-lg transition-all ${
         plant
-          ? "cursor-pointer shadow-sm hover:opacity-75"
+          ? "cursor-pointer shadow-sm hover:opacity-80"
           : isPlaceMode
             ? "cursor-crosshair bg-garden-100/50 hover:bg-garden-200 dark:bg-garden-900/20 dark:hover:bg-garden-900/40"
             : "bg-earth-200/60 dark:bg-earth-600/40"
@@ -94,6 +99,17 @@ function DroppableCell({
       style={plant ? { backgroundColor: plant.color + "30" } : undefined}
     >
       {plant?.icon ?? ""}
+      {plant && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          className="absolute -right-1 -top-1 hidden h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] text-white group-hover:flex"
+        >
+          ×
+        </button>
+      )}
+      {notes && plant && (
+        <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-blue-400" />
+      )}
     </div>
   );
 }
@@ -243,14 +259,13 @@ function BedGrid({
                 y={y}
                 plant={plant}
                 variety={cell?.variety}
+                notes={cell?.notes}
                 isCompanionHighlight={companionCells.has(cellKey)}
                 isAntagonistHighlight={antagonistCells.has(cellKey)}
                 isPlaceMode={!!selectedPlantId}
                 validationWarning={cellWarnings.get(cellKey)}
-                onRemove={() => {
-                  if (plant) onSelectPlantFromCell(plant.id);
-                  removeCell(gardenId, bed.id, x, y);
-                }}
+                onRemove={() => removeCell(gardenId, bed.id, x, y)}
+                onSelectPlant={() => { if (plant) onSelectPlantFromCell(plant.id); }}
                 onClick={() => onCellClick(bed.id, x, y)}
               />
             );
@@ -378,6 +393,8 @@ export function GardenPlanner() {
   } = useStore();
   const plants = usePlants();
   const plantMap = usePlantMap();
+  const { toast, confirm } = useToast();
+  const { pushUndo, undo, canUndo } = useUndo();
 
   const [showNewGarden, setShowNewGarden] = useState(false);
   const [showNewBed, setShowNewBed] = useState(false);
@@ -410,10 +427,11 @@ export function GardenPlanner() {
     return recommended;
   }, [activeGarden, plants, gridCellSizeCm, lastFrostDate]);
 
-  // ESC to deselect
+  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setSelectedPlant(null);
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") { e.preventDefault(); undo(); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -455,11 +473,14 @@ export function GardenPlanner() {
       return;
     }
 
-    setCell(activeGardenId, bedId, { cellX, cellY, plantId: selectedPlant.id });
+    const gid = activeGardenId;
+    const pid = selectedPlant.id;
+    setCell(gid, bedId, { cellX, cellY, plantId: pid });
+    pushUndo({ label: `Place ${pid}`, undo: () => useStore.getState().removeCell(gid, bedId, cellX, cellY) });
     if (result.issues.length > 0) {
       setPlacementFeedback(t(result.issues[0].messageKey, resolveParams(result.issues[0].messageParams)));
     }
-  }, [selectedPlant, activeGardenId, activeGarden, plantMap, gridCellSizeCm, setCell, t]);
+  }, [selectedPlant, activeGardenId, activeGarden, plantMap, gridCellSizeCm, setCell, t, pushUndo, resolveParams]);
 
   // DnD handlers
   const handleDragStart = (event: DragStartEvent) => {
@@ -549,7 +570,7 @@ export function GardenPlanner() {
             }
           }
         }
-      } catch { alert("Invalid file format"); }
+      } catch { toast(t("planner.importError"), "error"); }
     };
     reader.readAsText(file);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -587,8 +608,13 @@ export function GardenPlanner() {
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("planner.title")}</h1>
           <div className="flex gap-2">
+            {canUndo && (
+              <Button variant="ghost" size="sm" onClick={undo} title="Undo (Ctrl+Z)">
+                <Undo2 size={16} />
+              </Button>
+            )}
             {activeGarden && (
-              <Button variant="ghost" size="sm" onClick={() => { const url = generateShareUrl(activeGarden); navigator.clipboard.writeText(url); alert(t("planner.shareCopied")); }} title={t("planner.share")}>
+              <Button variant="ghost" size="sm" onClick={() => { const url = generateShareUrl(activeGarden); navigator.clipboard.writeText(url); toast(t("planner.shareCopied")); }} title={t("planner.share")}>
                 <Share2 size={16} />
               </Button>
             )}
@@ -611,11 +637,11 @@ export function GardenPlanner() {
                 }`}>
                 {g.name}
                 <span className="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-normal text-gray-500 dark:bg-gray-700 dark:text-gray-400">{g.season}</span>
-                <span role="button" onClick={(e) => { e.stopPropagation(); deleteGarden(g.id); }} className="ml-1 rounded p-0.5 text-gray-400 hover:text-red-500"><Trash2 size={12} /></span>
+                <span role="button" onClick={async (e) => { e.stopPropagation(); if (await confirm(t("planner.confirmDeleteGarden"))) deleteGarden(g.id); }} className="ml-1 rounded p-0.5 text-gray-400 hover:text-red-500"><Trash2 size={12} /></span>
               </button>
             ))}
             {activeGarden && activeGarden.beds.some((b) => b.cells.length > 0) && (
-              <Button variant="ghost" size="sm" onClick={() => { if (confirm(t("season.archiveConfirm"))) archiveSeason(activeGardenId!); }} title={t("season.archive")}>
+              <Button variant="ghost" size="sm" onClick={async () => { if (await confirm(t("season.archiveConfirm"))) archiveSeason(activeGardenId!); }} title={t("season.archive")}>
                 <Archive size={14} /><span className="text-xs">{t("season.archive")}</span>
               </Button>
             )}
