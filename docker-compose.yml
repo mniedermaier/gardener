@@ -1,0 +1,12 @@
+services:
+  gardener:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - gardener-data:/app/data
+    environment:
+      - DB_PATH=/app/data/gardener.db
+
+volumes:
+  gardener-data:

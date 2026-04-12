@@ -1,0 +1,380 @@
+{
+  "app": {
+    "title": "Gardener",
+    "subtitle": "Self-Sufficiency Garden Planner"
+  },
+  "nav": {
+    "planner": "Garden Planner",
+    "plants": "Plant Database",
+    "weather": "Weather",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "harvest": "Harvest Log",
+    "journal": "Journal",
+    "sufficiency": "Self-Sufficiency",
+    "expenses": "Costs & ROI"
+  },
+  "planner": {
+    "title": "Garden Planner",
+    "newGarden": "New Garden",
+    "newBed": "New Bed",
+    "deleteBed": "Delete Bed",
+    "gardenName": "Garden Name",
+    "bedName": "Bed Name",
+    "width": "Width",
+    "height": "Height",
+    "noGarden": "No garden created yet. Create one to get started!",
+    "dragPlant": "Drag a plant from the palette onto a bed cell",
+    "share": "Share garden plan",
+    "shareCopied": "Share link copied to clipboard!",
+    "importTemplate": "Import Garden Template",
+    "importNow": "Import",
+    "importError": "Invalid or expired share link.",
+    "importSuccess": "Garden imported successfully! Redirecting...",
+    "companions": "Good companions",
+    "antagonists": "Bad neighbors",
+    "environment": "Environment",
+    "environmentTypes": {
+      "outdoor_bed": "Outdoor Bed",
+      "raised_bed": "Raised Bed",
+      "greenhouse": "Greenhouse",
+      "cold_frame": "Cold Frame",
+      "polytunnel": "Polytunnel",
+      "container": "Container",
+      "windowsill": "Windowsill",
+      "vertical": "Vertical"
+    },
+    "greenhouse": {
+      "title": "Greenhouse Configuration",
+      "material": "Material",
+      "materials": {
+        "glass": "Glass",
+        "polycarbonate": "Polycarbonate",
+        "plastic": "Plastic film"
+      },
+      "heated": "Heated",
+      "heatingType": "Heating type",
+      "heatingTypes": {
+        "electric": "Electric",
+        "gas": "Gas",
+        "passive_solar": "Passive solar"
+      },
+      "ventilation": "Ventilation",
+      "ventilationTypes": {
+        "manual": "Manual",
+        "automatic": "Automatic"
+      },
+      "minTemp": "Min. temperature",
+      "maxTemp": "Max. temperature",
+      "frostProtection": "Frost protection (weeks earlier)"
+    },
+    "coldFrame": {
+      "frostProtection": "Frost protection (weeks earlier)"
+    },
+    "raisedBed": {
+      "height": "Bed height (cm)",
+      "layers": "Layers"
+    },
+    "container": {
+      "volume": "Volume (liters)",
+      "material": "Material",
+      "materials": {
+        "terracotta": "Terracotta",
+        "plastic": "Plastic",
+        "fabric": "Fabric",
+        "wood": "Wood",
+        "metal": "Metal"
+      }
+    }
+  },
+  "plants": {
+    "title": "Plant Database",
+    "search": "Search plants...",
+    "addCustom": "Add Custom Plant",
+    "customName": "Plant Name",
+    "allCategories": "All Categories",
+    "category": {
+      "vegetable": "Vegetables",
+      "fruit": "Fruit",
+      "berry": "Berries",
+      "herb": "Herbs"
+    },
+    "details": {
+      "sowIndoors": "Sow indoors",
+      "sowOutdoors": "Sow outdoors",
+      "transplant": "Transplant",
+      "harvest": "Harvest",
+      "spacing": "Spacing",
+      "rowSpacing": "Row spacing",
+      "sun": "Sun",
+      "water": "Water",
+      "companions": "Good companions",
+      "antagonists": "Avoid next to",
+      "weeksBeforeFrost": "{{weeks}} weeks before last frost",
+      "weeksAfterFrost": "{{weeks}} weeks after last frost",
+      "daysToHarvest": "{{min}}-{{max}} days"
+    },
+    "sun": {
+      "full": "Full sun",
+      "partial": "Partial shade",
+      "shade": "Shade"
+    },
+    "water": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "catalog": {
+      "tomato": { "name": "Tomato", "description": "Warm-season crop, needs staking. Very productive in good conditions." },
+      "zucchini": { "name": "Zucchini", "description": "Prolific summer squash. One or two plants are usually enough." },
+      "carrot": { "name": "Carrot", "description": "Root vegetable that prefers loose, sandy soil. Direct sow only." },
+      "lettuce": { "name": "Lettuce", "description": "Fast-growing salad green. Prefers cooler temperatures." },
+      "bean": { "name": "Bush Bean", "description": "Nitrogen-fixing legume. Easy to grow, productive." },
+      "pea": { "name": "Pea", "description": "Cool-season crop. Sow early in spring, harvest before heat." },
+      "radish": { "name": "Radish", "description": "Very fast-growing root vegetable. Ready in 25-30 days." },
+      "cucumber": { "name": "Cucumber", "description": "Needs warmth and consistent watering. Great for trellising." },
+      "pepper": { "name": "Bell Pepper", "description": "Heat-loving plant. Start indoors early for best results." },
+      "onion": { "name": "Onion", "description": "Long-season crop. Start from sets or transplants for best results." },
+      "garlic": { "name": "Garlic", "description": "Plant in autumn, harvest next summer. Very low maintenance." },
+      "potato": { "name": "Potato", "description": "Staple crop. Needs hilling as it grows. Good for beginners." },
+      "strawberry": { "name": "Strawberry", "description": "Perennial berry. Produces fruit for several years." },
+      "raspberry": { "name": "Raspberry", "description": "Perennial berry bush. Needs a trellis or support." },
+      "blueberry": { "name": "Blueberry", "description": "Needs acidic soil. Produces fruit after 2-3 years." },
+      "basil": { "name": "Basil", "description": "Annual herb, great companion for tomatoes. Loves warmth." },
+      "parsley": { "name": "Parsley", "description": "Biennial herb. Slow to germinate but very versatile." },
+      "dill": { "name": "Dill", "description": "Annual herb. Attracts beneficial insects. Self-seeds readily." },
+      "chives": { "name": "Chives", "description": "Perennial herb with mild onion flavor. Very easy to grow." },
+      "kale": { "name": "Kale", "description": "Hardy leafy green. Tastes sweeter after frost." },
+      "spinach": { "name": "Spinach", "description": "Cool-season green. Bolts quickly in heat." },
+      "beetroot": { "name": "Beetroot", "description": "Dual-purpose: eat both roots and leaves. Easy to grow." },
+      "leek": { "name": "Leek", "description": "Hardy allium. Needs blanching for white stems." },
+      "pumpkin": { "name": "Pumpkin", "description": "Needs lots of space. Great for storage over winter." },
+      "chard": { "name": "Swiss Chard", "description": "Colorful, productive green. Harvest outer leaves for continuous yield." },
+      "kohlrabi": { "name": "Kohlrabi", "description": "Fast-growing brassica. Eat the swollen stem raw or cooked." },
+      "fennel": { "name": "Fennel", "description": "Anise-flavored bulb vegetable. Does not grow well near most other plants." },
+      "corn": { "name": "Corn", "description": "Tall-growing cereal. Plant in blocks for good pollination." },
+      "sunflower": { "name": "Sunflower", "description": "Attracts pollinators. Edible seeds and great for companion planting." },
+      "cabbage": { "name": "Cabbage", "description": "Cool-season brassica. Good for sauerkraut and storage." },
+      "broccoli": { "name": "Broccoli", "description": "Harvest the main head, then side shoots keep producing." },
+      "cauliflower": { "name": "Cauliflower", "description": "Needs consistent conditions. Blanch heads by tying leaves." },
+      "celery": { "name": "Celery", "description": "Long-season crop that needs rich soil and consistent moisture." },
+      "turnip": { "name": "Turnip", "description": "Quick-growing root vegetable. Both roots and greens are edible." },
+      "mint": { "name": "Mint", "description": "Vigorous perennial herb. Best grown in containers to prevent spreading." },
+      "rosemary": { "name": "Rosemary", "description": "Woody perennial herb. Drought-tolerant once established." },
+      "thyme": { "name": "Thyme", "description": "Low-growing perennial herb. Excellent ground cover." },
+      "currant": { "name": "Currant", "description": "Hardy berry bush. Red and black varieties available." },
+      "gooseberry": { "name": "Gooseberry", "description": "Thorny berry bush. Excellent for jams and desserts." }
+    }
+  },
+  "weather": {
+    "title": "Weather",
+    "current": "Current Weather",
+    "forecast": "5-Day Forecast",
+    "noApiKey": "Please add your OpenWeatherMap API key in Settings.",
+    "noLocation": "Please set your location in Settings.",
+    "temp": "Temperature",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "feelsLike": "Feels like",
+    "precipitation": "Precipitation",
+    "frostWarning": "Frost warning! Protect sensitive plants."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "noTasks": "No tasks yet. Plan your garden to generate tasks automatically.",
+    "thisWeek": "This Week",
+    "upcoming": "Upcoming",
+    "overdue": "Overdue",
+    "completed": "Completed",
+    "addTask": "Add Task",
+    "taskTypes": {
+      "sow_indoors": "Sow Indoors",
+      "sow_outdoors": "Sow Outdoors",
+      "transplant": "Transplant",
+      "water": "Water",
+      "harvest": "Harvest",
+      "custom": "Custom"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "weather": "Weather Settings",
+    "apiKey": "OpenWeatherMap API Key",
+    "location": "Location",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "locationName": "Location Name",
+    "useGeolocation": "Use my location",
+    "garden": "Garden Settings",
+    "lastFrostDate": "Last frost date",
+    "gridSize": "Grid cell size (cm)",
+    "backend": "Backend Settings",
+    "alerts": "Alert Settings",
+    "alertTypes": {
+      "frost": "Frost warnings",
+      "watering": "Watering reminders",
+      "greenhouse": "Greenhouse alerts",
+      "weekly": "Weekly garden digest",
+      "frostThreshold": "Frost threshold (°C)"
+    },
+    "backendUrl": "Backend URL",
+    "backendHint": "Leave empty for local-only mode. Set when running in Docker.",
+    "saved": "Settings saved!"
+  },
+  "alerts": {
+    "frostTitle": "Frost warning: {{temp}}°C",
+    "frostDesc": "Temperatures dropping to {{temp}}°C on {{date}}. Protect sensitive plants!",
+    "greenhouseHotTitle": "{{name}}: Overheating risk",
+    "greenhouseHotDesc": "{{name}} may reach {{temp}}°C on {{date}} (max: {{max}}°C). Ensure ventilation!",
+    "greenhouseColdTitle": "{{name}}: Cold warning",
+    "greenhouseColdDesc": "{{name}} may drop to {{temp}}°C on {{date}} (min: {{min}}°C). Consider heating.",
+    "wateringNeeded": "Watering recommended",
+    "wateringNotNeeded": "No watering needed",
+    "wateringHotDry": "Hot and dry days ahead ({{temp}}°C avg). Water deeply in the morning.",
+    "wateringRainExpected": "Rain expected in the next days. Hold off on watering.",
+    "wateringHighNeedPlants": "{{count}} high-water plants need attention. No rain in forecast.",
+    "weeklySummaryTitle": "Weekly Garden Outlook",
+    "weeklySummaryNeutral": "Moderate conditions ahead. Temps {{minTemp}}–{{maxTemp}}°C, {{rainyDays}} rainy days.",
+    "weeklySummaryFrost": "Frost risk this week! Min {{minTemp}}°C. Protect tender plants and delay transplanting.",
+    "weeklySummaryHotDry": "Hot and dry week ahead (up to {{maxTemp}}°C). Prioritize watering and mulching.",
+    "weeklySummaryWet": "Wet week expected ({{rainyDays}} rainy days). Good for new plantings, watch for slugs.",
+    "weeklySummaryWarm": "Warm week ahead ({{maxTemp}}°C). Great growing conditions!"
+  },
+  "harvest": {
+    "title": "Harvest Log",
+    "add": "Log Harvest",
+    "plant": "Plant",
+    "bed": "Bed",
+    "date": "Date",
+    "weight": "Weight (g)",
+    "count": "Count",
+    "quality": "Quality",
+    "notes": "Notes",
+    "noEntries": "No harvests logged yet. Start tracking your yields!",
+    "total": "Total",
+    "entries": "entries",
+    "totalWeight": "Total weight",
+    "avgQuality": "Avg. quality",
+    "stars": "{{count}} stars"
+  },
+  "journal": {
+    "title": "Garden Journal",
+    "add": "New Entry",
+    "entryTitle": "Title",
+    "text": "What happened in the garden today?",
+    "tags": "Tags (comma separated)",
+    "noEntries": "Your garden journal is empty. Start documenting your garden journey!",
+    "linkedTo": "Linked to"
+  },
+  "season": {
+    "current": "Season {{year}}",
+    "archive": "Archive Season",
+    "archiveConfirm": "Archive the current season and start fresh? All beds will be cleared but your harvest data and journal remain.",
+    "archives": "Past Seasons",
+    "noArchives": "No archived seasons yet.",
+    "beds": "{{count}} beds",
+    "plants": "{{count}} plants"
+  },
+  "sufficiency": {
+    "title": "Self-Sufficiency Calculator",
+    "familySize": "Family size",
+    "noPlantings": "Plan your garden first to see self-sufficiency calculations.",
+    "estimatedYield": "Estimated seasonal yield",
+    "plantTypes": "Plant types grown",
+    "nutritionCoverage": "Nutrition Coverage",
+    "coverageDesc": "Estimated coverage of nutritional needs for {{size}} people during the growing season (180 days).",
+    "nutrients": {
+      "calories": "Calories",
+      "protein": "Protein",
+      "vitaminC": "Vitamin C",
+      "fiber": "Fiber"
+    },
+    "gaps": "Nutrition Gaps",
+    "covered": "covered",
+    "suggestion": "Consider adding",
+    "yieldByPlant": "Yield by Plant"
+  },
+  "preservation": {
+    "title": "Preservation Guide",
+    "desc": "Recommended preservation methods for your planted crops.",
+    "methods": {
+      "canning": "Canning",
+      "freezing": "Freezing",
+      "fermenting": "Fermenting",
+      "drying": "Drying",
+      "root_cellar": "Root cellar"
+    },
+    "seedSaving": "Seed Saving Guide",
+    "difficulty": {
+      "easy": "Easy",
+      "moderate": "Moderate",
+      "advanced": "Advanced"
+    },
+    "years": "years viability"
+  },
+  "expenses": {
+    "title": "Costs & ROI",
+    "add": "Add Expense",
+    "description": "Description",
+    "amount": "Amount (\u20ac)",
+    "category": "Category",
+    "totalExpenses": "Total expenses",
+    "harvestValue": "Harvest value (market price)",
+    "roi": "Return on Investment",
+    "byCategory": "By Category",
+    "noEntries": "No expenses tracked yet. Start logging your garden costs!",
+    "categories": {
+      "seeds": "Seeds",
+      "soil": "Soil & Compost",
+      "tools": "Tools",
+      "fertilizer": "Fertilizer",
+      "infrastructure": "Infrastructure",
+      "water": "Water",
+      "other": "Other"
+    }
+  },
+  "succession": {
+    "title": "Succession Planting",
+    "desc": "Stagger your sowings for continuous harvest throughout the season.",
+    "interval": "Every",
+    "weeks": "weeks",
+    "sowings": "Sowings",
+    "sowing": "Sowing",
+    "generateTasks": "Add to calendar"
+  },
+  "guilds": {
+    "title": "Plant Guilds",
+    "threeSisters": { "name": "Three Sisters", "desc": "Traditional: Corn + Beans + Squash support each other." },
+    "tomatoBasil": { "name": "Tomato & Basil", "desc": "Classic Mediterranean pairing with carrots and parsley." },
+    "saladBed": { "name": "Salad Bed", "desc": "Quick-growing salad mix with radish, spinach and herbs." },
+    "mediterranean": { "name": "Mediterranean", "desc": "Sun-loving mix: tomato, pepper, zucchini with herbs." },
+    "rootVegetables": { "name": "Root Vegetables", "desc": "Underground harvest: carrots, beets, turnips with alliums." },
+    "brassica": { "name": "Brassica Guild", "desc": "Cabbage family with protective herbs and root vegetables." }
+  },
+  "sunlight": {
+    "title": "Sunlight & Daylight",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "daylight": "Daylight hours",
+    "maxAltitude": "Max sun angle",
+    "yearlyDaylight": "Daylight hours by month"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "loading": "Loading...",
+    "noResults": "No results found.",
+    "cm": "cm"
+  }
+}

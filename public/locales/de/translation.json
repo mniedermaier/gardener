@@ -1,0 +1,380 @@
+{
+  "app": {
+    "title": "Gardener",
+    "subtitle": "Gartenplaner f\u00fcr Selbstversorger"
+  },
+  "nav": {
+    "planner": "Gartenplaner",
+    "plants": "Pflanzendatenbank",
+    "weather": "Wetter",
+    "calendar": "Kalender",
+    "settings": "Einstellungen",
+    "harvest": "Ernteprotokoll",
+    "journal": "Tagebuch",
+    "sufficiency": "Selbstversorgung",
+    "expenses": "Kosten & ROI"
+  },
+  "planner": {
+    "title": "Gartenplaner",
+    "newGarden": "Neuer Garten",
+    "newBed": "Neues Beet",
+    "deleteBed": "Beet l\u00f6schen",
+    "gardenName": "Gartenname",
+    "bedName": "Beetname",
+    "width": "Breite",
+    "height": "H\u00f6he",
+    "noGarden": "Noch kein Garten angelegt. Erstelle einen um loszulegen!",
+    "dragPlant": "Ziehe eine Pflanze aus der Palette auf eine Beet-Zelle",
+    "share": "Gartenplan teilen",
+    "shareCopied": "Teilen-Link in die Zwischenablage kopiert!",
+    "importTemplate": "Garten-Vorlage importieren",
+    "importNow": "Importieren",
+    "importError": "Ung\u00fcltiger oder abgelaufener Teilen-Link.",
+    "importSuccess": "Garten erfolgreich importiert! Weiterleitung...",
+    "companions": "Gute Nachbarn",
+    "antagonists": "Schlechte Nachbarn",
+    "environment": "Umgebung",
+    "environmentTypes": {
+      "outdoor_bed": "Freilandbeet",
+      "raised_bed": "Hochbeet",
+      "greenhouse": "Gew\u00e4chshaus",
+      "cold_frame": "Fr\u00fchbeet",
+      "polytunnel": "Folientunnel",
+      "container": "Container/Topf",
+      "windowsill": "Fensterbank",
+      "vertical": "Vertikalbeet"
+    },
+    "greenhouse": {
+      "title": "Gew\u00e4chshaus-Konfiguration",
+      "material": "Material",
+      "materials": {
+        "glass": "Glas",
+        "polycarbonate": "Polycarbonat",
+        "plastic": "Folie"
+      },
+      "heated": "Beheizt",
+      "heatingType": "Heizungsart",
+      "heatingTypes": {
+        "electric": "Elektrisch",
+        "gas": "Gas",
+        "passive_solar": "Passiv-Solar"
+      },
+      "ventilation": "L\u00fcftung",
+      "ventilationTypes": {
+        "manual": "Manuell",
+        "automatic": "Automatisch"
+      },
+      "minTemp": "Min. Temperatur",
+      "maxTemp": "Max. Temperatur",
+      "frostProtection": "Frostschutz (Wochen fr\u00fcher)"
+    },
+    "coldFrame": {
+      "frostProtection": "Frostschutz (Wochen fr\u00fcher)"
+    },
+    "raisedBed": {
+      "height": "Beeth\u00f6he (cm)",
+      "layers": "Schichten"
+    },
+    "container": {
+      "volume": "Volumen (Liter)",
+      "material": "Material",
+      "materials": {
+        "terracotta": "Terrakotta",
+        "plastic": "Kunststoff",
+        "fabric": "Stoff/Vlies",
+        "wood": "Holz",
+        "metal": "Metall"
+      }
+    }
+  },
+  "plants": {
+    "title": "Pflanzendatenbank",
+    "search": "Pflanzen suchen...",
+    "addCustom": "Eigene Pflanze hinzuf\u00fcgen",
+    "customName": "Pflanzenname",
+    "allCategories": "Alle Kategorien",
+    "category": {
+      "vegetable": "Gem\u00fcse",
+      "fruit": "Obst",
+      "berry": "Beeren",
+      "herb": "Kr\u00e4uter"
+    },
+    "details": {
+      "sowIndoors": "Vorziehen",
+      "sowOutdoors": "Direktsaat",
+      "transplant": "Auspflanzen",
+      "harvest": "Ernte",
+      "spacing": "Abstand",
+      "rowSpacing": "Reihenabstand",
+      "sun": "Sonne",
+      "water": "Wasser",
+      "companions": "Gute Nachbarn",
+      "antagonists": "Nicht neben",
+      "weeksBeforeFrost": "{{weeks}} Wochen vor letztem Frost",
+      "weeksAfterFrost": "{{weeks}} Wochen nach letztem Frost",
+      "daysToHarvest": "{{min}}\u2013{{max}} Tage"
+    },
+    "sun": {
+      "full": "Volle Sonne",
+      "partial": "Halbschatten",
+      "shade": "Schatten"
+    },
+    "water": {
+      "low": "Wenig",
+      "medium": "Mittel",
+      "high": "Viel"
+    },
+    "catalog": {
+      "tomato": { "name": "Tomate", "description": "W\u00e4rmeliebendes Gem\u00fcse, braucht St\u00fctze. Sehr ertragreich bei guten Bedingungen." },
+      "zucchini": { "name": "Zucchini", "description": "Ergiebiges Sommergem\u00fcse. Ein bis zwei Pflanzen reichen meist aus." },
+      "carrot": { "name": "Karotte", "description": "Wurzelgem\u00fcse, bevorzugt lockeren, sandigen Boden. Nur Direktsaat." },
+      "lettuce": { "name": "Kopfsalat", "description": "Schnell wachsender Salat. Bevorzugt k\u00fchlere Temperaturen." },
+      "bean": { "name": "Buschbohne", "description": "Stickstofffixierende H\u00fclsenfrucht. Einfach anzubauen, ertragreich." },
+      "pea": { "name": "Erbse", "description": "K\u00fchle Jahreszeit. Fr\u00fch im Fr\u00fchling s\u00e4en, vor der Hitze ernten." },
+      "radish": { "name": "Radieschen", "description": "Sehr schnell wachsendes Gem\u00fcse. In 25\u201330 Tagen erntereif." },
+      "cucumber": { "name": "Gurke", "description": "Braucht W\u00e4rme und regelm\u00e4\u00dfiges Gie\u00dfen. Gut f\u00fcr Rankhilfen." },
+      "pepper": { "name": "Paprika", "description": "W\u00e4rmeliebendes Gem\u00fcse. Fr\u00fch drinnen vorziehen f\u00fcr beste Ergebnisse." },
+      "onion": { "name": "Zwiebel", "description": "Langzeit-Kultur. Am besten aus Steckzwiebeln oder Setzlingen." },
+      "garlic": { "name": "Knoblauch", "description": "Im Herbst pflanzen, im n\u00e4chsten Sommer ernten. Sehr pflegeleicht." },
+      "potato": { "name": "Kartoffel", "description": "Grundnahrungsmittel. Muss angeh\u00e4ufelt werden. Gut f\u00fcr Anf\u00e4nger." },
+      "strawberry": { "name": "Erdbeere", "description": "Mehrj\u00e4hrige Beere. Tr\u00e4gt mehrere Jahre Fr\u00fcchte." },
+      "raspberry": { "name": "Himbeere", "description": "Mehrj\u00e4hriger Beerenstrauch. Braucht Rankhilfe oder St\u00fctze." },
+      "blueberry": { "name": "Heidelbeere", "description": "Braucht sauren Boden. Tr\u00e4gt nach 2\u20133 Jahren Fr\u00fcchte." },
+      "basil": { "name": "Basilikum", "description": "Einj\u00e4hriges Kraut, guter Begleiter f\u00fcr Tomaten. Liebt W\u00e4rme." },
+      "parsley": { "name": "Petersilie", "description": "Zweij\u00e4hriges Kraut. Keimt langsam, aber sehr vielseitig." },
+      "dill": { "name": "Dill", "description": "Einj\u00e4hriges Kraut. Lockt N\u00fctzlinge an. Sät sich selbst aus." },
+      "chives": { "name": "Schnittlauch", "description": "Mehrj\u00e4hriges Kraut mit mildem Zwiebelgeschmack. Sehr pflegeleicht." },
+      "kale": { "name": "Gr\u00fcnkohl", "description": "Robustes Blattgem\u00fcse. Schmeckt nach Frost s\u00fc\u00dfer." },
+      "spinach": { "name": "Spinat", "description": "K\u00fchle-Jahreszeit-Gem\u00fcse. Schie\u00dft schnell bei Hitze." },
+      "beetroot": { "name": "Rote Bete", "description": "Doppelt nutzbar: Knolle und Bl\u00e4tter essbar. Einfach anzubauen." },
+      "leek": { "name": "Lauch", "description": "Robustes Lauchgew\u00e4chs. Muss f\u00fcr wei\u00dfe Stangen angeh\u00e4ufelt werden." },
+      "pumpkin": { "name": "K\u00fcrbis", "description": "Braucht viel Platz. Hervorragend f\u00fcr die Winterlagerung." },
+      "chard": { "name": "Mangold", "description": "Farbenfrohes, ergiebiges Blattgem\u00fcse. \u00c4u\u00dfere Bl\u00e4tter ernten f\u00fcr laufende Ernte." },
+      "kohlrabi": { "name": "Kohlrabi", "description": "Schnell wachsendes Kohlgew\u00e4chs. Knolle roh oder gekocht genie\u00dfen." },
+      "fennel": { "name": "Fenchel", "description": "Knollengem\u00fcse mit Anisgeschmack. Vertr\u00e4gt sich nicht gut mit vielen anderen Pflanzen." },
+      "corn": { "name": "Mais", "description": "Hochwachsendes Getreide. In Bl\u00f6cken pflanzen f\u00fcr gute Best\u00e4ubung." },
+      "sunflower": { "name": "Sonnenblume", "description": "Lockt Best\u00e4uber an. Essbare Kerne und guter Begleitpflanzer." },
+      "cabbage": { "name": "Wei\u00dfkohl", "description": "K\u00fchle-Jahreszeit-Kohlgew\u00e4chs. Gut f\u00fcr Sauerkraut und Lagerung." },
+      "broccoli": { "name": "Brokkoli", "description": "Hauptkopf ernten, dann produzieren Seitentriebe weiter." },
+      "cauliflower": { "name": "Blumenkohl", "description": "Braucht gleichm\u00e4\u00dfige Bedingungen. K\u00f6pfe durch Bl\u00e4tter sch\u00fctzen." },
+      "celery": { "name": "Sellerie", "description": "Langzeit-Kultur, braucht n\u00e4hrstoffreichen Boden und gleichm\u00e4\u00dfige Feuchtigkeit." },
+      "turnip": { "name": "Steckr\u00fcbe", "description": "Schnell wachsendes Wurzelgem\u00fcse. Knolle und Bl\u00e4tter sind essbar." },
+      "mint": { "name": "Minze", "description": "Wuchsfreudiges mehrj\u00e4hriges Kraut. Am besten im Topf halten." },
+      "rosemary": { "name": "Rosmarin", "description": "Verholzendes mehrj\u00e4hriges Kraut. Trockenheitstolerant wenn etabliert." },
+      "thyme": { "name": "Thymian", "description": "Niedrig wachsendes mehrj\u00e4hriges Kraut. Hervorragender Bodendecker." },
+      "currant": { "name": "Johannisbeere", "description": "Robuster Beerenstrauch. Rote und schwarze Sorten verf\u00fcgbar." },
+      "gooseberry": { "name": "Stachelbeere", "description": "Dorniger Beerenstrauch. Hervorragend f\u00fcr Marmelade und Desserts." }
+    }
+  },
+  "weather": {
+    "title": "Wetter",
+    "current": "Aktuelles Wetter",
+    "forecast": "5-Tage-Vorhersage",
+    "noApiKey": "Bitte f\u00fcge deinen OpenWeatherMap API-Schl\u00fcssel in den Einstellungen hinzu.",
+    "noLocation": "Bitte setze deinen Standort in den Einstellungen.",
+    "temp": "Temperatur",
+    "humidity": "Luftfeuchtigkeit",
+    "wind": "Wind",
+    "feelsLike": "Gef\u00fchlt",
+    "precipitation": "Niederschlag",
+    "frostWarning": "Frostwarnung! Empfindliche Pflanzen sch\u00fctzen."
+  },
+  "calendar": {
+    "title": "Kalender",
+    "noTasks": "Noch keine Aufgaben. Plane deinen Garten um automatisch Aufgaben zu erstellen.",
+    "thisWeek": "Diese Woche",
+    "upcoming": "Bevorstehend",
+    "overdue": "\u00dcberf\u00e4llig",
+    "completed": "Erledigt",
+    "addTask": "Aufgabe hinzuf\u00fcgen",
+    "taskTypes": {
+      "sow_indoors": "Vorziehen",
+      "sow_outdoors": "Direktsaat",
+      "transplant": "Auspflanzen",
+      "water": "Gie\u00dfen",
+      "harvest": "Ernten",
+      "custom": "Eigene"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "theme": "Design",
+    "themes": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    },
+    "weather": "Wetter-Einstellungen",
+    "apiKey": "OpenWeatherMap API-Schl\u00fcssel",
+    "location": "Standort",
+    "latitude": "Breitengrad",
+    "longitude": "L\u00e4ngengrad",
+    "locationName": "Ortsname",
+    "useGeolocation": "Meinen Standort verwenden",
+    "garden": "Garten-Einstellungen",
+    "lastFrostDate": "Letzter Frosttag",
+    "gridSize": "Rastergr\u00f6\u00dfe (cm)",
+    "backend": "Backend-Einstellungen",
+    "alerts": "Benachrichtigungen",
+    "alertTypes": {
+      "frost": "Frostwarnungen",
+      "watering": "Gie\u00df-Erinnerungen",
+      "greenhouse": "Gew\u00e4chshaus-Warnungen",
+      "weekly": "W\u00f6chentliche Garten-\u00dcbersicht",
+      "frostThreshold": "Frost-Schwellwert (\u00b0C)"
+    },
+    "backendUrl": "Backend-URL",
+    "backendHint": "Leer lassen f\u00fcr Nur-Lokal-Modus. Setzen wenn Docker verwendet wird.",
+    "saved": "Einstellungen gespeichert!"
+  },
+  "alerts": {
+    "frostTitle": "Frostwarnung: {{temp}}\u00b0C",
+    "frostDesc": "Temperaturen fallen auf {{temp}}\u00b0C am {{date}}. Empfindliche Pflanzen sch\u00fctzen!",
+    "greenhouseHotTitle": "{{name}}: \u00dcberhitzungsgefahr",
+    "greenhouseHotDesc": "{{name}} k\u00f6nnte {{temp}}\u00b0C am {{date}} erreichen (Max: {{max}}\u00b0C). L\u00fcftung sicherstellen!",
+    "greenhouseColdTitle": "{{name}}: K\u00e4ltewarnung",
+    "greenhouseColdDesc": "{{name}} k\u00f6nnte auf {{temp}}\u00b0C am {{date}} fallen (Min: {{min}}\u00b0C). Heizung erw\u00e4gen.",
+    "wateringNeeded": "Gie\u00dfen empfohlen",
+    "wateringNotNeeded": "Kein Gie\u00dfen n\u00f6tig",
+    "wateringHotDry": "Hei\u00dfe und trockene Tage voraus ({{temp}}\u00b0C Durchschnitt). Morgens gr\u00fcndlich gie\u00dfen.",
+    "wateringRainExpected": "Regen erwartet in den n\u00e4chsten Tagen. Mit dem Gie\u00dfen warten.",
+    "wateringHighNeedPlants": "{{count}} Pflanzen mit hohem Wasserbedarf brauchen Aufmerksamkeit. Kein Regen vorhergesagt.",
+    "weeklySummaryTitle": "Wochenausblick f\u00fcr den Garten",
+    "weeklySummaryNeutral": "Moderate Bedingungen voraus. Temperaturen {{minTemp}}\u2013{{maxTemp}}\u00b0C, {{rainyDays}} Regentage.",
+    "weeklySummaryFrost": "Frostgefahr diese Woche! Min {{minTemp}}\u00b0C. Empfindliche Pflanzen sch\u00fctzen und Umpflanzen verschieben.",
+    "weeklySummaryHotDry": "Hei\u00dfe und trockene Woche voraus (bis {{maxTemp}}\u00b0C). Gie\u00dfen und Mulchen priorisieren.",
+    "weeklySummaryWet": "Nasse Woche erwartet ({{rainyDays}} Regentage). Gut f\u00fcr neue Pflanzungen, auf Schnecken achten.",
+    "weeklySummaryWarm": "Warme Woche voraus ({{maxTemp}}\u00b0C). Hervorragende Wachstumsbedingungen!"
+  },
+  "harvest": {
+    "title": "Ernteprotokoll",
+    "add": "Ernte erfassen",
+    "plant": "Pflanze",
+    "bed": "Beet",
+    "date": "Datum",
+    "weight": "Gewicht (g)",
+    "count": "Anzahl",
+    "quality": "Qualit\u00e4t",
+    "notes": "Notizen",
+    "noEntries": "Noch keine Ernten erfasst. Beginne deine Ertr\u00e4ge zu dokumentieren!",
+    "total": "Gesamt",
+    "entries": "Eintr\u00e4ge",
+    "totalWeight": "Gesamtgewicht",
+    "avgQuality": "Durchschn. Qualit\u00e4t",
+    "stars": "{{count}} Sterne"
+  },
+  "journal": {
+    "title": "Gartentagebuch",
+    "add": "Neuer Eintrag",
+    "entryTitle": "Titel",
+    "text": "Was ist heute im Garten passiert?",
+    "tags": "Tags (kommagetrennt)",
+    "noEntries": "Dein Gartentagebuch ist leer. Dokumentiere deine Gartenreise!",
+    "linkedTo": "Verkn\u00fcpft mit"
+  },
+  "season": {
+    "current": "Saison {{year}}",
+    "archive": "Saison archivieren",
+    "archiveConfirm": "Aktuelle Saison archivieren und neu starten? Alle Beete werden geleert, aber Erntedaten und Tagebuch bleiben erhalten.",
+    "archives": "Vergangene Saisons",
+    "noArchives": "Noch keine archivierten Saisons.",
+    "beds": "{{count}} Beete",
+    "plants": "{{count}} Pflanzen"
+  },
+  "sufficiency": {
+    "title": "Selbstversorger-Rechner",
+    "familySize": "Haushaltsgr\u00f6\u00dfe",
+    "noPlantings": "Plane zuerst deinen Garten, um Selbstversorgungs-Berechnungen zu sehen.",
+    "estimatedYield": "Gesch\u00e4tzter Saisonertrag",
+    "plantTypes": "Angebaute Pflanzenarten",
+    "nutritionCoverage": "N\u00e4hrstoff-Abdeckung",
+    "coverageDesc": "Gesch\u00e4tzte Abdeckung des N\u00e4hrstoffbedarfs f\u00fcr {{size}} Personen w\u00e4hrend der Wachstumssaison (180 Tage).",
+    "nutrients": {
+      "calories": "Kalorien",
+      "protein": "Protein",
+      "vitaminC": "Vitamin C",
+      "fiber": "Ballaststoffe"
+    },
+    "gaps": "N\u00e4hrstoff-L\u00fccken",
+    "covered": "abgedeckt",
+    "suggestion": "Erw\u00e4ge hinzuzuf\u00fcgen",
+    "yieldByPlant": "Ertrag nach Pflanze"
+  },
+  "preservation": {
+    "title": "Konservierungs-Ratgeber",
+    "desc": "Empfohlene Konservierungsmethoden f\u00fcr deine angebauten Pflanzen.",
+    "methods": {
+      "canning": "Einkochen",
+      "freezing": "Einfrieren",
+      "fermenting": "Fermentieren",
+      "drying": "Trocknen",
+      "root_cellar": "Erdkeller"
+    },
+    "seedSaving": "Saatgut-Gewinnung",
+    "difficulty": {
+      "easy": "Einfach",
+      "moderate": "Mittel",
+      "advanced": "Fortgeschritten"
+    },
+    "years": "Jahre Keimf\u00e4higkeit"
+  },
+  "expenses": {
+    "title": "Kosten & ROI",
+    "add": "Ausgabe hinzuf\u00fcgen",
+    "description": "Beschreibung",
+    "amount": "Betrag (\u20ac)",
+    "category": "Kategorie",
+    "totalExpenses": "Gesamtausgaben",
+    "harvestValue": "Erntewert (Marktpreis)",
+    "roi": "Rendite",
+    "byCategory": "Nach Kategorie",
+    "noEntries": "Noch keine Ausgaben erfasst. Beginne deine Gartenkosten zu dokumentieren!",
+    "categories": {
+      "seeds": "Saatgut",
+      "soil": "Erde & Kompost",
+      "tools": "Werkzeug",
+      "fertilizer": "D\u00fcnger",
+      "infrastructure": "Infrastruktur",
+      "water": "Wasser",
+      "other": "Sonstiges"
+    }
+  },
+  "succession": {
+    "title": "Staffelaussaat",
+    "desc": "Versetzte Aussaaten f\u00fcr durchgehende Ernte w\u00e4hrend der Saison.",
+    "interval": "Alle",
+    "weeks": "Wochen",
+    "sowings": "Aussaaten",
+    "sowing": "Aussaat",
+    "generateTasks": "Zum Kalender hinzuf\u00fcgen"
+  },
+  "guilds": {
+    "title": "Pflanzgilden",
+    "threeSisters": { "name": "Drei Schwestern", "desc": "Traditionell: Mais + Bohne + K\u00fcrbis unterst\u00fctzen sich gegenseitig." },
+    "tomatoBasil": { "name": "Tomate & Basilikum", "desc": "Klassische mediterrane Kombination mit Karotten und Petersilie." },
+    "saladBed": { "name": "Salatbeet", "desc": "Schnell wachsende Salatmischung mit Radieschen, Spinat und Kr\u00e4utern." },
+    "mediterranean": { "name": "Mediterran", "desc": "Sonnenliebende Mischung: Tomate, Paprika, Zucchini mit Kr\u00e4utern." },
+    "rootVegetables": { "name": "Wurzelgem\u00fcse", "desc": "Unterirdische Ernte: Karotten, Rote Bete, R\u00fcben mit Lauchgew\u00e4chsen." },
+    "brassica": { "name": "Kohlgilde", "desc": "Kohlfamilie mit sch\u00fctzenden Kr\u00e4utern und Wurzelgem\u00fcse." }
+  },
+  "sunlight": {
+    "title": "Sonnenlicht & Tageslicht",
+    "sunrise": "Sonnenaufgang",
+    "sunset": "Sonnenuntergang",
+    "daylight": "Tageslichtstunden",
+    "maxAltitude": "Max. Sonnenh\u00f6he",
+    "yearlyDaylight": "Tageslichtstunden nach Monat"
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "L\u00f6schen",
+    "edit": "Bearbeiten",
+    "add": "Hinzuf\u00fcgen",
+    "close": "Schlie\u00dfen",
+    "loading": "Laden...",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "cm": "cm"
+  }
+}
