@@ -108,9 +108,13 @@ const DroppableCell = memo(function DroppableCell({
       style={plant && !isPath ? { backgroundColor: plant.color + "18" } : undefined}
     >
       {isPath && (
-        <svg viewBox="0 0 24 24" width="18" height="18" opacity="0.4">
-          <path d="M4 20L12 4L20 20" stroke="currentColor" strokeWidth="1.5" fill="none" strokeDasharray="2 2"/>
-          <circle cx="12" cy="12" r="1.5" fill="currentColor" opacity="0.3"/>
+        <svg viewBox="0 0 24 24" width="22" height="22">
+          <rect x="3" y="3" width="7" height="5" rx="1" fill="#a8a29e" opacity="0.6"/>
+          <rect x="12" y="3" width="9" height="5" rx="1" fill="#78716c" opacity="0.5"/>
+          <rect x="2" y="10" width="9" height="4" rx="1" fill="#78716c" opacity="0.5"/>
+          <rect x="13" y="10" width="8" height="4" rx="1" fill="#a8a29e" opacity="0.6"/>
+          <rect x="4" y="16" width="7" height="5" rx="1" fill="#a8a29e" opacity="0.55"/>
+          <rect x="13" y="16" width="8" height="5" rx="1" fill="#78716c" opacity="0.45"/>
         </svg>
       )}
       {plant && !isPath && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={22} />}

@@ -108,11 +108,13 @@ const PLANT_SVGS: Record<string, string> = {
     <defs><radialGradient id="pg" cx="35%" cy="30%"><stop offset="0%" stop-color="#fff" stop-opacity="0.12"/><stop offset="100%" stop-color="#000" stop-opacity="0.1"/></radialGradient></defs>`,
 
   kale: `
-    <path d="M12 22V13" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M5 10C5 5 8 2 12 2S19 5 19 10C19 14 16 16 12 16S5 14 5 10Z" fill="#166534"/>
-    <path d="M7 9C8 5 9.5 3 12 3S16 5 17 9C17 12 15 14 12 14S7 12 7 9Z" fill="#22c55e"/>
-    <path d="M6.5 10Q9 7 12 7T17.5 10" stroke="#14532d" stroke-width="0.6" fill="none" opacity="0.4"/>
-    <path d="M8 12Q10 9 12 9T16 12" stroke="#14532d" stroke-width="0.4" fill="none" opacity="0.3"/>`,
+    <path d="M12 22V14" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M4 10C3 6 6 2 12 2S21 6 20 10C19 14 16 16 12 16S5 14 4 10Z" fill="#166534"/>
+    <path d="M6 9Q8 4 12 3Q16 4 18 9Q16 13 12 14Q8 13 6 9Z" fill="#22c55e"/>
+    <path d="M5 10C4 9 5 8 6.5 9S6 11 5 10Z" fill="#14532d"/>
+    <path d="M19 10C20 9 19 8 17.5 9S18 11 19 10Z" fill="#14532d"/>
+    <path d="M7 7C6 6 7 5 8 6Z" fill="#14532d" opacity="0.5"/>
+    <path d="M17 7C18 6 17 5 16 6Z" fill="#14532d" opacity="0.5"/>`,
 
   spinach: `
     <path d="M12 22V12" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"/>
@@ -151,11 +153,13 @@ const PLANT_SVGS: Record<string, string> = {
     <defs><radialGradient id="pug" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff" stop-opacity="0.1"/><stop offset="100%" stop-color="#000" stop-opacity="0.15"/></radialGradient></defs>`,
 
   chard: `
-    <path d="M12 22V10" stroke="#dc2626" stroke-width="2.8" stroke-linecap="round"/>
-    <path d="M6 8C6 3 9 1 12 1S18 3 18 8C18 12 15 14 12 14S6 12 6 8Z" fill="#22c55e"/>
-    <path d="M12 2V13" stroke="#dc2626" stroke-width="0.8"/>
-    <path d="M9 4L12 3L15 4" stroke="#dc2626" stroke-width="0.5" fill="none"/>
-    <path d="M8 7L12 6L16 7" stroke="#dc2626" stroke-width="0.4" fill="none"/>`,
+    <path d="M12 22V12" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+    <path d="M5 9C5 4 8 1 12 1S19 4 19 9C19 13 16 15 12 15S5 13 5 9Z" fill="#22c55e"/>
+    <path d="M7 8Q9 4 12 3Q15 4 17 8Q15 12 12 13Q9 12 7 8Z" fill="#4ade80"/>
+    <path d="M12 2V14" stroke="#dc2626" stroke-width="1.2"/>
+    <path d="M9 5L12 3.5L15 5" stroke="#dc2626" stroke-width="0.7" fill="none"/>
+    <path d="M8 8L12 6.5L16 8" stroke="#dc2626" stroke-width="0.5" fill="none"/>
+    <path d="M8 11L12 9.5L16 11" stroke="#dc2626" stroke-width="0.4" fill="none"/>`,
 
   kohlrabi: `
     <circle cx="12" cy="16" r="5.5" fill="#84cc16"/>
@@ -286,13 +290,14 @@ const PLANT_SVGS: Record<string, string> = {
   // ── HERBS ──
 
   basil: `
-    <path d="M12 22V11" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"/>
-    <ellipse cx="8.5" cy="9" rx="4.5" ry="3.5" fill="#22c55e" transform="rotate(-20 8.5 9)"/>
-    <ellipse cx="15.5" cy="9" rx="4.5" ry="3.5" fill="#22c55e" transform="rotate(20 15.5 9)"/>
-    <ellipse cx="12" cy="5.5" rx="4" ry="3.5" fill="#4ade80"/>
-    <path d="M8.5 9L5.5 9.5" stroke="#15803d" stroke-width="0.4"/>
-    <path d="M15.5 9L18.5 9.5" stroke="#15803d" stroke-width="0.4"/>
-    <path d="M12 5.5V2.5" stroke="#15803d" stroke-width="0.4"/>`,
+    <path d="M12 22V12" stroke="#15803d" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="8" cy="10" rx="5" ry="3.5" fill="#22c55e" transform="rotate(-15 8 10)"/>
+    <ellipse cx="16" cy="10" rx="5" ry="3.5" fill="#22c55e" transform="rotate(15 16 10)"/>
+    <ellipse cx="12" cy="6" rx="5" ry="4" fill="#4ade80"/>
+    <path d="M12 6V3" stroke="#15803d" stroke-width="0.5"/>
+    <path d="M8 10L5 10" stroke="#15803d" stroke-width="0.5"/>
+    <path d="M16 10L19 10" stroke="#15803d" stroke-width="0.5"/>
+    <ellipse cx="12" cy="5" rx="2.5" ry="1.5" fill="#86efac" opacity="0.5"/>`,
 
   parsley: `
     <path d="M12 22V11" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"/>
@@ -322,36 +327,35 @@ const PLANT_SVGS: Record<string, string> = {
     <circle cx="12" cy="1" r="0.5" fill="#e9d5ff" opacity="0.4"/>`,
 
   mint: `
-    <path d="M12 22V9" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"/>
-    <ellipse cx="7.5" cy="7" rx="4.5" ry="3" fill="#34d399" transform="rotate(-25 7.5 7)"/>
-    <ellipse cx="16.5" cy="11" rx="4.5" ry="3" fill="#34d399" transform="rotate(25 16.5 11)"/>
-    <ellipse cx="8" cy="14" rx="4" ry="2.5" fill="#6ee7b7" transform="rotate(-15 8 14)"/>
-    <path d="M7.5 7L4.5 6.5" stroke="#059669" stroke-width="0.4"/>
-    <path d="M16.5 11L19 11.5" stroke="#059669" stroke-width="0.4"/>
-    <path d="M8 14L5 14" stroke="#059669" stroke-width="0.4"/>`,
+    <path d="M12 22V8" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 8L7 5C5 6 4 4 6 3L12 6Z" fill="#34d399"/>
+    <path d="M12 12L17 9C19 10 20 8 18 7L12 10Z" fill="#34d399"/>
+    <path d="M12 16L7 13C5 14 4 12 6 11L12 14Z" fill="#6ee7b7"/>
+    <circle cx="7" cy="4" r="0.8" fill="#34d399"/>
+    <circle cx="17" cy="8" r="0.8" fill="#34d399"/>
+    <circle cx="7" cy="12" r="0.8" fill="#6ee7b7"/>`,
 
   rosemary: `
-    <path d="M12 22V4" stroke="#65a30d" stroke-width="1.8" stroke-linecap="round"/>
-    ${[5,7.5,10,12.5,15,17.5].map(y => `
-      <ellipse cx="9" cy="${y}" rx="3.2" ry="1" fill="#059669" transform="rotate(-35 9 ${y})"/>
-      <ellipse cx="15" cy="${y}" rx="3.2" ry="1" fill="#059669" transform="rotate(35 15 ${y})"/>
+    <path d="M12 22V3" stroke="#65a30d" stroke-width="2" stroke-linecap="round"/>
+    ${[4,6.5,9,11.5,14,16.5].map(y => `
+      <path d="M12 ${y}L${y < 10 ? 7 : 8} ${y - 1}" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M12 ${y}L${y < 10 ? 17 : 16} ${y - 1}" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/>
     `).join("")}
-    <path d="M12 4L11 2" stroke="#22c55e" stroke-width="0.8"/>
-    <path d="M12 4L13 2" stroke="#22c55e" stroke-width="0.8"/>`,
+    <circle cx="12" cy="2.5" r="1" fill="#4ade80"/>`,
 
   thyme: `
-    <path d="M12 22V6" stroke="#78350f" stroke-width="1.2" stroke-linecap="round"/>
-    <path d="M12 10L8 12" stroke="#78350f" stroke-width="0.8"/>
-    <path d="M12 10L16 12" stroke="#78350f" stroke-width="0.8"/>
-    <path d="M12 14L9 16" stroke="#78350f" stroke-width="0.8"/>
-    <path d="M12 14L15 16" stroke="#78350f" stroke-width="0.8"/>
-    <ellipse cx="8" cy="11.5" rx="1.8" ry="1.2" fill="#059669"/>
-    <ellipse cx="16" cy="11.5" rx="1.8" ry="1.2" fill="#059669"/>
-    <ellipse cx="9" cy="15.5" rx="1.8" ry="1.2" fill="#059669"/>
-    <ellipse cx="15" cy="15.5" rx="1.8" ry="1.2" fill="#059669"/>
-    <circle cx="10.5" cy="5" r="1.8" fill="#c084fc"/>
-    <circle cx="13.5" cy="4" r="1.8" fill="#a855f7"/>
-    <circle cx="12" cy="6.5" r="1.5" fill="#d8b4fe"/>`,
+    <path d="M12 22V5" stroke="#92400e" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M12 9L7 11" stroke="#92400e" stroke-width="1"/>
+    <path d="M12 9L17 11" stroke="#92400e" stroke-width="1"/>
+    <path d="M12 13L8 15" stroke="#92400e" stroke-width="1"/>
+    <path d="M12 13L16 15" stroke="#92400e" stroke-width="1"/>
+    <circle cx="7" cy="10.5" r="1.5" fill="#22c55e"/>
+    <circle cx="17" cy="10.5" r="1.5" fill="#22c55e"/>
+    <circle cx="8" cy="14.5" r="1.5" fill="#22c55e"/>
+    <circle cx="16" cy="14.5" r="1.5" fill="#22c55e"/>
+    <circle cx="10" cy="4" r="2" fill="#c084fc"/>
+    <circle cx="14" cy="3.5" r="2" fill="#a855f7"/>
+    <circle cx="12" cy="5.5" r="1.5" fill="#d8b4fe"/>`,
 
   // ── NEW VEGETABLES ──
 
