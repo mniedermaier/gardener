@@ -256,6 +256,11 @@
     "taskType": "Type",
     "taskDate": "Date",
     "generate": "Generate",
+    "generated": "Generated {{count}} tasks",
+    "active": "Active",
+    "deleteCompleted": "Clear completed",
+    "deleteCompletedConfirm": "Delete {{count}} completed tasks?",
+    "deletedCompleted": "Deleted {{count}} completed tasks",
     "taskTypes": {
       "sow_indoors": "Sow Indoors",
       "sow_outdoors": "Sow Outdoors",

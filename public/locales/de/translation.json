@@ -256,6 +256,11 @@
     "taskType": "Typ",
     "taskDate": "Datum",
     "generate": "Generieren",
+    "generated": "{{count}} Aufgaben generiert",
+    "active": "Aktiv",
+    "deleteCompleted": "Erledigte l\u00f6schen",
+    "deleteCompletedConfirm": "{{count}} erledigte Aufgaben l\u00f6schen?",
+    "deletedCompleted": "{{count}} erledigte Aufgaben gel\u00f6scht",
     "taskTypes": {
       "sow_indoors": "Vorziehen",
       "sow_outdoors": "Direktsaat",
