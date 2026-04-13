@@ -38,6 +38,16 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,json,png,svg}"],
+        skipWaiting: true,
+        clientsClaim: true,
+        navigateFallback: "index.html",
+        runtimeCaching: [
+          {
+            urlPattern: /\.js$/,
+            handler: "NetworkFirst",
+            options: { cacheName: "js-cache", expiration: { maxEntries: 50, maxAgeSeconds: 86400 } },
+          },
+        ],
       },
     }),
   ],

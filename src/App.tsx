@@ -5,16 +5,31 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { useStore } from "@/store";
 
-const GardenPlanner = lazy(() => import("@/components/planner/GardenPlanner").then((m) => ({ default: m.GardenPlanner })));
-const PlantList = lazy(() => import("@/components/plants/PlantList").then((m) => ({ default: m.PlantList })));
-const TaskCalendar = lazy(() => import("@/components/calendar/TaskCalendar").then((m) => ({ default: m.TaskCalendar })));
-const HarvestLog = lazy(() => import("@/components/harvest/HarvestLog").then((m) => ({ default: m.HarvestLog })));
-const GardenJournal = lazy(() => import("@/components/journal/GardenJournal").then((m) => ({ default: m.GardenJournal })));
-const SufficiencyDashboard = lazy(() => import("@/components/sufficiency/SufficiencyDashboard").then((m) => ({ default: m.SufficiencyDashboard })));
-const ExpenseDashboard = lazy(() => import("@/components/expenses/ExpenseDashboard").then((m) => ({ default: m.ExpenseDashboard })));
-const WeatherDashboard = lazy(() => import("@/components/weather/WeatherDashboard").then((m) => ({ default: m.WeatherDashboard })));
-const ImportPage = lazy(() => import("@/components/planner/ImportPage").then((m) => ({ default: m.ImportPage })));
-const SettingsPage = lazy(() => import("@/components/settings/SettingsPage").then((m) => ({ default: m.SettingsPage })));
+// Retry wrapper: if a chunk fails to load (stale cache after deploy), reload once
+function lazyRetry<T extends Record<string, unknown>>(
+  fn: () => Promise<T>,
+): Promise<T> {
+  return fn().catch(() => {
+    // Chunk load failed - likely stale SW cache. Force reload once.
+    const reloaded = sessionStorage.getItem("chunk-reload");
+    if (!reloaded) {
+      sessionStorage.setItem("chunk-reload", "1");
+      window.location.reload();
+    }
+    throw new Error("Chunk load failed");
+  });
+}
+
+const GardenPlanner = lazy(() => lazyRetry(() => import("@/components/planner/GardenPlanner")).then((m) => ({ default: m.GardenPlanner })));
+const PlantList = lazy(() => lazyRetry(() => import("@/components/plants/PlantList")).then((m) => ({ default: m.PlantList })));
+const TaskCalendar = lazy(() => lazyRetry(() => import("@/components/calendar/TaskCalendar")).then((m) => ({ default: m.TaskCalendar })));
+const HarvestLog = lazy(() => lazyRetry(() => import("@/components/harvest/HarvestLog")).then((m) => ({ default: m.HarvestLog })));
+const GardenJournal = lazy(() => lazyRetry(() => import("@/components/journal/GardenJournal")).then((m) => ({ default: m.GardenJournal })));
+const SufficiencyDashboard = lazy(() => lazyRetry(() => import("@/components/sufficiency/SufficiencyDashboard")).then((m) => ({ default: m.SufficiencyDashboard })));
+const ExpenseDashboard = lazy(() => lazyRetry(() => import("@/components/expenses/ExpenseDashboard")).then((m) => ({ default: m.ExpenseDashboard })));
+const WeatherDashboard = lazy(() => lazyRetry(() => import("@/components/weather/WeatherDashboard")).then((m) => ({ default: m.WeatherDashboard })));
+const ImportPage = lazy(() => lazyRetry(() => import("@/components/planner/ImportPage")).then((m) => ({ default: m.ImportPage })));
+const SettingsPage = lazy(() => lazyRetry(() => import("@/components/settings/SettingsPage")).then((m) => ({ default: m.SettingsPage })));
 
 function PageLoader() {
   return <div className="flex h-32 items-center justify-center text-gray-400">...</div>;
