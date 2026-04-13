@@ -53,11 +53,18 @@ describe("Placement validation", () => {
     expect(result.isRecommended).toBe(true);
   });
 
-  it("should warn about spacing for same species", () => {
+  it("should warn about spacing for same species when very close", () => {
+    // 15cm grid: adjacent cells are 15cm apart, tomato needs 50cm (threshold: 20cm)
+    const bed = makeBed([{ cellX: 1, cellY: 0, plantId: "tomato" }]);
+    const result = validatePlacement("tomato", 0, 0, bed, plantMap, 15);
+    expect(result.issues.some((i) => i.type === "spacing")).toBe(true);
+  });
+
+  it("should not warn at normal grid spacing", () => {
+    // 30cm grid: adjacent cells are 30cm apart, tomato threshold is 20cm - OK
     const bed = makeBed([{ cellX: 1, cellY: 0, plantId: "tomato" }]);
     const result = validatePlacement("tomato", 0, 0, bed, plantMap, 30);
-    // 30cm apart but tomato needs 50cm
-    expect(result.issues.some((i) => i.type === "spacing")).toBe(true);
+    expect(result.issues.some((i) => i.type === "spacing")).toBe(false);
   });
 
   it("should not warn when spacing is sufficient", () => {

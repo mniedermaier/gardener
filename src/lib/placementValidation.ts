@@ -71,9 +71,12 @@ export function validatePlacement(
       }
     }
 
-    // Spacing check for same species
-    if (cell.plantId === plantId) {
-      if (distCm < plant.spacingCm * 0.8) {
+    // Spacing check for same species - only warn if MUCH too close
+    // In a grid system, one cell apart is the expected minimum spacing.
+    // Only warn if plants are in the exact same or directly adjacent cell
+    // AND the plant needs significantly more space than the grid provides.
+    if (cell.plantId === plantId && distCm > 0) {
+      if (distCm < plant.spacingCm * 0.4) {
         issues.push({
           severity: "warning",
           type: "spacing",

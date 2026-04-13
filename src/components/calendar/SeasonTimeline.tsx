@@ -57,19 +57,19 @@ export function SeasonTimeline() {
 
           if (plant.sowIndoorsWeeks !== null) {
             const start = addWeeks(effectiveFrostDate, plant.sowIndoorsWeeks);
-            const end = addWeeks(start, 3);
+            const end = addWeeks(start, 2);
             tl.sowIndoors = { start: monthFraction(start), end: monthFraction(end) };
           }
 
           if (plant.sowOutdoorsWeeks !== null) {
             const start = addWeeks(effectiveFrostDate, plant.sowOutdoorsWeeks);
-            const end = addWeeks(start, 4);
+            const end = addWeeks(start, 2);
             tl.sowOutdoors = { start: monthFraction(start), end: monthFraction(end) };
           }
 
           if (plant.transplantWeeks !== null) {
             const start = addWeeks(effectiveFrostDate, plant.transplantWeeks);
-            const end = addWeeks(start, 2);
+            const end = addWeeks(start, 1);
             tl.transplant = { start: monthFraction(start), end: monthFraction(end) };
           }
 
@@ -122,38 +122,38 @@ export function SeasonTimeline() {
                 {t(`plants.catalog.${tl.plantId}.name`)}
                 {tl.envIcon && <span className="ml-1 text-[10px]">{tl.envIcon}</span>}
               </div>
-              <div className="relative h-5 flex-1 rounded bg-gray-100 dark:bg-gray-800">
+              <div className="relative flex-1 rounded bg-gray-100 dark:bg-gray-800" style={{ height: "20px" }}>
                 {tl.sowIndoors && (
                   <div
-                    className="absolute top-0 h-full rounded opacity-80"
-                    style={barStyle(tl.sowIndoors, "#a855f7")}
+                    className="absolute rounded-sm"
+                    style={{ ...barStyle(tl.sowIndoors, "#a855f7"), top: "0px", height: "5px" }}
                     title={t("plants.details.sowIndoors")}
                   />
                 )}
                 {tl.sowOutdoors && (
                   <div
-                    className="absolute top-0 h-full rounded opacity-80"
-                    style={barStyle(tl.sowOutdoors, "#22c55e")}
+                    className="absolute rounded-sm"
+                    style={{ ...barStyle(tl.sowOutdoors, "#22c55e"), top: "5px", height: "5px" }}
                     title={t("plants.details.sowOutdoors")}
                   />
                 )}
                 {tl.transplant && (
                   <div
-                    className="absolute top-0 h-full rounded opacity-80"
-                    style={barStyle(tl.transplant, "#3b82f6")}
+                    className="absolute rounded-sm"
+                    style={{ ...barStyle(tl.transplant, "#3b82f6"), top: "10px", height: "5px" }}
                     title={t("plants.details.transplant")}
                   />
                 )}
                 {tl.harvest && (
                   <div
-                    className="absolute top-0 h-full rounded opacity-80"
-                    style={barStyle(tl.harvest, "#f59e0b")}
+                    className="absolute rounded-sm"
+                    style={{ ...barStyle(tl.harvest, "#f59e0b"), top: "15px", height: "5px" }}
                     title={t("plants.details.harvest")}
                   />
                 )}
                 <div
-                  className="absolute top-0 h-full w-px bg-red-400"
-                  style={{ left: `${(monthFraction(parseISO(lastFrostDate)) / 12) * 100}%` }}
+                  className="absolute top-0 w-px bg-red-400"
+                  style={{ left: `${(monthFraction(parseISO(lastFrostDate)) / 12) * 100}%`, height: "20px" }}
                   title={`${t("settings.lastFrostDate")}: ${format(parseISO(lastFrostDate), "dd.MM")}`}
                 />
               </div>

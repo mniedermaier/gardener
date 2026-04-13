@@ -168,7 +168,7 @@ function placePlantsOnGrid(
             ((c.cellX - x) * gridCellSizeCm) ** 2 +
             ((c.cellY - y) * gridCellSizeCm) ** 2
           );
-          return dist < plant.spacingCm * 0.8;
+          return dist < plant.spacingCm * 0.4;
         });
 
         if (!tooClose) {
