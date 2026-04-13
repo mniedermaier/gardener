@@ -11,16 +11,29 @@
     "rowSpacingCm": 70,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["basil", "carrot", "parsley", "chives"],
-    "antagonists": ["potato", "cucumber", "pea"],
+    "companions": [
+      "basil",
+      "carrot",
+      "parsley",
+      "chives"
+    ],
+    "antagonists": [
+      "potato",
+      "cucumber",
+      "pea"
+    ],
     "color": "#ef4444",
-    "icon": "\ud83c\udf45",
+    "icon": "🍅",
     "caloriesPer100g": 18,
     "proteinPer100g": 0.9,
     "vitaminCPer100g": 14,
     "fiberPer100g": 1.2,
     "expectedYieldKgPerM2": 8,
-    "preservationMethods": ["canning", "freezing", "drying"],
+    "preservationMethods": [
+      "canning",
+      "freezing",
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 3,
@@ -39,16 +52,25 @@
     "rowSpacingCm": 100,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["bean", "pea", "radish"],
-    "antagonists": ["potato"],
+    "companions": [
+      "bean",
+      "pea",
+      "radish"
+    ],
+    "antagonists": [
+      "potato"
+    ],
     "color": "#65a30d",
-    "icon": "\ud83e\udd52",
+    "icon": "🥒",
     "caloriesPer100g": 17,
     "proteinPer100g": 1.2,
     "vitaminCPer100g": 18,
-    "fiberPer100g": 1.0,
+    "fiberPer100g": 1,
     "expectedYieldKgPerM2": 6,
-    "preservationMethods": ["freezing", "canning"],
+    "preservationMethods": [
+      "freezing",
+      "canning"
+    ],
     "seedSaving": {
       "difficulty": "advanced",
       "isolationDistanceM": 500,
@@ -67,16 +89,28 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["tomato", "lettuce", "onion", "leek", "chives"],
-    "antagonists": ["dill"],
+    "companions": [
+      "tomato",
+      "lettuce",
+      "onion",
+      "leek",
+      "chives"
+    ],
+    "antagonists": [
+      "dill"
+    ],
     "color": "#f97316",
-    "icon": "\ud83e\udd55",
+    "icon": "🥕",
     "caloriesPer100g": 41,
     "proteinPer100g": 0.9,
     "vitaminCPer100g": 6,
     "fiberPer100g": 2.8,
     "expectedYieldKgPerM2": 4,
-    "preservationMethods": ["root_cellar", "freezing", "canning"],
+    "preservationMethods": [
+      "root_cellar",
+      "freezing",
+      "canning"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -95,10 +129,15 @@
     "rowSpacingCm": 30,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["carrot", "radish", "strawberry", "chives"],
+    "companions": [
+      "carrot",
+      "radish",
+      "strawberry",
+      "chives"
+    ],
     "antagonists": [],
     "color": "#84cc16",
-    "icon": "\ud83e\udd6c",
+    "icon": "🥬",
     "caloriesPer100g": 15,
     "proteinPer100g": 1.4,
     "vitaminCPer100g": 9,
@@ -123,16 +162,29 @@
     "rowSpacingCm": 40,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["cucumber", "potato", "zucchini"],
-    "antagonists": ["onion", "garlic", "leek", "chives"],
+    "companions": [
+      "cucumber",
+      "potato",
+      "zucchini"
+    ],
+    "antagonists": [
+      "onion",
+      "garlic",
+      "leek",
+      "chives"
+    ],
     "color": "#16a34a",
-    "icon": "\ud83e\udeda",
+    "icon": "🫘",
     "caloriesPer100g": 31,
     "proteinPer100g": 1.8,
     "vitaminCPer100g": 12,
     "fiberPer100g": 2.7,
     "expectedYieldKgPerM2": 2,
-    "preservationMethods": ["freezing", "canning", "drying"],
+    "preservationMethods": [
+      "freezing",
+      "canning",
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 3,
@@ -151,16 +203,26 @@
     "rowSpacingCm": 50,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["carrot", "radish", "cucumber"],
-    "antagonists": ["onion", "garlic"],
+    "companions": [
+      "carrot",
+      "radish",
+      "cucumber"
+    ],
+    "antagonists": [
+      "onion",
+      "garlic"
+    ],
     "color": "#22c55e",
-    "icon": "\ud83e\uded4",
+    "icon": "🫛",
     "caloriesPer100g": 81,
     "proteinPer100g": 5.4,
     "vitaminCPer100g": 40,
     "fiberPer100g": 5.7,
     "expectedYieldKgPerM2": 1.5,
-    "preservationMethods": ["freezing", "drying"],
+    "preservationMethods": [
+      "freezing",
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 3,
@@ -179,16 +241,23 @@
     "rowSpacingCm": 15,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["lettuce", "pea", "bean", "spinach"],
+    "companions": [
+      "lettuce",
+      "pea",
+      "bean",
+      "spinach"
+    ],
     "antagonists": [],
     "color": "#e11d48",
-    "icon": "\ud83e\udeda",
+    "icon": "🔴",
     "caloriesPer100g": 16,
     "proteinPer100g": 0.7,
     "vitaminCPer100g": 15,
     "fiberPer100g": 1.6,
     "expectedYieldKgPerM2": 2.5,
-    "preservationMethods": ["fermenting"],
+    "preservationMethods": [
+      "fermenting"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 100,
@@ -207,16 +276,27 @@
     "rowSpacingCm": 100,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["bean", "pea", "dill", "lettuce"],
-    "antagonists": ["tomato", "potato"],
+    "companions": [
+      "bean",
+      "pea",
+      "dill",
+      "lettuce"
+    ],
+    "antagonists": [
+      "tomato",
+      "potato"
+    ],
     "color": "#15803d",
-    "icon": "\ud83e\udd52",
+    "icon": "🥒",
     "caloriesPer100g": 15,
     "proteinPer100g": 0.7,
     "vitaminCPer100g": 3,
     "fiberPer100g": 0.5,
     "expectedYieldKgPerM2": 5,
-    "preservationMethods": ["fermenting", "canning"],
+    "preservationMethods": [
+      "fermenting",
+      "canning"
+    ],
     "seedSaving": {
       "difficulty": "advanced",
       "isolationDistanceM": 500,
@@ -235,16 +315,26 @@
     "rowSpacingCm": 60,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["basil", "carrot", "tomato"],
-    "antagonists": ["bean"],
+    "companions": [
+      "basil",
+      "carrot",
+      "tomato"
+    ],
+    "antagonists": [
+      "bean"
+    ],
     "color": "#dc2626",
-    "icon": "\ud83c\udf36\ufe0f",
+    "icon": "🫑",
     "caloriesPer100g": 31,
-    "proteinPer100g": 1.0,
+    "proteinPer100g": 1,
     "vitaminCPer100g": 128,
     "fiberPer100g": 1.7,
     "expectedYieldKgPerM2": 4,
-    "preservationMethods": ["freezing", "drying", "canning"],
+    "preservationMethods": [
+      "freezing",
+      "drying",
+      "canning"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 100,
@@ -263,16 +353,27 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "low",
-    "companions": ["carrot", "lettuce", "beetroot", "strawberry"],
-    "antagonists": ["bean", "pea"],
+    "companions": [
+      "carrot",
+      "lettuce",
+      "beetroot",
+      "strawberry"
+    ],
+    "antagonists": [
+      "bean",
+      "pea"
+    ],
     "color": "#d97706",
-    "icon": "\ud83e\uddc5",
+    "icon": "🧅",
     "caloriesPer100g": 40,
     "proteinPer100g": 1.1,
     "vitaminCPer100g": 7,
     "fiberPer100g": 1.7,
     "expectedYieldKgPerM2": 5,
-    "preservationMethods": ["root_cellar", "drying"],
+    "preservationMethods": [
+      "root_cellar",
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -291,16 +392,26 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "low",
-    "companions": ["tomato", "strawberry", "beetroot"],
-    "antagonists": ["bean", "pea"],
+    "companions": [
+      "tomato",
+      "strawberry",
+      "beetroot"
+    ],
+    "antagonists": [
+      "bean",
+      "pea"
+    ],
     "color": "#fef3c7",
-    "icon": "\ud83e\uddc4",
+    "icon": "🧄",
     "caloriesPer100g": 149,
     "proteinPer100g": 6.4,
     "vitaminCPer100g": 31,
     "fiberPer100g": 2.1,
     "expectedYieldKgPerM2": 1,
-    "preservationMethods": ["root_cellar", "drying"],
+    "preservationMethods": [
+      "root_cellar",
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 3,
@@ -319,16 +430,27 @@
     "rowSpacingCm": 70,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["bean", "spinach", "garlic"],
-    "antagonists": ["tomato", "cucumber", "pumpkin"],
+    "companions": [
+      "bean",
+      "spinach",
+      "garlic"
+    ],
+    "antagonists": [
+      "tomato",
+      "cucumber",
+      "pumpkin"
+    ],
     "color": "#a16207",
-    "icon": "\ud83e\udd54",
+    "icon": "🥔",
     "caloriesPer100g": 77,
-    "proteinPer100g": 2.0,
+    "proteinPer100g": 2,
     "vitaminCPer100g": 20,
     "fiberPer100g": 2.2,
     "expectedYieldKgPerM2": 4,
-    "preservationMethods": ["root_cellar", "freezing"],
+    "preservationMethods": [
+      "root_cellar",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 3,
@@ -347,16 +469,25 @@
     "rowSpacingCm": 50,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["lettuce", "onion", "garlic", "spinach"],
+    "companions": [
+      "lettuce",
+      "onion",
+      "garlic",
+      "spinach"
+    ],
     "antagonists": [],
     "color": "#be123c",
-    "icon": "\ud83c\udf53",
+    "icon": "🍓",
     "caloriesPer100g": 32,
     "proteinPer100g": 0.7,
     "vitaminCPer100g": 59,
-    "fiberPer100g": 2.0,
+    "fiberPer100g": 2,
     "expectedYieldKgPerM2": 1.5,
-    "preservationMethods": ["freezing", "canning", "drying"]
+    "preservationMethods": [
+      "freezing",
+      "canning",
+      "drying"
+    ]
   },
   {
     "id": "raspberry",
@@ -370,16 +501,21 @@
     "rowSpacingCm": 150,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["garlic"],
+    "companions": [
+      "garlic"
+    ],
     "antagonists": [],
     "color": "#be185d",
-    "icon": "\ud83e\uddc3",
+    "icon": "🫐",
     "caloriesPer100g": 52,
     "proteinPer100g": 1.2,
     "vitaminCPer100g": 26,
     "fiberPer100g": 6.5,
     "expectedYieldKgPerM2": 0.8,
-    "preservationMethods": ["freezing", "canning"]
+    "preservationMethods": [
+      "freezing",
+      "canning"
+    ]
   },
   {
     "id": "blueberry",
@@ -396,13 +532,16 @@
     "companions": [],
     "antagonists": [],
     "color": "#4338ca",
-    "icon": "\ud83e\udeb7",
+    "icon": "💙",
     "caloriesPer100g": 57,
     "proteinPer100g": 0.7,
     "vitaminCPer100g": 10,
     "fiberPer100g": 2.4,
     "expectedYieldKgPerM2": 0.5,
-    "preservationMethods": ["freezing", "drying"]
+    "preservationMethods": [
+      "freezing",
+      "drying"
+    ]
   },
   {
     "id": "basil",
@@ -416,16 +555,22 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["tomato", "pepper"],
+    "companions": [
+      "tomato",
+      "pepper"
+    ],
     "antagonists": [],
     "color": "#16a34a",
-    "icon": "\ud83c\udf3f",
+    "icon": "🌿",
     "caloriesPer100g": 23,
     "proteinPer100g": 3.2,
     "vitaminCPer100g": 18,
     "fiberPer100g": 1.6,
     "expectedYieldKgPerM2": 0.5,
-    "preservationMethods": ["drying", "freezing"],
+    "preservationMethods": [
+      "drying",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 50,
@@ -444,16 +589,24 @@
     "rowSpacingCm": 30,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["tomato", "carrot"],
-    "antagonists": ["lettuce"],
+    "companions": [
+      "tomato",
+      "carrot"
+    ],
+    "antagonists": [
+      "lettuce"
+    ],
     "color": "#15803d",
-    "icon": "\ud83c\udf3f",
+    "icon": "☘️",
     "caloriesPer100g": 36,
-    "proteinPer100g": 3.0,
+    "proteinPer100g": 3,
     "vitaminCPer100g": 133,
     "fiberPer100g": 3.3,
     "expectedYieldKgPerM2": 0.8,
-    "preservationMethods": ["drying", "freezing"],
+    "preservationMethods": [
+      "drying",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 300,
@@ -472,16 +625,24 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "low",
-    "companions": ["cucumber", "lettuce"],
-    "antagonists": ["carrot"],
+    "companions": [
+      "cucumber",
+      "lettuce"
+    ],
+    "antagonists": [
+      "carrot"
+    ],
     "color": "#65a30d",
-    "icon": "\ud83c\udf3f",
+    "icon": "🪻",
     "caloriesPer100g": 43,
     "proteinPer100g": 3.5,
     "vitaminCPer100g": 85,
     "fiberPer100g": 2.1,
     "expectedYieldKgPerM2": 0.3,
-    "preservationMethods": ["drying", "freezing"],
+    "preservationMethods": [
+      "drying",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 100,
@@ -500,16 +661,26 @@
     "rowSpacingCm": 30,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["carrot", "tomato", "lettuce"],
-    "antagonists": ["bean", "pea"],
+    "companions": [
+      "carrot",
+      "tomato",
+      "lettuce"
+    ],
+    "antagonists": [
+      "bean",
+      "pea"
+    ],
     "color": "#7c3aed",
-    "icon": "\ud83c\udf3f",
+    "icon": "💜",
     "caloriesPer100g": 30,
     "proteinPer100g": 3.3,
     "vitaminCPer100g": 58,
     "fiberPer100g": 2.5,
     "expectedYieldKgPerM2": 0.5,
-    "preservationMethods": ["drying", "freezing"],
+    "preservationMethods": [
+      "drying",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 100,
@@ -528,16 +699,25 @@
     "rowSpacingCm": 60,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["beetroot", "onion", "dill"],
-    "antagonists": ["strawberry"],
+    "companions": [
+      "beetroot",
+      "onion",
+      "dill"
+    ],
+    "antagonists": [
+      "strawberry"
+    ],
     "color": "#166534",
-    "icon": "\ud83e\udd6c",
+    "icon": "🥗",
     "caloriesPer100g": 49,
     "proteinPer100g": 4.3,
     "vitaminCPer100g": 120,
     "fiberPer100g": 3.6,
     "expectedYieldKgPerM2": 3,
-    "preservationMethods": ["freezing", "drying"],
+    "preservationMethods": [
+      "freezing",
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -556,16 +736,22 @@
     "rowSpacingCm": 30,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["strawberry", "radish", "bean"],
+    "companions": [
+      "strawberry",
+      "radish",
+      "bean"
+    ],
     "antagonists": [],
     "color": "#14532d",
-    "icon": "\ud83e\udd6c",
+    "icon": "🍃",
     "caloriesPer100g": 23,
     "proteinPer100g": 2.9,
     "vitaminCPer100g": 28,
     "fiberPer100g": 2.2,
     "expectedYieldKgPerM2": 2.5,
-    "preservationMethods": ["freezing"],
+    "preservationMethods": [
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 500,
@@ -584,16 +770,27 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["onion", "garlic", "lettuce", "kale"],
-    "antagonists": ["bean"],
+    "companions": [
+      "onion",
+      "garlic",
+      "lettuce",
+      "kale"
+    ],
+    "antagonists": [
+      "bean"
+    ],
     "color": "#881337",
-    "icon": "\ud83e\udeda",
+    "icon": "🟣",
     "caloriesPer100g": 43,
     "proteinPer100g": 1.6,
     "vitaminCPer100g": 5,
     "fiberPer100g": 2.8,
     "expectedYieldKgPerM2": 4,
-    "preservationMethods": ["root_cellar", "canning", "fermenting"],
+    "preservationMethods": [
+      "root_cellar",
+      "canning",
+      "fermenting"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 500,
@@ -612,16 +809,24 @@
     "rowSpacingCm": 40,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["carrot", "strawberry"],
-    "antagonists": ["bean", "pea"],
+    "companions": [
+      "carrot",
+      "strawberry"
+    ],
+    "antagonists": [
+      "bean",
+      "pea"
+    ],
     "color": "#4d7c0f",
-    "icon": "\ud83c\udf3f",
+    "icon": "🥢",
     "caloriesPer100g": 61,
     "proteinPer100g": 1.5,
     "vitaminCPer100g": 12,
     "fiberPer100g": 1.8,
     "expectedYieldKgPerM2": 3,
-    "preservationMethods": ["freezing"],
+    "preservationMethods": [
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -640,16 +845,25 @@
     "rowSpacingCm": 200,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["bean", "radish"],
-    "antagonists": ["potato"],
+    "companions": [
+      "bean",
+      "radish"
+    ],
+    "antagonists": [
+      "potato"
+    ],
     "color": "#ea580c",
-    "icon": "\ud83c\udf83",
+    "icon": "🎃",
     "caloriesPer100g": 26,
-    "proteinPer100g": 1.0,
+    "proteinPer100g": 1,
     "vitaminCPer100g": 9,
     "fiberPer100g": 0.5,
     "expectedYieldKgPerM2": 5,
-    "preservationMethods": ["root_cellar", "canning", "freezing"],
+    "preservationMethods": [
+      "root_cellar",
+      "canning",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "advanced",
       "isolationDistanceM": 500,
@@ -668,16 +882,22 @@
     "rowSpacingCm": 40,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["carrot", "radish", "bean"],
+    "companions": [
+      "carrot",
+      "radish",
+      "bean"
+    ],
     "antagonists": [],
     "color": "#dc2626",
-    "icon": "\ud83e\udd6c",
+    "icon": "🌈",
     "caloriesPer100g": 19,
     "proteinPer100g": 1.8,
     "vitaminCPer100g": 30,
     "fiberPer100g": 1.6,
     "expectedYieldKgPerM2": 3,
-    "preservationMethods": ["freezing"],
+    "preservationMethods": [
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 500,
@@ -696,16 +916,25 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["lettuce", "onion", "beetroot"],
-    "antagonists": ["strawberry"],
+    "companions": [
+      "lettuce",
+      "onion",
+      "beetroot"
+    ],
+    "antagonists": [
+      "strawberry"
+    ],
     "color": "#a3e635",
-    "icon": "\ud83e\udd6c",
+    "icon": "🟢",
     "caloriesPer100g": 27,
     "proteinPer100g": 1.7,
     "vitaminCPer100g": 62,
     "fiberPer100g": 3.6,
     "expectedYieldKgPerM2": 3.5,
-    "preservationMethods": ["root_cellar", "freezing"],
+    "preservationMethods": [
+      "root_cellar",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -725,15 +954,21 @@
     "sunRequirement": "full",
     "waterNeed": "medium",
     "companions": [],
-    "antagonists": ["tomato", "bean", "carrot"],
+    "antagonists": [
+      "tomato",
+      "bean",
+      "carrot"
+    ],
     "color": "#fbbf24",
-    "icon": "\ud83c\udf3f",
+    "icon": "🌾",
     "caloriesPer100g": 31,
     "proteinPer100g": 1.2,
     "vitaminCPer100g": 12,
     "fiberPer100g": 3.1,
     "expectedYieldKgPerM2": 3,
-    "preservationMethods": ["freezing"],
+    "preservationMethods": [
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "advanced",
       "isolationDistanceM": 500,
@@ -752,16 +987,24 @@
     "rowSpacingCm": 75,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["bean", "pumpkin", "cucumber"],
+    "companions": [
+      "bean",
+      "pumpkin",
+      "cucumber"
+    ],
     "antagonists": [],
     "color": "#eab308",
-    "icon": "\ud83c\udf3d",
+    "icon": "🌽",
     "caloriesPer100g": 86,
     "proteinPer100g": 3.3,
     "vitaminCPer100g": 7,
     "fiberPer100g": 2.7,
     "expectedYieldKgPerM2": 1,
-    "preservationMethods": ["freezing", "drying", "canning"],
+    "preservationMethods": [
+      "freezing",
+      "drying",
+      "canning"
+    ],
     "seedSaving": {
       "difficulty": "advanced",
       "isolationDistanceM": 500,
@@ -780,16 +1023,23 @@
     "rowSpacingCm": 75,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["cucumber", "corn"],
-    "antagonists": ["potato"],
+    "companions": [
+      "cucumber",
+      "corn"
+    ],
+    "antagonists": [
+      "potato"
+    ],
     "color": "#facc15",
-    "icon": "\ud83c\udf3b",
+    "icon": "🌻",
     "caloriesPer100g": 584,
-    "proteinPer100g": 21.0,
+    "proteinPer100g": 21,
     "vitaminCPer100g": 1.4,
     "fiberPer100g": 8.6,
     "expectedYieldKgPerM2": 0.3,
-    "preservationMethods": ["drying"],
+    "preservationMethods": [
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 500,
@@ -808,16 +1058,26 @@
     "rowSpacingCm": 60,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["onion", "dill", "beetroot"],
-    "antagonists": ["strawberry"],
+    "companions": [
+      "onion",
+      "dill",
+      "beetroot"
+    ],
+    "antagonists": [
+      "strawberry"
+    ],
     "color": "#86efac",
-    "icon": "\ud83e\udd6c",
+    "icon": "🥬",
     "caloriesPer100g": 25,
     "proteinPer100g": 1.3,
     "vitaminCPer100g": 37,
     "fiberPer100g": 2.5,
     "expectedYieldKgPerM2": 5,
-    "preservationMethods": ["fermenting", "root_cellar", "freezing"],
+    "preservationMethods": [
+      "fermenting",
+      "root_cellar",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -836,16 +1096,25 @@
     "rowSpacingCm": 60,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["onion", "dill", "basil"],
-    "antagonists": ["strawberry", "tomato"],
+    "companions": [
+      "onion",
+      "dill",
+      "basil"
+    ],
+    "antagonists": [
+      "strawberry",
+      "tomato"
+    ],
     "color": "#059669",
-    "icon": "\ud83e\udd66",
+    "icon": "🥦",
     "caloriesPer100g": 34,
     "proteinPer100g": 2.8,
     "vitaminCPer100g": 89,
     "fiberPer100g": 2.6,
     "expectedYieldKgPerM2": 2,
-    "preservationMethods": ["freezing"],
+    "preservationMethods": [
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -864,16 +1133,25 @@
     "rowSpacingCm": 60,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["onion", "beetroot"],
-    "antagonists": ["strawberry", "tomato"],
+    "companions": [
+      "onion",
+      "beetroot"
+    ],
+    "antagonists": [
+      "strawberry",
+      "tomato"
+    ],
     "color": "#f5f5f4",
-    "icon": "\ud83e\udd6c",
+    "icon": "🤍",
     "caloriesPer100g": 25,
     "proteinPer100g": 1.9,
     "vitaminCPer100g": 48,
-    "fiberPer100g": 2.0,
+    "fiberPer100g": 2,
     "expectedYieldKgPerM2": 2.5,
-    "preservationMethods": ["freezing", "canning"],
+    "preservationMethods": [
+      "freezing",
+      "canning"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 500,
@@ -892,16 +1170,26 @@
     "rowSpacingCm": 40,
     "sunRequirement": "full",
     "waterNeed": "high",
-    "companions": ["tomato", "leek", "cabbage"],
-    "antagonists": ["carrot", "potato"],
+    "companions": [
+      "tomato",
+      "leek",
+      "cabbage"
+    ],
+    "antagonists": [
+      "carrot",
+      "potato"
+    ],
     "color": "#a3e635",
-    "icon": "\ud83c\udf3f",
+    "icon": "🟩",
     "caloriesPer100g": 16,
     "proteinPer100g": 0.7,
     "vitaminCPer100g": 3,
     "fiberPer100g": 1.6,
     "expectedYieldKgPerM2": 4,
-    "preservationMethods": ["root_cellar", "freezing"],
+    "preservationMethods": [
+      "root_cellar",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "advanced",
       "isolationDistanceM": 500,
@@ -920,16 +1208,22 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": ["pea", "onion"],
+    "companions": [
+      "pea",
+      "onion"
+    ],
     "antagonists": [],
     "color": "#e9d5ff",
-    "icon": "\ud83e\udeda",
+    "icon": "🤎",
     "caloriesPer100g": 28,
     "proteinPer100g": 0.9,
     "vitaminCPer100g": 21,
     "fiberPer100g": 1.8,
     "expectedYieldKgPerM2": 4,
-    "preservationMethods": ["root_cellar", "fermenting"],
+    "preservationMethods": [
+      "root_cellar",
+      "fermenting"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 100,
@@ -948,16 +1242,22 @@
     "rowSpacingCm": 40,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["tomato", "cabbage"],
+    "companions": [
+      "tomato",
+      "cabbage"
+    ],
     "antagonists": [],
     "color": "#34d399",
-    "icon": "\ud83c\udf3f",
+    "icon": "🍀",
     "caloriesPer100g": 44,
     "proteinPer100g": 3.3,
     "vitaminCPer100g": 13,
     "fiberPer100g": 6.8,
     "expectedYieldKgPerM2": 0.5,
-    "preservationMethods": ["drying", "freezing"],
+    "preservationMethods": [
+      "drying",
+      "freezing"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 50,
@@ -976,16 +1276,22 @@
     "rowSpacingCm": 60,
     "sunRequirement": "full",
     "waterNeed": "low",
-    "companions": ["bean", "cabbage", "carrot"],
+    "companions": [
+      "bean",
+      "cabbage",
+      "carrot"
+    ],
     "antagonists": [],
     "color": "#6366f1",
-    "icon": "\ud83c\udf3f",
+    "icon": "💐",
     "caloriesPer100g": 131,
     "proteinPer100g": 3.3,
     "vitaminCPer100g": 22,
     "fiberPer100g": 14.1,
     "expectedYieldKgPerM2": 0.3,
-    "preservationMethods": ["drying"],
+    "preservationMethods": [
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "easy",
       "isolationDistanceM": 50,
@@ -1004,16 +1310,22 @@
     "rowSpacingCm": 30,
     "sunRequirement": "full",
     "waterNeed": "low",
-    "companions": ["tomato", "cabbage", "strawberry"],
+    "companions": [
+      "tomato",
+      "cabbage",
+      "strawberry"
+    ],
     "antagonists": [],
     "color": "#a78bfa",
-    "icon": "\ud83c\udf3f",
+    "icon": "🌸",
     "caloriesPer100g": 101,
     "proteinPer100g": 5.6,
     "vitaminCPer100g": 160,
-    "fiberPer100g": 14.0,
+    "fiberPer100g": 14,
     "expectedYieldKgPerM2": 0.3,
-    "preservationMethods": ["drying"],
+    "preservationMethods": [
+      "drying"
+    ],
     "seedSaving": {
       "difficulty": "moderate",
       "isolationDistanceM": 50,
@@ -1032,16 +1344,22 @@
     "rowSpacingCm": 150,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["garlic", "chives"],
+    "companions": [
+      "garlic",
+      "chives"
+    ],
     "antagonists": [],
     "color": "#dc2626",
-    "icon": "\ud83c\udf47",
+    "icon": "🍒",
     "caloriesPer100g": 56,
     "proteinPer100g": 1.4,
     "vitaminCPer100g": 41,
     "fiberPer100g": 4.3,
     "expectedYieldKgPerM2": 1,
-    "preservationMethods": ["freezing", "canning"]
+    "preservationMethods": [
+      "freezing",
+      "canning"
+    ]
   },
   {
     "id": "gooseberry",
@@ -1055,15 +1373,20 @@
     "rowSpacingCm": 150,
     "sunRequirement": "partial",
     "waterNeed": "medium",
-    "companions": ["garlic"],
+    "companions": [
+      "garlic"
+    ],
     "antagonists": [],
     "color": "#84cc16",
-    "icon": "\ud83c\udf47",
+    "icon": "🫒",
     "caloriesPer100g": 44,
     "proteinPer100g": 0.9,
     "vitaminCPer100g": 28,
     "fiberPer100g": 4.3,
     "expectedYieldKgPerM2": 1,
-    "preservationMethods": ["canning", "freezing"]
+    "preservationMethods": [
+      "canning",
+      "freezing"
+    ]
   }
 ]
