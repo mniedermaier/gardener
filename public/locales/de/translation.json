@@ -440,6 +440,7 @@
   },
   "bedStats": {
     "types": "Arten",
+    "plants": "Pflanzen",
     "compatibility": "Vertr\u00e4glichkeit",
     "conflicts": "Konflikte"
   },

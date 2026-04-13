@@ -61,11 +61,12 @@ const ENVIRONMENT_BORDERS: Record<EnvironmentType, string> = {
 
 const DroppableCell = memo(function DroppableCell({
   bedId, x, y, plant, variety, isCompanionHighlight, isAntagonistHighlight,
-  isPlaceMode, isPath, isPathMode, onRemove, onClick, onSelectPlant, onTogglePath, validationWarning, notes,
+  isPlaceMode, isPath, isPathMode, cellSize, iconSize, onRemove, onClick, onSelectPlant, onTogglePath, validationWarning, notes,
 }: {
   bedId: string; x: number; y: number; plant?: Plant; variety?: string;
   isCompanionHighlight: boolean; isAntagonistHighlight: boolean;
   isPlaceMode: boolean; isPath: boolean; isPathMode: boolean;
+  cellSize: number; iconSize: number;
   onRemove: () => void; onClick: () => void;
   onSelectPlant: () => void; onTogglePath: () => void; validationWarning?: string; notes?: string;
 }) {
@@ -91,7 +92,7 @@ const DroppableCell = memo(function DroppableCell({
       aria-label={plantName || `Empty cell ${x + 1}, ${y + 1}`}
       onClick={isPathMode ? onTogglePath : plant ? onSelectPlant : onClick}
       title={isPath ? t("planner.path") : tooltip}
-      className={`group relative flex h-12 w-12 items-center justify-center rounded text-lg transition-all ${
+      className={`group relative flex items-center justify-center rounded transition-all ${
         isPath
           ? "bg-stone-400/50 dark:bg-stone-600/50"
           : plant
@@ -105,7 +106,7 @@ const DroppableCell = memo(function DroppableCell({
       ${isAntagonistHighlight && !plant && !isPath ? "bg-red-100 ring-1 ring-red-300 dark:bg-red-900/20" : ""}
       ${isCompanionHighlight && !plant && !isPath ? "bg-green-100 ring-1 ring-green-300 dark:bg-green-900/20" : ""}
       ${plant && validationWarning ? "ring-2 ring-red-400" : ""}`}
-      style={plant && !isPath ? { backgroundColor: plant.color + "18" } : undefined}
+      style={{ width: cellSize, height: cellSize, ...(plant && !isPath ? { backgroundColor: plant.color + "18" } : {}) }}
     >
       {isPath && (
         <svg viewBox="0 0 24 24" width="22" height="22">
@@ -117,7 +118,7 @@ const DroppableCell = memo(function DroppableCell({
           <rect x="13" y="16" width="8" height="5" rx="1" fill="#78716c" opacity="0.45"/>
         </svg>
       )}
-      {plant && !isPath && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={22} />}
+      {plant && !isPath && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={iconSize} />}
       {plant && (
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
@@ -136,9 +137,10 @@ const DroppableCell = memo(function DroppableCell({
 // --- BedGrid with stats and validation ---
 
 function BedGrid({
-  bed, gardenId, selectedPlantId, isPathMode, onCellClick, onSelectPlantFromCell,
+  bed, gardenId, selectedPlantId, isPathMode, isExpanded, onToggleExpand, onCellClick, onSelectPlantFromCell,
 }: {
   bed: Bed; gardenId: string; selectedPlantId: string | null; isPathMode: boolean;
+  isExpanded: boolean; onToggleExpand: () => void;
   onCellClick: (bedId: string, x: number, y: number) => void;
   onSelectPlantFromCell: (plantId: string, bedId: string, cellX: number, cellY: number) => void;
 }) {
@@ -148,6 +150,7 @@ function BedGrid({
   const [showConfig, setShowConfig] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(bed.name);
+  const [zoom, setZoom] = useState(1); // 0.6 = small, 1 = normal, 1.3 = large
   const envType = bed.environmentType ?? "outdoor_bed";
   const frostWeeks = getFrostProtectionWeeks(bed);
   const bedWidthM = ((bed.width * gridCellSizeCm) / 100).toFixed(1);
@@ -176,10 +179,21 @@ function BedGrid({
     return warnings;
   }, [bed, plantMap, gridCellSizeCm]);
 
+  const cellSize = Math.round(48 * zoom);
+  const iconSize = Math.round(22 * zoom);
+  const gridCellRem = `${(cellSize / 16).toFixed(2)}rem`;
+
   return (
     <Card className={`overflow-hidden ${ENVIRONMENT_BORDERS[envType]}`}>
-      <div className="mb-3 flex items-center justify-between">
+      {/* Clickable header - accordion toggle */}
+      <div
+        className="flex cursor-pointer items-center justify-between"
+        onClick={onToggleExpand}
+      >
         <div className="flex items-center gap-2">
+          <span className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-gray-400"><path d="M4 2l4 4-4 4"/></svg>
+          </span>
           <span className="text-lg" title={t(`planner.environmentTypes.${envType}`)}>
             {ENVIRONMENT_ICONS[envType]}
           </span>
@@ -189,18 +203,19 @@ function BedGrid({
               onChange={(e) => setNewName(e.target.value)}
               onBlur={() => { updateBed(gardenId, bed.id, { name: newName.trim() || bed.name }); setEditingName(false); }}
               onKeyDown={(e) => { if (e.key === "Enter") { updateBed(gardenId, bed.id, { name: newName.trim() || bed.name }); setEditingName(false); } }}
+              onClick={(e) => e.stopPropagation()}
               className="w-32 rounded border border-garden-400 bg-transparent px-1 text-sm font-semibold focus:outline-none"
               autoFocus
             />
           ) : (
-            <h3 className="cursor-pointer font-semibold hover:text-garden-600" onClick={() => { setNewName(bed.name); setEditingName(true); }} title={t("common.edit")}>
+            <h3 className="font-semibold" onDoubleClick={(e) => { e.stopPropagation(); setNewName(bed.name); setEditingName(true); }}>
               {bed.name}
             </h3>
           )}
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
             {bedWidthM} × {bedHeightM} m
           </span>
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <span className="hidden rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 sm:inline dark:bg-gray-800 dark:text-gray-400">
             {t(`planner.environmentTypes.${envType}`)}
           </span>
           {frostWeeks > 0 && (
@@ -208,32 +223,46 @@ function BedGrid({
               +{frostWeeks}w
             </span>
           )}
-        </div>
-        <div className="flex items-center gap-1">
-          {bed.cells.length > 0 && (
-            <button
-              onClick={() => {
-                for (const cell of [...bed.cells]) {
-                  removeCell(gardenId, bed.id, cell.cellX, cell.cellY);
-                }
-              }}
-              className="rounded-lg p-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
-              title={t("planner.clearBed")}
-            >
-              {t("planner.clearBed")}
-            </button>
+          {!isExpanded && bed.cells.length > 0 && (
+            <span className="text-xs text-gray-400">
+              · {bed.cells.length} {t("bedStats.plants")} · {new Set(bed.cells.map(c => c.plantId)).size} {t("bedStats.types")}
+            </span>
           )}
-        {(envType === "greenhouse" || envType === "cold_frame" || envType === "raised_bed" || envType === "container") && (
-          <button
-            onClick={() => setShowConfig(!showConfig)}
-            className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
-          >
-            <Settings size={14} />
-          </button>
-        )}
+        </div>
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {isExpanded && (
+            <>
+              {/* Zoom controls */}
+              <div className="mr-2 flex items-center gap-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
+                <button onClick={() => setZoom(Math.max(0.5, zoom - 0.15))} className="rounded-l-lg px-1.5 py-0.5 text-xs text-gray-500 hover:text-gray-700" title="Zoom out">−</button>
+                <span className="px-1 text-[10px] text-gray-400">{Math.round(zoom * 100)}%</span>
+                <button onClick={() => setZoom(Math.min(1.5, zoom + 0.15))} className="rounded-r-lg px-1.5 py-0.5 text-xs text-gray-500 hover:text-gray-700" title="Zoom in">+</button>
+              </div>
+              {bed.cells.length > 0 && (
+                <button
+                  onClick={() => { for (const cell of [...bed.cells]) removeCell(gardenId, bed.id, cell.cellX, cell.cellY); }}
+                  className="rounded-lg p-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                  title={t("planner.clearBed")}
+                >
+                  {t("planner.clearBed")}
+                </button>
+              )}
+              {(envType === "greenhouse" || envType === "cold_frame" || envType === "raised_bed" || envType === "container") && (
+                <button
+                  onClick={() => setShowConfig(!showConfig)}
+                  className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
+                >
+                  <Settings size={14} />
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
+      {!isExpanded && <BedStats bed={bed} plantMap={plantMap} gridCellSizeCm={gridCellSizeCm} />}
+
+      {isExpanded && <>
       {showConfig && envType === "greenhouse" && (
         <GreenhouseConfigPanel
           config={bed.greenhouseConfig ?? { material: "glass", heated: false, ventilation: "manual", minTempC: 5, maxTempC: 35, frostProtectionWeeks: 4 }}
@@ -262,7 +291,7 @@ function BedGrid({
       <div className="overflow-x-auto pb-2">
       <div
         className={`inline-grid gap-0.5 rounded-lg border p-1 ${ENVIRONMENT_COLORS[envType]} ${ENVIRONMENT_BORDERS[envType]}`}
-        style={{ gridTemplateColumns: `repeat(${bed.width}, 3rem)` }}
+        style={{ gridTemplateColumns: `repeat(${bed.width}, ${gridCellRem})` }}
       >
         {Array.from({ length: bed.height }, (_, y) =>
           Array.from({ length: bed.width }, (_, x) => {
@@ -285,6 +314,8 @@ function BedGrid({
                 isPlaceMode={!!selectedPlantId && !isPathMode}
                 isPath={isPath}
                 isPathMode={isPathMode}
+                cellSize={cellSize}
+                iconSize={iconSize}
                 validationWarning={isPath ? undefined : cellWarnings.get(cellKey)}
                 onRemove={() => removeCell(gardenId, bed.id, x, y)}
                 onSelectPlant={() => { if (plant) onSelectPlantFromCell(plant.id, bed.id, x, y); }}
@@ -302,6 +333,7 @@ function BedGrid({
       )}
 
       <BedStats bed={bed} plantMap={plantMap} gridCellSizeCm={gridCellSizeCm} />
+      </>}
     </Card>
   );
 }
@@ -438,6 +470,7 @@ export function GardenPlanner() {
   const [placementFeedback, setPlacementFeedback] = useState<string | null>(null);
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
   const [pathMode, setPathMode] = useState(false);
+  const [expandedBedId, setExpandedBedId] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<{ gardenId: string; bedId: string; cellX: number; cellY: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -774,6 +807,8 @@ export function GardenPlanner() {
                       gardenId={activeGardenId!}
                       selectedPlantId={selectedPlant?.id ?? null}
                       isPathMode={pathMode}
+                      isExpanded={expandedBedId === null ? (activeGarden?.beds.length ?? 0) <= 2 : expandedBedId === bed.id}
+                      onToggleExpand={() => setExpandedBedId(expandedBedId === bed.id ? null : bed.id)}
                       onCellClick={handleCellClick}
                       onSelectPlantFromCell={(id, bedId, cellX, cellY) => {
                         const p = plantMap.get(id);

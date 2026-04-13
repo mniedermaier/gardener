@@ -440,6 +440,7 @@
   },
   "bedStats": {
     "types": "types",
+    "plants": "plants",
     "compatibility": "Compatibility",
     "conflicts": "conflicts"
   },
