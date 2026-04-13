@@ -13,6 +13,7 @@
     "settings": "Einstellungen",
     "harvest": "Ernteprotokoll",
     "journal": "Tagebuch",
+    "seeds": "Saatgut",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI"
   },
@@ -411,6 +412,35 @@
     "winterGap": "Winter-Versorgungsl\u00fccke",
     "winterGapDesc": "Geringe Lebensmittelversorgung im {{months}}. Du brauchst ca. {{kg}} kg gelagerte Lebensmittel um diese L\u00fccke zu \u00fcberbr\u00fccken.",
     "storageTitle": "Lager- & Konservierungsbedarf"
+  },
+  "seeds": {
+    "title": "Saatgut-Inventar",
+    "add": "Saatgut hinzuf\u00fcgen",
+    "added": "Saatgut hinzugef\u00fcgt!",
+    "items": "Saatgut-Posten",
+    "expiring": "Ablaufend",
+    "totalCost": "Gesamtkosten",
+    "expiringTitle": "Ablaufendes oder abgelaufenes Saatgut",
+    "acquiredIn": "erworben",
+    "shoppingList": "Saatgut ben\u00f6tigt (gepflanzt aber kein Vorrat)",
+    "empty": "Kein Saatgut im Inventar. Beginne deine Saatgut-Sammlung zu dokumentieren!",
+    "quantity": "Menge",
+    "unit": "Einheit",
+    "year": "Erwerbsjahr",
+    "source": "Quelle",
+    "expired": "Abgelaufen",
+    "yearsLeft": "Jahre \u00fcbrig",
+    "units": {
+      "packets": "P\u00e4ckchen",
+      "grams": "Gramm",
+      "seeds": "Samen"
+    },
+    "sources": {
+      "shop": "Gekauft",
+      "saved": "Selbst gewonnen",
+      "traded": "Getauscht",
+      "gifted": "Geschenk"
+    }
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",

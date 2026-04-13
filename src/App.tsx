@@ -36,6 +36,7 @@ const TaskCalendar = lazy(() => lazyRetry(() => import("@/components/calendar/Ta
 const HarvestLog = lazy(() => lazyRetry(() => import("@/components/harvest/HarvestLog")).then((m) => ({ default: m.HarvestLog })));
 const GardenJournal = lazy(() => lazyRetry(() => import("@/components/journal/GardenJournal")).then((m) => ({ default: m.GardenJournal })));
 const SufficiencyDashboard = lazy(() => lazyRetry(() => import("@/components/sufficiency/SufficiencyDashboard")).then((m) => ({ default: m.SufficiencyDashboard })));
+const SeedInventory = lazy(() => lazyRetry(() => import("@/components/seeds/SeedInventory")).then((m) => ({ default: m.SeedInventory })));
 const ExpenseDashboard = lazy(() => lazyRetry(() => import("@/components/expenses/ExpenseDashboard")).then((m) => ({ default: m.ExpenseDashboard })));
 const WeatherDashboard = lazy(() => lazyRetry(() => import("@/components/weather/WeatherDashboard")).then((m) => ({ default: m.WeatherDashboard })));
 const ImportPage = lazy(() => lazyRetry(() => import("@/components/planner/ImportPage")).then((m) => ({ default: m.ImportPage })));
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="tasks" element={<L><TaskCalendar /></L>} />
           <Route path="harvest" element={<L><HarvestLog /></L>} />
           <Route path="journal" element={<L><GardenJournal /></L>} />
+          <Route path="seeds" element={<L><SeedInventory /></L>} />
           <Route path="sufficiency" element={<L><SufficiencyDashboard /></L>} />
           <Route path="expenses" element={<L><ExpenseDashboard /></L>} />
           <Route path="import" element={<L><ImportPage /></L>} />

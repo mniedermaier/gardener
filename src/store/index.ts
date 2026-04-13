@@ -8,9 +8,10 @@ import { createJournalSlice, type JournalSlice } from "./journalSlice";
 import { createWeatherSlice, type WeatherSlice } from "./weatherSlice";
 import { createCustomPlantsSlice, type CustomPlantsSlice } from "./customPlantsSlice";
 import { createExpenseSlice, type ExpenseSlice } from "./expenseSlice";
+import { createSeedSlice, type SeedSlice } from "./seedSlice";
 import type { Garden, SeasonArchive } from "@/types/garden";
 
-export type AppStore = SettingsSlice & GardenSlice & TaskSlice & HarvestSlice & JournalSlice & WeatherSlice & CustomPlantsSlice & ExpenseSlice & {
+export type AppStore = SettingsSlice & GardenSlice & TaskSlice & HarvestSlice & JournalSlice & WeatherSlice & CustomPlantsSlice & ExpenseSlice & SeedSlice & {
   seasonArchives: SeasonArchive[];
   archiveSeason: (gardenId: string) => void;
 };
@@ -31,6 +32,7 @@ export const useStore = create<AppStore>()(
       ...createWeatherSlice(...a),
       ...createCustomPlantsSlice(...a),
       ...createExpenseSlice(...a),
+      ...createSeedSlice(...a),
       seasonArchives: [],
       archiveSeason: (gardenId: string) => {
         const [set, get] = [a[0], a[1]];

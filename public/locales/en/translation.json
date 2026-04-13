@@ -13,6 +13,7 @@
     "settings": "Settings",
     "harvest": "Harvest Log",
     "journal": "Journal",
+    "seeds": "Seeds",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI"
   },
@@ -411,6 +412,35 @@
     "winterGap": "Winter Food Gap",
     "winterGapDesc": "Low food coverage in {{months}}. You need approximately {{kg}} kg of stored food to bridge this gap.",
     "storageTitle": "Storage & Preservation Needed"
+  },
+  "seeds": {
+    "title": "Seed Inventory",
+    "add": "Add Seeds",
+    "added": "Seeds added!",
+    "items": "Seed items",
+    "expiring": "Expiring",
+    "totalCost": "Total cost",
+    "expiringTitle": "Expiring or expired seeds",
+    "acquiredIn": "acquired",
+    "shoppingList": "Seeds needed (planted but no stock)",
+    "empty": "No seeds in inventory. Start tracking your seed collection!",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "year": "Year acquired",
+    "source": "Source",
+    "expired": "Expired",
+    "yearsLeft": "years left",
+    "units": {
+      "packets": "packets",
+      "grams": "grams",
+      "seeds": "seeds"
+    },
+    "sources": {
+      "shop": "Purchased",
+      "saved": "Saved",
+      "traded": "Traded",
+      "gifted": "Gift"
+    }
   },
   "preservation": {
     "title": "Preservation Guide",
