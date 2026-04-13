@@ -78,7 +78,7 @@ export function Dashboard() {
       <div className="mb-6 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <StatCard icon={LayoutGrid} value={totalBeds} label={t("dashboard.beds")} color="bg-garden-600" onClick={() => navigate("/planner")} />
         <StatCard icon={Sprout} value={uniquePlantIds.size} label={t("dashboard.plantTypes")} color="bg-emerald-600" onClick={() => navigate("/plants")} />
-        <StatCard icon={CalendarDays} value={upcomingTasks.length} label={t("dashboard.tasksDue")} color="bg-blue-600" onClick={() => navigate("/calendar")} />
+        <StatCard icon={CalendarDays} value={upcomingTasks.length} label={t("dashboard.tasksDue")} color="bg-blue-600" onClick={() => navigate("/tasks")} />
         <StatCard icon={Apple} value={`${totalHarvestKg.toFixed(1)} kg`} label={t("dashboard.harvested")} color="bg-amber-600" onClick={() => navigate("/harvest")} />
       </div>
 
@@ -115,7 +115,7 @@ export function Dashboard() {
               <CalendarDays size={16} className="text-blue-500" />
               {t("dashboard.upcomingTasks")}
             </h2>
-            <button onClick={() => navigate("/calendar")} className="text-xs text-garden-600 hover:underline">
+            <button onClick={() => navigate("/tasks")} className="text-xs text-garden-600 hover:underline">
               {t("dashboard.viewAll")} <ArrowRight size={12} className="ml-0.5 inline" />
             </button>
           </div>

@@ -13,8 +13,6 @@ import { Input } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import type { Task, TaskType } from "@/types/task";
 import { getFrostProtectionWeeks } from "@/types/garden";
-import { SeasonTimeline } from "./SeasonTimeline";
-import { SuccessionPlanner } from "./SuccessionPlanner";
 import { downloadIcal } from "@/lib/ical";
 import { format, isAfter, isBefore, startOfWeek, endOfWeek, addWeeks, parseISO } from "date-fns";
 
@@ -143,7 +141,7 @@ export function TaskCalendar() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("calendar.title")}</h1>
+        <h1 className="text-2xl font-bold">{t("nav.tasks")}</h1>
         <div className="flex gap-2">
           {tasks.length > 0 && (
             <Button variant="ghost" size="sm" onClick={() => downloadIcal(tasks)} title="iCal">
@@ -288,9 +286,6 @@ export function TaskCalendar() {
           </button>
         </div>
       )}
-
-      <SeasonTimeline />
-      <SuccessionPlanner />
 
       <Modal open={showAddTask} onClose={() => setShowAddTask(false)} title={t("calendar.addTask")}>
         <div className="space-y-4">

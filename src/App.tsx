@@ -31,6 +31,7 @@ function lazyRetry<T extends Record<string, unknown>>(
 
 const GardenPlanner = lazy(() => lazyRetry(() => import("@/components/planner/GardenPlanner")).then((m) => ({ default: m.GardenPlanner })));
 const PlantList = lazy(() => lazyRetry(() => import("@/components/plants/PlantList")).then((m) => ({ default: m.PlantList })));
+const CalendarPage = lazy(() => lazyRetry(() => import("@/components/calendar/CalendarPage")).then((m) => ({ default: m.CalendarPage })));
 const TaskCalendar = lazy(() => lazyRetry(() => import("@/components/calendar/TaskCalendar")).then((m) => ({ default: m.TaskCalendar })));
 const HarvestLog = lazy(() => lazyRetry(() => import("@/components/harvest/HarvestLog")).then((m) => ({ default: m.HarvestLog })));
 const GardenJournal = lazy(() => lazyRetry(() => import("@/components/journal/GardenJournal")).then((m) => ({ default: m.GardenJournal })));
@@ -63,7 +64,8 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="planner" element={<L><GardenPlanner /></L>} />
           <Route path="plants" element={<L><PlantList /></L>} />
-          <Route path="calendar" element={<L><TaskCalendar /></L>} />
+          <Route path="calendar" element={<L><CalendarPage /></L>} />
+          <Route path="tasks" element={<L><TaskCalendar /></L>} />
           <Route path="harvest" element={<L><HarvestLog /></L>} />
           <Route path="journal" element={<L><GardenJournal /></L>} />
           <Route path="sufficiency" element={<L><SufficiencyDashboard /></L>} />
