@@ -54,6 +54,12 @@ export const plantFamilyMap: Record<string, PlantFamily> = {
   blueberry: "ericaceae",
   currant: "grossulariaceae",
   gooseberry: "grossulariaceae",
+  eggplant: "solanaceae",
+  arugula: "brassicaceae",
+  squash: "cucurbitaceae",
+  asparagus: "other",
+  pak_choi: "brassicaceae",
+  endive: "asteraceae",
 };
 
 export const familyColors: Record<PlantFamily, string> = {

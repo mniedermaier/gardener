@@ -135,7 +135,9 @@
       "strawberry",
       "chives"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "parsley"
+    ],
     "color": "#84cc16",
     "icon": "🥬",
     "caloriesPer100g": 15,
@@ -475,7 +477,12 @@
       "garlic",
       "spinach"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "cabbage",
+      "broccoli",
+      "cauliflower",
+      "kohlrabi"
+    ],
     "color": "#be123c",
     "icon": "🍓",
     "caloriesPer100g": 32,
@@ -529,7 +536,10 @@
     "rowSpacingCm": 200,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": [],
+    "companions": [
+      "strawberry",
+      "thyme"
+    ],
     "antagonists": [],
     "color": "#4338ca",
     "icon": "💙",
@@ -559,7 +569,9 @@
       "tomato",
       "pepper"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "rosemary"
+    ],
     "color": "#16a34a",
     "icon": "🌿",
     "caloriesPer100g": 23,
@@ -885,9 +897,13 @@
     "companions": [
       "carrot",
       "radish",
-      "bean"
+      "bean",
+      "cabbage"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "corn",
+      "cucumber"
+    ],
     "color": "#dc2626",
     "icon": "🌈",
     "caloriesPer100g": 19,
@@ -953,7 +969,10 @@
     "rowSpacingCm": 40,
     "sunRequirement": "full",
     "waterNeed": "medium",
-    "companions": [],
+    "companions": [
+      "dill",
+      "lettuce"
+    ],
     "antagonists": [
       "tomato",
       "bean",
@@ -1244,9 +1263,12 @@
     "waterNeed": "medium",
     "companions": [
       "tomato",
-      "cabbage"
+      "cabbage",
+      "pea"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "parsley"
+    ],
     "color": "#34d399",
     "icon": "🍀",
     "caloriesPer100g": 44,
@@ -1281,7 +1303,10 @@
       "cabbage",
       "carrot"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "basil",
+      "mint"
+    ],
     "color": "#6366f1",
     "icon": "💐",
     "caloriesPer100g": 131,
@@ -1315,7 +1340,9 @@
       "cabbage",
       "strawberry"
     ],
-    "antagonists": [],
+    "antagonists": [
+      "basil"
+    ],
     "color": "#a78bfa",
     "icon": "🌸",
     "caloriesPer100g": 101,
@@ -1388,5 +1415,226 @@
       "canning",
       "freezing"
     ]
+  },
+  {
+    "id": "eggplant",
+    "category": "vegetable",
+    "sowIndoorsWeeks": -10,
+    "sowOutdoorsWeeks": null,
+    "transplantWeeks": 2,
+    "harvestDaysMin": 65,
+    "harvestDaysMax": 90,
+    "spacingCm": 50,
+    "rowSpacingCm": 70,
+    "sunRequirement": "full",
+    "waterNeed": "high",
+    "companions": [
+      "basil",
+      "bean",
+      "pepper"
+    ],
+    "antagonists": [
+      "fennel"
+    ],
+    "color": "#7c3aed",
+    "icon": "🍆",
+    "caloriesPer100g": 25,
+    "proteinPer100g": 1.0,
+    "vitaminCPer100g": 2.2,
+    "fiberPer100g": 3.0,
+    "expectedYieldKgPerM2": 4,
+    "preservationMethods": [
+      "freezing",
+      "canning",
+      "drying"
+    ],
+    "seedSaving": {
+      "difficulty": "moderate",
+      "isolationDistanceM": 50,
+      "seedViabilityYears": 5
+    }
+  },
+  {
+    "id": "arugula",
+    "category": "vegetable",
+    "sowIndoorsWeeks": null,
+    "sowOutdoorsWeeks": -4,
+    "transplantWeeks": null,
+    "harvestDaysMin": 21,
+    "harvestDaysMax": 40,
+    "spacingCm": 10,
+    "rowSpacingCm": 20,
+    "sunRequirement": "partial",
+    "waterNeed": "medium",
+    "companions": [
+      "carrot",
+      "lettuce",
+      "bean",
+      "onion"
+    ],
+    "antagonists": [
+      "strawberry"
+    ],
+    "color": "#4d7c0f",
+    "icon": "🥗",
+    "caloriesPer100g": 25,
+    "proteinPer100g": 2.6,
+    "vitaminCPer100g": 15,
+    "fiberPer100g": 1.6,
+    "expectedYieldKgPerM2": 2,
+    "preservationMethods": [],
+    "seedSaving": {
+      "difficulty": "easy",
+      "isolationDistanceM": 100,
+      "seedViabilityYears": 4
+    }
+  },
+  {
+    "id": "squash",
+    "category": "vegetable",
+    "sowIndoorsWeeks": -4,
+    "sowOutdoorsWeeks": 2,
+    "transplantWeeks": 2,
+    "harvestDaysMin": 85,
+    "harvestDaysMax": 110,
+    "spacingCm": 90,
+    "rowSpacingCm": 180,
+    "sunRequirement": "full",
+    "waterNeed": "high",
+    "companions": [
+      "bean",
+      "corn",
+      "radish"
+    ],
+    "antagonists": [
+      "potato"
+    ],
+    "color": "#d2b48c",
+    "icon": "🍂",
+    "caloriesPer100g": 45,
+    "proteinPer100g": 1.0,
+    "vitaminCPer100g": 21,
+    "fiberPer100g": 2.0,
+    "expectedYieldKgPerM2": 4,
+    "preservationMethods": [
+      "root_cellar",
+      "freezing",
+      "canning"
+    ],
+    "seedSaving": {
+      "difficulty": "advanced",
+      "isolationDistanceM": 500,
+      "seedViabilityYears": 5
+    }
+  },
+  {
+    "id": "asparagus",
+    "category": "vegetable",
+    "sowIndoorsWeeks": null,
+    "sowOutdoorsWeeks": null,
+    "transplantWeeks": -4,
+    "harvestDaysMin": 730,
+    "harvestDaysMax": 1095,
+    "spacingCm": 40,
+    "rowSpacingCm": 120,
+    "sunRequirement": "full",
+    "waterNeed": "medium",
+    "companions": [
+      "tomato",
+      "parsley",
+      "basil"
+    ],
+    "antagonists": [
+      "garlic",
+      "onion"
+    ],
+    "color": "#22c55e",
+    "icon": "🌿",
+    "caloriesPer100g": 20,
+    "proteinPer100g": 2.2,
+    "vitaminCPer100g": 5.6,
+    "fiberPer100g": 2.1,
+    "expectedYieldKgPerM2": 1.5,
+    "preservationMethods": [
+      "freezing",
+      "canning"
+    ],
+    "seedSaving": {
+      "difficulty": "advanced",
+      "isolationDistanceM": 500,
+      "seedViabilityYears": 3
+    }
+  },
+  {
+    "id": "pak_choi",
+    "category": "vegetable",
+    "sowIndoorsWeeks": -4,
+    "sowOutdoorsWeeks": -2,
+    "transplantWeeks": 0,
+    "harvestDaysMin": 30,
+    "harvestDaysMax": 50,
+    "spacingCm": 20,
+    "rowSpacingCm": 30,
+    "sunRequirement": "partial",
+    "waterNeed": "high",
+    "companions": [
+      "onion",
+      "garlic",
+      "dill",
+      "lettuce"
+    ],
+    "antagonists": [
+      "strawberry"
+    ],
+    "color": "#86efac",
+    "icon": "🥬",
+    "caloriesPer100g": 13,
+    "proteinPer100g": 1.5,
+    "vitaminCPer100g": 45,
+    "fiberPer100g": 1.0,
+    "expectedYieldKgPerM2": 3,
+    "preservationMethods": [
+      "freezing",
+      "fermenting"
+    ],
+    "seedSaving": {
+      "difficulty": "moderate",
+      "isolationDistanceM": 500,
+      "seedViabilityYears": 4
+    }
+  },
+  {
+    "id": "endive",
+    "category": "vegetable",
+    "sowIndoorsWeeks": -6,
+    "sowOutdoorsWeeks": -2,
+    "transplantWeeks": 0,
+    "harvestDaysMin": 45,
+    "harvestDaysMax": 65,
+    "spacingCm": 30,
+    "rowSpacingCm": 35,
+    "sunRequirement": "partial",
+    "waterNeed": "medium",
+    "companions": [
+      "carrot",
+      "radish",
+      "chives"
+    ],
+    "antagonists": [
+      "lettuce"
+    ],
+    "color": "#bef264",
+    "icon": "🥬",
+    "caloriesPer100g": 17,
+    "proteinPer100g": 1.3,
+    "vitaminCPer100g": 6.5,
+    "fiberPer100g": 3.1,
+    "expectedYieldKgPerM2": 3,
+    "preservationMethods": [],
+    "seedSaving": {
+      "difficulty": "moderate",
+      "isolationDistanceM": 100,
+      "seedViabilityYears": 5
+    }
   }
 ]

@@ -352,6 +352,60 @@ const PLANT_SVGS: Record<string, string> = {
     <circle cx="10.5" cy="5" r="1.8" fill="#c084fc"/>
     <circle cx="13.5" cy="4" r="1.8" fill="#a855f7"/>
     <circle cx="12" cy="6.5" r="1.5" fill="#d8b4fe"/>`,
+
+  // ── NEW VEGETABLES ──
+
+  eggplant: `
+    <ellipse cx="12" cy="14" rx="5" ry="7" fill="#581c87"/>
+    <ellipse cx="12" cy="14" rx="5" ry="7" fill="url(#epg)"/>
+    <ellipse cx="12" cy="13" rx="3.5" ry="5.5" fill="#7c3aed"/>
+    <ellipse cx="10.5" cy="11" rx="1.5" ry="2" fill="#fff" opacity="0.08"/>
+    <path d="M9 7C9 5 10 4 12 4S15 5 15 7" fill="#22c55e"/>
+    <path d="M12 4V2" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+    <defs><radialGradient id="epg" cx="35%" cy="30%"><stop offset="0%" stop-color="#fff" stop-opacity="0.12"/><stop offset="100%" stop-color="#000" stop-opacity="0.18"/></radialGradient></defs>`,
+
+  arugula: `
+    <path d="M12 22V12" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M12 12L7 8C5 10 4 7 6 5L12 8" fill="#22c55e"/>
+    <path d="M12 12L17 8C19 10 20 7 18 5L12 8" fill="#22c55e"/>
+    <path d="M12 9L8 4C6 5 5 3 7 2L12 5" fill="#4ade80"/>
+    <path d="M12 9L16 4C18 5 19 3 17 2L12 5" fill="#4ade80"/>
+    <path d="M12 6L10 1C11 0 13 0 14 1L12 6" fill="#86efac"/>`,
+
+  squash: `
+    <ellipse cx="12" cy="13" rx="5" ry="8" fill="#c2956b" transform="rotate(-10 12 13)"/>
+    <ellipse cx="12" cy="13" rx="5" ry="8" fill="url(#sqg)" transform="rotate(-10 12 13)"/>
+    <ellipse cx="12" cy="12.5" rx="3.5" ry="6.5" fill="#d2b48c" transform="rotate(-10 12 13)"/>
+    <path d="M12 5V3" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M12 3.5C11 2 11.5 1 12.5 1.5S13 3 12 3.5" fill="#22c55e"/>
+    <path d="M9 8L15 8" stroke="#a0845c" stroke-width="0.4" opacity="0.4"/>
+    <path d="M8.5 13L15.5 13" stroke="#a0845c" stroke-width="0.4" opacity="0.4"/>
+    <defs><radialGradient id="sqg" cx="35%" cy="30%"><stop offset="0%" stop-color="#fff" stop-opacity="0.15"/><stop offset="100%" stop-color="#000" stop-opacity="0.1"/></radialGradient></defs>`,
+
+  asparagus: `
+    <path d="M7 22L7.5 8" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M12 22L12 5" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M17 22L16.5 9" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M12 5C12 3 11.5 2 12 1.5S13 3 12 5" fill="#4ade80"/>
+    <path d="M7.5 8C7 6 7 5 7.5 4.5S8.5 6 7.5 8" fill="#86efac"/>
+    <path d="M16.5 9C16 7 16 6 16.5 5.5S17.5 7 16.5 9" fill="#86efac"/>
+    <path d="M10 8L12 7" stroke="#15803d" stroke-width="0.5"/><path d="M14 9L12 8" stroke="#15803d" stroke-width="0.5"/>`,
+
+  pak_choi: `
+    <path d="M8 22C8 22 8.5 16 9 13C9.5 10 10 8 10 8" stroke="#f0fdf4" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M16 22C16 22 15.5 16 15 13C14.5 10 14 8 14 8" stroke="#f0fdf4" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M12 22C12 22 12 16 12 13V9" stroke="#ecfdf5" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M6 7C6 3 9 1 12 1S18 3 18 7C18 10 15 12 12 12S6 10 6 7Z" fill="#22c55e"/>
+    <path d="M8 7C8 4 10 2 12 2S16 4 16 7C16 9 14 11 12 11S8 9 8 7Z" fill="#4ade80"/>
+    <path d="M12 3V10" stroke="#15803d" stroke-width="0.5"/>`,
+
+  endive: `
+    <path d="M12 22V13" stroke="#65a30d" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M5 10C5 5 8 2 12 2S19 5 19 10C19 14 16 16 12 16S5 14 5 10Z" fill="#bef264"/>
+    <path d="M7 9C8 5 10 3 12 3S16 5 17 9C17 12 15 14 12 14S7 12 7 9Z" fill="#d9f99d"/>
+    <path d="M6 11Q9 8 12 8T18 11" stroke="#84cc16" stroke-width="0.5" fill="none" opacity="0.5"/>
+    <path d="M7 13Q10 10 12 10T17 13" stroke="#84cc16" stroke-width="0.4" fill="none" opacity="0.4"/>
+    <path d="M8 9Q10 6 12 6T16 9" stroke="#84cc16" stroke-width="0.4" fill="none" opacity="0.4"/>`,
 };
 
 export function PlantIcon({ plantId, size = 24, className = "" }: Props) {

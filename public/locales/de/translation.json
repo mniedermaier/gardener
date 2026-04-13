@@ -219,7 +219,13 @@
       "rosemary": { "name": "Rosmarin", "description": "Verholzendes mehrj\u00e4hriges Kraut. Trockenheitstolerant wenn etabliert." },
       "thyme": { "name": "Thymian", "description": "Niedrig wachsendes mehrj\u00e4hriges Kraut. Hervorragender Bodendecker." },
       "currant": { "name": "Johannisbeere", "description": "Robuster Beerenstrauch. Rote und schwarze Sorten verf\u00fcgbar." },
-      "gooseberry": { "name": "Stachelbeere", "description": "Dorniger Beerenstrauch. Hervorragend f\u00fcr Marmelade und Desserts." }
+      "gooseberry": { "name": "Stachelbeere", "description": "Dorniger Beerenstrauch. Hervorragend f\u00fcr Marmelade und Desserts." },
+      "eggplant": { "name": "Aubergine", "description": "W\u00e4rmeliebendes Nachtschattengew\u00e4chs. Braucht warme Bedingungen und n\u00e4hrstoffreichen Boden." },
+      "arugula": { "name": "Rucola", "description": "W\u00fcrziges Salatgr\u00fcn. Schnellwachsend, innerhalb weniger Wochen erntereif." },
+      "squash": { "name": "Butternut-K\u00fcrbis", "description": "Winterk\u00fcrbis mit s\u00fc\u00dfem, nussigem Fruchtfleisch. Monatelang lagerf\u00e4hig." },
+      "asparagus": { "name": "Spargel", "description": "Mehrj\u00e4hriges Gem\u00fcse. Braucht 2-3 Jahre zum Etablieren, tr\u00e4gt dann \u00fcber 15 Jahre." },
+      "pak_choi": { "name": "Pak Choi", "description": "Schnellwachsendes asiatisches Blattgem\u00fcse mit knackigen wei\u00dfen Stielen und zarten Bl\u00e4ttern." },
+      "endive": { "name": "Endivie", "description": "Leicht bitterer Salat. Herzen bleichen f\u00fcr milderes Aroma." }
     }
   },
   "weather": {

@@ -219,7 +219,13 @@
       "rosemary": { "name": "Rosemary", "description": "Woody perennial herb. Drought-tolerant once established." },
       "thyme": { "name": "Thyme", "description": "Low-growing perennial herb. Excellent ground cover." },
       "currant": { "name": "Currant", "description": "Hardy berry bush. Red and black varieties available." },
-      "gooseberry": { "name": "Gooseberry", "description": "Thorny berry bush. Excellent for jams and desserts." }
+      "gooseberry": { "name": "Gooseberry", "description": "Thorny berry bush. Excellent for jams and desserts." },
+      "eggplant": { "name": "Eggplant", "description": "Heat-loving solanaceous fruit. Needs warm conditions and rich soil." },
+      "arugula": { "name": "Arugula", "description": "Peppery salad green. Fast-growing cool-season crop, ready in weeks." },
+      "squash": { "name": "Butternut Squash", "description": "Winter squash with sweet, nutty flesh. Stores well for months." },
+      "asparagus": { "name": "Asparagus", "description": "Perennial vegetable. Takes 2-3 years to establish but produces for 15+ years." },
+      "pak_choi": { "name": "Pak Choi", "description": "Fast-growing Asian green with crisp white stems and tender leaves." },
+      "endive": { "name": "Endive", "description": "Slightly bitter salad green. Blanch hearts for milder flavor." }
     }
   },
   "weather": {
