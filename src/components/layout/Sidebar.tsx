@@ -40,11 +40,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               {t("app.title")}
             </span>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 lg:hidden dark:hover:bg-gray-800">
+          <button onClick={onClose} aria-label="Close sidebar" className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 lg:hidden dark:hover:bg-gray-800">
             <X size={20} />
           </button>
         </div>
-        <nav className="flex-1 space-y-1 p-3">
+        <nav aria-label="Main navigation" className="flex-1 space-y-1 p-3">
           {navItems.map(({ to, icon: Icon, labelKey }) => (
             <NavLink
               key={to}

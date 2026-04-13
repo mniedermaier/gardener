@@ -68,12 +68,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
 
       {/* Toast stack */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" aria-live="polite">
         {toasts.map((t) => {
           const Icon = ICONS[t.type];
           return (
             <div
               key={t.id}
+              role="alert"
               className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm shadow-lg animate-in slide-in-from-right ${STYLES[t.type]}`}
             >
               <Icon size={16} />

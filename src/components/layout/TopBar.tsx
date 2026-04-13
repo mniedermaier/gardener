@@ -82,6 +82,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-900">
       <button
         onClick={onMenuClick}
+        aria-label="Open menu"
         className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
       >
         <Menu size={24} />
@@ -97,6 +98,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
             onFocus={() => setSearchOpen(true)}
+            aria-label={t("search.placeholder")}
             placeholder={`${t("search.placeholder")} (Ctrl+K)`}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 py-1.5 pl-9 pr-8 text-sm placeholder:text-gray-400 focus:border-garden-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-700 dark:bg-gray-800 dark:focus:bg-gray-800"
           />
@@ -146,6 +148,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         )}
         <button
           onClick={toggleLocale}
+          aria-label="Toggle language"
           className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
         >
           <Globe size={16} />

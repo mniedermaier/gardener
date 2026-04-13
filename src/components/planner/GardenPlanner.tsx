@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback, useEffect } from "react";
+import { useState, useRef, useMemo, useCallback, useEffect, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2 } from "lucide-react";
 import {
@@ -58,7 +58,7 @@ const ENVIRONMENT_BORDERS: Record<EnvironmentType, string> = {
 
 // --- DroppableCell with validation feedback ---
 
-function DroppableCell({
+const DroppableCell = memo(function DroppableCell({
   bedId, x, y, plant, variety, isCompanionHighlight, isAntagonistHighlight,
   isPlaceMode, onRemove, onClick, onSelectPlant, validationWarning, notes,
 }: {
@@ -84,6 +84,8 @@ function DroppableCell({
   return (
     <div
       ref={setNodeRef}
+      role="gridcell"
+      aria-label={plantName || `Empty cell ${x + 1}, ${y + 1}`}
       onClick={plant ? onSelectPlant : onClick}
       title={tooltip}
       className={`group relative flex h-10 w-10 items-center justify-center rounded text-lg transition-all ${
@@ -112,7 +114,7 @@ function DroppableCell({
       )}
     </div>
   );
-}
+});
 
 // --- BedGrid with stats and validation ---
 
