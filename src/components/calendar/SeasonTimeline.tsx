@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
 import { usePlantMap } from "@/hooks/usePlants";
@@ -12,7 +12,7 @@ const MONTHS_DE = ["Jan", "Feb", "M\u00e4r", "Apr", "Mai", "Jun", "Jul", "Aug", 
 interface TimeRange {
   start: number;
   end: number;
-  startDate: string; // dd.MM
+  startDate: string;
   endDate: string;
 }
 
@@ -24,6 +24,14 @@ interface PlantTimeline {
   sowOutdoors?: TimeRange;
   transplant?: TimeRange;
   harvest?: TimeRange;
+}
+
+interface TooltipInfo {
+  label: string;
+  dates: string;
+  color: string;
+  x: number;
+  y: number;
 }
 
 function monthFraction(date: Date): number {
@@ -39,6 +47,7 @@ export function SeasonTimeline() {
   const { gardens, lastFrostDate } = useStore();
   const plantMap = usePlantMap();
   const months = i18n.language === "de" ? MONTHS_DE : MONTHS_EN;
+  const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
 
   const timelines = useMemo(() => {
     const frostDate = parseISO(lastFrostDate);
@@ -118,6 +127,17 @@ export function SeasonTimeline() {
   const ROW_HEIGHT = 28;
   const STRIPE_HEIGHT = 7;
 
+  const showTooltip = (e: React.MouseEvent, label: string, dates: string, color: string) => {
+    const rect = (e.currentTarget as HTMLElement).closest(".relative")!.getBoundingClientRect();
+    setTooltip({
+      label,
+      dates,
+      color,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top - 40,
+    });
+  };
+
   return (
     <Card className="mt-6 overflow-x-auto">
       <h2 className="mb-4 text-lg font-semibold">{t("calendar.title")} - Timeline</h2>
@@ -127,7 +147,7 @@ export function SeasonTimeline() {
           <div key={i} className="flex-1 text-center">{m}</div>
         ))}
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1" onMouseLeave={() => setTooltip(null)}>
         {timelines.map((tl, idx) => {
           const plant = plantMap.get(tl.plantId)!;
           return (
@@ -140,37 +160,54 @@ export function SeasonTimeline() {
               <div className="relative flex-1 rounded bg-gray-100 dark:bg-gray-800" style={{ height: `${ROW_HEIGHT}px` }}>
                 {tl.sowIndoors && (
                   <div
-                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    className="absolute rounded-sm opacity-85 transition-all hover:opacity-100 hover:brightness-110"
                     style={{ ...barStyle(tl.sowIndoors, "#a855f7"), top: "0px", height: `${STRIPE_HEIGHT}px` }}
-                    title={`${t("plants.details.sowIndoors")}: ${tl.sowIndoors.startDate} – ${tl.sowIndoors.endDate}`}
+                    onMouseEnter={(e) => showTooltip(e, t("plants.details.sowIndoors"), `${tl.sowIndoors!.startDate} – ${tl.sowIndoors!.endDate}`, "#a855f7")}
+                    onMouseLeave={() => setTooltip(null)}
                   />
                 )}
                 {tl.sowOutdoors && (
                   <div
-                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    className="absolute rounded-sm opacity-85 transition-all hover:opacity-100 hover:brightness-110"
                     style={{ ...barStyle(tl.sowOutdoors, "#22c55e"), top: `${STRIPE_HEIGHT}px`, height: `${STRIPE_HEIGHT}px` }}
-                    title={`${t("plants.details.sowOutdoors")}: ${tl.sowOutdoors.startDate} – ${tl.sowOutdoors.endDate}`}
+                    onMouseEnter={(e) => showTooltip(e, t("plants.details.sowOutdoors"), `${tl.sowOutdoors!.startDate} – ${tl.sowOutdoors!.endDate}`, "#22c55e")}
+                    onMouseLeave={() => setTooltip(null)}
                   />
                 )}
                 {tl.transplant && (
                   <div
-                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    className="absolute rounded-sm opacity-85 transition-all hover:opacity-100 hover:brightness-110"
                     style={{ ...barStyle(tl.transplant, "#3b82f6"), top: `${STRIPE_HEIGHT * 2}px`, height: `${STRIPE_HEIGHT}px` }}
-                    title={`${t("plants.details.transplant")}: ${tl.transplant.startDate} – ${tl.transplant.endDate}`}
+                    onMouseEnter={(e) => showTooltip(e, t("plants.details.transplant"), `${tl.transplant!.startDate} – ${tl.transplant!.endDate}`, "#3b82f6")}
+                    onMouseLeave={() => setTooltip(null)}
                   />
                 )}
                 {tl.harvest && (
                   <div
-                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    className="absolute rounded-sm opacity-85 transition-all hover:opacity-100 hover:brightness-110"
                     style={{ ...barStyle(tl.harvest, "#f59e0b"), top: `${STRIPE_HEIGHT * 3}px`, height: `${STRIPE_HEIGHT}px` }}
-                    title={`${t("plants.details.harvest")}: ${tl.harvest.startDate} – ${tl.harvest.endDate}`}
+                    onMouseEnter={(e) => showTooltip(e, t("plants.details.harvest"), `${tl.harvest!.startDate} – ${tl.harvest!.endDate}`, "#f59e0b")}
+                    onMouseLeave={() => setTooltip(null)}
                   />
                 )}
                 <div
                   className="absolute top-0 w-px bg-red-400"
                   style={{ left: `${(monthFraction(parseISO(lastFrostDate)) / 12) * 100}%`, height: `${ROW_HEIGHT}px` }}
-                  title={`${t("settings.lastFrostDate")}: ${format(parseISO(lastFrostDate), "dd.MM")}`}
                 />
+
+                {/* Custom tooltip */}
+                {tooltip && (
+                  <div
+                    className="pointer-events-none absolute z-30 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs shadow-lg dark:border-gray-600 dark:bg-gray-800"
+                    style={{ left: `${Math.min(Math.max(tooltip.x, 60), 80)}%`, top: `${tooltip.y}px`, transform: "translateX(-50%)" }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: tooltip.color }} />
+                      <span className="font-medium">{tooltip.label}</span>
+                    </div>
+                    <p className="mt-0.5 text-gray-500 dark:text-gray-400">{tooltip.dates}</p>
+                  </div>
+                )}
               </div>
             </div>
           );
