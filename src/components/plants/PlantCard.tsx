@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Sun, Droplets } from "lucide-react";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant } from "@/types/plant";
 
 interface PlantCardProps {
@@ -19,7 +20,7 @@ export function PlantCard({ plant, onClick }: PlantCardProps) {
         className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-2xl"
         style={{ backgroundColor: plant.color + "20" }}
       >
-        {plant.icon}
+        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
       </span>
       <div className="min-w-0 flex-1">
         <h3 className="font-semibold text-gray-900 dark:text-gray-100">

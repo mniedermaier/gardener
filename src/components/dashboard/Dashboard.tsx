@@ -6,6 +6,7 @@ import {
   AlertTriangle, ArrowRight, Star,
 } from "lucide-react";
 import { useStore } from "@/store";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { Card } from "@/components/ui/Card";
@@ -155,7 +156,7 @@ export function Dashboard() {
                 return (
                   <div key={h.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
                     <span className="flex items-center gap-2 text-sm">
-                      <span>{plant?.icon}</span>
+                      {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />}
                       {getPlantName(h.plantId)}
                     </span>
                     <div className="flex items-center gap-2 text-xs text-gray-500">

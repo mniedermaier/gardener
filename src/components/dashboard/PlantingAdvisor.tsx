@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Lightbulb } from "lucide-react";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useStore } from "@/store";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
@@ -55,7 +56,7 @@ export function PlantingAdvisor() {
               className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800"
             >
               <div className="flex items-center gap-2">
-                <span>{plant.icon}</span>
+                <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />
                 <span className="text-sm font-medium">{getPlantName(a.plantId)}</span>
                 <span className="text-xs text-gray-500">{t(ACTION_KEYS[a.action])}</span>
               </div>

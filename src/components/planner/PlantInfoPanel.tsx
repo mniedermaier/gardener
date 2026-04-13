@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Sun, Droplets, Ruler, Clock, Apple, X } from "lucide-react";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant } from "@/types/plant";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
@@ -43,8 +44,8 @@ export function PlantInfoPanel({ plant, onClose }: Props) {
     <div className="rounded-xl border border-garden-200 bg-garden-50/50 p-4 dark:border-garden-800 dark:bg-garden-900/20">
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg text-2xl" style={{ backgroundColor: plant.color + "20" }}>
-            {plant.icon}
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: plant.color + "20" }}>
+            <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
           </span>
           <div>
             <h3 className="font-semibold">{getPlantName(plant.id)}</h3>
@@ -103,7 +104,7 @@ export function PlantInfoPanel({ plant, onClose }: Props) {
               const p = plantMap.get(id);
               return p ? (
                 <span key={id} className="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  {p.icon} {getPlantName(id)}
+                  <PlantIconDisplay plantId={id} emoji={p.icon} size={14} /> {getPlantName(id)}
                 </span>
               ) : null;
             })}
@@ -119,7 +120,7 @@ export function PlantInfoPanel({ plant, onClose }: Props) {
               const p = plantMap.get(id);
               return p ? (
                 <span key={id} className="rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                  {p.icon} {getPlantName(id)}
+                  <PlantIconDisplay plantId={id} emoji={p.icon} size={14} /> {getPlantName(id)}
                 </span>
               ) : null;
             })}

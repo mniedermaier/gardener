@@ -4,6 +4,7 @@ import { Search, Star } from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
 import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant, PlantCategory } from "@/types/plant";
 
 interface Props {
@@ -36,7 +37,7 @@ function DraggableItem({ plant, isSelected, isRecommended, onSelect }: {
           : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
       }`}
     >
-      <span className="text-sm">{plant.icon}</span>
+      <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={16} />
       <span className="max-w-[80px] truncate">{getPlantName(plant.id)}</span>
       {isRecommended && <Star size={10} className="shrink-0 text-green-500" fill="currentColor" />}
     </button>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
 import { usePlantMap } from "@/hooks/usePlants";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import { addWeeks, addDays, parseISO, getMonth, format } from "date-fns";
 import { getFrostProtectionWeeks, ENVIRONMENT_ICONS } from "@/types/garden";
@@ -152,7 +153,7 @@ export function SeasonTimeline() {
           return (
             <div key={`${tl.plantId}-${idx}`} className="flex items-center gap-2">
               <div className="w-32 shrink-0 truncate text-xs font-medium">
-                <span className="mr-1">{plant.icon}</span>
+                <span className="mr-1"><PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={14} /></span>
                 {t(`plants.catalog.${tl.plantId}.name`)}
                 {tl.envIcon && <span className="ml-1 text-[10px]">{tl.envIcon}</span>}
               </div>

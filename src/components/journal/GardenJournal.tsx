@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2, Tag, Sprout, LayoutGrid } from "lucide-react";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useStore } from "@/store";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { Card } from "@/components/ui/Card";
@@ -88,7 +89,7 @@ export function GardenJournal() {
                     {plant && (
                       <span className="flex items-center gap-1 rounded-full bg-garden-50 px-2 py-0.5 text-xs text-garden-700 dark:bg-garden-900/30 dark:text-garden-400">
                         <Sprout size={10} />
-                        {plant.icon} {t(`plants.catalog.${plant.id}.name`)}
+                        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={14} /> {t(`plants.catalog.${plant.id}.name`)}
                       </span>
                     )}
                     {bed && (

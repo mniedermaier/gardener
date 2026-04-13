@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Repeat, Plus, Calendar } from "lucide-react";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useStore } from "@/store";
 import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
@@ -96,7 +97,7 @@ export function SuccessionPlanner() {
               className="flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1 text-xs transition-colors hover:border-garden-400 hover:bg-garden-50 dark:border-gray-700 dark:hover:border-garden-600 dark:hover:bg-garden-900/20"
             >
               <Plus size={10} />
-              {p.icon} {getPlantName(p.id)}
+              <PlantIconDisplay plantId={p.id} emoji={p.icon} size={14} /> {getPlantName(p.id)}
             </button>
           ))}
         </div>
@@ -115,7 +116,7 @@ export function SuccessionPlanner() {
               >
                 <div className="mb-2 flex items-center justify-between">
                   <span className="font-medium">
-                    {plant.icon} {getPlantName(plant.id)}
+                    <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={16} /> {getPlantName(plant.id)}
                   </span>
                   <button
                     onClick={() => removeConfig(idx)}

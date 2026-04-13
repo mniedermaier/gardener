@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Users, TrendingUp, AlertCircle, Apple, Beef, Citrus, Wheat } from "lucide-react";
 import { useStore } from "@/store";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { calculateSufficiency, type SufficiencyResult } from "@/lib/sufficiency";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -131,10 +132,16 @@ export function SufficiencyDashboard() {
                       {t(`sufficiency.nutrients.${gap.nutrient}`)}: {gap.percent}% {t("sufficiency.covered")}
                     </p>
                     <p className="text-xs text-amber-700 dark:text-amber-400">
-                      {t("sufficiency.suggestion")}: {gap.suggestion.split(",").map((id) => {
+                      {t("sufficiency.suggestion")}:{" "}
+                      {gap.suggestion.split(",").map((id, i, arr) => {
                         const p = plantMap.get(id);
-                        return p ? `${p.icon} ${t(`plants.catalog.${id}.name`)}` : id;
-                      }).join(", ")}
+                        return p ? (
+                          <span key={id} className="inline-flex items-center gap-0.5">
+                            <PlantIconDisplay plantId={id} emoji={p.icon} size={14} />
+                            {t(`plants.catalog.${id}.name`)}{i < arr.length - 1 ? ", " : ""}
+                          </span>
+                        ) : id;
+                      })}
                     </p>
                   </div>
                 ))}
@@ -156,7 +163,7 @@ export function SufficiencyDashboard() {
                   return (
                     <div key={y.plantId} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
                       <div className="flex items-center gap-2">
-                        <span>{plant.icon}</span>
+                        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />
                         <span className="text-sm font-medium">{t(`plants.catalog.${y.plantId}.name`)}</span>
                         <span className="text-xs text-gray-400">{y.areaM2.toFixed(1)} m²</span>
                       </div>

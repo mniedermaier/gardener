@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Sun, Droplets, Ruler, ArrowLeft } from "lucide-react";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant } from "@/types/plant";
 import { usePlantMap } from "@/hooks/usePlants";
 import { Card } from "@/components/ui/Card";
@@ -65,7 +66,7 @@ export function PlantDetail({ plant, onBack }: PlantDetailProps) {
             className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl text-4xl"
             style={{ backgroundColor: plant.color + "20" }}
           >
-            {plant.icon}
+            <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={40} />
           </span>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">

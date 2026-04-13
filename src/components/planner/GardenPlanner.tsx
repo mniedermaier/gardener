@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/Card";
 import type { Bed, Garden, EnvironmentType, GreenhouseConfig, ContainerConfig, RaisedBedConfig, ColdFrameConfig } from "@/types/garden";
 import { ENVIRONMENT_ICONS, getFrostProtectionWeeks } from "@/types/garden";
 import type { Plant } from "@/types/plant";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { CropRotation } from "./CropRotation";
 import { GuildPicker } from "./GuildPicker";
 import { PlantPalette } from "./PlantPalette";
@@ -100,7 +101,7 @@ const DroppableCell = memo(function DroppableCell({
       ${plant && validationWarning ? "ring-2 ring-red-400" : ""}`}
       style={plant ? { backgroundColor: plant.color + "30" } : undefined}
     >
-      {plant?.icon ?? ""}
+      {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />}
       {plant && (
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
@@ -782,7 +783,7 @@ export function GardenPlanner() {
         <DragOverlay>
           {activeDragPlant ? (
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white text-2xl shadow-xl ring-2 ring-garden-500 dark:bg-gray-800">
-              {activeDragPlant.icon}
+              <PlantIconDisplay plantId={activeDragPlant.id} emoji={activeDragPlant.icon} size={28} />
             </div>
           ) : null}
         </DragOverlay>

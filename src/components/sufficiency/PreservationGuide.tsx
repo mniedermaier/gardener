@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
 import { usePlantMap } from "@/hooks/usePlants";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import type { PreservationMethod } from "@/types/plant";
 
@@ -48,7 +49,7 @@ export function PreservationGuide() {
             {plantedPlants.map((plant) => (
               <div key={plant!.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
                 <div className="flex items-center gap-2">
-                  <span>{plant!.icon}</span>
+                  <PlantIconDisplay plantId={plant!.id} emoji={plant!.icon} size={20} />
                   <span className="text-sm font-medium">{t(`plants.catalog.${plant!.id}.name`)}</span>
                 </div>
                 <div className="flex gap-2">
@@ -77,7 +78,7 @@ export function PreservationGuide() {
               return (
                 <div key={plant!.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
                   <div className="flex items-center gap-2">
-                    <span>{plant!.icon}</span>
+                    <PlantIconDisplay plantId={plant!.id} emoji={plant!.icon} size={20} />
                     <span className="text-sm font-medium">{t(`plants.catalog.${plant!.id}.name`)}</span>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-gray-500">
