@@ -686,10 +686,20 @@ export function GardenPlanner() {
                 </div>
               )}
 
-              {selectedPlant && (
+              {selectedPlant && !pathMode && (
                 <div className="mb-3 rounded-lg bg-garden-50 px-3 py-1.5 text-xs text-garden-700 dark:bg-garden-900/20 dark:text-garden-400">
                   {t("planner.placeMode", { plant: selectedPlant.icon + " " + (selectedPlant.displayName ?? t(`plants.catalog.${selectedPlant.id}.name`)) })}
                   <button onClick={() => setSelectedPlant(null)} className="ml-2 font-medium underline">ESC</button>
+                </div>
+              )}
+
+              {pathMode && (
+                <div className="mb-3 flex items-center gap-2 rounded-lg bg-stone-100 px-3 py-2 text-xs text-stone-700 dark:bg-stone-800 dark:text-stone-300">
+                  <Footprints size={14} />
+                  <span>{t("planner.pathModeHint")}</span>
+                  <button onClick={() => setPathMode(false)} className="ml-auto rounded bg-stone-200 px-2 py-0.5 font-medium hover:bg-stone-300 dark:bg-stone-700 dark:hover:bg-stone-600">
+                    {t("planner.pathModeDone")}
+                  </button>
                 </div>
               )}
 
@@ -702,7 +712,7 @@ export function GardenPlanner() {
                   size="sm"
                   onClick={() => { setPathMode(!pathMode); if (!pathMode) setSelectedPlant(null); }}
                 >
-                  <Footprints size={16} />{t("planner.pathMode")}
+                  <Footprints size={16} />{pathMode ? t("planner.pathModeDone") : t("planner.pathMode")}
                 </Button>
               </div>
 
