@@ -107,7 +107,8 @@ export function SeasonTimeline() {
   return (
     <Card className="mt-6 overflow-x-auto">
       <h2 className="mb-4 text-lg font-semibold">{t("calendar.title")} - Timeline</h2>
-      <div className="mb-2 flex text-xs text-gray-400">
+      <div className="mb-2 flex items-center gap-2 text-xs text-gray-400">
+        <div className="w-32 shrink-0" />
         {months.map((m, i) => (
           <div key={i} className="flex-1 text-center">{m}</div>
         ))}
