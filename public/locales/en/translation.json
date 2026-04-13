@@ -14,6 +14,7 @@
     "harvest": "Harvest Log",
     "journal": "Journal",
     "seeds": "Seeds",
+    "soil": "Soil",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI"
   },
@@ -440,6 +441,35 @@
       "saved": "Saved",
       "traded": "Traded",
       "gifted": "Gift"
+    }
+  },
+  "soil": {
+    "title": "Soil Management",
+    "addTest": "Add Soil Test",
+    "addAmendment": "Add Amendment",
+    "tests": "Soil Tests",
+    "amendments": "Amendments",
+    "testAdded": "Soil test recorded!",
+    "amendmentAdded": "Amendment recorded!",
+    "noTests": "No soil tests recorded yet. Test your soil to track fertility!",
+    "noAmendments": "No amendments recorded yet.",
+    "organicMatter": "Organic matter",
+    "amendmentType": "Type",
+    "material": "Material",
+    "materialPlaceholder": "e.g. Horse manure, Garden compost...",
+    "phTooAcid": "Very acidic - add lime to raise pH",
+    "phSlightlyAcid": "Slightly acidic - most plants prefer 6.0-7.0",
+    "phOptimal": "Optimal pH range for most vegetables",
+    "phSlightlyAlkaline": "Slightly alkaline - add sulfur if needed",
+    "phTooAlkaline": "Too alkaline - add sulfur or peat to lower pH",
+    "types": {
+      "compost": "Compost",
+      "manure": "Manure",
+      "lime": "Lime",
+      "sulfur": "Sulfur",
+      "fertilizer": "Fertilizer",
+      "mulch": "Mulch",
+      "other": "Other"
     }
   },
   "preservation": {

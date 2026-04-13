@@ -14,6 +14,7 @@
     "harvest": "Ernteprotokoll",
     "journal": "Tagebuch",
     "seeds": "Saatgut",
+    "soil": "Boden",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI"
   },
@@ -440,6 +441,35 @@
       "saved": "Selbst gewonnen",
       "traded": "Getauscht",
       "gifted": "Geschenk"
+    }
+  },
+  "soil": {
+    "title": "Boden-Management",
+    "addTest": "Bodentest hinzufügen",
+    "addAmendment": "Düngung hinzufügen",
+    "tests": "Bodentests",
+    "amendments": "Düngungen",
+    "testAdded": "Bodentest erfasst!",
+    "amendmentAdded": "Düngung erfasst!",
+    "noTests": "Noch keine Bodentests erfasst. Teste deinen Boden um die Fruchtbarkeit zu verfolgen!",
+    "noAmendments": "Noch keine Düngungen erfasst.",
+    "organicMatter": "Organische Substanz",
+    "amendmentType": "Typ",
+    "material": "Material",
+    "materialPlaceholder": "z.B. Pferdemist, Gartenkompost...",
+    "phTooAcid": "Sehr sauer - Kalk ausbringen um pH zu erhöhen",
+    "phSlightlyAcid": "Leicht sauer - die meisten Pflanzen bevorzugen 6.0-7.0",
+    "phOptimal": "Optimaler pH-Bereich für die meisten Gemüsesorten",
+    "phSlightlyAlkaline": "Leicht alkalisch - bei Bedarf Schwefel ausbringen",
+    "phTooAlkaline": "Zu alkalisch - Schwefel oder Torf ausbringen um pH zu senken",
+    "types": {
+      "compost": "Kompost",
+      "manure": "Mist",
+      "lime": "Kalk",
+      "sulfur": "Schwefel",
+      "fertilizer": "Dünger",
+      "mulch": "Mulch",
+      "other": "Sonstiges"
     }
   },
   "preservation": {
