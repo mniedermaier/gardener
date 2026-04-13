@@ -19,6 +19,7 @@ export interface SettingsSlice {
   backendUrl: string | null;
   theme: "light" | "dark" | "system";
   alerts: AlertConfig;
+  lastBackupDate: string | null;
   setLocale: (locale: "de" | "en") => void;
   setWeatherApiKey: (key: string) => void;
   setLocation: (lat: number, lon: number, name: string) => void;
@@ -26,6 +27,7 @@ export interface SettingsSlice {
   setTheme: (theme: "light" | "dark" | "system") => void;
   setBackendUrl: (url: string | null) => void;
   setAlerts: (alerts: Partial<AlertConfig>) => void;
+  setLastBackupDate: (date: string) => void;
 }
 
 export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
@@ -45,6 +47,7 @@ export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
     greenhouseAlerts: true,
     weeklyDigest: true,
   },
+  lastBackupDate: null,
   setLocale: (locale) => set({ locale }),
   setWeatherApiKey: (weatherApiKey) => set({ weatherApiKey }),
   setLocation: (locationLat, locationLon, locationName) =>
@@ -54,4 +57,5 @@ export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
   setBackendUrl: (backendUrl) => set({ backendUrl }),
   setAlerts: (updates) =>
     set((state) => ({ alerts: { ...state.alerts, ...updates } })),
+  setLastBackupDate: (lastBackupDate) => set({ lastBackupDate }),
 });

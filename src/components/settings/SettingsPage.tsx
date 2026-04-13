@@ -6,6 +6,7 @@ import { applyTheme } from "@/lib/theme";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DataManagement } from "./DataManagement";
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -201,6 +202,8 @@ export function SettingsPage() {
           />
           <p className="mt-2 text-xs text-gray-500">{t("settings.backendHint")}</p>
         </Card>
+
+        <DataManagement />
 
         <Button onClick={showSaved}>
           {saved ? <Check size={16} /> : null}

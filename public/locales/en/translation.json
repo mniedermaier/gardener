@@ -35,7 +35,10 @@
     "totalPlantings": "Total plantings",
     "totalHarvest": "Total harvest",
     "totalExpenses": "Total expenses",
-    "harvestEntries": "Harvest entries"
+    "harvestEntries": "Harvest entries",
+    "noBackup": "No backup yet. Your data only exists in this browser.",
+    "backupOld": "Last backup was {{days}} days ago.",
+    "backupNow": "Backup now"
   },
   "search": {
     "placeholder": "Search plants, tasks, journal..."
@@ -272,6 +275,32 @@
     "backendUrl": "Backend URL",
     "backendHint": "Leave empty for local-only mode. Set when running in Docker.",
     "saved": "Settings saved!"
+  },
+  "dataManagement": {
+    "title": "Data Management",
+    "exportAll": "Download Full Backup",
+    "importBackup": "Restore Backup",
+    "exportHarvestsCsv": "Harvests as CSV",
+    "exportExpensesCsv": "Expenses as CSV",
+    "clearAll": "Delete All Data",
+    "clearConfirm": "Delete ALL data? This cannot be undone. Make a backup first!",
+    "lastBackup": "Last backup",
+    "daysAgo": "days ago",
+    "noBackup": "No backup created yet. Your data only exists in this browser!",
+    "exportSuccess": "Backup downloaded successfully.",
+    "importSuccess": "Data restored successfully!",
+    "importError": "Import failed.",
+    "invalidFile": "Invalid backup file. Must be a Gardener export.",
+    "importMode": "How to import?",
+    "importModeDesc": "Merge adds new data without deleting existing. Overwrite replaces everything.",
+    "merge": "Merge (keep existing + add new)",
+    "overwrite": "Overwrite (replace everything)",
+    "imported": "Imported",
+    "statsGardens": "gardens",
+    "statsTasks": "tasks",
+    "statsHarvests": "harvests",
+    "statsJournal": "journal entries",
+    "statsExpenses": "expenses"
   },
   "alerts": {
     "frostTitle": "Frost warning: {{temp}}°C",

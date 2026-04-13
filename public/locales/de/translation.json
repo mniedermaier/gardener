@@ -35,7 +35,10 @@
     "totalPlantings": "Pflanzungen gesamt",
     "totalHarvest": "Ernte gesamt",
     "totalExpenses": "Ausgaben gesamt",
-    "harvestEntries": "Ernteeintr\u00e4ge"
+    "harvestEntries": "Ernteeintr\u00e4ge",
+    "noBackup": "Noch kein Backup. Deine Daten existieren nur in diesem Browser.",
+    "backupOld": "Letztes Backup vor {{days}} Tagen.",
+    "backupNow": "Jetzt sichern"
   },
   "onboarding": {
     "welcome": "Willkommen bei Gardener!",
@@ -272,6 +275,32 @@
     "backendUrl": "Backend-URL",
     "backendHint": "Leer lassen f\u00fcr Nur-Lokal-Modus. Setzen wenn Docker verwendet wird.",
     "saved": "Einstellungen gespeichert!"
+  },
+  "dataManagement": {
+    "title": "Daten-Management",
+    "exportAll": "Vollst\u00e4ndiges Backup herunterladen",
+    "importBackup": "Backup wiederherstellen",
+    "exportHarvestsCsv": "Ernten als CSV",
+    "exportExpensesCsv": "Ausgaben als CSV",
+    "clearAll": "Alle Daten l\u00f6schen",
+    "clearConfirm": "ALLE Daten l\u00f6schen? Das kann nicht r\u00fcckg\u00e4ngig gemacht werden. Erstelle zuerst ein Backup!",
+    "lastBackup": "Letztes Backup",
+    "daysAgo": "Tage her",
+    "noBackup": "Noch kein Backup erstellt. Deine Daten existieren nur in diesem Browser!",
+    "exportSuccess": "Backup erfolgreich heruntergeladen.",
+    "importSuccess": "Daten erfolgreich wiederhergestellt!",
+    "importError": "Import fehlgeschlagen.",
+    "invalidFile": "Ung\u00fcltige Backup-Datei. Muss ein Gardener-Export sein.",
+    "importMode": "Wie importieren?",
+    "importModeDesc": "Zusammenf\u00fchren f\u00fcgt neue Daten hinzu ohne bestehende zu l\u00f6schen. \u00dcberschreiben ersetzt alles.",
+    "merge": "Zusammenf\u00fchren (bestehende behalten + neue hinzuf\u00fcgen)",
+    "overwrite": "\u00dcberschreiben (alles ersetzen)",
+    "imported": "Importiert",
+    "statsGardens": "G\u00e4rten",
+    "statsTasks": "Aufgaben",
+    "statsHarvests": "Ernten",
+    "statsJournal": "Tagebucheintr\u00e4ge",
+    "statsExpenses": "Ausgaben"
   },
   "alerts": {
     "frostTitle": "Frostwarnung: {{temp}}\u00b0C",

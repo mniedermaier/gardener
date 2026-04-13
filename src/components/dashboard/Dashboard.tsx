@@ -34,7 +34,7 @@ function StatCard({ icon: Icon, value, label, color, onClick }: {
 export function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { gardens, tasks, harvests, expenses } = useStore();
+  const { gardens, tasks, harvests, expenses, lastBackupDate } = useStore();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
@@ -79,6 +79,27 @@ export function Dashboard() {
         <StatCard icon={CalendarDays} value={upcomingTasks.length} label={t("dashboard.tasksDue")} color="bg-blue-600" onClick={() => navigate("/calendar")} />
         <StatCard icon={Apple} value={`${totalHarvestKg.toFixed(1)} kg`} label={t("dashboard.harvested")} color="bg-amber-600" onClick={() => navigate("/harvest")} />
       </div>
+
+      {/* Backup reminder */}
+      {(() => {
+        const daysSinceBackup = lastBackupDate
+          ? Math.floor((Date.now() - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24))
+          : null;
+        if (daysSinceBackup === null || daysSinceBackup >= 7) {
+          return (
+            <div className="mb-4 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                <AlertTriangle size={12} className="mr-1.5 inline" />
+                {daysSinceBackup === null ? t("dashboard.noBackup") : t("dashboard.backupOld", { days: daysSinceBackup })}
+              </p>
+              <button onClick={() => navigate("/settings")} className="text-xs font-medium text-amber-700 underline dark:text-amber-400">
+                {t("dashboard.backupNow")}
+              </button>
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       <div className="mb-6">
         <PlantingAdvisor />
