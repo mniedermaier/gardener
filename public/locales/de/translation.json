@@ -165,6 +165,7 @@
       "water": "Wasser",
       "companions": "Gute Nachbarn",
       "antagonists": "Nicht neben",
+      "plantedIn": "Aktuell gepflanzt in",
       "weeksBeforeFrost": "{{weeks}} Wochen vor letztem Frost",
       "weeksAfterFrost": "{{weeks}} Wochen nach letztem Frost",
       "daysToHarvest": "{{min}}\u2013{{max}} Tage",

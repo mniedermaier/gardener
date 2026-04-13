@@ -165,6 +165,7 @@
       "water": "Water",
       "companions": "Good companions",
       "antagonists": "Avoid next to",
+      "plantedIn": "Currently planted in",
       "weeksBeforeFrost": "{{weeks}} weeks before last frost",
       "weeksAfterFrost": "{{weeks}} weeks after last frost",
       "daysToHarvest": "{{min}}-{{max}} days",

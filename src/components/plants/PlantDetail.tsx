@@ -1,10 +1,60 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Droplets, Ruler, ArrowLeft } from "lucide-react";
+import { Sun, Droplets, Ruler, ArrowLeft, MapPin } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant } from "@/types/plant";
 import { usePlantMap } from "@/hooks/usePlants";
+import { useStore } from "@/store";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { ENVIRONMENT_ICONS } from "@/types/garden";
+
+function PlantedLocations({ plantId }: { plantId: string }) {
+  const { t } = useTranslation();
+  const gardens = useStore((s) => s.gardens);
+
+  const locations = useMemo(() => {
+    const result: Array<{ gardenName: string; bedName: string; envIcon: string; count: number }> = [];
+    for (const g of gardens) {
+      for (const b of g.beds) {
+        const count = b.cells.filter((c) => c.plantId === plantId).length;
+        if (count > 0) {
+          result.push({
+            gardenName: g.name,
+            bedName: b.name,
+            envIcon: ENVIRONMENT_ICONS[b.environmentType ?? "outdoor_bed"],
+            count,
+          });
+        }
+      }
+    }
+    return result;
+  }, [gardens, plantId]);
+
+  if (locations.length === 0) return null;
+
+  return (
+    <div className="mt-6">
+      <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400">
+        <MapPin size={14} />
+        {t("plants.details.plantedIn")}
+      </h2>
+      <div className="space-y-1">
+        {locations.map((loc, i) => (
+          <div key={i} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-1.5 text-xs dark:bg-gray-800">
+            <span>
+              <span className="mr-1">{loc.envIcon}</span>
+              <span className="font-medium">{loc.gardenName}</span>
+              <span className="mx-1 text-gray-400">/</span>
+              {loc.bedName}
+            </span>
+            <span className="text-gray-500">{loc.count}x</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface PlantDetailProps {
   plant: Plant;
@@ -141,6 +191,8 @@ export function PlantDetail({ plant, onBack }: PlantDetailProps) {
             </div>
           </div>
         )}
+
+        <PlantedLocations plantId={plant.id} />
       </Card>
     </div>
   );
