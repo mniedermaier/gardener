@@ -6,6 +6,7 @@ import {
   AlertTriangle, ArrowRight, Star,
 } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
@@ -35,7 +36,7 @@ function StatCard({ icon: Icon, value, label, color, onClick }: {
 export function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { gardens, tasks, harvests, expenses, lastBackupDate } = useStore();
+  const { gardens, tasks, harvests, expenses, lastBackupDate } = useStore(useShallow((s) => ({ gardens: s.gardens, tasks: s.tasks, harvests: s.harvests, expenses: s.expenses, lastBackupDate: s.lastBackupDate })));
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 

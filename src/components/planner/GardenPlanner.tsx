@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect, memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2, Footprints } from "lucide-react";
+import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2, Footprints, Copy } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -69,6 +69,7 @@ const DroppableCell = memo(function DroppableCell({
   onRemove: () => void; onClick: () => void;
   onSelectPlant: () => void; onTogglePath: () => void; validationWarning?: string; notes?: string;
 }) {
+  const { t } = useTranslation();
   const getPlantName = usePlantName();
   const { setNodeRef, isOver } = useDroppable({
     id: `cell-${bedId}-${x}-${y}`,
@@ -89,8 +90,8 @@ const DroppableCell = memo(function DroppableCell({
       role="gridcell"
       aria-label={plantName || `Empty cell ${x + 1}, ${y + 1}`}
       onClick={isPathMode ? onTogglePath : plant ? onSelectPlant : onClick}
-      title={isPath ? "Path / Weg" : tooltip}
-      className={`group relative flex h-11 w-11 items-center justify-center rounded text-lg transition-all ${
+      title={isPath ? t("planner.path") : tooltip}
+      className={`group relative flex h-12 w-12 items-center justify-center rounded text-lg transition-all ${
         isPath
           ? "bg-stone-400/50 dark:bg-stone-600/50"
           : plant
@@ -135,7 +136,7 @@ function BedGrid({
 }: {
   bed: Bed; gardenId: string; selectedPlantId: string | null; isPathMode: boolean;
   onCellClick: (bedId: string, x: number, y: number) => void;
-  onSelectPlantFromCell: (plantId: string) => void;
+  onSelectPlantFromCell: (plantId: string, bedId: string, cellX: number, cellY: number) => void;
 }) {
   const { t } = useTranslation();
   const plantMap = usePlantMap();
@@ -257,7 +258,7 @@ function BedGrid({
       <div className="overflow-x-auto pb-2">
       <div
         className={`inline-grid gap-0.5 rounded-lg border p-1 ${ENVIRONMENT_COLORS[envType]} ${ENVIRONMENT_BORDERS[envType]}`}
-        style={{ gridTemplateColumns: `repeat(${bed.width}, 2.75rem)` }}
+        style={{ gridTemplateColumns: `repeat(${bed.width}, 3rem)` }}
       >
         {Array.from({ length: bed.height }, (_, y) =>
           Array.from({ length: bed.width }, (_, x) => {
@@ -282,7 +283,7 @@ function BedGrid({
                 isPathMode={isPathMode}
                 validationWarning={isPath ? undefined : cellWarnings.get(cellKey)}
                 onRemove={() => removeCell(gardenId, bed.id, x, y)}
-                onSelectPlant={() => { if (plant) onSelectPlantFromCell(plant.id); }}
+                onSelectPlant={() => { if (plant) onSelectPlantFromCell(plant.id, bed.id, x, y); }}
                 onTogglePath={() => togglePath(gardenId, bed.id, x, y)}
                 onClick={() => onCellClick(bed.id, x, y)}
               />
@@ -407,7 +408,8 @@ export function GardenPlanner() {
   const { t } = useTranslation();
   const {
     gardens, activeGardenId, addGarden, setActiveGarden, addBed, deleteBed,
-    deleteGarden, setCell, archiveSeason, seasonArchives, gridCellSizeCm, lastFrostDate,
+    deleteGarden, setCell, updateCell, archiveSeason, seasonArchives, gridCellSizeCm, lastFrostDate,
+    duplicateGarden, duplicateBed,
   } = useStore();
   const plants = usePlants();
   const plantMap = usePlantMap();
@@ -432,6 +434,7 @@ export function GardenPlanner() {
   const [placementFeedback, setPlacementFeedback] = useState<string | null>(null);
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
   const [pathMode, setPathMode] = useState(false);
+  const [editingCell, setEditingCell] = useState<{ gardenId: string; bedId: string; cellX: number; cellY: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeGarden = gardens.find((g) => g.id === activeGardenId);
@@ -659,7 +662,8 @@ export function GardenPlanner() {
                 }`}>
                 {g.name}
                 <span className="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-normal text-gray-500 dark:bg-gray-700 dark:text-gray-400">{g.season}</span>
-                <span role="button" onClick={async (e) => { e.stopPropagation(); if (await confirm(t("planner.confirmDeleteGarden"))) deleteGarden(g.id); }} className="ml-1 rounded p-0.5 text-gray-400 hover:text-red-500"><Trash2 size={12} /></span>
+                <span role="button" onClick={(e) => { e.stopPropagation(); duplicateGarden(g.id); }} className="rounded p-0.5 text-gray-400 hover:text-gray-600" title={t("common.duplicate")}><Copy size={11} /></span>
+                <span role="button" onClick={async (e) => { e.stopPropagation(); if (await confirm(t("planner.confirmDeleteGarden"))) deleteGarden(g.id); }} className="rounded p-0.5 text-gray-400 hover:text-red-500"><Trash2 size={12} /></span>
               </button>
             ))}
             {activeGarden && activeGarden.beds.some((b) => b.cells.length > 0) && (
@@ -737,7 +741,14 @@ export function GardenPlanner() {
                         )}
                       </div>
                       <button
-                        onClick={() => deleteBed(activeGardenId!, bed.id)}
+                        onClick={() => duplicateBed(activeGardenId!, bed.id)}
+                        className="rounded-full bg-gray-100 p-1 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                        title={t("common.duplicate")}
+                      >
+                        <Copy size={14} />
+                      </button>
+                      <button
+                        onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteBed(activeGardenId!, bed.id); }}
                         className="rounded-full bg-red-100 p-1 text-red-600 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400"
                         title={t("planner.deleteBed")}
                       >
@@ -750,9 +761,10 @@ export function GardenPlanner() {
                       selectedPlantId={selectedPlant?.id ?? null}
                       isPathMode={pathMode}
                       onCellClick={handleCellClick}
-                      onSelectPlantFromCell={(id) => {
+                      onSelectPlantFromCell={(id, bedId, cellX, cellY) => {
                         const p = plantMap.get(id);
                         if (p) setSelectedPlant(p);
+                        setEditingCell({ gardenId: activeGardenId!, bedId, cellX, cellY });
                       }}
                     />
                   </div>
@@ -794,8 +806,51 @@ export function GardenPlanner() {
               </Card>
 
               {selectedPlant && (
-                <PlantInfoPanel plant={selectedPlant} onClose={() => setSelectedPlant(null)} />
+                <PlantInfoPanel plant={selectedPlant} onClose={() => { setSelectedPlant(null); setEditingCell(null); }} />
               )}
+
+              {/* Cell editing panel */}
+              {editingCell && (() => {
+                const bed = activeGarden?.beds.find((b) => b.id === editingCell.bedId);
+                const cell = bed?.cells.find((c) => c.cellX === editingCell.cellX && c.cellY === editingCell.cellY);
+                if (!cell) return null;
+                return (
+                  <Card>
+                    <h3 className="mb-3 text-sm font-semibold">{t("planner.editCell")}</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-xs text-gray-500">{t("planner.variety")}</label>
+                        <input
+                          type="text"
+                          value={cell.variety ?? ""}
+                          onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { variety: e.target.value || undefined })}
+                          placeholder={t("planner.varietyPlaceholder")}
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs text-gray-500">{t("planner.plantedDate")}</label>
+                        <input
+                          type="date"
+                          value={cell.plantedDate ?? ""}
+                          onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { plantedDate: e.target.value || undefined })}
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs text-gray-500">{t("harvest.notes")}</label>
+                        <textarea
+                          value={cell.notes ?? ""}
+                          onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { notes: e.target.value || undefined })}
+                          rows={2}
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
+                        />
+                      </div>
+                      <button onClick={() => setEditingCell(null)} className="text-xs text-gray-400 hover:text-gray-600">{t("common.close")}</button>
+                    </div>
+                  </Card>
+                );
+              })()}
             </div>
           </div>
         ) : (

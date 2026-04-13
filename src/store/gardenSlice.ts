@@ -11,8 +11,11 @@ export interface GardenSlice {
   updateBed: (gardenId: string, bedId: string, updates: Partial<Bed>) => void;
   deleteBed: (gardenId: string, bedId: string) => void;
   setCell: (gardenId: string, bedId: string, cell: CellPlanting) => void;
+  updateCell: (gardenId: string, bedId: string, cellX: number, cellY: number, updates: Partial<CellPlanting>) => void;
   removeCell: (gardenId: string, bedId: string, cellX: number, cellY: number) => void;
   togglePath: (gardenId: string, bedId: string, cellX: number, cellY: number) => void;
+  duplicateGarden: (gardenId: string) => string;
+  duplicateBed: (gardenId: string, bedId: string) => void;
 }
 
 let nextId = Date.now();
@@ -92,6 +95,23 @@ export const createGardenSlice: StateCreator<GardenSlice> = (set) => ({
       ),
     })),
 
+  updateCell: (gardenId, bedId, cellX, cellY, updates) =>
+    set((state) => ({
+      gardens: state.gardens.map((g) =>
+        g.id === gardenId
+          ? {
+              ...g,
+              beds: g.beds.map((b) =>
+                b.id === bedId
+                  ? { ...b, cells: b.cells.map((c) => c.cellX === cellX && c.cellY === cellY ? { ...c, ...updates } : c) }
+                  : b
+              ),
+              updatedAt: new Date().toISOString(),
+            }
+          : g
+      ),
+    })),
+
   removeCell: (gardenId, bedId, cellX, cellY) =>
     set((state) => ({
       gardens: state.gardens.map((g) =>
@@ -134,5 +154,39 @@ export const createGardenSlice: StateCreator<GardenSlice> = (set) => ({
             }
           : g
       ),
+    })),
+
+  duplicateGarden: (gardenId) => {
+    const id = genId();
+    set((state) => {
+      const source = state.gardens.find((g) => g.id === gardenId);
+      if (!source) return state;
+      const clone: Garden = {
+        ...JSON.parse(JSON.stringify(source)),
+        id,
+        name: `${source.name} (copy)`,
+        beds: source.beds.map((b) => ({ ...JSON.parse(JSON.stringify(b)), id: genId() })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      return { gardens: [...state.gardens, clone], activeGardenId: id };
+    });
+    return id;
+  },
+
+  duplicateBed: (gardenId, bedId) =>
+    set((state) => ({
+      gardens: state.gardens.map((g) => {
+        if (g.id !== gardenId) return g;
+        const source = g.beds.find((b) => b.id === bedId);
+        if (!source) return g;
+        const clone: Bed = {
+          ...JSON.parse(JSON.stringify(source)),
+          id: genId(),
+          name: `${source.name} (copy)`,
+          y: g.beds.length,
+        };
+        return { ...g, beds: [...g.beds, clone], updatedAt: new Date().toISOString() };
+      }),
     })),
 });

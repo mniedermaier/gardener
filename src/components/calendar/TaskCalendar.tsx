@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Check, Calendar, AlertCircle, Download } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +28,7 @@ const taskTypes: TaskType[] = ["sow_indoors", "sow_outdoors", "transplant", "wat
 
 export function TaskCalendar() {
   const { t } = useTranslation();
-  const { tasks, gardens, lastFrostDate, addTask, completeTask, generateTasks } = useStore();
+  const { tasks, gardens, lastFrostDate, addTask, completeTask, generateTasks } = useStore(useShallow((s) => ({ tasks: s.tasks, gardens: s.gardens, lastFrostDate: s.lastFrostDate, addTask: s.addTask, completeTask: s.completeTask, generateTasks: s.generateTasks })));
   const plantMap = usePlantMap();
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -168,7 +169,7 @@ export function TaskCalendar() {
           {gardens.some((g) => g.beds.some((b) => b.cells.length > 0)) && (
             <Button variant="secondary" size="sm" onClick={handleGenerateTasks}>
               <Calendar size={16} />
-              Generate
+              {t("calendar.generate")}
             </Button>
           )}
           <Button size="sm" onClick={() => setShowAddTask(true)}>
@@ -196,9 +197,9 @@ export function TaskCalendar() {
 
       <Modal open={showAddTask} onClose={() => setShowAddTask(false)} title={t("calendar.addTask")}>
         <div className="space-y-4">
-          <Input label="Title" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} autoFocus />
+          <Input label={t("calendar.taskTitle")} value={newTitle} onChange={(e) => setNewTitle(e.target.value)} autoFocus />
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.taskType")}</label>
             <div className="flex flex-wrap gap-2">
               {taskTypes.map((type) => (
                 <button
@@ -213,7 +214,7 @@ export function TaskCalendar() {
               ))}
             </div>
           </div>
-          <Input label="Date" type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
+          <Input label={t("calendar.taskDate")} type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setShowAddTask(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAddTask}>{t("common.add")}</Button>

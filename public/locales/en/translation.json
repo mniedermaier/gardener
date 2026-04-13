@@ -72,7 +72,12 @@
     "autoFill": "Smart plant suggestions",
     "autoFillDone": "Placed {{count}} plants!",
     "clearBed": "Clear all",
+    "path": "Path",
     "pathMode": "Paths",
+    "editCell": "Edit Planting",
+    "variety": "Variety",
+    "varietyPlaceholder": "e.g. San Marzano, Brandywine...",
+    "plantedDate": "Planted date",
     "confirmDeleteGarden": "Delete this garden and all its beds? This cannot be undone.",
     "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
     "share": "Share garden plan",
@@ -162,7 +167,8 @@
       "antagonists": "Avoid next to",
       "weeksBeforeFrost": "{{weeks}} weeks before last frost",
       "weeksAfterFrost": "{{weeks}} weeks after last frost",
-      "daysToHarvest": "{{min}}-{{max}} days"
+      "daysToHarvest": "{{min}}-{{max}} days",
+      "timing": "Timing"
     },
     "sun": {
       "full": "Full sun",
@@ -237,6 +243,10 @@
     "overdue": "Overdue",
     "completed": "Completed",
     "addTask": "Add Task",
+    "taskTitle": "Title",
+    "taskType": "Type",
+    "taskDate": "Date",
+    "generate": "Generate",
     "taskTypes": {
       "sow_indoors": "Sow Indoors",
       "sow_outdoors": "Sow Outdoors",
@@ -346,6 +356,7 @@
     "entryTitle": "Title",
     "text": "What happened in the garden today?",
     "tags": "Tags (comma separated)",
+    "tagsPlaceholder": "e.g. sowing, pests, weather",
     "noEntries": "Your garden journal is empty. Start documenting your garden journey!",
     "linkedTo": "Linked to"
   },
@@ -483,8 +494,10 @@
     "edit": "Edit",
     "add": "Add",
     "close": "Close",
+    "duplicate": "Duplicate",
     "loading": "Loading...",
     "noResults": "No results found.",
-    "cm": "cm"
+    "cm": "cm",
+    "confirmDelete": "Are you sure you want to delete this?"
   }
 }

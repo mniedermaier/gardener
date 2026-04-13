@@ -72,7 +72,12 @@
     "autoFill": "Smarte Pflanzvorschl\u00e4ge",
     "autoFillDone": "{{count}} Pflanzen platziert!",
     "clearBed": "Alle entfernen",
+    "path": "Weg",
     "pathMode": "Wege",
+    "editCell": "Pflanzung bearbeiten",
+    "variety": "Sorte",
+    "varietyPlaceholder": "z.B. San Marzano, Ochsenherz...",
+    "plantedDate": "Pflanzdatum",
     "confirmDeleteGarden": "Diesen Garten und alle Beete l\u00f6schen? Das kann nicht r\u00fcckg\u00e4ngig gemacht werden.",
     "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
     "share": "Gartenplan teilen",
@@ -162,7 +167,8 @@
       "antagonists": "Nicht neben",
       "weeksBeforeFrost": "{{weeks}} Wochen vor letztem Frost",
       "weeksAfterFrost": "{{weeks}} Wochen nach letztem Frost",
-      "daysToHarvest": "{{min}}\u2013{{max}} Tage"
+      "daysToHarvest": "{{min}}\u2013{{max}} Tage",
+      "timing": "Zeitplan"
     },
     "sun": {
       "full": "Volle Sonne",
@@ -237,6 +243,10 @@
     "overdue": "\u00dcberf\u00e4llig",
     "completed": "Erledigt",
     "addTask": "Aufgabe hinzuf\u00fcgen",
+    "taskTitle": "Titel",
+    "taskType": "Typ",
+    "taskDate": "Datum",
+    "generate": "Generieren",
     "taskTypes": {
       "sow_indoors": "Vorziehen",
       "sow_outdoors": "Direktsaat",
@@ -346,6 +356,7 @@
     "entryTitle": "Titel",
     "text": "Was ist heute im Garten passiert?",
     "tags": "Tags (kommagetrennt)",
+    "tagsPlaceholder": "z.B. Aussaat, Sch\u00e4dlinge, Wetter",
     "noEntries": "Dein Gartentagebuch ist leer. Dokumentiere deine Gartenreise!",
     "linkedTo": "Verkn\u00fcpft mit"
   },
@@ -483,8 +494,10 @@
     "edit": "Bearbeiten",
     "add": "Hinzuf\u00fcgen",
     "close": "Schlie\u00dfen",
+    "duplicate": "Duplizieren",
     "loading": "Laden...",
     "noResults": "Keine Ergebnisse gefunden.",
-    "cm": "cm"
+    "cm": "cm",
+    "confirmDelete": "Wirklich löschen?"
   }
 }

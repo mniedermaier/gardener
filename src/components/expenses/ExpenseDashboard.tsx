@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2, TrendingUp, TrendingDown, Euro } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -36,7 +38,8 @@ const MARKET_PRICES: Record<string, number> = {
 
 export function ExpenseDashboard() {
   const { t } = useTranslation();
-  const { expenses, harvests, addExpense, deleteExpense } = useStore();
+  const { confirm } = useToast();
+  const { expenses, harvests, addExpense, deleteExpense } = useStore(useShallow((s) => ({ expenses: s.expenses, harvests: s.harvests, addExpense: s.addExpense, deleteExpense: s.deleteExpense })));
   const [showAdd, setShowAdd] = useState(false);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -145,7 +148,7 @@ export function ExpenseDashboard() {
                 <p className="text-xs text-gray-400">{e.date}</p>
               </div>
               <span className="text-sm font-semibold text-red-600">{formatCents(e.amountCents)}</span>
-              <button onClick={() => deleteExpense(e.id)} className="rounded p-1 text-gray-400 hover:text-red-500">
+              <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteExpense(e.id); }} className="rounded p-1 text-gray-400 hover:text-red-500">
                 <Trash2 size={14} />
               </button>
             </div>

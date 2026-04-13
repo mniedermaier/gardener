@@ -2,7 +2,9 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2, Star, TrendingUp } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { useToast } from "@/components/ui/Toast";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -12,7 +14,8 @@ import { format } from "date-fns";
 
 export function HarvestLog() {
   const { t } = useTranslation();
-  const { harvests, gardens, addHarvest, deleteHarvest } = useStore();
+  const { confirm } = useToast();
+  const { harvests, gardens, addHarvest, deleteHarvest } = useStore(useShallow((s) => ({ harvests: s.harvests, gardens: s.gardens, addHarvest: s.addHarvest, deleteHarvest: s.deleteHarvest })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [showAdd, setShowAdd] = useState(false);
@@ -164,7 +167,7 @@ export function HarvestLog() {
                     ))}
                   </div>
                   <button
-                    onClick={() => deleteHarvest(h.id)}
+                    onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHarvest(h.id); }}
                     className="rounded p-1 text-gray-400 hover:text-red-500"
                   >
                     <Trash2 size={14} />

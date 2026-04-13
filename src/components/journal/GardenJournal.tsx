@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2, Tag, Sprout, LayoutGrid } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { useToast } from "@/components/ui/Toast";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -12,7 +14,8 @@ import { format } from "date-fns";
 
 export function GardenJournal() {
   const { t } = useTranslation();
-  const { journalEntries, gardens, addJournalEntry, deleteJournalEntry } = useStore();
+  const { confirm } = useToast();
+  const { journalEntries, gardens, addJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({ journalEntries: s.journalEntries, gardens: s.gardens, addJournalEntry: s.addJournalEntry, deleteJournalEntry: s.deleteJournalEntry })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [showAdd, setShowAdd] = useState(false);
@@ -76,7 +79,7 @@ export function GardenJournal() {
                     <p className="text-xs text-gray-400">{entry.date}</p>
                   </div>
                   <button
-                    onClick={() => deleteJournalEntry(entry.id)}
+                    onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteJournalEntry(entry.id); }}
                     className="rounded p-1 text-gray-400 hover:text-red-500"
                   >
                     <Trash2 size={14} />
@@ -130,7 +133,7 @@ export function GardenJournal() {
               className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
-          <Input label={t("journal.tags")} value={tags} onChange={(e) => setTags(e.target.value)} placeholder="z.B. Aussaat, Schädlinge, Wetter" />
+          <Input label={t("journal.tags")} value={tags} onChange={(e) => setTags(e.target.value)} placeholder={t("journal.tagsPlaceholder")} />
           <div className="grid grid-cols-2 gap-2">
             {gardens.length > 0 && (
               <div>
