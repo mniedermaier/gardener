@@ -49,6 +49,7 @@ export interface Bed {
   width: number;
   height: number;
   cells: CellPlanting[];
+  paths?: string[]; // "x-y" keys for path cells
   environmentType: EnvironmentType;
   greenhouseConfig?: GreenhouseConfig;
   containerConfig?: ContainerConfig;

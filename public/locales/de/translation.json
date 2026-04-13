@@ -72,6 +72,7 @@
     "autoFill": "Smarte Pflanzvorschl\u00e4ge",
     "autoFillDone": "{{count}} Pflanzen platziert!",
     "clearBed": "Alle entfernen",
+    "pathMode": "Wege",
     "confirmDeleteGarden": "Diesen Garten und alle Beete l\u00f6schen? Das kann nicht r\u00fcckg\u00e4ngig gemacht werden.",
     "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
     "share": "Gartenplan teilen",

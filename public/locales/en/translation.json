@@ -72,6 +72,7 @@
     "autoFill": "Smart plant suggestions",
     "autoFillDone": "Placed {{count}} plants!",
     "clearBed": "Clear all",
+    "pathMode": "Paths",
     "confirmDeleteGarden": "Delete this garden and all its beds? This cannot be undone.",
     "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
     "share": "Share garden plan",

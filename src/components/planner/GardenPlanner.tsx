@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect, memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2 } from "lucide-react";
+import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2, Footprints } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -61,12 +61,13 @@ const ENVIRONMENT_BORDERS: Record<EnvironmentType, string> = {
 
 const DroppableCell = memo(function DroppableCell({
   bedId, x, y, plant, variety, isCompanionHighlight, isAntagonistHighlight,
-  isPlaceMode, onRemove, onClick, onSelectPlant, validationWarning, notes,
+  isPlaceMode, isPath, isPathMode, onRemove, onClick, onSelectPlant, onTogglePath, validationWarning, notes,
 }: {
   bedId: string; x: number; y: number; plant?: Plant; variety?: string;
   isCompanionHighlight: boolean; isAntagonistHighlight: boolean;
-  isPlaceMode: boolean; onRemove: () => void; onClick: () => void;
-  onSelectPlant: () => void; validationWarning?: string; notes?: string;
+  isPlaceMode: boolean; isPath: boolean; isPathMode: boolean;
+  onRemove: () => void; onClick: () => void;
+  onSelectPlant: () => void; onTogglePath: () => void; validationWarning?: string; notes?: string;
 }) {
   const getPlantName = usePlantName();
   const { setNodeRef, isOver } = useDroppable({
@@ -87,21 +88,31 @@ const DroppableCell = memo(function DroppableCell({
       ref={setNodeRef}
       role="gridcell"
       aria-label={plantName || `Empty cell ${x + 1}, ${y + 1}`}
-      onClick={plant ? onSelectPlant : onClick}
-      title={tooltip}
+      onClick={isPathMode ? onTogglePath : plant ? onSelectPlant : onClick}
+      title={isPath ? "Path / Weg" : tooltip}
       className={`group relative flex h-11 w-11 items-center justify-center rounded text-lg transition-all ${
-        plant
-          ? "cursor-pointer shadow-sm hover:opacity-80"
-          : isPlaceMode
-            ? "cursor-crosshair bg-garden-100/50 hover:bg-garden-200 dark:bg-garden-900/20 dark:hover:bg-garden-900/40"
-            : "bg-earth-200/60 dark:bg-earth-600/40"
-      } ${isOver ? "ring-2 ring-garden-400 ring-offset-1 bg-garden-100 dark:bg-garden-900/40" : ""}
-      ${isAntagonistHighlight && !plant ? "bg-red-100 ring-1 ring-red-300 dark:bg-red-900/20" : ""}
-      ${isCompanionHighlight && !plant ? "bg-green-100 ring-1 ring-green-300 dark:bg-green-900/20" : ""}
+        isPath
+          ? "bg-stone-400/50 dark:bg-stone-600/50"
+          : plant
+            ? "cursor-pointer shadow-sm hover:opacity-80"
+            : isPlaceMode
+              ? "cursor-crosshair bg-garden-100/50 hover:bg-garden-200 dark:bg-garden-900/20 dark:hover:bg-garden-900/40"
+              : isPathMode
+                ? "cursor-pointer bg-earth-200/40 hover:bg-stone-300 dark:bg-earth-600/30 dark:hover:bg-stone-600"
+                : "bg-earth-200/60 dark:bg-earth-600/40"
+      } ${isOver && !isPath ? "ring-2 ring-garden-400 ring-offset-1 bg-garden-100 dark:bg-garden-900/40" : ""}
+      ${isAntagonistHighlight && !plant && !isPath ? "bg-red-100 ring-1 ring-red-300 dark:bg-red-900/20" : ""}
+      ${isCompanionHighlight && !plant && !isPath ? "bg-green-100 ring-1 ring-green-300 dark:bg-green-900/20" : ""}
       ${plant && validationWarning ? "ring-2 ring-red-400" : ""}`}
-      style={plant ? { backgroundColor: plant.color + "18" } : undefined}
+      style={plant && !isPath ? { backgroundColor: plant.color + "18" } : undefined}
     >
-      {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={22} />}
+      {isPath && (
+        <svg viewBox="0 0 24 24" width="18" height="18" opacity="0.4">
+          <path d="M4 20L12 4L20 20" stroke="currentColor" strokeWidth="1.5" fill="none" strokeDasharray="2 2"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor" opacity="0.3"/>
+        </svg>
+      )}
+      {plant && !isPath && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={22} />}
       {plant && (
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
@@ -120,15 +131,15 @@ const DroppableCell = memo(function DroppableCell({
 // --- BedGrid with stats and validation ---
 
 function BedGrid({
-  bed, gardenId, selectedPlantId, onCellClick, onSelectPlantFromCell,
+  bed, gardenId, selectedPlantId, isPathMode, onCellClick, onSelectPlantFromCell,
 }: {
-  bed: Bed; gardenId: string; selectedPlantId: string | null;
+  bed: Bed; gardenId: string; selectedPlantId: string | null; isPathMode: boolean;
   onCellClick: (bedId: string, x: number, y: number) => void;
   onSelectPlantFromCell: (plantId: string) => void;
 }) {
   const { t } = useTranslation();
   const plantMap = usePlantMap();
-  const { removeCell, updateBed, gridCellSizeCm } = useStore();
+  const { removeCell, updateBed, togglePath, gridCellSizeCm } = useStore();
   const [showConfig, setShowConfig] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(bed.name);
@@ -250,9 +261,10 @@ function BedGrid({
       >
         {Array.from({ length: bed.height }, (_, y) =>
           Array.from({ length: bed.width }, (_, x) => {
+            const cellKey = `${x}-${y}`;
+            const isPath = (bed.paths ?? []).includes(cellKey);
             const cell = bed.cells.find((c) => c.cellX === x && c.cellY === y);
             const plant = cell ? plantMap.get(cell.plantId) : undefined;
-            const cellKey = `${x}-${y}`;
 
             return (
               <DroppableCell
@@ -260,15 +272,18 @@ function BedGrid({
                 bedId={bed.id}
                 x={x}
                 y={y}
-                plant={plant}
+                plant={isPath ? undefined : plant}
                 variety={cell?.variety}
                 notes={cell?.notes}
-                isCompanionHighlight={companionCells.has(cellKey)}
-                isAntagonistHighlight={antagonistCells.has(cellKey)}
-                isPlaceMode={!!selectedPlantId}
-                validationWarning={cellWarnings.get(cellKey)}
+                isCompanionHighlight={!isPath && companionCells.has(cellKey)}
+                isAntagonistHighlight={!isPath && antagonistCells.has(cellKey)}
+                isPlaceMode={!!selectedPlantId && !isPathMode}
+                isPath={isPath}
+                isPathMode={isPathMode}
+                validationWarning={isPath ? undefined : cellWarnings.get(cellKey)}
                 onRemove={() => removeCell(gardenId, bed.id, x, y)}
                 onSelectPlant={() => { if (plant) onSelectPlantFromCell(plant.id); }}
+                onTogglePath={() => togglePath(gardenId, bed.id, x, y)}
                 onClick={() => onCellClick(bed.id, x, y)}
               />
             );
@@ -416,6 +431,7 @@ export function GardenPlanner() {
   const [activeDragPlant, setActiveDragPlant] = useState<Plant | null>(null);
   const [placementFeedback, setPlacementFeedback] = useState<string | null>(null);
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
+  const [pathMode, setPathMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeGarden = gardens.find((g) => g.id === activeGardenId);
@@ -677,6 +693,13 @@ export function GardenPlanner() {
                 <Button variant="secondary" size="sm" onClick={() => setShowNewBed(true)}>
                   <Plus size={16} />{t("planner.newBed")}
                 </Button>
+                <Button
+                  variant={pathMode ? "primary" : "ghost"}
+                  size="sm"
+                  onClick={() => { setPathMode(!pathMode); if (!pathMode) setSelectedPlant(null); }}
+                >
+                  <Footprints size={16} />{t("planner.pathMode")}
+                </Button>
               </div>
 
               <div className="space-y-6">
@@ -725,6 +748,7 @@ export function GardenPlanner() {
                       bed={bed}
                       gardenId={activeGardenId!}
                       selectedPlantId={selectedPlant?.id ?? null}
+                      isPathMode={pathMode}
                       onCellClick={handleCellClick}
                       onSelectPlantFromCell={(id) => {
                         const p = plantMap.get(id);

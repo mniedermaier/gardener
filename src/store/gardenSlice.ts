@@ -12,6 +12,7 @@ export interface GardenSlice {
   deleteBed: (gardenId: string, bedId: string) => void;
   setCell: (gardenId: string, bedId: string, cell: CellPlanting) => void;
   removeCell: (gardenId: string, bedId: string, cellX: number, cellY: number) => void;
+  togglePath: (gardenId: string, bedId: string, cellX: number, cellY: number) => void;
 }
 
 let nextId = Date.now();
@@ -102,6 +103,33 @@ export const createGardenSlice: StateCreator<GardenSlice> = (set) => ({
                   ? { ...b, cells: b.cells.filter((c) => !(c.cellX === cellX && c.cellY === cellY)) }
                   : b
               ),
+              updatedAt: new Date().toISOString(),
+            }
+          : g
+      ),
+    })),
+
+  togglePath: (gardenId, bedId, cellX, cellY) =>
+    set((state) => ({
+      gardens: state.gardens.map((g) =>
+        g.id === gardenId
+          ? {
+              ...g,
+              beds: g.beds.map((b) => {
+                if (b.id !== bedId) return b;
+                const key = `${cellX}-${cellY}`;
+                const paths = new Set(b.paths ?? []);
+                if (paths.has(key)) {
+                  paths.delete(key);
+                } else {
+                  paths.add(key);
+                }
+                // Remove any plant on this cell when adding a path
+                const cells = paths.has(key)
+                  ? b.cells.filter((c) => !(c.cellX === cellX && c.cellY === cellY))
+                  : b.cells;
+                return { ...b, paths: Array.from(paths), cells };
+              }),
               updatedAt: new Date().toISOString(),
             }
           : g
