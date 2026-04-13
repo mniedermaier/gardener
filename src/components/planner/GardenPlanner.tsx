@@ -27,7 +27,7 @@ import { generateShareUrl } from "@/lib/sharing";
 import { useToast } from "@/components/ui/Toast";
 import { useUndo } from "@/hooks/useUndo";
 import { validatePlacement, getCompanionHighlights, getAntagonistHighlights } from "@/lib/placementValidation";
-import { recommendBedPlanting, getRecommendedPlants } from "@/lib/bedRecommendation";
+import { recommendBedPlanting, getRecommendedPlants, STRATEGY_DETAILS, type PlantingStrategy } from "@/lib/bedRecommendation";
 
 const ALL_ENVIRONMENTS: EnvironmentType[] = [
   "outdoor_bed", "raised_bed", "greenhouse", "cold_frame",
@@ -414,6 +414,7 @@ export function GardenPlanner() {
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [activeDragPlant, setActiveDragPlant] = useState<Plant | null>(null);
   const [placementFeedback, setPlacementFeedback] = useState<string | null>(null);
+  const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeGarden = gardens.find((g) => g.id === activeGardenId);
@@ -520,16 +521,18 @@ export function GardenPlanner() {
     }
   };
 
-  // Auto-fill a bed
-  const handleAutoFill = (bedId: string) => {
+  // Auto-fill a bed with strategy
+  const handleAutoFill = (bedId: string, strategy: PlantingStrategy) => {
     if (!activeGardenId) return;
     const bed = activeGarden?.beds.find((b) => b.id === bedId);
     if (!bed) return;
 
-    const cells = recommendBedPlanting(bed, plants, { gridCellSizeCm, lastFrostDate });
+    const cells = recommendBedPlanting(bed, plants, { gridCellSizeCm, lastFrostDate, strategy });
     for (const cell of cells) {
       setCell(activeGardenId, bedId, cell);
     }
+    setAutoFillBedId(null);
+    toast(t("planner.autoFillDone", { count: cells.length }), "success");
   };
 
   const handleExport = () => {
@@ -679,13 +682,36 @@ export function GardenPlanner() {
                 {activeGarden.beds.map((bed) => (
                   <div key={bed.id} className="relative">
                     <div className="absolute -right-2 -top-2 z-10 flex gap-1">
-                      <button
-                        onClick={() => handleAutoFill(bed.id)}
-                        className="rounded-full bg-garden-100 p-1 text-garden-600 hover:bg-garden-200 dark:bg-garden-900/40 dark:text-garden-400"
-                        title={t("planner.autoFill")}
-                      >
-                        <Wand2 size={14} />
-                      </button>
+                      <div className="relative">
+                        <button
+                          onClick={() => setAutoFillBedId(autoFillBedId === bed.id ? null : bed.id)}
+                          className="rounded-full bg-garden-100 p-1 text-garden-600 hover:bg-garden-200 dark:bg-garden-900/40 dark:text-garden-400"
+                          title={t("planner.autoFill")}
+                        >
+                          <Wand2 size={14} />
+                        </button>
+                        {autoFillBedId === bed.id && (
+                          <div className="absolute right-0 top-8 z-20 w-56 rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{t("planner.autoFill")}</p>
+                            {(Object.keys(STRATEGY_DETAILS) as PlantingStrategy[]).map((key) => {
+                              const s = STRATEGY_DETAILS[key];
+                              return (
+                                <button
+                                  key={key}
+                                  onClick={() => handleAutoFill(bed.id, key)}
+                                  className="flex w-full items-start gap-2 rounded-lg px-2 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-gray-800"
+                                >
+                                  <span className="mt-0.5 text-sm">{s.icon}</span>
+                                  <div>
+                                    <p className="font-medium">{t(s.nameKey)}</p>
+                                    <p className="text-[10px] text-gray-400">{t(s.descKey)}</p>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
                       <button
                         onClick={() => deleteBed(activeGardenId!, bed.id)}
                         className="rounded-full bg-red-100 p-1 text-red-600 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400"

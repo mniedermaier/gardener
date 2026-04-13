@@ -69,7 +69,8 @@
     "noGarden": "Noch kein Garten angelegt. Erstelle einen um loszulegen!",
     "dragPlant": "Ziehen oder klicken um Pflanzen zu platzieren",
     "gridInfo": "Raster: {{cells}} Felder (je {{size}} cm)",
-    "autoFill": "Beet intelligent bef\u00fcllen",
+    "autoFill": "Smarte Pflanzvorschl\u00e4ge",
+    "autoFillDone": "{{count}} Pflanzen platziert!",
     "clearBed": "Alle entfernen",
     "confirmDeleteGarden": "Diesen Garten und alle Beete l\u00f6schen? Das kann nicht r\u00fcckg\u00e4ngig gemacht werden.",
     "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
@@ -392,6 +393,20 @@
       "advanced": "Fortgeschritten"
     },
     "years": "Jahre Keimf\u00e4higkeit"
+  },
+  "strategy": {
+    "balanced": "Ausgewogener Mix",
+    "balancedDesc": "Vielf\u00e4ltige Auswahl an Gem\u00fcse, Kr\u00e4utern und mehr",
+    "calories": "Maximale Kalorien",
+    "caloriesDesc": "Kartoffel, Mais, Bohnen - h\u00f6chste Kalorienausbeute pro m\u00b2",
+    "selfsufficient": "Selbstversorgung",
+    "selfsufficientDesc": "Alle N\u00e4hrstoffe abdecken: Kalorien, Protein, Vitamine, Ballaststoffe + haltbar",
+    "yield": "Maximaler Ertrag",
+    "yieldDesc": "Tomate, Zucchini, Gurke - meiste kg pro m\u00b2",
+    "beginner": "Anf\u00e4ngerfreundlich",
+    "beginnerDesc": "Pflegeleicht, Direktsaat, schnelle Ergebnisse",
+    "quickharvest": "Schnelle Ernte",
+    "quickharvestDesc": "Radieschen, Salat, Spinat - Ernte in Wochen statt Monaten"
   },
   "palette": {
     "recommended": "Empfohlen"

@@ -69,7 +69,8 @@
     "noGarden": "No garden created yet. Create one to get started!",
     "dragPlant": "Drag or click to place plants",
     "gridInfo": "Grid: {{cells}} cells ({{size}} cm each)",
-    "autoFill": "Auto-fill with smart recommendations",
+    "autoFill": "Smart plant suggestions",
+    "autoFillDone": "Placed {{count}} plants!",
     "clearBed": "Clear all",
     "confirmDeleteGarden": "Delete this garden and all its beds? This cannot be undone.",
     "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
@@ -392,6 +393,20 @@
       "advanced": "Advanced"
     },
     "years": "years viability"
+  },
+  "strategy": {
+    "balanced": "Balanced Mix",
+    "balancedDesc": "Diverse selection of vegetables, herbs, and more",
+    "calories": "Maximum Calories",
+    "caloriesDesc": "Potato, corn, beans - highest calorie output per m\u00b2",
+    "selfsufficient": "Self-Sufficiency",
+    "selfsufficientDesc": "Cover all nutrients: calories, protein, vitamins, fiber + preservable",
+    "yield": "Maximum Yield",
+    "yieldDesc": "Tomato, zucchini, cucumber - most kg per m\u00b2",
+    "beginner": "Beginner Friendly",
+    "beginnerDesc": "Easy to grow, low maintenance, direct sow, fast results",
+    "quickharvest": "Quick Harvest",
+    "quickharvestDesc": "Radish, lettuce, spinach - harvest in weeks, not months"
   },
   "palette": {
     "recommended": "Recommended"
