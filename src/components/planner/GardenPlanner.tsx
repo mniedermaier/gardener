@@ -89,7 +89,7 @@ const DroppableCell = memo(function DroppableCell({
       aria-label={plantName || `Empty cell ${x + 1}, ${y + 1}`}
       onClick={plant ? onSelectPlant : onClick}
       title={tooltip}
-      className={`group relative flex h-10 w-10 items-center justify-center rounded text-lg transition-all ${
+      className={`group relative flex h-11 w-11 items-center justify-center rounded text-lg transition-all ${
         plant
           ? "cursor-pointer shadow-sm hover:opacity-80"
           : isPlaceMode
@@ -99,9 +99,9 @@ const DroppableCell = memo(function DroppableCell({
       ${isAntagonistHighlight && !plant ? "bg-red-100 ring-1 ring-red-300 dark:bg-red-900/20" : ""}
       ${isCompanionHighlight && !plant ? "bg-green-100 ring-1 ring-green-300 dark:bg-green-900/20" : ""}
       ${plant && validationWarning ? "ring-2 ring-red-400" : ""}`}
-      style={plant ? { backgroundColor: plant.color + "30" } : undefined}
+      style={plant ? { backgroundColor: plant.color + "18" } : undefined}
     >
-      {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />}
+      {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={22} />}
       {plant && (
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
@@ -246,7 +246,7 @@ function BedGrid({
       <div className="overflow-x-auto pb-2">
       <div
         className={`inline-grid gap-0.5 rounded-lg border p-1 ${ENVIRONMENT_COLORS[envType]} ${ENVIRONMENT_BORDERS[envType]}`}
-        style={{ gridTemplateColumns: `repeat(${bed.width}, 2.5rem)` }}
+        style={{ gridTemplateColumns: `repeat(${bed.width}, 2.75rem)` }}
       >
         {Array.from({ length: bed.height }, (_, y) =>
           Array.from({ length: bed.width }, (_, x) => {
