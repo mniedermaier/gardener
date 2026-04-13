@@ -15,6 +15,7 @@
     "journal": "Tagebuch",
     "seeds": "Saatgut",
     "soil": "Boden",
+    "pests": "Schädlinge",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI"
   },
@@ -413,6 +414,29 @@
     "winterGap": "Winter-Versorgungsl\u00fccke",
     "winterGapDesc": "Geringe Lebensmittelversorgung im {{months}}. Du brauchst ca. {{kg}} kg gelagerte Lebensmittel um diese L\u00fccke zu \u00fcberbr\u00fccken.",
     "storageTitle": "Lager- & Konservierungsbedarf"
+  },
+  "pests": {
+    "title": "Schädlings- & Krankheits-Tracker",
+    "add": "Problem melden",
+    "added": "Problem erfasst!",
+    "resolved": "Als gelöst markiert!",
+    "active": "Aktiv",
+    "resolvedLabel": "Gelöst",
+    "empty": "Keine Schädlings- oder Krankheitsprobleme erfasst. Das ist großartig!",
+    "name": "Problemname",
+    "namePlaceholder": "z.B. Blattläuse, Tomatenfäule, Mehltau...",
+    "severity": "Schweregrad",
+    "description": "Beschreibung",
+    "organic": "Bio",
+    "organicOnly": "Nur biologische Behandlung",
+    "treatment": "Behandlung",
+    "addTreatment": "Behandlung hinzufügen",
+    "treatmentPrompt": "Welche Behandlung wurde angewendet?",
+    "resolve": "Als gelöst markieren",
+    "types": {
+      "pest": "Schädling",
+      "disease": "Krankheit"
+    }
   },
   "seeds": {
     "title": "Saatgut-Inventar",

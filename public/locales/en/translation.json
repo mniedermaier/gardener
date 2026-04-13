@@ -15,6 +15,7 @@
     "journal": "Journal",
     "seeds": "Seeds",
     "soil": "Soil",
+    "pests": "Pests",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI"
   },
@@ -413,6 +414,29 @@
     "winterGap": "Winter Food Gap",
     "winterGapDesc": "Low food coverage in {{months}}. You need approximately {{kg}} kg of stored food to bridge this gap.",
     "storageTitle": "Storage & Preservation Needed"
+  },
+  "pests": {
+    "title": "Pest & Disease Tracker",
+    "add": "Report Problem",
+    "added": "Problem reported!",
+    "resolved": "Marked as resolved!",
+    "active": "Active",
+    "resolvedLabel": "Resolved",
+    "empty": "No pest or disease problems recorded. That's great!",
+    "name": "Problem name",
+    "namePlaceholder": "e.g. Aphids, Tomato blight, Powdery mildew...",
+    "severity": "Severity",
+    "description": "Description",
+    "organic": "Organic",
+    "organicOnly": "Organic treatment only",
+    "treatment": "Treatment",
+    "addTreatment": "Add treatment",
+    "treatmentPrompt": "What treatment was applied?",
+    "resolve": "Mark resolved",
+    "types": {
+      "pest": "Pest",
+      "disease": "Disease"
+    }
   },
   "seeds": {
     "title": "Seed Inventory",
