@@ -128,13 +128,12 @@ export function SeasonTimeline() {
   const STRIPE_HEIGHT = 7;
 
   const showTooltip = (e: React.MouseEvent, label: string, dates: string, color: string) => {
-    const rect = (e.currentTarget as HTMLElement).closest(".relative")!.getBoundingClientRect();
     setTooltip({
       label,
       dates,
       color,
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top - 40,
+      x: e.clientX,
+      y: e.clientY - 45,
     });
   };
 
@@ -195,24 +194,26 @@ export function SeasonTimeline() {
                   style={{ left: `${(monthFraction(parseISO(lastFrostDate)) / 12) * 100}%`, height: `${ROW_HEIGHT}px` }}
                 />
 
-                {/* Custom tooltip */}
-                {tooltip && (
-                  <div
-                    className="pointer-events-none absolute z-30 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs shadow-lg dark:border-gray-600 dark:bg-gray-800"
-                    style={{ left: `${Math.min(Math.max(tooltip.x, 60), 80)}%`, top: `${tooltip.y}px`, transform: "translateX(-50%)" }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: tooltip.color }} />
-                      <span className="font-medium">{tooltip.label}</span>
-                    </div>
-                    <p className="mt-0.5 text-gray-500 dark:text-gray-400">{tooltip.dates}</p>
-                  </div>
-                )}
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Tooltip - rendered once, fixed position */}
+      {tooltip && (
+        <div
+          className="pointer-events-none fixed z-50 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs shadow-lg dark:border-gray-600 dark:bg-gray-800"
+          style={{ left: `${tooltip.x}px`, top: `${tooltip.y}px`, transform: "translateX(-50%)" }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: tooltip.color }} />
+            <span className="font-medium">{tooltip.label}</span>
+          </div>
+          <p className="mt-0.5 text-gray-500 dark:text-gray-400">{tooltip.dates}</p>
+        </div>
+      )}
+
       <div className="mt-3 flex flex-wrap gap-4 text-xs">
         <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: "#a855f7" }} /> {t("plants.details.sowIndoors")}</span>
         <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: "#22c55e" }} /> {t("plants.details.sowOutdoors")}</span>
