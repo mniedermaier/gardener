@@ -5,17 +5,26 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { useStore } from "@/store";
 
-// Retry wrapper: if a chunk fails to load (stale cache after deploy), reload once
+// Retry wrapper: if a chunk fails to load (stale cache after deploy), clear cache and reload
 function lazyRetry<T extends Record<string, unknown>>(
   fn: () => Promise<T>,
 ): Promise<T> {
-  return fn().catch(() => {
-    // Chunk load failed - likely stale SW cache. Force reload once.
+  return fn().catch(async () => {
     const reloaded = sessionStorage.getItem("chunk-reload");
     if (!reloaded) {
       sessionStorage.setItem("chunk-reload", "1");
+      // Clear SW caches before reload
+      if ("caches" in window) {
+        const names = await caches.keys();
+        for (const name of names) await caches.delete(name);
+      }
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs) await r.unregister();
+      }
       window.location.reload();
     }
+    sessionStorage.removeItem("chunk-reload");
     throw new Error("Chunk load failed");
   });
 }
