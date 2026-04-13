@@ -401,7 +401,16 @@
     "gaps": "Nutrition Gaps",
     "covered": "covered",
     "suggestion": "Consider adding",
-    "yieldByPlant": "Yield by Plant"
+    "yieldByPlant": "Yield by Plant",
+    "monthlyTitle": "Monthly Food Availability",
+    "monthlyDesc": "Estimated food production for {{size}} people, month by month. Includes fresh harvest and preserved/stored food.",
+    "annualCoverage": "Annual coverage",
+    "fresh": "Fresh harvest",
+    "stored": "Preserved/stored",
+    "months": "months shelf life",
+    "winterGap": "Winter Food Gap",
+    "winterGapDesc": "Low food coverage in {{months}}. You need approximately {{kg}} kg of stored food to bridge this gap.",
+    "storageTitle": "Storage & Preservation Needed"
   },
   "preservation": {
     "title": "Preservation Guide",

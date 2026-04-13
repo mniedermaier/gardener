@@ -401,7 +401,16 @@
     "gaps": "N\u00e4hrstoff-L\u00fccken",
     "covered": "abgedeckt",
     "suggestion": "Erw\u00e4ge hinzuzuf\u00fcgen",
-    "yieldByPlant": "Ertrag nach Pflanze"
+    "yieldByPlant": "Ertrag nach Pflanze",
+    "monthlyTitle": "Monatliche Lebensmittel-Verf\u00fcgbarkeit",
+    "monthlyDesc": "Gesch\u00e4tzte Lebensmittelproduktion f\u00fcr {{size}} Personen, Monat f\u00fcr Monat. Inklusive Frischernte und konservierter/gelagerter Lebensmittel.",
+    "annualCoverage": "Jahresabdeckung",
+    "fresh": "Frischernte",
+    "stored": "Konserviert/gelagert",
+    "months": "Monate haltbar",
+    "winterGap": "Winter-Versorgungsl\u00fccke",
+    "winterGapDesc": "Geringe Lebensmittelversorgung im {{months}}. Du brauchst ca. {{kg}} kg gelagerte Lebensmittel um diese L\u00fccke zu \u00fcberbr\u00fccken.",
+    "storageTitle": "Lager- & Konservierungsbedarf"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
