@@ -9,18 +9,29 @@ import { getFrostProtectionWeeks, ENVIRONMENT_ICONS } from "@/types/garden";
 const MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTHS_DE = ["Jan", "Feb", "M\u00e4r", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
+interface TimeRange {
+  start: number;
+  end: number;
+  startDate: string; // dd.MM
+  endDate: string;
+}
+
 interface PlantTimeline {
   plantId: string;
   envLabel: string;
   envIcon: string;
-  sowIndoors?: { start: number; end: number };
-  sowOutdoors?: { start: number; end: number };
-  transplant?: { start: number; end: number };
-  harvest?: { start: number; end: number };
+  sowIndoors?: TimeRange;
+  sowOutdoors?: TimeRange;
+  transplant?: TimeRange;
+  harvest?: TimeRange;
 }
 
 function monthFraction(date: Date): number {
   return getMonth(date) + date.getDate() / 31;
+}
+
+function fmt(date: Date): string {
+  return format(date, "dd.MM");
 }
 
 export function SeasonTimeline() {
@@ -57,20 +68,20 @@ export function SeasonTimeline() {
 
           if (plant.sowIndoorsWeeks !== null) {
             const start = addWeeks(effectiveFrostDate, plant.sowIndoorsWeeks);
-            const end = addWeeks(start, 2);
-            tl.sowIndoors = { start: monthFraction(start), end: monthFraction(end) };
+            const end = addWeeks(start, 3);
+            tl.sowIndoors = { start: monthFraction(start), end: monthFraction(end), startDate: fmt(start), endDate: fmt(end) };
           }
 
           if (plant.sowOutdoorsWeeks !== null) {
             const start = addWeeks(effectiveFrostDate, plant.sowOutdoorsWeeks);
-            const end = addWeeks(start, 2);
-            tl.sowOutdoors = { start: monthFraction(start), end: monthFraction(end) };
+            const end = addWeeks(start, 3);
+            tl.sowOutdoors = { start: monthFraction(start), end: monthFraction(end), startDate: fmt(start), endDate: fmt(end) };
           }
 
           if (plant.transplantWeeks !== null) {
             const start = addWeeks(effectiveFrostDate, plant.transplantWeeks);
-            const end = addWeeks(start, 1);
-            tl.transplant = { start: monthFraction(start), end: monthFraction(end) };
+            const end = addWeeks(start, 2);
+            tl.transplant = { start: monthFraction(start), end: monthFraction(end), startDate: fmt(start), endDate: fmt(end) };
           }
 
           const harvestBase = plant.transplantWeeks !== null
@@ -81,7 +92,7 @@ export function SeasonTimeline() {
           const harvestStart = addDays(harvestBase, plant.harvestDaysMin);
           const harvestEnd = addDays(harvestBase, plant.harvestDaysMax);
           if (plant.harvestDaysMax < 365) {
-            tl.harvest = { start: monthFraction(harvestStart), end: monthFraction(harvestEnd) };
+            tl.harvest = { start: monthFraction(harvestStart), end: monthFraction(harvestEnd), startDate: fmt(harvestStart), endDate: fmt(harvestEnd) };
           }
 
           result.push(tl);
@@ -94,15 +105,18 @@ export function SeasonTimeline() {
 
   if (timelines.length === 0) return null;
 
-  const barStyle = (range: { start: number; end: number }, color: string) => {
+  const barStyle = (range: TimeRange, color: string) => {
     const left = (range.start / 12) * 100;
-    const width = Math.max(((range.end - range.start) / 12) * 100, 1.5);
+    const width = Math.max(((range.end - range.start) / 12) * 100, 2);
     return {
       left: `${left}%`,
       width: `${width}%`,
       backgroundColor: color,
     };
   };
+
+  const ROW_HEIGHT = 28;
+  const STRIPE_HEIGHT = 7;
 
   return (
     <Card className="mt-6 overflow-x-auto">
@@ -123,38 +137,38 @@ export function SeasonTimeline() {
                 {t(`plants.catalog.${tl.plantId}.name`)}
                 {tl.envIcon && <span className="ml-1 text-[10px]">{tl.envIcon}</span>}
               </div>
-              <div className="relative flex-1 rounded bg-gray-100 dark:bg-gray-800" style={{ height: "20px" }}>
+              <div className="relative flex-1 rounded bg-gray-100 dark:bg-gray-800" style={{ height: `${ROW_HEIGHT}px` }}>
                 {tl.sowIndoors && (
                   <div
-                    className="absolute rounded-sm"
-                    style={{ ...barStyle(tl.sowIndoors, "#a855f7"), top: "0px", height: "5px" }}
-                    title={t("plants.details.sowIndoors")}
+                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    style={{ ...barStyle(tl.sowIndoors, "#a855f7"), top: "0px", height: `${STRIPE_HEIGHT}px` }}
+                    title={`${t("plants.details.sowIndoors")}: ${tl.sowIndoors.startDate} – ${tl.sowIndoors.endDate}`}
                   />
                 )}
                 {tl.sowOutdoors && (
                   <div
-                    className="absolute rounded-sm"
-                    style={{ ...barStyle(tl.sowOutdoors, "#22c55e"), top: "5px", height: "5px" }}
-                    title={t("plants.details.sowOutdoors")}
+                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    style={{ ...barStyle(tl.sowOutdoors, "#22c55e"), top: `${STRIPE_HEIGHT}px`, height: `${STRIPE_HEIGHT}px` }}
+                    title={`${t("plants.details.sowOutdoors")}: ${tl.sowOutdoors.startDate} – ${tl.sowOutdoors.endDate}`}
                   />
                 )}
                 {tl.transplant && (
                   <div
-                    className="absolute rounded-sm"
-                    style={{ ...barStyle(tl.transplant, "#3b82f6"), top: "10px", height: "5px" }}
-                    title={t("plants.details.transplant")}
+                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    style={{ ...barStyle(tl.transplant, "#3b82f6"), top: `${STRIPE_HEIGHT * 2}px`, height: `${STRIPE_HEIGHT}px` }}
+                    title={`${t("plants.details.transplant")}: ${tl.transplant.startDate} – ${tl.transplant.endDate}`}
                   />
                 )}
                 {tl.harvest && (
                   <div
-                    className="absolute rounded-sm"
-                    style={{ ...barStyle(tl.harvest, "#f59e0b"), top: "15px", height: "5px" }}
-                    title={t("plants.details.harvest")}
+                    className="absolute cursor-help rounded-sm transition-opacity hover:opacity-100 opacity-85"
+                    style={{ ...barStyle(tl.harvest, "#f59e0b"), top: `${STRIPE_HEIGHT * 3}px`, height: `${STRIPE_HEIGHT}px` }}
+                    title={`${t("plants.details.harvest")}: ${tl.harvest.startDate} – ${tl.harvest.endDate}`}
                   />
                 )}
                 <div
                   className="absolute top-0 w-px bg-red-400"
-                  style={{ left: `${(monthFraction(parseISO(lastFrostDate)) / 12) * 100}%`, height: "20px" }}
+                  style={{ left: `${(monthFraction(parseISO(lastFrostDate)) / 12) * 100}%`, height: `${ROW_HEIGHT}px` }}
                   title={`${t("settings.lastFrostDate")}: ${format(parseISO(lastFrostDate), "dd.MM")}`}
                 />
               </div>
@@ -167,7 +181,7 @@ export function SeasonTimeline() {
         <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: "#22c55e" }} /> {t("plants.details.sowOutdoors")}</span>
         <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: "#3b82f6" }} /> {t("plants.details.transplant")}</span>
         <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: "#f59e0b" }} /> {t("plants.details.harvest")}</span>
-        <span className="flex items-center gap-1"><span className="inline-block h-3 w-px bg-red-400" style={{ width: "2px", height: "12px" }} /> {t("settings.lastFrostDate")}</span>
+        <span className="flex items-center gap-1"><span className="inline-block bg-red-400" style={{ width: "2px", height: "12px" }} /> {t("settings.lastFrostDate")}</span>
       </div>
     </Card>
   );
