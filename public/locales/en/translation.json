@@ -19,6 +19,9 @@
     "pests": "Pests",
     "waterLog": "Irrigation",
     "livestock": "Livestock",
+    "livestockProduction": "Production",
+    "livestockFeed": "Feed",
+    "livestockHealth": "Health",
     "foodplan": "Food Plan",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI",
@@ -602,6 +605,32 @@
     "deleteAnimal": "Delete animal",
     "noJournal": "No journal entries for this animal.",
     "notesPlaceholder": "e.g. breed, special notes...",
+    "production": {
+      "title": "Production Log",
+      "totalEggs": "Total eggs",
+      "totalHoney": "Total honey",
+      "totalMilk": "Total milk",
+      "allProducts": "All products"
+    },
+    "feed": {
+      "title": "Feed Management",
+      "thisMonth": "Cost this month",
+      "lastMonth": "Cost last month",
+      "totalCost": "Total cost",
+      "totalKg": "Total feed",
+      "perAnimal": "Cost per animal"
+    },
+    "health": {
+      "title": "Health Overview",
+      "totalEvents": "Total entries",
+      "totalCost": "Veterinary costs",
+      "losses": "Losses",
+      "overdueVacc": "Vaccination due",
+      "overdueWarning": "Vaccination possibly overdue",
+      "daysSince": "{{days}} days ago",
+      "neverVaccinated": "Never vaccinated",
+      "allTypes": "All types"
+    },
     "healthTypes": {
       "vaccination": "Vaccination",
       "deworming": "Deworming",

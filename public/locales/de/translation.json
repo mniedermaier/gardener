@@ -19,6 +19,9 @@
     "pests": "Schädlinge",
     "waterLog": "Bewässerung",
     "livestock": "Tierhaltung",
+    "livestockProduction": "Produktion",
+    "livestockFeed": "Futter",
+    "livestockHealth": "Gesundheit",
     "foodplan": "Ernährungsplan",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI",
@@ -602,6 +605,32 @@
     "deleteAnimal": "Tier löschen",
     "noJournal": "Keine Tagebucheinträge für dieses Tier.",
     "notesPlaceholder": "z.B. Rasse, Besonderheiten...",
+    "production": {
+      "title": "Produktion",
+      "totalEggs": "Eier gesamt",
+      "totalHoney": "Honig gesamt",
+      "totalMilk": "Milch gesamt",
+      "allProducts": "Alle Produkte"
+    },
+    "feed": {
+      "title": "Futterverwaltung",
+      "thisMonth": "Kosten diesen Monat",
+      "lastMonth": "Kosten letzten Monat",
+      "totalCost": "Gesamtkosten",
+      "totalKg": "Futter gesamt",
+      "perAnimal": "Kosten pro Tier"
+    },
+    "health": {
+      "title": "Gesundheitsübersicht",
+      "totalEvents": "Einträge gesamt",
+      "totalCost": "Tierarztkosten",
+      "losses": "Verluste",
+      "overdueVacc": "Impfung fällig",
+      "overdueWarning": "Impfung möglicherweise fällig",
+      "daysSince": "vor {{days}} Tagen",
+      "neverVaccinated": "Noch nie geimpft",
+      "allTypes": "Alle Typen"
+    },
     "healthTypes": {
       "vaccination": "Impfung",
       "deworming": "Entwurmung",

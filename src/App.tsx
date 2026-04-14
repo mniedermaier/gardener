@@ -47,6 +47,9 @@ const WaterTracker = lazy(() => lazyRetry(() => import("@/components/water/Water
 const FoodPlan = lazy(() => lazyRetry(() => import("@/components/foodplan/FoodPlan")).then((m) => ({ default: m.FoodPlan })));
 const LivestockPage = lazy(() => lazyRetry(() => import("@/components/livestock/LivestockPage")).then((m) => ({ default: m.LivestockPage })));
 const AnimalDetail = lazy(() => lazyRetry(() => import("@/components/livestock/AnimalDetail")).then((m) => ({ default: m.AnimalDetail })));
+const ProductionPage = lazy(() => lazyRetry(() => import("@/components/livestock/ProductionPage")).then((m) => ({ default: m.ProductionPage })));
+const FeedPage = lazy(() => lazyRetry(() => import("@/components/livestock/FeedPage")).then((m) => ({ default: m.FeedPage })));
+const HealthPage = lazy(() => lazyRetry(() => import("@/components/livestock/HealthPage")).then((m) => ({ default: m.HealthPage })));
 const PantryPage = lazy(() => lazyRetry(() => import("@/components/pantry/PantryPage")).then((m) => ({ default: m.PantryPage })));
 const ExpenseDashboard = lazy(() => lazyRetry(() => import("@/components/expenses/ExpenseDashboard")).then((m) => ({ default: m.ExpenseDashboard })));
 const WeatherDashboard = lazy(() => lazyRetry(() => import("@/components/weather/WeatherDashboard")).then((m) => ({ default: m.WeatherDashboard })));
@@ -89,6 +92,9 @@ export default function App() {
           <Route path="water-log" element={<L><WaterTracker /></L>} />
           <Route path="livestock" element={<L><LivestockPage /></L>} />
           <Route path="livestock/:id" element={<L><AnimalDetail /></L>} />
+          <Route path="livestock/production" element={<L><ProductionPage /></L>} />
+          <Route path="livestock/feed" element={<L><FeedPage /></L>} />
+          <Route path="livestock/health" element={<L><HealthPage /></L>} />
           <Route path="foodplan" element={<L><FoodPlan /></L>} />
           <Route path="sufficiency" element={<L><SufficiencyDashboard /></L>} />
           <Route path="expenses" element={<L><ExpenseDashboard /></L>} />

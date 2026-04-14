@@ -19,6 +19,9 @@
     "pests": "Plagas",
     "waterLog": "Riego",
     "livestock": "Animales",
+    "livestockProduction": "Producción",
+    "livestockFeed": "Alimentación",
+    "livestockHealth": "Salud",
     "foodplan": "Plan alimentario",
     "sufficiency": "Autosuficiencia",
     "expenses": "Costos y ROI",
@@ -587,6 +590,32 @@
     "deleteAnimal": "Eliminar animal",
     "noJournal": "Sin entradas de diario para este animal.",
     "notesPlaceholder": "ej. raza, notas especiales...",
+    "production": {
+      "title": "Registro de producción",
+      "totalEggs": "Total huevos",
+      "totalHoney": "Total miel",
+      "totalMilk": "Total leche",
+      "allProducts": "Todos los productos"
+    },
+    "feed": {
+      "title": "Gestión de alimentación",
+      "thisMonth": "Costo este mes",
+      "lastMonth": "Costo mes anterior",
+      "totalCost": "Costo total",
+      "totalKg": "Alimento total",
+      "perAnimal": "Costo por animal"
+    },
+    "health": {
+      "title": "Resumen de salud",
+      "totalEvents": "Total registros",
+      "totalCost": "Costos veterinarios",
+      "losses": "Pérdidas",
+      "overdueVacc": "Vacuna pendiente",
+      "overdueWarning": "Vacunación posiblemente vencida",
+      "daysSince": "hace {{days}} días",
+      "neverVaccinated": "Nunca vacunado",
+      "allTypes": "Todos los tipos"
+    },
     "healthTypes": {
       "vaccination": "Vacunación",
       "deworming": "Desparasitación",
