@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, Check } from "lucide-react";
+import { MapPin, Check, Coffee } from "lucide-react";
 import { useStore } from "@/store";
 import { applyTheme } from "@/lib/theme";
 import { Card } from "@/components/ui/Card";
@@ -210,6 +210,21 @@ export function SettingsPage() {
           {saved ? <Check size={16} /> : null}
           {saved ? t("settings.saved") : t("common.save")}
         </Button>
+
+        <div className="mt-6 flex flex-col items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center dark:border-amber-800/40 dark:bg-amber-900/10">
+          <Coffee size={24} className="text-amber-600" />
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{t("settings.coffeeTitle")}</p>
+          <p className="text-xs text-amber-600 dark:text-amber-400">{t("settings.coffeeDesc")}</p>
+          <a
+            href="https://buymeacoffee.com/mniedermaier"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-flex items-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-amber-900 shadow-sm transition-colors hover:bg-amber-500"
+          >
+            <Coffee size={16} />
+            Buy me a coffee
+          </a>
+        </div>
       </div>
     </div>
   );

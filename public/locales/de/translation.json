@@ -328,7 +328,9 @@
     },
     "backendUrl": "Backend-URL",
     "backendHint": "Leer lassen f\u00fcr Nur-Lokal-Modus. Setzen wenn Docker verwendet wird.",
-    "saved": "Einstellungen gespeichert!"
+    "saved": "Einstellungen gespeichert!",
+    "coffeeTitle": "Gefällt dir Gardener?",
+    "coffeeDesc": "Dieses Projekt ist Open Source und kostenlos. Unterstütze die Entwicklung mit einem Kaffee!"
   },
   "dataManagement": {
     "title": "Daten-Management",

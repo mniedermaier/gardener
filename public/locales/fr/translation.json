@@ -328,7 +328,9 @@
     },
     "backendUrl": "URL du serveur",
     "backendHint": "Laisser vide pour le mode local uniquement. À définir avec Docker.",
-    "saved": "Paramètres enregistrés !"
+    "saved": "Paramètres enregistrés !",
+    "coffeeTitle": "Vous aimez Gardener ?",
+    "coffeeDesc": "Ce projet est open source et gratuit. Soutenez le développement avec un café !"
   },
   "dataManagement": {
     "title": "Gestion des données",
