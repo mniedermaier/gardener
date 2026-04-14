@@ -20,6 +20,18 @@ export interface AnimalProduct {
   notes?: string;
 }
 
+export type HealthEventType = "vaccination" | "deworming" | "illness" | "injury" | "checkup" | "treatment" | "death" | "other";
+
+export interface HealthEvent {
+  id: string;
+  animalId: string;
+  date: string;
+  type: HealthEventType;
+  description: string;
+  cost?: number;
+  notes?: string;
+}
+
 export interface FeedEntry {
   id: string;
   animalId: string;

@@ -18,6 +18,7 @@ function makeExport(overrides: Partial<GardenerExport["data"]> = {}): GardenerEx
       animals: [],
       animalProducts: [],
       feedEntries: [],
+      healthEvents: [],
       seeds: [],
       soilTests: [],
       amendments: [],

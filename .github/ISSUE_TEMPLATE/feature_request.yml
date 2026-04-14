@@ -1,0 +1,59 @@
+name: Feature Request
+description: Suggest a new feature or improvement for the Gardener application
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature. Please fill out the form below.
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module / Area
+      description: Which part of the application does this feature relate to?
+      options:
+        - Garden Planner
+        - Plants
+        - Calendar
+        - Tasks
+        - Harvest
+        - Journal
+        - Seeds
+        - Soil
+        - Pests
+        - Livestock
+        - Food Plan
+        - Sufficiency
+        - Expenses
+        - Weather
+        - Settings
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the feature you would like.
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why is this useful?
+      description: Explain why this feature would be valuable and what problem it solves.
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Mockups
+      description: If applicable, add screenshots or mockups to illustrate the feature.
+    validations:
+      required: false

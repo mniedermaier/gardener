@@ -17,6 +17,7 @@ export interface ImportResult {
     animals: number;
     animalProducts: number;
     feedEntries: number;
+    healthEvents: number;
     seeds: number;
     soilTests: number;
     amendments: number;
@@ -27,7 +28,7 @@ export interface ImportResult {
 const EMPTY_STATS: ImportResult["stats"] = {
   gardens: 0, tasks: 0, harvests: 0, journalEntries: 0, expenses: 0,
   customPlants: 0, seasonArchives: 0, animals: 0, animalProducts: 0,
-  feedEntries: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0,
+  feedEntries: 0, healthEvents: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0,
 };
 
 export function validateExportFile(json: unknown): json is GardenerExport {
@@ -74,6 +75,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
     animals: data.animals ?? [],
     animalProducts: data.animalProducts ?? [],
     feedEntries: data.feedEntries ?? [],
+    healthEvents: data.healthEvents ?? [],
     seeds: data.seeds ?? [],
     soilTests: data.soilTests ?? [],
     amendments: data.amendments ?? [],
@@ -111,6 +113,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
       animals: data.animals?.length ?? 0,
       animalProducts: data.animalProducts?.length ?? 0,
       feedEntries: data.feedEntries?.length ?? 0,
+      healthEvents: data.healthEvents?.length ?? 0,
       seeds: data.seeds?.length ?? 0,
       soilTests: data.soilTests?.length ?? 0,
       amendments: data.amendments?.length ?? 0,
@@ -141,6 +144,7 @@ function importMerge(
   const mergedAnimals = mergeById(current.animals, data.animals ?? []);
   const mergedAnimalProducts = mergeById(current.animalProducts, data.animalProducts ?? []);
   const mergedFeedEntries = mergeById(current.feedEntries, data.feedEntries ?? []);
+  const mergedHealthEvents = mergeById(current.healthEvents, data.healthEvents ?? []);
   const mergedSeeds = mergeById(current.seeds, data.seeds ?? []);
   const mergedSoilTests = mergeById(current.soilTests, data.soilTests ?? []);
   const mergedAmendments = mergeById(current.amendments, data.amendments ?? []);
@@ -172,6 +176,7 @@ function importMerge(
     animals: mergedAnimals,
     animalProducts: mergedAnimalProducts,
     feedEntries: mergedFeedEntries,
+    healthEvents: mergedHealthEvents,
     seeds: mergedSeeds,
     soilTests: mergedSoilTests,
     amendments: mergedAmendments,
@@ -193,6 +198,7 @@ function importMerge(
       animals: mergedAnimals.length - current.animals.length,
       animalProducts: mergedAnimalProducts.length - current.animalProducts.length,
       feedEntries: mergedFeedEntries.length - current.feedEntries.length,
+      healthEvents: mergedHealthEvents.length - current.healthEvents.length,
       seeds: mergedSeeds.length - current.seeds.length,
       soilTests: mergedSoilTests.length - current.soilTests.length,
       amendments: mergedAmendments.length - current.amendments.length,

@@ -7,7 +7,7 @@ import type { Expense } from "@/types/expense";
 import type { Plant } from "@/types/plant";
 import type { AlertConfig } from "@/store/settingsSlice";
 import type { WeatherHistoryEntry } from "@/store/weatherSlice";
-import type { Animal, AnimalProduct, FeedEntry } from "@/types/animal";
+import type { Animal, AnimalProduct, FeedEntry, HealthEvent } from "@/types/animal";
 import type { SeedItem } from "@/types/seed";
 import type { SoilTest, Amendment } from "@/types/soil";
 import type { PestEntry } from "@/types/pest";
@@ -27,6 +27,7 @@ export interface GardenerExport {
     animals: Animal[];
     animalProducts: AnimalProduct[];
     feedEntries: FeedEntry[];
+    healthEvents: HealthEvent[];
     seeds: SeedItem[];
     soilTests: SoilTest[];
     amendments: Amendment[];
@@ -62,6 +63,7 @@ export function buildExportData(): GardenerExport {
       animals: state.animals,
       animalProducts: state.animalProducts,
       feedEntries: state.feedEntries,
+      healthEvents: state.healthEvents,
       seeds: state.seeds,
       soilTests: state.soilTests,
       amendments: state.amendments,

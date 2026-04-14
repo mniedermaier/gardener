@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Egg, Wheat } from "lucide-react";
+import { Plus, Trash2, Egg, Wheat, Heart, Pencil, Filter } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
-import { ANIMAL_ICONS, PRODUCT_ICONS, ANNUAL_YIELD, type AnimalType, type ProductType } from "@/types/animal";
+import { ANIMAL_ICONS, PRODUCT_ICONS, ANNUAL_YIELD, type AnimalType, type ProductType, type HealthEventType } from "@/types/animal";
 import { format, startOfWeek, endOfWeek, parseISO, isAfter, isBefore, startOfMonth, endOfMonth } from "date-fns";
 
 const ANIMAL_TYPES: AnimalType[] = ["chicken", "duck", "rabbit", "bee"];
@@ -19,37 +19,54 @@ const PRODUCT_TYPES_BY_ANIMAL: Record<AnimalType, ProductType[]> = {
   bee: ["honey", "wax"],
 };
 
+const HEALTH_EVENT_TYPES: HealthEventType[] = ["vaccination", "deworming", "illness", "injury", "checkup", "treatment", "death", "other"];
+const HEALTH_ICONS: Record<HealthEventType, string> = {
+  vaccination: "💉", deworming: "💊", illness: "🤒", injury: "🩹",
+  checkup: "🩺", treatment: "💊", death: "✝️", other: "📋",
+};
+
 export function LivestockPage() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
   const {
-    animals, animalProducts, feedEntries,
-    addAnimal, deleteAnimal, addProduct, deleteProduct,
-    addFeedEntry, deleteFeedEntry,
+    animals, animalProducts, feedEntries, healthEvents,
+    addAnimal, updateAnimal, deleteAnimal, addProduct, deleteProduct,
+    addFeedEntry, deleteFeedEntry, addHealthEvent, deleteHealthEvent,
   } = useStore(
     useShallow((s) => ({
-      animals: s.animals, animalProducts: s.animalProducts, feedEntries: s.feedEntries,
-      addAnimal: s.addAnimal, deleteAnimal: s.deleteAnimal,
+      animals: s.animals, animalProducts: s.animalProducts, feedEntries: s.feedEntries, healthEvents: s.healthEvents,
+      addAnimal: s.addAnimal, updateAnimal: s.updateAnimal, deleteAnimal: s.deleteAnimal,
       addProduct: s.addProduct, deleteProduct: s.deleteProduct,
       addFeedEntry: s.addFeedEntry, deleteFeedEntry: s.deleteFeedEntry,
+      addHealthEvent: s.addHealthEvent, deleteHealthEvent: s.deleteHealthEvent,
     }))
   );
 
-  const [tab, setTab] = useState<"animals" | "production" | "feed">("animals");
+  const [tab, setTab] = useState<"animals" | "production" | "feed" | "health">("animals");
   const [showAddAnimal, setShowAddAnimal] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddFeed, setShowAddFeed] = useState(false);
+  const [showAddHealth, setShowAddHealth] = useState(false);
+  const [editAnimalId, setEditAnimalId] = useState<string | null>(null);
+  const [filterAnimalId, setFilterAnimalId] = useState<string>("");
 
   // Add animal form
   const [animalType, setAnimalType] = useState<AnimalType>("chicken");
   const [animalName, setAnimalName] = useState("");
   const [animalCount, setAnimalCount] = useState("1");
+  const [animalNotes, setAnimalNotes] = useState("");
+
+  // Edit animal form
+  const [editName, setEditName] = useState("");
+  const [editCount, setEditCount] = useState("");
+  const [editNotes, setEditNotes] = useState("");
 
   // Add product form
   const [prodAnimalId, setProdAnimalId] = useState("");
   const [prodType, setProdType] = useState<ProductType>("eggs");
   const [prodQuantity, setProdQuantity] = useState("");
   const [prodDate, setProdDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [prodNotes, setProdNotes] = useState("");
 
   // Add feed form
   const [feedAnimalId, setFeedAnimalId] = useState("");
@@ -59,6 +76,14 @@ export function LivestockPage() {
   const [feedCost, setFeedCost] = useState("");
   const [feedDate, setFeedDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [feedNotes, setFeedNotes] = useState("");
+
+  // Add health form
+  const [healthAnimalId, setHealthAnimalId] = useState("");
+  const [healthType, setHealthType] = useState<HealthEventType>("checkup");
+  const [healthDesc, setHealthDesc] = useState("");
+  const [healthCost, setHealthCost] = useState("");
+  const [healthDate, setHealthDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [healthNotes, setHealthNotes] = useState("");
 
   // Stats
   const now = new Date();
@@ -80,29 +105,58 @@ export function LivestockPage() {
     return { totalAnimals, eggsThisWeek, honeyThisYear, feedCostMonth };
   }, [animals, animalProducts, feedEntries, weekStart, weekEnd, monthStart, monthEnd, now]);
 
+  // Filtered lists
+  const filteredProducts = filterAnimalId
+    ? animalProducts.filter((p) => p.animalId === filterAnimalId)
+    : animalProducts;
+  const filteredFeed = filterAnimalId
+    ? feedEntries.filter((f) => f.animalId === filterAnimalId)
+    : feedEntries;
+  const filteredHealth = filterAnimalId
+    ? healthEvents.filter((h) => h.animalId === filterAnimalId)
+    : healthEvents;
+
   const handleAddAnimal = () => {
     addAnimal({
       type: animalType,
       name: animalName || undefined,
       count: Number(animalCount),
       acquiredDate: format(new Date(), "yyyy-MM-dd"),
+      notes: animalNotes || undefined,
     });
-    setAnimalName("");
-    setAnimalCount("1");
+    setAnimalName(""); setAnimalCount("1"); setAnimalNotes("");
     setShowAddAnimal(false);
     toast(t("livestock.added"), "success");
+  };
+
+  const openEditAnimal = (id: string) => {
+    const animal = animals.find((a) => a.id === id);
+    if (!animal) return;
+    setEditAnimalId(id);
+    setEditName(animal.name ?? "");
+    setEditCount(String(animal.count));
+    setEditNotes(animal.notes ?? "");
+  };
+
+  const handleEditAnimal = () => {
+    if (!editAnimalId) return;
+    updateAnimal(editAnimalId, {
+      name: editName || undefined,
+      count: Number(editCount),
+      notes: editNotes || undefined,
+    });
+    setEditAnimalId(null);
+    toast(t("livestock.updated"), "success");
   };
 
   const handleAddProduct = () => {
     if (!prodAnimalId || !prodQuantity) return;
     addProduct({
-      animalId: prodAnimalId,
-      type: prodType,
-      date: prodDate,
-      quantity: Number(prodQuantity),
-      unit: prodType === "eggs" ? "pieces" : "kg",
+      animalId: prodAnimalId, type: prodType, date: prodDate,
+      quantity: Number(prodQuantity), unit: prodType === "eggs" ? "pieces" : "kg",
+      notes: prodNotes || undefined,
     });
-    setProdQuantity("");
+    setProdQuantity(""); setProdNotes("");
     setShowAddProduct(false);
     toast(t("livestock.productAdded"), "success");
   };
@@ -110,32 +164,35 @@ export function LivestockPage() {
   const handleAddFeed = () => {
     if (!feedAnimalId || !feedQuantity || !feedType) return;
     addFeedEntry({
-      animalId: feedAnimalId,
-      date: feedDate,
-      feedType: feedType,
-      quantity: Number(feedQuantity),
-      unit: feedUnit,
+      animalId: feedAnimalId, date: feedDate, feedType: feedType,
+      quantity: Number(feedQuantity), unit: feedUnit,
       cost: feedCost ? Number(feedCost) : undefined,
       notes: feedNotes || undefined,
     });
-    setFeedQuantity("");
-    setFeedType("");
-    setFeedCost("");
-    setFeedNotes("");
+    setFeedQuantity(""); setFeedType(""); setFeedCost(""); setFeedNotes("");
     setShowAddFeed(false);
     toast(t("livestock.feedAdded"), "success");
   };
 
-  // Quick egg log
+  const handleAddHealth = () => {
+    if (!healthAnimalId || !healthDesc) return;
+    addHealthEvent({
+      animalId: healthAnimalId, date: healthDate, type: healthType,
+      description: healthDesc,
+      cost: healthCost ? Number(healthCost) : undefined,
+      notes: healthNotes || undefined,
+    });
+    setHealthDesc(""); setHealthCost(""); setHealthNotes("");
+    setShowAddHealth(false);
+    toast(t("livestock.healthAdded"), "success");
+  };
+
   const handleQuickEggs = (count: number) => {
     const chickenOrDuck = animals.find((a) => a.type === "chicken" || a.type === "duck");
     if (!chickenOrDuck) return;
     addProduct({
-      animalId: chickenOrDuck.id,
-      type: "eggs",
-      date: format(new Date(), "yyyy-MM-dd"),
-      quantity: count,
-      unit: "pieces",
+      animalId: chickenOrDuck.id, type: "eggs",
+      date: format(new Date(), "yyyy-MM-dd"), quantity: count, unit: "pieces",
     });
     toast(`${count} ${t("livestock.products.eggs")}`, "success");
   };
@@ -143,10 +200,11 @@ export function LivestockPage() {
   const addButton = () => {
     if (tab === "animals") setShowAddAnimal(true);
     else if (tab === "production") setShowAddProduct(true);
-    else setShowAddFeed(true);
+    else if (tab === "feed") setShowAddFeed(true);
+    else setShowAddHealth(true);
   };
 
-  const addLabel = tab === "animals" ? t("livestock.addAnimal") : tab === "production" ? t("livestock.addProduct") : t("livestock.addFeed");
+  const addLabel = tab === "animals" ? t("livestock.addAnimal") : tab === "production" ? t("livestock.addProduct") : tab === "feed" ? t("livestock.addFeed") : t("livestock.addHealth");
 
   return (
     <div>
@@ -191,7 +249,7 @@ export function LivestockPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         <button onClick={() => setTab("animals")} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${tab === "animals" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
           {t("livestock.animalsTab")} ({animals.length})
         </button>
@@ -203,7 +261,25 @@ export function LivestockPage() {
           <Wheat size={14} className="mr-1 inline" />
           {t("livestock.feedTab")} ({feedEntries.length})
         </button>
+        <button onClick={() => setTab("health")} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${tab === "health" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
+          <Heart size={14} className="mr-1 inline" />
+          {t("livestock.healthTab")} ({healthEvents.length})
+        </button>
       </div>
+
+      {/* Animal filter (for production/feed/health tabs) */}
+      {tab !== "animals" && animals.length > 1 && (
+        <div className="mb-3 flex items-center gap-2">
+          <Filter size={14} className="text-gray-400" />
+          <select value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)}
+            className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800">
+            <option value="">{t("livestock.allAnimals")}</option>
+            {animals.map((a) => (
+              <option key={a.id} value={a.id}>{ANIMAL_ICONS[a.type]} {a.name || t(`livestock.types.${a.type}`)}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Animals tab */}
       {tab === "animals" && (
@@ -213,21 +289,20 @@ export function LivestockPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {animals.map((animal) => {
               const yields = ANNUAL_YIELD[animal.type];
-              const animalFeedCost = feedEntries
-                .filter((f) => f.animalId === animal.id)
-                .reduce((s, f) => s + (f.cost ?? 0), 0);
+              const animalFeedCost = feedEntries.filter((f) => f.animalId === animal.id).reduce((s, f) => s + (f.cost ?? 0), 0);
               const animalProductCount = animalProducts.filter((p) => p.animalId === animal.id).length;
+              const animalHealthCount = healthEvents.filter((h) => h.animalId === animal.id).length;
+              const lastHealth = healthEvents.filter((h) => h.animalId === animal.id).sort((a, b) => b.date.localeCompare(a.date))[0];
               return (
                 <Card key={animal.id}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{ANIMAL_ICONS[animal.type]}</span>
                       <div>
-                        <h3 className="font-semibold">
-                          {animal.name || t(`livestock.types.${animal.type}`)}
-                        </h3>
+                        <h3 className="font-semibold">{animal.name || t(`livestock.types.${animal.type}`)}</h3>
                         <p className="text-sm text-gray-500">
                           {animal.count}× {t(`livestock.types.${animal.type}`)}
+                          <span className="ml-2 text-xs text-gray-400">{t("livestock.since")} {animal.acquiredDate}</span>
                         </p>
                         <div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-400">
                           {yields.map((y) => (
@@ -236,16 +311,29 @@ export function LivestockPage() {
                             </span>
                           ))}
                         </div>
-                        <div className="mt-1 flex gap-3 text-xs text-gray-400">
+                        <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-400">
                           <span>{t("livestock.productionEntries", { count: animalProductCount })}</span>
                           {animalFeedCost > 0 && <span>{t("livestock.feedTotal")}: {animalFeedCost.toFixed(2)} €</span>}
+                          {animalHealthCount > 0 && <span>🩺 {animalHealthCount}</span>}
                         </div>
+                        {animal.notes && <p className="mt-1 text-xs italic text-gray-400">{animal.notes}</p>}
+                        {lastHealth && (
+                          <p className="mt-1 text-xs text-gray-400">
+                            {HEALTH_ICONS[lastHealth.type]} {t(`livestock.healthTypes.${lastHealth.type}`)} · {lastHealth.date}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteAnimal(animal.id); }}
-                      className="rounded p-1 text-gray-300 hover:text-red-500">
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="flex gap-1">
+                      <button onClick={() => openEditAnimal(animal.id)}
+                        className="rounded p-1 text-gray-300 hover:text-garden-500">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteAnimal(animal.id); }}
+                        className="rounded p-1 text-gray-300 hover:text-red-500">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 </Card>
               );
@@ -256,11 +344,11 @@ export function LivestockPage() {
 
       {/* Production tab */}
       {tab === "production" && (
-        animalProducts.length === 0 ? (
+        filteredProducts.length === 0 ? (
           <Card><p className="text-center text-gray-500">{t("livestock.noProducts")}</p></Card>
         ) : (
           <div className="space-y-2">
-            {[...animalProducts].sort((a, b) => b.date.localeCompare(a.date)).map((prod) => {
+            {[...filteredProducts].sort((a, b) => b.date.localeCompare(a.date)).map((prod) => {
               const animal = animals.find((a) => a.id === prod.animalId);
               return (
                 <div key={prod.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
@@ -272,6 +360,7 @@ export function LivestockPage() {
                     <p className="text-xs text-gray-400">
                       {animal ? `${ANIMAL_ICONS[animal.type]} ${animal.name || t(`livestock.types.${animal.type}`)}` : ""} · {prod.date}
                     </p>
+                    {prod.notes && <p className="mt-0.5 text-xs text-gray-400">{prod.notes}</p>}
                   </div>
                   <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteProduct(prod.id); }}
                     className="rounded p-1 text-gray-300 hover:text-red-500">
@@ -286,19 +375,17 @@ export function LivestockPage() {
 
       {/* Feed tab */}
       {tab === "feed" && (
-        feedEntries.length === 0 ? (
+        filteredFeed.length === 0 ? (
           <Card><p className="text-center text-gray-500">{t("livestock.noFeed")}</p></Card>
         ) : (
           <div className="space-y-2">
-            {[...feedEntries].sort((a, b) => b.date.localeCompare(a.date)).map((entry) => {
+            {[...filteredFeed].sort((a, b) => b.date.localeCompare(a.date)).map((entry) => {
               const animal = animals.find((a) => a.id === entry.animalId);
               return (
                 <div key={entry.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
                   <span className="text-lg">🌾</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium">
-                      {entry.quantity} {entry.unit} {entry.feedType}
-                    </p>
+                    <p className="text-sm font-medium">{entry.quantity} {entry.unit} {entry.feedType}</p>
                     <p className="text-xs text-gray-400">
                       {animal ? `${ANIMAL_ICONS[animal.type]} ${animal.name || t(`livestock.types.${animal.type}`)}` : ""} · {entry.date}
                       {entry.cost ? ` · ${entry.cost.toFixed(2)} €` : ""}
@@ -306,6 +393,38 @@ export function LivestockPage() {
                     {entry.notes && <p className="mt-0.5 text-xs text-gray-400">{entry.notes}</p>}
                   </div>
                   <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteFeedEntry(entry.id); }}
+                    className="rounded p-1 text-gray-300 hover:text-red-500">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )
+      )}
+
+      {/* Health tab */}
+      {tab === "health" && (
+        filteredHealth.length === 0 ? (
+          <Card><p className="text-center text-gray-500">{t("livestock.noHealth")}</p></Card>
+        ) : (
+          <div className="space-y-2">
+            {[...filteredHealth].sort((a, b) => b.date.localeCompare(a.date)).map((event) => {
+              const animal = animals.find((a) => a.id === event.animalId);
+              return (
+                <div key={event.id} className={`flex items-center gap-3 rounded-lg border p-3 ${event.type === "death" ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/10" : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"}`}>
+                  <span className="text-lg">{HEALTH_ICONS[event.type]}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">
+                      {t(`livestock.healthTypes.${event.type}`)} — {event.description}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {animal ? `${ANIMAL_ICONS[animal.type]} ${animal.name || t(`livestock.types.${animal.type}`)}` : ""} · {event.date}
+                      {event.cost ? ` · ${event.cost.toFixed(2)} €` : ""}
+                    </p>
+                    {event.notes && <p className="mt-0.5 text-xs text-gray-400">{event.notes}</p>}
+                  </div>
+                  <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHealthEvent(event.id); }}
                     className="rounded p-1 text-gray-300 hover:text-red-500">
                     <Trash2 size={14} />
                   </button>
@@ -330,9 +449,31 @@ export function LivestockPage() {
           </div>
           <Input label={t("livestock.animalName")} value={animalName} onChange={(e) => setAnimalName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
           <Input label={t("livestock.count")} type="number" min={1} value={animalCount} onChange={(e) => setAnimalCount(e.target.value)} />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.notes")}</label>
+            <textarea value={animalNotes} onChange={(e) => setAnimalNotes(e.target.value)} rows={2} placeholder={t("livestock.notesPlaceholder")}
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800" />
+          </div>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setShowAddAnimal(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAddAnimal}>{t("common.add")}</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit animal modal */}
+      <Modal open={editAnimalId !== null} onClose={() => setEditAnimalId(null)} title={t("livestock.editAnimal")}>
+        <div className="space-y-4">
+          <Input label={t("livestock.animalName")} value={editName} onChange={(e) => setEditName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
+          <Input label={t("livestock.count")} type="number" min={0} value={editCount} onChange={(e) => setEditCount(e.target.value)} />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.notes")}</label>
+            <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} rows={2}
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800" />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setEditAnimalId(null)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditAnimal}>{t("common.save")}</Button>
           </div>
         </div>
       </Modal>
@@ -370,6 +511,7 @@ export function LivestockPage() {
           })()}
           <Input label={t("livestock.quantity")} type="number" min={1} step={prodType === "eggs" ? 1 : 0.1} value={prodQuantity} onChange={(e) => setProdQuantity(e.target.value)} />
           <Input label={t("harvest.date")} type="date" value={prodDate} onChange={(e) => setProdDate(e.target.value)} />
+          <Input label={t("harvest.notes")} value={prodNotes} onChange={(e) => setProdNotes(e.target.value)} />
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setShowAddProduct(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAddProduct}>{t("common.add")}</Button>
@@ -409,6 +551,41 @@ export function LivestockPage() {
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setShowAddFeed(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAddFeed}>{t("common.add")}</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Add health event modal */}
+      <Modal open={showAddHealth} onClose={() => setShowAddHealth(false)} title={t("livestock.addHealth")}>
+        <div className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.selectAnimal")}</label>
+            <select value={healthAnimalId} onChange={(e) => setHealthAnimalId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base sm:py-2 sm:text-sm dark:border-gray-600 dark:bg-gray-800">
+              <option value="">--</option>
+              {animals.map((a) => (
+                <option key={a.id} value={a.id}>{ANIMAL_ICONS[a.type]} {a.name || t(`livestock.types.${a.type}`)} ({a.count}×)</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.healthType")}</label>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              {HEALTH_EVENT_TYPES.map((type) => (
+                <button key={type} onClick={() => setHealthType(type)}
+                  className={`rounded-lg border px-2 py-1.5 text-xs ${healthType === type ? "border-garden-500 bg-garden-50 font-medium dark:bg-garden-900/30" : "border-gray-200 dark:border-gray-700"}`}>
+                  {HEALTH_ICONS[type]} {t(`livestock.healthTypes.${type}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <Input label={t("livestock.healthDesc")} value={healthDesc} onChange={(e) => setHealthDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} />
+          <Input label={t("livestock.feedCost")} type="number" min={0} step={0.01} value={healthCost} onChange={(e) => setHealthCost(e.target.value)} placeholder="0.00" />
+          <Input label={t("harvest.date")} type="date" value={healthDate} onChange={(e) => setHealthDate(e.target.value)} />
+          <Input label={t("harvest.notes")} value={healthNotes} onChange={(e) => setHealthNotes(e.target.value)} />
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setShowAddHealth(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleAddHealth}>{t("common.add")}</Button>
           </div>
         </div>
       </Modal>
