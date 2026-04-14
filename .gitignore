@@ -29,3 +29,4 @@ playwright-report/
 
 # PWA dev
 dev-dist/
+backend/tsconfig.tsbuildinfo
