@@ -16,6 +16,7 @@
     "seeds": "Semences",
     "soil": "Sol",
     "pests": "Ravageurs",
+    "livestock": "Élevage",
     "foodplan": "Plan alimentaire",
     "sufficiency": "Autosuffisance",
     "expenses": "Coûts & ROI",
@@ -459,6 +460,39 @@
     "types": {
       "pest": "Ravageur",
       "disease": "Maladie"
+    }
+  },
+  "livestock": {
+    "title": "Gestion de l'Élevage",
+    "addAnimal": "Ajouter un animal",
+    "addProduct": "Enregistrer la production",
+    "added": "Animal ajouté !",
+    "productAdded": "Production enregistrée !",
+    "totalAnimals": "Total animaux",
+    "eggsThisWeek": "Œufs cette semaine",
+    "honeyThisYear": "Miel cette année",
+    "animalsTab": "Animaux",
+    "productionTab": "Production",
+    "noAnimals": "Pas encore d'animaux. Commencez à suivre votre élevage !",
+    "noProducts": "Aucune production enregistrée.",
+    "animalName": "Nom (optionnel)",
+    "namePlaceholder": "ex. Henriette, Ruche 1...",
+    "count": "Nombre",
+    "selectAnimal": "Sélectionner un animal",
+    "quantity": "Quantité",
+    "pieces": "pcs",
+    "year": "an",
+    "types": {
+      "chicken": "Poules",
+      "duck": "Canards coureurs",
+      "rabbit": "Lapins",
+      "bee": "Ruches"
+    },
+    "products": {
+      "eggs": "Œufs",
+      "honey": "Miel",
+      "meat": "Viande",
+      "wax": "Cire"
     }
   },
   "seeds": {

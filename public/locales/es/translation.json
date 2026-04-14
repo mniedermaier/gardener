@@ -16,6 +16,7 @@
     "seeds": "Semillas",
     "soil": "Suelo",
     "pests": "Plagas",
+    "livestock": "Animales",
     "foodplan": "Plan alimentario",
     "sufficiency": "Autosuficiencia",
     "expenses": "Costos y ROI",
@@ -459,6 +460,39 @@
     "types": {
       "pest": "Plaga",
       "disease": "Enfermedad"
+    }
+  },
+  "livestock": {
+    "title": "Gestión de Animales",
+    "addAnimal": "Agregar Animal",
+    "addProduct": "Registrar Producción",
+    "added": "¡Animal agregado!",
+    "productAdded": "¡Producción registrada!",
+    "totalAnimals": "Total animales",
+    "eggsThisWeek": "Huevos esta semana",
+    "honeyThisYear": "Miel este año",
+    "animalsTab": "Animales",
+    "productionTab": "Producción",
+    "noAnimals": "Sin animales aún. ¡Comienza a registrar tu ganado!",
+    "noProducts": "Sin producción registrada.",
+    "animalName": "Nombre (opcional)",
+    "namePlaceholder": "ej. Henriette, Colmena 1...",
+    "count": "Cantidad",
+    "selectAnimal": "Seleccionar animal",
+    "quantity": "Cantidad",
+    "pieces": "uds.",
+    "year": "año",
+    "types": {
+      "chicken": "Gallinas",
+      "duck": "Patos corredores",
+      "rabbit": "Conejos",
+      "bee": "Colmenas"
+    },
+    "products": {
+      "eggs": "Huevos",
+      "honey": "Miel",
+      "meat": "Carne",
+      "wax": "Cera"
     }
   },
   "seeds": {

@@ -16,6 +16,7 @@
     "seeds": "Saatgut",
     "soil": "Boden",
     "pests": "Schädlinge",
+    "livestock": "Tierhaltung",
     "foodplan": "Ernährungsplan",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI",
@@ -459,6 +460,39 @@
     "types": {
       "pest": "Schädling",
       "disease": "Krankheit"
+    }
+  },
+  "livestock": {
+    "title": "Tierhaltung",
+    "addAnimal": "Tier hinzufügen",
+    "addProduct": "Produktion erfassen",
+    "added": "Tier hinzugefügt!",
+    "productAdded": "Produktion erfasst!",
+    "totalAnimals": "Tiere gesamt",
+    "eggsThisWeek": "Eier diese Woche",
+    "honeyThisYear": "Honig dieses Jahr",
+    "animalsTab": "Bestand",
+    "productionTab": "Produktion",
+    "noAnimals": "Noch keine Tiere. Beginne deine Tierhaltung zu dokumentieren!",
+    "noProducts": "Noch keine Produktion erfasst.",
+    "animalName": "Name (optional)",
+    "namePlaceholder": "z.B. Henriette, Bienenstock 1...",
+    "count": "Anzahl",
+    "selectAnimal": "Tier auswählen",
+    "quantity": "Menge",
+    "pieces": "Stk.",
+    "year": "Jahr",
+    "types": {
+      "chicken": "Hühner",
+      "duck": "Laufenten",
+      "rabbit": "Kaninchen",
+      "bee": "Bienenstöcke"
+    },
+    "products": {
+      "eggs": "Eier",
+      "honey": "Honig",
+      "meat": "Fleisch",
+      "wax": "Wachs"
     }
   },
   "seeds": {

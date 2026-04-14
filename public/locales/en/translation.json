@@ -16,6 +16,7 @@
     "seeds": "Seeds",
     "soil": "Soil",
     "pests": "Pests",
+    "livestock": "Livestock",
     "foodplan": "Food Plan",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI",
@@ -459,6 +460,39 @@
     "types": {
       "pest": "Pest",
       "disease": "Disease"
+    }
+  },
+  "livestock": {
+    "title": "Livestock Management",
+    "addAnimal": "Add Animal",
+    "addProduct": "Log Production",
+    "added": "Animal added!",
+    "productAdded": "Production logged!",
+    "totalAnimals": "Total animals",
+    "eggsThisWeek": "Eggs this week",
+    "honeyThisYear": "Honey this year",
+    "animalsTab": "Animals",
+    "productionTab": "Production",
+    "noAnimals": "No animals yet. Start tracking your livestock!",
+    "noProducts": "No production logged yet.",
+    "animalName": "Name (optional)",
+    "namePlaceholder": "e.g. Henriette, Hive 1...",
+    "count": "Number of animals",
+    "selectAnimal": "Select animal",
+    "quantity": "Quantity",
+    "pieces": "pcs",
+    "year": "year",
+    "types": {
+      "chicken": "Chickens",
+      "duck": "Runner Ducks",
+      "rabbit": "Rabbits",
+      "bee": "Bee Hives"
+    },
+    "products": {
+      "eggs": "Eggs",
+      "honey": "Honey",
+      "meat": "Meat",
+      "wax": "Wax"
     }
   },
   "seeds": {

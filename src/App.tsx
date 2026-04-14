@@ -40,6 +40,7 @@ const SeedInventory = lazy(() => lazyRetry(() => import("@/components/seeds/Seed
 const SoilManagement = lazy(() => lazyRetry(() => import("@/components/soil/SoilManagement")).then((m) => ({ default: m.SoilManagement })));
 const PestTracker = lazy(() => lazyRetry(() => import("@/components/pests/PestTracker")).then((m) => ({ default: m.PestTracker })));
 const FoodPlan = lazy(() => lazyRetry(() => import("@/components/foodplan/FoodPlan")).then((m) => ({ default: m.FoodPlan })));
+const LivestockPage = lazy(() => lazyRetry(() => import("@/components/livestock/LivestockPage")).then((m) => ({ default: m.LivestockPage })));
 const ExpenseDashboard = lazy(() => lazyRetry(() => import("@/components/expenses/ExpenseDashboard")).then((m) => ({ default: m.ExpenseDashboard })));
 const WeatherDashboard = lazy(() => lazyRetry(() => import("@/components/weather/WeatherDashboard")).then((m) => ({ default: m.WeatherDashboard })));
 const ImportPage = lazy(() => lazyRetry(() => import("@/components/planner/ImportPage")).then((m) => ({ default: m.ImportPage })));
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="seeds" element={<L><SeedInventory /></L>} />
           <Route path="soil" element={<L><SoilManagement /></L>} />
           <Route path="pests" element={<L><PestTracker /></L>} />
+          <Route path="livestock" element={<L><LivestockPage /></L>} />
           <Route path="foodplan" element={<L><FoodPlan /></L>} />
           <Route path="sufficiency" element={<L><SufficiencyDashboard /></L>} />
           <Route path="expenses" element={<L><ExpenseDashboard /></L>} />
