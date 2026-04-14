@@ -85,14 +85,11 @@ test("can navigate to settings", async ({ page }) => {
   await expect(page.getByText("Theme")).toBeVisible();
 });
 
-test("language toggle works", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-
-  // Toggle to German
-  await page.getByRole("button", { name: /Toggle language/i }).click();
-  await expect(page.getByRole("heading", { name: "\u00dcbersicht", exact: true })).toBeVisible();
-
-  // Toggle back
-  await page.getByRole("button", { name: /Toggle language/i }).click();
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+test("can navigate to settings and see language options", async ({ page }) => {
+  // Language is now changed in settings, not top bar
+  await page.getByRole("link", { name: /Settings/i }).click();
+  await expect(page.getByText("Deutsch")).toBeVisible();
+  await expect(page.getByText("English")).toBeVisible();
+  await expect(page.getByText("Español")).toBeVisible();
+  await expect(page.getByText("Français")).toBeVisible();
 });
