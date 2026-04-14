@@ -17,10 +17,12 @@
     "seeds": "Seeds",
     "soil": "Soil",
     "pests": "Pests",
+    "waterLog": "Irrigation",
     "livestock": "Livestock",
     "foodplan": "Food Plan",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI",
+    "companions": "Companions",
     "more": "More",
     "group": {
       "planning": "Planning",
@@ -601,14 +603,21 @@
       "chicken": "Chickens",
       "duck": "Runner Ducks",
       "rabbit": "Rabbits",
-      "bee": "Bee Hives"
+      "bee": "Bee Hives",
+      "goat": "Goats",
+      "sheep": "Sheep",
+      "quail": "Quail"
     },
     "products": {
       "eggs": "Eggs",
       "honey": "Honey",
       "meat": "Meat",
-      "wax": "Wax"
-    }
+      "wax": "Wax",
+      "milk": "Milk",
+      "wool": "Wool"
+    },
+    "chartTitle": "Production Trends",
+    "noChartData": "No production data for this period yet."
   },
   "seeds": {
     "title": "Seed Inventory",
@@ -788,5 +797,33 @@
     "noResults": "No results found.",
     "cm": "cm",
     "confirmDelete": "Are you sure you want to delete this?"
+  },
+  "companions": {
+    "title": "Companion Planting Matrix",
+    "search": "Search plant...",
+    "matrixView": "Matrix",
+    "listView": "List",
+    "companionsLabel": "Good neighbors",
+    "antagonistsLabel": "Bad neighbors",
+    "noRelations": "No known relationships"
+  },
+  "water": {
+    "title": "Irrigation",
+    "add": "Log watering",
+    "added": "Watering logged!",
+    "liters": "liters",
+    "method": "Method",
+    "duration": "Duration",
+    "minutes": "minutes",
+    "noEntries": "No watering entries yet.",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "methods": {
+      "manual": "Watering can",
+      "hose": "Hose",
+      "drip": "Drip irrigation",
+      "sprinkler": "Sprinkler",
+      "rain": "Rain"
+    }
   }
 }

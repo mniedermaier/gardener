@@ -9,14 +9,18 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { ANIMAL_ICONS, PRODUCT_ICONS, ANNUAL_YIELD, type AnimalType, type ProductType, type HealthEventType } from "@/types/animal";
+import { ProductionChart } from "@/components/livestock/ProductionChart";
 import { format, startOfWeek, endOfWeek, parseISO, isAfter, isBefore, startOfMonth, endOfMonth } from "date-fns";
 
-const ANIMAL_TYPES: AnimalType[] = ["chicken", "duck", "rabbit", "bee"];
+const ANIMAL_TYPES: AnimalType[] = ["chicken", "duck", "rabbit", "bee", "goat", "sheep", "quail"];
 const PRODUCT_TYPES_BY_ANIMAL: Record<AnimalType, ProductType[]> = {
   chicken: ["eggs"],
   duck: ["eggs"],
   rabbit: ["meat"],
   bee: ["honey", "wax"],
+  goat: ["milk"],
+  sheep: ["wool", "meat"],
+  quail: ["eggs"],
 };
 
 const HEALTH_EVENT_TYPES: HealthEventType[] = ["vaccination", "deworming", "illness", "injury", "checkup", "treatment", "death", "other"];
@@ -247,6 +251,13 @@ export function LivestockPage() {
           <p className="text-xs text-gray-500">{t("livestock.feedCostMonth")}</p>
         </Card>
       </div>
+
+      {/* Production Trend Chart */}
+      {animalProducts.length > 0 && (
+        <Card className="mb-4">
+          <ProductionChart animalProducts={animalProducts} animals={animals} />
+        </Card>
+      )}
 
       {/* Tabs */}
       <div className="mb-4 flex flex-wrap gap-2">

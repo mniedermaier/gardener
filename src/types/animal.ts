@@ -1,5 +1,5 @@
-export type AnimalType = "chicken" | "duck" | "rabbit" | "bee";
-export type ProductType = "eggs" | "honey" | "meat" | "wax";
+export type AnimalType = "chicken" | "duck" | "rabbit" | "bee" | "goat" | "sheep" | "quail";
+export type ProductType = "eggs" | "honey" | "meat" | "wax" | "milk" | "wool";
 
 export interface Animal {
   id: string;
@@ -48,6 +48,9 @@ export const ANIMAL_ICONS: Record<AnimalType, string> = {
   duck: "\ud83e\udd86",
   rabbit: "\ud83d\udc30",
   bee: "\ud83d\udc1d",
+  goat: "🐐",
+  sheep: "🐑",
+  quail: "🐦",
 };
 
 export const PRODUCT_ICONS: Record<ProductType, string> = {
@@ -55,6 +58,8 @@ export const PRODUCT_ICONS: Record<ProductType, string> = {
   honey: "\ud83c\udf6f",
   meat: "\ud83e\udd69",
   wax: "\ud83d\udeaf",
+  milk: "🥛",
+  wool: "🧶",
 };
 
 // Nutrition per 100g of product
@@ -63,6 +68,8 @@ export const PRODUCT_NUTRITION: Record<ProductType, { caloriesPer100g: number; p
   honey: { caloriesPer100g: 304, proteinPer100g: 0.3 },
   meat: { caloriesPer100g: 175, proteinPer100g: 27 },
   wax: { caloriesPer100g: 0, proteinPer100g: 0 },
+  milk: { caloriesPer100g: 69, proteinPer100g: 3.3 },
+  wool: { caloriesPer100g: 0, proteinPer100g: 0 },
 };
 
 // Estimated annual production per animal/hive
@@ -71,4 +78,7 @@ export const ANNUAL_YIELD: Record<AnimalType, { product: ProductType; quantity: 
   duck: [{ product: "eggs", quantity: 150, unit: "pieces" }],
   rabbit: [{ product: "meat", quantity: 2.5, unit: "kg" }],
   bee: [{ product: "honey", quantity: 20, unit: "kg" }, { product: "wax", quantity: 0.5, unit: "kg" }],
+  goat: [{ product: "milk", quantity: 800, unit: "liters" }],
+  sheep: [{ product: "wool", quantity: 4, unit: "kg" }, { product: "meat", quantity: 20, unit: "kg" }],
+  quail: [{ product: "eggs", quantity: 300, unit: "pieces" }],
 };

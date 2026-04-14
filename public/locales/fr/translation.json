@@ -17,10 +17,12 @@
     "seeds": "Semences",
     "soil": "Sol",
     "pests": "Ravageurs",
+    "waterLog": "Arrosage",
     "livestock": "Élevage",
     "foodplan": "Plan alimentaire",
     "sufficiency": "Autosuffisance",
     "expenses": "Coûts & ROI",
+    "companions": "Compagnons",
     "more": "Plus",
     "group": {
       "planning": "Planification",
@@ -586,14 +588,21 @@
       "chicken": "Poules",
       "duck": "Canards coureurs",
       "rabbit": "Lapins",
-      "bee": "Ruches"
+      "bee": "Ruches",
+      "goat": "Chèvres",
+      "sheep": "Moutons",
+      "quail": "Cailles"
     },
     "products": {
       "eggs": "Œufs",
       "honey": "Miel",
       "meat": "Viande",
-      "wax": "Cire"
-    }
+      "wax": "Cire",
+      "milk": "Lait",
+      "wool": "Laine"
+    },
+    "chartTitle": "Tendances de production",
+    "noChartData": "Pas de données de production pour cette période."
   },
   "seeds": {
     "title": "Inventaire des semences",
@@ -773,5 +782,33 @@
     "noResults": "Aucun résultat trouvé.",
     "cm": "cm",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ceci ?"
+  },
+  "companions": {
+    "title": "Matrice de compagnonnage",
+    "search": "Chercher plante...",
+    "matrixView": "Matrice",
+    "listView": "Liste",
+    "companionsLabel": "Bons voisins",
+    "antagonistsLabel": "Mauvais voisins",
+    "noRelations": "Pas de relations connues"
+  },
+  "water": {
+    "title": "Arrosage",
+    "add": "Enregistrer arrosage",
+    "added": "Arrosage enregistré !",
+    "liters": "litres",
+    "method": "Méthode",
+    "duration": "Durée",
+    "minutes": "minutes",
+    "noEntries": "Aucun arrosage enregistré.",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois",
+    "methods": {
+      "manual": "Arrosoir",
+      "hose": "Tuyau",
+      "drip": "Goutte-à-goutte",
+      "sprinkler": "Arroseur",
+      "rain": "Pluie"
+    }
   }
 }

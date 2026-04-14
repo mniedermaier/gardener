@@ -17,10 +17,12 @@
     "seeds": "Semillas",
     "soil": "Suelo",
     "pests": "Plagas",
+    "waterLog": "Riego",
     "livestock": "Animales",
     "foodplan": "Plan alimentario",
     "sufficiency": "Autosuficiencia",
     "expenses": "Costos y ROI",
+    "companions": "Compañeras",
     "more": "Mas",
     "group": {
       "planning": "Planificación",
@@ -586,14 +588,21 @@
       "chicken": "Gallinas",
       "duck": "Patos corredores",
       "rabbit": "Conejos",
-      "bee": "Colmenas"
+      "bee": "Colmenas",
+      "goat": "Cabras",
+      "sheep": "Ovejas",
+      "quail": "Codornices"
     },
     "products": {
       "eggs": "Huevos",
       "honey": "Miel",
       "meat": "Carne",
-      "wax": "Cera"
-    }
+      "wax": "Cera",
+      "milk": "Leche",
+      "wool": "Lana"
+    },
+    "chartTitle": "Tendencias de producción",
+    "noChartData": "Sin datos de producción para este período."
   },
   "seeds": {
     "title": "Inventario de semillas",
@@ -773,5 +782,33 @@
     "noResults": "No se encontraron resultados.",
     "cm": "cm",
     "confirmDelete": "Estas seguro de que quieres eliminar esto?"
+  },
+  "companions": {
+    "title": "Matriz de asociación",
+    "search": "Buscar planta...",
+    "matrixView": "Matriz",
+    "listView": "Lista",
+    "companionsLabel": "Buenos vecinos",
+    "antagonistsLabel": "Malos vecinos",
+    "noRelations": "Sin relaciones conocidas"
+  },
+  "water": {
+    "title": "Riego",
+    "add": "Registrar riego",
+    "added": "Riego registrado!",
+    "liters": "litros",
+    "method": "Método",
+    "duration": "Duración",
+    "minutes": "minutos",
+    "noEntries": "Aún no hay registros de riego.",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "methods": {
+      "manual": "Regadera",
+      "hose": "Manguera",
+      "drip": "Goteo",
+      "sprinkler": "Aspersor",
+      "rain": "Lluvia"
+    }
   }
 }

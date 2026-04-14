@@ -17,10 +17,12 @@
     "seeds": "Saatgut",
     "soil": "Boden",
     "pests": "Schädlinge",
+    "waterLog": "Bewässerung",
     "livestock": "Tierhaltung",
     "foodplan": "Ernährungsplan",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI",
+    "companions": "Pflanzpartner",
     "more": "Mehr",
     "group": {
       "planning": "Planung",
@@ -601,14 +603,21 @@
       "chicken": "Hühner",
       "duck": "Laufenten",
       "rabbit": "Kaninchen",
-      "bee": "Bienenstöcke"
+      "bee": "Bienenstöcke",
+      "goat": "Ziegen",
+      "sheep": "Schafe",
+      "quail": "Wachteln"
     },
     "products": {
       "eggs": "Eier",
       "honey": "Honig",
       "meat": "Fleisch",
-      "wax": "Wachs"
-    }
+      "wax": "Wachs",
+      "milk": "Milch",
+      "wool": "Wolle"
+    },
+    "chartTitle": "Produktionsverlauf",
+    "noChartData": "Noch keine Produktionsdaten für den Zeitraum."
   },
   "seeds": {
     "title": "Saatgut-Inventar",
@@ -788,5 +797,33 @@
     "noResults": "Keine Ergebnisse gefunden.",
     "cm": "cm",
     "confirmDelete": "Wirklich löschen?"
+  },
+  "companions": {
+    "title": "Pflanzpartner-Matrix",
+    "search": "Pflanze suchen...",
+    "matrixView": "Matrix",
+    "listView": "Liste",
+    "companionsLabel": "Gute Nachbarn",
+    "antagonistsLabel": "Schlechte Nachbarn",
+    "noRelations": "Keine bekannten Beziehungen"
+  },
+  "water": {
+    "title": "Bewässerung",
+    "add": "Bewässerung erfassen",
+    "added": "Bewässerung erfasst!",
+    "liters": "Liter",
+    "method": "Methode",
+    "duration": "Dauer",
+    "minutes": "Minuten",
+    "noEntries": "Noch keine Bewässerung erfasst.",
+    "thisWeek": "Diese Woche",
+    "thisMonth": "Dieser Monat",
+    "methods": {
+      "manual": "Gießkanne",
+      "hose": "Schlauch",
+      "drip": "Tropfbewässerung",
+      "sprinkler": "Sprinkler",
+      "rain": "Regen"
+    }
   }
 }

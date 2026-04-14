@@ -22,6 +22,7 @@ export interface ImportResult {
     soilTests: number;
     amendments: number;
     pests: number;
+    waterEntries: number;
     pantryItems: number;
   };
 }
@@ -29,7 +30,7 @@ export interface ImportResult {
 const EMPTY_STATS: ImportResult["stats"] = {
   gardens: 0, tasks: 0, harvests: 0, journalEntries: 0, expenses: 0,
   customPlants: 0, seasonArchives: 0, animals: 0, animalProducts: 0,
-  feedEntries: 0, healthEvents: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0, pantryItems: 0,
+  feedEntries: 0, healthEvents: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0, waterEntries: 0, pantryItems: 0,
 };
 
 export function validateExportFile(json: unknown): json is GardenerExport {
@@ -81,6 +82,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
     soilTests: data.soilTests ?? [],
     amendments: data.amendments ?? [],
     pests: data.pests ?? [],
+    waterEntries: data.waterEntries ?? [],
     pantryItems: data.pantryItems ?? [],
     weatherHistory: data.weatherHistory ?? [],
   });
@@ -120,6 +122,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
       soilTests: data.soilTests?.length ?? 0,
       amendments: data.amendments?.length ?? 0,
       pests: data.pests?.length ?? 0,
+      waterEntries: data.waterEntries?.length ?? 0,
       pantryItems: data.pantryItems?.length ?? 0,
     },
   };
@@ -152,6 +155,7 @@ function importMerge(
   const mergedSoilTests = mergeById(current.soilTests, data.soilTests ?? []);
   const mergedAmendments = mergeById(current.amendments, data.amendments ?? []);
   const mergedPests = mergeById(current.pests, data.pests ?? []);
+  const mergedWaterEntries = mergeById(current.waterEntries, data.waterEntries ?? []);
   const mergedPantryItems = mergeById(current.pantryItems, data.pantryItems ?? []);
 
   // Season archives: merge by gardenId+season combo
@@ -185,6 +189,7 @@ function importMerge(
     soilTests: mergedSoilTests,
     amendments: mergedAmendments,
     pests: mergedPests,
+    waterEntries: mergedWaterEntries,
     pantryItems: mergedPantryItems,
     seasonArchives: mergedArchives,
     weatherHistory: mergedWeather,
@@ -208,6 +213,7 @@ function importMerge(
       soilTests: mergedSoilTests.length - current.soilTests.length,
       amendments: mergedAmendments.length - current.amendments.length,
       pests: mergedPests.length - current.pests.length,
+      waterEntries: mergedWaterEntries.length - current.waterEntries.length,
       pantryItems: mergedPantryItems.length - current.pantryItems.length,
     },
   };
