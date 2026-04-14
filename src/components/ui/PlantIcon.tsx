@@ -412,20 +412,35 @@ const PLANT_SVGS: Record<string, string> = {
     <path d="M8 9Q10 6 12 6T16 9" stroke="#84cc16" stroke-width="0.4" fill="none" opacity="0.4"/>`,
 };
 
-export function PlantIcon({ plantId, size = 24, className = "" }: Props) {
+import { memo, useMemo } from "react";
+
+// Cache parsed SVG HTML to avoid re-parsing on every render
+const svgCache = new Map<string, string>();
+
+function getSvgHtml(plantId: string, size: number): string | null {
   const svg = PLANT_SVGS[plantId];
   if (!svg) return null;
+  const key = `${plantId}-${size}`;
+  let cached = svgCache.get(key);
+  if (!cached) {
+    cached = `<svg viewBox="0 0 24 24" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
+    svgCache.set(key, cached);
+  }
+  return cached;
+}
+
+export const PlantIcon = memo(function PlantIcon({ plantId, size = 24, className = "" }: Props) {
+  const html = useMemo(() => getSvgHtml(plantId, size), [plantId, size]);
+  if (!html) return null;
 
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center ${className}`}
       style={{ width: size, height: size }}
-      dangerouslySetInnerHTML={{
-        __html: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`,
-      }}
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   );
-}
+});
 
 export function hasPlantSvg(plantId: string): boolean {
   return plantId in PLANT_SVGS;

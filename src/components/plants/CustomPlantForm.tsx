@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -15,7 +16,7 @@ interface Props {
 
 export function CustomPlantForm({ open, onClose }: Props) {
   const { t } = useTranslation();
-  const { addCustomPlant } = useStore();
+  const { addCustomPlant } = useStore(useShallow((s) => ({ addCustomPlant: s.addCustomPlant })));
   const [name, setName] = useState("");
   const [category, setCategory] = useState<PlantCategory>("vegetable");
   const [icon, setIcon] = useState("\ud83c\udf3f");

@@ -9,6 +9,7 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { Button } from "@/components/ui/Button";
@@ -146,7 +147,7 @@ function BedGrid({
 }) {
   const { t } = useTranslation();
   const plantMap = usePlantMap();
-  const { removeCell, updateBed, togglePath, gridCellSizeCm } = useStore();
+  const { removeCell, updateBed, togglePath, gridCellSizeCm } = useStore(useShallow((s) => ({ removeCell: s.removeCell, updateBed: s.updateBed, togglePath: s.togglePath, gridCellSizeCm: s.gridCellSizeCm })));
   const [showConfig, setShowConfig] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(bed.name);
@@ -446,7 +447,7 @@ export function GardenPlanner() {
     gardens, activeGardenId, addGarden, setActiveGarden, addBed, deleteBed,
     deleteGarden, setCell, updateCell, archiveSeason, seasonArchives, gridCellSizeCm, lastFrostDate,
     duplicateGarden, duplicateBed,
-  } = useStore();
+  } = useStore(useShallow((s) => ({ gardens: s.gardens, activeGardenId: s.activeGardenId, addGarden: s.addGarden, setActiveGarden: s.setActiveGarden, addBed: s.addBed, deleteBed: s.deleteBed, deleteGarden: s.deleteGarden, setCell: s.setCell, updateCell: s.updateCell, archiveSeason: s.archiveSeason, seasonArchives: s.seasonArchives, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, duplicateGarden: s.duplicateGarden, duplicateBed: s.duplicateBed })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const { toast, confirm } = useToast();

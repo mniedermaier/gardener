@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Upload, FileSpreadsheet, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -10,7 +11,7 @@ import { importAllData, validateExportFile, clearAllData, type ImportMode, type 
 
 export function DataManagement() {
   const { t } = useTranslation();
-  const { lastBackupDate, harvests, expenses } = useStore();
+  const { lastBackupDate, harvests, expenses } = useStore(useShallow((s) => ({ lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses })));
   const { toast, confirm } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);

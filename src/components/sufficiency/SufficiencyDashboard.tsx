@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Users, TrendingUp, AlertCircle, Apple, Beef, Citrus, Wheat, Snowflake, Archive } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { calculateSufficiency, type SufficiencyResult } from "@/lib/sufficiency";
@@ -36,7 +37,7 @@ function ProgressBar({ percent, color }: { percent: number; color: string }) {
 
 export function SufficiencyDashboard() {
   const { t, i18n } = useTranslation();
-  const { gardens, gridCellSizeCm, lastFrostDate } = useStore();
+  const { gardens, gridCellSizeCm, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [familySize, setFamilySize] = useState(2);

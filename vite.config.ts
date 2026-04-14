@@ -43,9 +43,19 @@ export default defineConfig({
         navigateFallback: "index.html",
         runtimeCaching: [
           {
-            urlPattern: /\.js$/,
-            handler: "NetworkFirst",
-            options: { cacheName: "js-cache", expiration: { maxEntries: 50, maxAgeSeconds: 86400 } },
+            urlPattern: /assets\/.*\.(js|css)$/,
+            handler: "CacheFirst",
+            options: { cacheName: "assets-cache", expiration: { maxEntries: 60, maxAgeSeconds: 86400 * 30 } },
+          },
+          {
+            urlPattern: /locales\/.*\.json$/,
+            handler: "CacheFirst",
+            options: { cacheName: "translations-cache", expiration: { maxEntries: 10, maxAgeSeconds: 86400 * 30 } },
+          },
+          {
+            urlPattern: /api\.openweathermap\.org/,
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "weather-cache", expiration: { maxEntries: 5, maxAgeSeconds: 3600 } },
           },
         ],
       },

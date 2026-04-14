@@ -5,6 +5,7 @@ import type { Plant } from "@/types/plant";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { addWeeks, parseISO, format } from "date-fns";
 
 interface Props {
@@ -16,7 +17,7 @@ export function PlantInfoPanel({ plant, onClose }: Props) {
   const { t } = useTranslation();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
-  const { lastFrostDate } = useStore();
+  const { lastFrostDate } = useStore(useShallow((s) => ({ lastFrostDate: s.lastFrostDate })));
 
   const frostDate = parseISO(lastFrostDate);
 

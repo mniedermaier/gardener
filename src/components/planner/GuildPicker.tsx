@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { GUILDS, type PlantGuild } from "@/data/guilds";
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 
 export function GuildPicker({ gardenId, bedId, bedWidth, bedHeight }: Props) {
   const { t } = useTranslation();
-  const { setCell } = useStore();
+  const { setCell } = useStore(useShallow((s) => ({ setCell: s.setCell })));
 
   const applyGuild = (guild: PlantGuild) => {
     for (const p of guild.plants) {

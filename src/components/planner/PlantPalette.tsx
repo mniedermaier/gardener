@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Star } from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
@@ -13,7 +13,7 @@ interface Props {
   recommendedIds?: Set<string>;
 }
 
-function DraggableItem({ plant, isSelected, isRecommended, onSelect }: {
+const DraggableItem = memo(function DraggableItem({ plant, isSelected, isRecommended, onSelect }: {
   plant: Plant; isSelected: boolean; isRecommended: boolean; onSelect: () => void;
 }) {
   const getPlantName = usePlantName();
@@ -42,7 +42,7 @@ function DraggableItem({ plant, isSelected, isRecommended, onSelect }: {
       {isRecommended && <Star size={10} className="shrink-0 text-green-500" fill="currentColor" />}
     </button>
   );
-}
+});
 
 const CATEGORIES: (PlantCategory | "all" | "recommended")[] = ["recommended", "all", "vegetable", "fruit", "berry", "herb"];
 

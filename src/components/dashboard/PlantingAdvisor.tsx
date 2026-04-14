@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Lightbulb } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { getPlantingAdvice } from "@/lib/advisor";
@@ -22,7 +23,7 @@ const ACTION_KEYS = {
 
 export function PlantingAdvisor() {
   const { t } = useTranslation();
-  const { gardens, lastFrostDate } = useStore();
+  const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { PlantIcon, hasPlantSvg } from "./PlantIcon";
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
   className?: string;
 }
 
-export function PlantIconDisplay({ plantId, emoji, size = 24, className = "" }: Props) {
+export const PlantIconDisplay = memo(function PlantIconDisplay({ plantId, emoji, size = 24, className = "" }: Props) {
   if (hasPlantSvg(plantId)) {
     return <PlantIcon plantId={plantId} size={size} className={className} />;
   }
@@ -16,4 +17,4 @@ export function PlantIconDisplay({ plantId, emoji, size = 24, className = "" }: 
       {emoji}
     </span>
   );
-}
+});

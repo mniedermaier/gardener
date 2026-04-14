@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 
 export function useBackendSync() {
-  const { backendUrl, gardens, tasks } = useStore();
+  const { backendUrl, gardens, tasks } = useStore(useShallow((s) => ({ backendUrl: s.backendUrl, gardens: s.gardens, tasks: s.tasks })));
   const [connected, setConnected] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const lastSyncRef = useRef<string | null>(null);

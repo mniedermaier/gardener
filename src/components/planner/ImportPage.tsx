@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { decodeGardenFromUrl, importTemplateToStore } from "@/lib/sharing";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +11,7 @@ export function ImportPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { addGarden, addBed, setCell } = useStore();
+  const { addGarden, addBed, setCell } = useStore(useShallow((s) => ({ addGarden: s.addGarden, addBed: s.addBed, setCell: s.setCell })));
   const [status, setStatus] = useState<"loading" | "preview" | "done" | "error">("loading");
   const [templateName, setTemplateName] = useState("");
   const [bedCount, setBedCount] = useState(0);

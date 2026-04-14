@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sun, Sunrise, Sunset, Clock } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
 import { getDaylightInfo, getMonthlyDaylight } from "@/lib/sunlight";
 
@@ -10,7 +11,7 @@ const MONTH_LABELS_DE = ["Jan", "Feb", "M\u00e4r", "Apr", "Mai", "Jun", "Jul", "
 
 export function SunlightWidget() {
   const { t, i18n } = useTranslation();
-  const { locationLat, locationLon } = useStore();
+  const { locationLat, locationLon } = useStore(useShallow((s) => ({ locationLat: s.locationLat, locationLon: s.locationLon })));
   const months = i18n.language === "de" ? MONTH_LABELS_DE : MONTH_LABELS_EN;
   const [selectedDate] = useState(new Date());
 

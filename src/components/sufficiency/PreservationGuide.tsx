@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
@@ -16,7 +17,7 @@ const METHOD_ICONS: Record<PreservationMethod, string> = {
 
 export function PreservationGuide() {
   const { t } = useTranslation();
-  const { gardens } = useStore();
+  const { gardens } = useStore(useShallow((s) => ({ gardens: s.gardens })));
   const plantMap = usePlantMap();
 
   const plantedPlants = useMemo(() => {

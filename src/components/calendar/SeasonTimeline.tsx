@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
@@ -51,7 +52,7 @@ type FilterMode = "all" | string; // "all" or bedId
 
 export function SeasonTimeline() {
   const { t, i18n } = useTranslation();
-  const { gardens, lastFrostDate } = useStore();
+  const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const months = i18n.language === "de" ? MONTHS_DE : MONTHS_EN;

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Menu, Globe, Cloud, CloudOff, RefreshCw, Search, X } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useBackendSync } from "@/hooks/useBackendSync";
@@ -14,17 +15,24 @@ interface TopBarProps {
 export function TopBar({ onMenuClick }: TopBarProps) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { locale, setLocale, backendUrl, journalEntries, tasks } = useStore();
+  const { locale, setLocale, backendUrl, journalEntries, tasks } = useStore(useShallow((s) => ({ locale: s.locale, setLocale: s.setLocale, backendUrl: s.backendUrl, journalEntries: s.journalEntries, tasks: s.tasks })));
   const { connected, syncing } = useBackendSync();
   const plants = usePlants();
   const getPlantName = usePlantName();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (searchOpen) inputRef.current?.focus();
   }, [searchOpen]);
+
+  // Debounce search query by 200ms
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 200);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   // Keyboard shortcut: Ctrl+K to open search
   useEffect(() => {
@@ -40,8 +48,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
   }, []);
 
   const results = useMemo(() => {
-    if (!query || query.length < 2) return [];
-    const q = query.toLowerCase();
+    if (!debouncedQuery || debouncedQuery.length < 2) return [];
+    const q = debouncedQuery.toLowerCase();
     const items: Array<{ type: string; label: string; icon: string; path: string }> = [];
 
     // Search plants
@@ -70,7 +78,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
     }
 
     return items.slice(0, 8);
-  }, [query, plants, journalEntries, tasks, getPlantName, t]);
+  }, [debouncedQuery, plants, journalEntries, tasks, getPlantName, t]);
 
   const toggleLocale = () => {
     const newLocale = locale === "de" ? "en" : "de";

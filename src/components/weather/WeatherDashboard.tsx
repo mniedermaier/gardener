@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Cloud, Thermometer, Droplets, Wind, AlertTriangle, RefreshCw, Snowflake, Sun, Umbrella, Sprout } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -41,7 +42,7 @@ function AlertCard({ alert }: { alert: WeatherAlert }) {
 
 export function WeatherDashboard() {
   const { t } = useTranslation();
-  const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore();
+  const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, gardens: s.gardens, addWeatherHistory: s.addWeatherHistory })));
   const plantMap = usePlantMap();
   const [weather, setWeather] = useState<WeatherData | null>(() => {
     try {

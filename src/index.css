@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,47 +6,44 @@ body {
   @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
 }
 
-/* Dark mode scrollbars */
-.dark * {
-  scrollbar-color: #374151 #1f2937;
+/* Scrollbars - only on scrollable containers, not all elements */
+main,
+aside,
+[class*="overflow-y-auto"],
+[class*="overflow-x-auto"] {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
 }
 
-.dark *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.dark main,
+.dark aside,
+.dark [class*="overflow-y-auto"],
+.dark [class*="overflow-x-auto"] {
+  scrollbar-color: #4b5563 #1f2937;
 }
 
-.dark *::-webkit-scrollbar-track {
-  background: #1f2937;
-  border-radius: 4px;
+main::-webkit-scrollbar,
+aside::-webkit-scrollbar,
+[class*="overflow-y-auto"]::-webkit-scrollbar,
+[class*="overflow-x-auto"]::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.dark *::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 4px;
-}
-
-.dark *::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
-}
-
-/* Light mode scrollbars (subtle) */
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
+main::-webkit-scrollbar-thumb,
+aside::-webkit-scrollbar-thumb,
+[class*="overflow-y-auto"]::-webkit-scrollbar-thumb,
+[class*="overflow-x-auto"]::-webkit-scrollbar-thumb {
   background: #d1d5db;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
-*::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+.dark main::-webkit-scrollbar-thumb,
+.dark aside::-webkit-scrollbar-thumb,
+.dark [class*="overflow-y-auto"]::-webkit-scrollbar-thumb,
+.dark [class*="overflow-x-auto"]::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
 }
 
 @media print {

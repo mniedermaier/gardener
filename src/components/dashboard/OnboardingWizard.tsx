@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MapPin, Sprout, Calendar, ArrowRight, Check } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -10,7 +11,7 @@ type Step = "welcome" | "location" | "frost" | "garden" | "done";
 
 export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const { t, i18n } = useTranslation();
-  const { setLocale, setLocation, setLastFrostDate, addGarden, locale } = useStore();
+  const { setLocale, setLocation, setLastFrostDate, addGarden, locale } = useStore(useShallow((s) => ({ setLocale: s.setLocale, setLocation: s.setLocation, setLastFrostDate: s.setLastFrostDate, addGarden: s.addGarden, locale: s.locale })));
   const [step, setStep] = useState<Step>("welcome");
   const [locationName, setLocationName] = useState("");
   const [frostDate, setFrostDate] = useState("2026-05-15");

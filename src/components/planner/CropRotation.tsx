@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { plantFamilyMap, familyColors, familyNameKeys, rotationGroups, type PlantFamily } from "@/data/plantFamilies";
 import { Card } from "@/components/ui/Card";
 
 export function CropRotation() {
   const { i18n } = useTranslation();
-  const { gardens, activeGardenId } = useStore();
+  const { gardens, activeGardenId } = useStore(useShallow((s) => ({ gardens: s.gardens, activeGardenId: s.activeGardenId })));
   const lang = i18n.language as "de" | "en";
 
   const activeGarden = gardens.find((g) => g.id === activeGardenId);

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Repeat, Plus, Calendar } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { Card } from "@/components/ui/Card";
@@ -16,7 +17,7 @@ import {
 
 export function SuccessionPlanner() {
   const { t } = useTranslation();
-  const { lastFrostDate, addTask, gardens } = useStore();
+  const { lastFrostDate, addTask, gardens } = useStore(useShallow((s) => ({ lastFrostDate: s.lastFrostDate, addTask: s.addTask, gardens: s.gardens })));
   const plants = usePlants();
   const getPlantName = usePlantName();
 
