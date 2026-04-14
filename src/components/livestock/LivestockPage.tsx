@@ -98,7 +98,7 @@ export function LivestockPage() {
     );
     const eggsThisWeek = thisWeekProducts.filter((p) => p.type === "eggs").reduce((s, p) => s + p.quantity, 0);
     const totalAnimals = animals.reduce((s, a) => s + a.count, 0);
-    const honeyThisYear = animalProducts.filter((p) => p.type === "honey" && p.date.startsWith(String(now.getFullYear()))).reduce((s, p) => s + p.quantity, 0);
+    const honeyThisYear = Math.round(animalProducts.filter((p) => p.type === "honey" && p.date.startsWith(String(now.getFullYear()))).reduce((s, p) => s + p.quantity, 0) * 10) / 10;
     const feedCostMonth = feedEntries
       .filter((f) => !isBefore(parseISO(f.date), monthStart) && !isAfter(parseISO(f.date), monthEnd))
       .reduce((s, f) => s + (f.cost ?? 0), 0);
@@ -289,7 +289,7 @@ export function LivestockPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {animals.map((animal) => {
               const yields = ANNUAL_YIELD[animal.type];
-              const animalFeedCost = feedEntries.filter((f) => f.animalId === animal.id).reduce((s, f) => s + (f.cost ?? 0), 0);
+              const animalFeedCost = Math.round(feedEntries.filter((f) => f.animalId === animal.id).reduce((s, f) => s + (f.cost ?? 0), 0) * 100) / 100;
               const animalProductCount = animalProducts.filter((p) => p.animalId === animal.id).length;
               const animalHealthCount = healthEvents.filter((h) => h.animalId === animal.id).length;
               const lastHealth = healthEvents.filter((h) => h.animalId === animal.id).sort((a, b) => b.date.localeCompare(a.date))[0];

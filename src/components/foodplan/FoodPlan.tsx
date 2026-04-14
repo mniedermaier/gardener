@@ -75,18 +75,18 @@ export function FoodPlan() {
         currentAreaM2,
         neededAreaM2,
         currentYieldKg,
-        deficit: Math.max(0, targetKg - currentYieldKg),
-        surplus: Math.max(0, currentYieldKg - targetKg),
+        deficit: Math.round(Math.max(0, targetKg - currentYieldKg) * 10) / 10,
+        surplus: Math.round(Math.max(0, currentYieldKg - targetKg) * 10) / 10,
       });
     }
 
     return plans.sort((a, b) => b.deficit - a.deficit);
   }, [familySize, gardens, plantMap, gridCellSizeCm]);
 
-  const totalTargetKg = cropPlans.reduce((s, p) => s + p.targetKg, 0);
-  const totalCurrentKg = cropPlans.reduce((s, p) => s + p.currentYieldKg, 0);
-  const totalNeededM2 = cropPlans.reduce((s, p) => s + p.neededAreaM2, 0);
-  const totalCurrentM2 = cropPlans.reduce((s, p) => s + p.currentAreaM2, 0);
+  const totalTargetKg = Math.round(cropPlans.reduce((s, p) => s + p.targetKg, 0) * 10) / 10;
+  const totalCurrentKg = Math.round(cropPlans.reduce((s, p) => s + p.currentYieldKg, 0) * 10) / 10;
+  const totalNeededM2 = Math.round(cropPlans.reduce((s, p) => s + p.neededAreaM2, 0) * 10) / 10;
+  const totalCurrentM2 = Math.round(cropPlans.reduce((s, p) => s + p.currentAreaM2, 0) * 10) / 10;
   const coveragePercent = totalTargetKg > 0 ? Math.round((totalCurrentKg / totalTargetKg) * 100) : 0;
   const deficits = cropPlans.filter((p) => p.deficit > 0);
 
