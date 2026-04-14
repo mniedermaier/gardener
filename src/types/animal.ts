@@ -20,6 +20,17 @@ export interface AnimalProduct {
   notes?: string;
 }
 
+export interface FeedEntry {
+  id: string;
+  animalId: string;
+  date: string;
+  feedType: string;
+  quantity: number;
+  unit: "kg" | "g" | "liters";
+  cost?: number;
+  notes?: string;
+}
+
 export const ANIMAL_ICONS: Record<AnimalType, string> = {
   chicken: "\ud83d\udc14",
   duck: "\ud83e\udd86",

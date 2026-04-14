@@ -24,6 +24,7 @@
     "group": {
       "planning": "Planification",
       "fieldwork": "Travail de terrain",
+      "livestock": "Élevage",
       "records": "Documentation",
       "analysis": "Analyse"
     }
@@ -482,6 +483,18 @@
     "quantity": "Quantité",
     "pieces": "pcs",
     "year": "an",
+    "feedTab": "Nourriture",
+    "addFeed": "Enregistrer nourriture",
+    "feedAdded": "Nourriture enregistrée !",
+    "noFeed": "Aucune nourriture enregistrée. Suivez l'alimentation de vos animaux !",
+    "feedType": "Type de nourriture",
+    "feedTypePlaceholder": "ex. Mélange de grains, Foin, Sirop...",
+    "feedCost": "Coût (€)",
+    "feedCostMonth": "Coût nourriture/mois",
+    "feedTotal": "Coût nourriture",
+    "unit": "Unité",
+    "liters": "Litres",
+    "productionEntries": "{{count}} entrées",
     "types": {
       "chicken": "Poules",
       "duck": "Canards coureurs",

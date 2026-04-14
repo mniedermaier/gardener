@@ -62,6 +62,9 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
     expenses: data.expenses ?? [],
     customPlants: data.customPlants ?? [],
     seasonArchives: data.seasonArchives ?? [],
+    animals: data.animals ?? [],
+    animalProducts: data.animalProducts ?? [],
+    feedEntries: data.feedEntries ?? [],
     weatherHistory: data.weatherHistory ?? [],
   });
 
@@ -115,6 +118,9 @@ function importMerge(
   const mergedJournal = mergeById(current.journalEntries, data.journalEntries ?? []);
   const mergedExpenses = mergeById(current.expenses, data.expenses ?? []);
   const mergedCustomPlants = mergeById(current.customPlants, data.customPlants ?? []);
+  const mergedAnimals = mergeById(current.animals, data.animals ?? []);
+  const mergedAnimalProducts = mergeById(current.animalProducts, data.animalProducts ?? []);
+  const mergedFeedEntries = mergeById(current.feedEntries, data.feedEntries ?? []);
 
   // Season archives: merge by gardenId+season combo
   const existingArchiveKeys = new Set(
@@ -139,6 +145,9 @@ function importMerge(
     journalEntries: mergedJournal,
     expenses: mergedExpenses,
     customPlants: mergedCustomPlants,
+    animals: mergedAnimals,
+    animalProducts: mergedAnimalProducts,
+    feedEntries: mergedFeedEntries,
     seasonArchives: mergedArchives,
     weatherHistory: mergedWeather,
   });

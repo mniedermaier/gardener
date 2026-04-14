@@ -24,6 +24,7 @@
     "group": {
       "planning": "Planning",
       "fieldwork": "Field Work",
+      "livestock": "Livestock",
       "records": "Records",
       "analysis": "Analysis"
     }
@@ -482,6 +483,18 @@
     "quantity": "Quantity",
     "pieces": "pcs",
     "year": "year",
+    "feedTab": "Feed",
+    "addFeed": "Log Feed",
+    "feedAdded": "Feed entry logged!",
+    "noFeed": "No feed logged yet. Track what your animals eat!",
+    "feedType": "Feed type",
+    "feedTypePlaceholder": "e.g. Grain mix, Hay, Sugar syrup...",
+    "feedCost": "Cost (€)",
+    "feedCostMonth": "Feed cost/month",
+    "feedTotal": "Feed cost",
+    "unit": "Unit",
+    "liters": "Liters",
+    "productionEntries": "{{count}} entries",
     "types": {
       "chicken": "Chickens",
       "duck": "Runner Ducks",

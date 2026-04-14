@@ -7,6 +7,7 @@ import type { Expense } from "@/types/expense";
 import type { Plant } from "@/types/plant";
 import type { AlertConfig } from "@/store/settingsSlice";
 import type { WeatherHistoryEntry } from "@/store/weatherSlice";
+import type { Animal, AnimalProduct, FeedEntry } from "@/types/animal";
 
 export interface GardenerExport {
   version: 1;
@@ -20,6 +21,9 @@ export interface GardenerExport {
     expenses: Expense[];
     customPlants: Plant[];
     seasonArchives: SeasonArchive[];
+    animals: Animal[];
+    animalProducts: AnimalProduct[];
+    feedEntries: FeedEntry[];
     settings: {
       locale: string;
       lastFrostDate: string;
@@ -48,6 +52,9 @@ export function buildExportData(): GardenerExport {
       expenses: state.expenses,
       customPlants: state.customPlants,
       seasonArchives: state.seasonArchives,
+      animals: state.animals,
+      animalProducts: state.animalProducts,
+      feedEntries: state.feedEntries,
       settings: {
         locale: state.locale,
         lastFrostDate: state.lastFrostDate,

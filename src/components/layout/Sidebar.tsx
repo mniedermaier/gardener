@@ -40,6 +40,13 @@ const groups: NavGroup[] = [
       { to: "/seeds", icon: Wheat, labelKey: "nav.seeds" },
       { to: "/soil", icon: Beaker, labelKey: "nav.soil" },
       { to: "/pests", icon: Bug, labelKey: "nav.pests" },
+    ],
+  },
+  {
+    labelKey: "nav.group.livestock",
+    icon: Bird,
+    color: "text-orange-500",
+    items: [
       { to: "/livestock", icon: Bird, labelKey: "nav.livestock" },
     ],
   },

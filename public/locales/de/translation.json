@@ -24,6 +24,7 @@
     "group": {
       "planning": "Planung",
       "fieldwork": "Feldarbeit",
+      "livestock": "Tierhaltung",
       "records": "Dokumentation",
       "analysis": "Analyse"
     }
@@ -482,6 +483,18 @@
     "quantity": "Menge",
     "pieces": "Stk.",
     "year": "Jahr",
+    "feedTab": "Futter",
+    "addFeed": "Futter erfassen",
+    "feedAdded": "Futtereintrag erfasst!",
+    "noFeed": "Noch kein Futter erfasst. Dokumentiere das Futter deiner Tiere!",
+    "feedType": "Futterart",
+    "feedTypePlaceholder": "z.B. Körnerfutter, Heu, Zuckersirup...",
+    "feedCost": "Kosten (€)",
+    "feedCostMonth": "Futterkosten/Monat",
+    "feedTotal": "Futterkosten",
+    "unit": "Einheit",
+    "liters": "Liter",
+    "productionEntries": "{{count}} Einträge",
     "types": {
       "chicken": "Hühner",
       "duck": "Laufenten",

@@ -24,6 +24,7 @@
     "group": {
       "planning": "Planificación",
       "fieldwork": "Trabajo de campo",
+      "livestock": "Ganadería",
       "records": "Registros",
       "analysis": "Análisis"
     }
@@ -482,6 +483,18 @@
     "quantity": "Cantidad",
     "pieces": "uds.",
     "year": "año",
+    "feedTab": "Alimentación",
+    "addFeed": "Registrar alimento",
+    "feedAdded": "¡Alimento registrado!",
+    "noFeed": "Sin registros de alimentación. ¡Documenta la alimentación de tus animales!",
+    "feedType": "Tipo de alimento",
+    "feedTypePlaceholder": "ej. Mezcla de granos, Heno, Jarabe...",
+    "feedCost": "Costo (€)",
+    "feedCostMonth": "Costo alimento/mes",
+    "feedTotal": "Costo alimento",
+    "unit": "Unidad",
+    "liters": "Litros",
+    "productionEntries": "{{count}} registros",
     "types": {
       "chicken": "Gallinas",
       "duck": "Patos corredores",
