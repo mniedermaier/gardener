@@ -29,7 +29,7 @@ import { generateShareUrl } from "@/lib/sharing";
 import { useToast } from "@/components/ui/Toast";
 import { useUndo } from "@/hooks/useUndo";
 import { validatePlacement, getCompanionHighlights, getAntagonistHighlights } from "@/lib/placementValidation";
-import { recommendBedPlanting, getRecommendedPlants, STRATEGY_DETAILS, type PlantingStrategy } from "@/lib/bedRecommendation";
+import { recommendBedPlanting, getRecommendedPlants, STRATEGY_DETAILS, DIRECTION_DETAILS, type PlantingStrategy, type PlantingDirection } from "@/lib/bedRecommendation";
 
 const ALL_ENVIRONMENTS: EnvironmentType[] = [
   "outdoor_bed", "raised_bed", "greenhouse", "cold_frame",
@@ -470,6 +470,7 @@ export function GardenPlanner() {
   const [activeDragPlant, setActiveDragPlant] = useState<Plant | null>(null);
   const [placementFeedback, setPlacementFeedback] = useState<string | null>(null);
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
+  const [autoFillDirection, setAutoFillDirection] = useState<import("@/lib/bedRecommendation").PlantingDirection>("rows_ew");
   const [pathMode, setPathMode] = useState(false);
   const [expandedBedId, setExpandedBedId] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<{ gardenId: string; bedId: string; cellX: number; cellY: number } | null>(null);
@@ -585,7 +586,7 @@ export function GardenPlanner() {
     const bed = activeGarden?.beds.find((b) => b.id === bedId);
     if (!bed) return;
 
-    const cells = recommendBedPlanting(bed, plants, { gridCellSizeCm, lastFrostDate, strategy });
+    const cells = recommendBedPlanting(bed, plants, { gridCellSizeCm, lastFrostDate, strategy, direction: autoFillDirection });
     for (const cell of cells) {
       setCell(activeGardenId, bedId, cell);
     }
@@ -767,8 +768,28 @@ export function GardenPlanner() {
                           <Wand2 size={14} />
                         </button>
                         {autoFillBedId === bed.id && (
-                          <div className="absolute right-0 top-8 z-20 w-56 rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-                            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{t("planner.autoFill")}</p>
+                          <div className="absolute right-0 top-8 z-20 w-64 rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                            {/* Direction picker */}
+                            <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{t("planner.direction")}</p>
+                            <div className="mb-2 flex gap-1 px-1">
+                              {(Object.keys(DIRECTION_DETAILS) as PlantingDirection[]).map((key) => {
+                                const d = DIRECTION_DETAILS[key];
+                                return (
+                                  <button
+                                    key={key}
+                                    onClick={() => setAutoFillDirection(key)}
+                                    className={`flex-1 rounded-md px-1.5 py-1 text-center text-xs transition-colors ${autoFillDirection === key ? "bg-garden-100 font-medium text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400"}`}
+                                    title={t(d.nameKey)}
+                                  >
+                                    <span className="text-sm">{d.icon}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <p className="mb-2 px-2 text-[10px] text-gray-400">{t(`planner.directionHint.${autoFillDirection}`)}</p>
+
+                            {/* Strategy picker */}
+                            <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{t("planner.strategy")}</p>
                             {(Object.keys(STRATEGY_DETAILS) as PlantingStrategy[]).map((key) => {
                               const s = STRATEGY_DETAILS[key];
                               return (

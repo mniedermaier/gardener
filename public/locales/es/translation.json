@@ -158,6 +158,14 @@
         "wood": "Madera",
         "metal": "Metal"
       }
+    },
+    "direction": "Dirección",
+    "strategy": "Estrategia",
+    "directionHint": {
+      "rows_ew": "Filas de este a oeste (horizontal)",
+      "rows_ns": "Filas de norte a sur (vertical)",
+      "blocks": "Bloques rectangulares por planta",
+      "companion_clusters": "Grupos de plantas compañeras"
     }
   },
   "plants": {
@@ -601,6 +609,12 @@
     "beginnerDesc": "Facil de cultivar, bajo mantenimiento, siembra directa, resultados rapidos",
     "quickharvest": "Cosecha rapida",
     "quickharvestDesc": "Rabano, lechuga, espinaca - cosecha en semanas, no en meses"
+  },
+  "direction": {
+    "rows_ew": "E↔O Filas",
+    "rows_ns": "N↔S Filas",
+    "blocks": "Bloques",
+    "companion_clusters": "Compañeras"
   },
   "palette": {
     "recommended": "Recomendado"

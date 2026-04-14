@@ -158,6 +158,14 @@
         "wood": "Wood",
         "metal": "Metal"
       }
+    },
+    "direction": "Direction",
+    "strategy": "Strategy",
+    "directionHint": {
+      "rows_ew": "Rows from east to west (horizontal)",
+      "rows_ns": "Rows from north to south (vertical)",
+      "blocks": "Rectangular blocks per plant",
+      "companion_clusters": "Companion plant groups side by side"
     }
   },
   "plants": {
@@ -601,6 +609,12 @@
     "beginnerDesc": "Easy to grow, low maintenance, direct sow, fast results",
     "quickharvest": "Quick Harvest",
     "quickharvestDesc": "Radish, lettuce, spinach - harvest in weeks, not months"
+  },
+  "direction": {
+    "rows_ew": "E↔W Rows",
+    "rows_ns": "N↔S Rows",
+    "blocks": "Blocks",
+    "companion_clusters": "Companions"
   },
   "palette": {
     "recommended": "Recommended"

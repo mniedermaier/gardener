@@ -158,6 +158,14 @@
         "wood": "Holz",
         "metal": "Metall"
       }
+    },
+    "direction": "Richtung",
+    "strategy": "Strategie",
+    "directionHint": {
+      "rows_ew": "Reihen von Ost nach West (horizontal)",
+      "rows_ns": "Reihen von Nord nach Süd (vertikal)",
+      "blocks": "Rechteckige Blöcke pro Pflanze",
+      "companion_clusters": "Begleitpflanzen-Gruppen nebeneinander"
     }
   },
   "plants": {
@@ -601,6 +609,12 @@
     "beginnerDesc": "Pflegeleicht, Direktsaat, schnelle Ergebnisse",
     "quickharvest": "Schnelle Ernte",
     "quickharvestDesc": "Radieschen, Salat, Spinat - Ernte in Wochen statt Monaten"
+  },
+  "direction": {
+    "rows_ew": "O↔W Reihen",
+    "rows_ns": "N↔S Reihen",
+    "blocks": "Blöcke",
+    "companion_clusters": "Begleiter"
   },
   "palette": {
     "recommended": "Empfohlen"

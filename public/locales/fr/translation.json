@@ -158,6 +158,14 @@
         "wood": "Bois",
         "metal": "Métal"
       }
+    },
+    "direction": "Direction",
+    "strategy": "Stratégie",
+    "directionHint": {
+      "rows_ew": "Rangs d'est en ouest (horizontal)",
+      "rows_ns": "Rangs du nord au sud (vertical)",
+      "blocks": "Blocs rectangulaires par plante",
+      "companion_clusters": "Groupes de plantes compagnes"
     }
   },
   "plants": {
@@ -601,6 +609,12 @@
     "beginnerDesc": "Facile à cultiver, peu d'entretien, semis direct, résultats rapides",
     "quickharvest": "Récolte rapide",
     "quickharvestDesc": "Radis, laitue, épinard - récolte en semaines, pas en mois"
+  },
+  "direction": {
+    "rows_ew": "E↔O Rangs",
+    "rows_ns": "N↔S Rangs",
+    "blocks": "Blocs",
+    "companion_clusters": "Compagnes"
   },
   "palette": {
     "recommended": "Recommandé"
