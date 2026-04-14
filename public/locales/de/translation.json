@@ -594,6 +594,13 @@
     "updated": "Tier aktualisiert!",
     "since": "seit",
     "allAnimals": "Alle Tiere",
+    "animalNotFound": "Tier nicht gefunden.",
+    "days": "Tage",
+    "totalCosts": "Gesamtkosten",
+    "productionValue": "Produktionswert",
+    "perEgg": "Ei",
+    "deleteAnimal": "Tier löschen",
+    "noJournal": "Keine Tagebucheinträge für dieses Tier.",
     "notesPlaceholder": "z.B. Rasse, Besonderheiten...",
     "healthTypes": {
       "vaccination": "Impfung",

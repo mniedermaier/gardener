@@ -232,16 +232,16 @@ export function Dashboard() {
             </div>
             {totalAnimals > 0 && (
               <>
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
+                <button onClick={() => navigate("/livestock")} className="flex w-full items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-left hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                   <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <Bird size={14} /> {t("dashboard.totalAnimals")}
                   </span>
                   <span className="text-sm font-bold">{totalAnimals}</span>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
+                </button>
+                <button onClick={() => navigate("/livestock")} className="flex w-full items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-left hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                   <span className="text-sm text-gray-600 dark:text-gray-400">{t("dashboard.totalEggs")}</span>
                   <span className="text-sm font-bold">{totalEggs} 🥚</span>
-                </div>
+                </button>
               </>
             )}
           </div>
