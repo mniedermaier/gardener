@@ -845,63 +845,87 @@ export function GardenPlanner() {
               )}
             </div>
 
-            {/* Plant palette + info (top on mobile, right sidebar on desktop) */}
-            <div className="order-first space-y-4 md:order-last">
+            {/* Plant palette (compact on mobile, sidebar on desktop) */}
+            <div className="order-first md:order-last">
               <Card>
-                <PlantPalette
-                  selectedPlantId={selectedPlant?.id ?? null}
-                  onSelectPlant={handleSelectPlant}
-                  recommendedIds={recommendedIds}
-                />
+                <div className="max-h-[200px] overflow-y-auto sm:max-h-[300px] md:max-h-none">
+                  <PlantPalette
+                    selectedPlantId={selectedPlant?.id ?? null}
+                    onSelectPlant={handleSelectPlant}
+                    recommendedIds={recommendedIds}
+                  />
+                </div>
               </Card>
 
-              {selectedPlant && (
-                <PlantInfoPanel plant={selectedPlant} onClose={() => { setSelectedPlant(null); setEditingCell(null); }} />
-              )}
-
-              {/* Cell editing panel */}
-              {editingCell && (() => {
-                const bed = activeGarden?.beds.find((b) => b.id === editingCell.bedId);
-                const cell = bed?.cells.find((c) => c.cellX === editingCell.cellX && c.cellY === editingCell.cellY);
-                if (!cell) return null;
-                return (
-                  <Card>
-                    <h3 className="mb-3 text-sm font-semibold">{t("planner.editCell")}</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="mb-1 block text-xs text-gray-500">{t("planner.variety")}</label>
-                        <input
-                          type="text"
-                          value={cell.variety ?? ""}
-                          onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { variety: e.target.value || undefined })}
-                          placeholder={t("planner.varietyPlaceholder")}
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-                        />
+              {/* Desktop only: info + edit panels in sidebar */}
+              <div className="hidden md:block md:space-y-4 md:mt-4">
+                {selectedPlant && (
+                  <PlantInfoPanel plant={selectedPlant} onClose={() => { setSelectedPlant(null); setEditingCell(null); }} />
+                )}
+                {editingCell && (() => {
+                  const bed = activeGarden?.beds.find((b) => b.id === editingCell.bedId);
+                  const cell = bed?.cells.find((c) => c.cellX === editingCell.cellX && c.cellY === editingCell.cellY);
+                  if (!cell) return null;
+                  return (
+                    <Card>
+                      <h3 className="mb-3 text-sm font-semibold">{t("planner.editCell")}</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="mb-1 block text-xs text-gray-500">{t("planner.variety")}</label>
+                          <input type="text" value={cell.variety ?? ""} onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { variety: e.target.value || undefined })} placeholder={t("planner.varietyPlaceholder")} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800" />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-gray-500">{t("planner.plantedDate")}</label>
+                          <input type="date" value={cell.plantedDate ?? ""} onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { plantedDate: e.target.value || undefined })} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800" />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-gray-500">{t("harvest.notes")}</label>
+                          <textarea value={cell.notes ?? ""} onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { notes: e.target.value || undefined })} rows={2} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800" />
+                        </div>
+                        <button onClick={() => setEditingCell(null)} className="text-xs text-gray-400 hover:text-gray-600">{t("common.close")}</button>
                       </div>
-                      <div>
-                        <label className="mb-1 block text-xs text-gray-500">{t("planner.plantedDate")}</label>
-                        <input
-                          type="date"
-                          value={cell.plantedDate ?? ""}
-                          onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { plantedDate: e.target.value || undefined })}
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs text-gray-500">{t("harvest.notes")}</label>
-                        <textarea
-                          value={cell.notes ?? ""}
-                          onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { notes: e.target.value || undefined })}
-                          rows={2}
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-                        />
-                      </div>
-                      <button onClick={() => setEditingCell(null)} className="text-xs text-gray-400 hover:text-gray-600">{t("common.close")}</button>
-                    </div>
-                  </Card>
-                );
-              })()}
+                    </Card>
+                  );
+                })()}
+              </div>
             </div>
+
+            {/* Mobile only: info + edit as bottom modal */}
+            {(selectedPlant || editingCell) && (
+              <div className="fixed inset-x-0 bottom-0 z-40 max-h-[60vh] overflow-y-auto rounded-t-xl border-t border-gray-200 bg-white p-4 shadow-xl md:hidden dark:border-gray-700 dark:bg-gray-900">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="mx-auto h-1 w-10 rounded-full bg-gray-300 dark:bg-gray-600" />
+                </div>
+                {selectedPlant && (
+                  <PlantInfoPanel plant={selectedPlant} onClose={() => { setSelectedPlant(null); setEditingCell(null); }} />
+                )}
+                {editingCell && (() => {
+                  const bed = activeGarden?.beds.find((b) => b.id === editingCell.bedId);
+                  const cell = bed?.cells.find((c) => c.cellX === editingCell.cellX && c.cellY === editingCell.cellY);
+                  if (!cell) return null;
+                  return (
+                    <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                      <h3 className="mb-3 text-sm font-semibold">{t("planner.editCell")}</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="mb-1 block text-xs text-gray-500">{t("planner.variety")}</label>
+                          <input type="text" value={cell.variety ?? ""} onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { variety: e.target.value || undefined })} placeholder={t("planner.varietyPlaceholder")} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base dark:border-gray-600 dark:bg-gray-900" />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-gray-500">{t("planner.plantedDate")}</label>
+                          <input type="date" value={cell.plantedDate ?? ""} onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { plantedDate: e.target.value || undefined })} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base dark:border-gray-600 dark:bg-gray-900" />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-gray-500">{t("harvest.notes")}</label>
+                          <textarea value={cell.notes ?? ""} onChange={(e) => updateCell(editingCell.gardenId, editingCell.bedId, editingCell.cellX, editingCell.cellY, { notes: e.target.value || undefined })} rows={2} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base dark:border-gray-600 dark:bg-gray-900" />
+                        </div>
+                        <button onClick={() => setEditingCell(null)} className="w-full rounded-lg bg-garden-600 px-4 py-2 text-sm font-medium text-white">{t("common.close")}</button>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         ) : (
           <Card>
