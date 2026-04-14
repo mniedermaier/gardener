@@ -16,7 +16,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
-      <BottomNav onMenuClick={() => setSidebarOpen(true)} />
+      <BottomNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Home, ClipboardList, Apple, LayoutGrid, Menu } from "lucide-react";
 
 interface Props {
   onMenuClick: () => void;
+  sidebarOpen: boolean;
 }
 
 const tabs = [
@@ -13,7 +14,7 @@ const tabs = [
   { to: "/planner", icon: LayoutGrid, labelKey: "nav.planner" },
 ];
 
-export function BottomNav({ onMenuClick }: Props) {
+export function BottomNav({ onMenuClick, sidebarOpen }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -38,7 +39,7 @@ export function BottomNav({ onMenuClick }: Props) {
         ))}
         <button
           onClick={onMenuClick}
-          className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-gray-400 dark:text-gray-500"
+          className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${sidebarOpen ? "text-garden-600 dark:text-garden-400" : "text-gray-400 dark:text-gray-500"}`}
         >
           <Menu size={20} />
           <span>{t("nav.more", { defaultValue: "More" })}</span>
