@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/plants-45+-228B22" alt="45+ plants">
   <img src="https://img.shields.io/badge/tests-95-brightgreen" alt="95 tests">
   <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20FR-blue" alt="DE | EN | ES | FR">
+  <a href="https://buymeacoffee.com/mniedermaier"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee"></a>
 </p>
 
 <p align="center">
