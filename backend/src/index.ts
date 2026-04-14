@@ -8,8 +8,9 @@ import syncRouter from "./routes/sync.js";
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") ?? ["http://localhost:5173", "http://localhost:4173", "http://localhost:8080"];
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+  origin: allowedOrigins,
 }));
 app.use(express.json({ limit: "5mb" }));
 
