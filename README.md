@@ -14,7 +14,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/plants-45+-228B22" alt="45+ plants">
   <img src="https://img.shields.io/badge/tests-95-brightgreen" alt="95 tests">
-  <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN-blue" alt="DE | EN">
+  <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20FR-blue" alt="DE | EN | ES | FR">
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 
 Plan your beds. Track your harvests. Get weather alerts. Calculate if your garden can feed your family.
 
-Works as a **static site** (GitHub Pages), **offline PWA**, or **Docker container** with backend sync.
+Available in **4 languages**: Deutsch, English, Español, Français. Works as a **static site** (GitHub Pages), **offline PWA**, or **Docker container** with backend sync.
 
 ## Highlights
 

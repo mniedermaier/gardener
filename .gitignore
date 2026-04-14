@@ -1,5 +1,31 @@
-node_modules
-dist
-*.db
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
 .env
+.env.*
 *.local
+
+# Database
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+test-results/
+playwright-report/
+
+# PWA dev
+dev-dist/
