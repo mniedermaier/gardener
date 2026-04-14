@@ -29,7 +29,7 @@ jobs:
       - run: npx tsc -b
       - run: npm run test
       - run: npm run build -- --base=/gardener/
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
       - id: deployment
