@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Home, LayoutGrid, Sprout, Cloud, CalendarDays, ClipboardList, Settings, X,
-  Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug, Droplets, UtensilsCrossed, ChevronRight, Bird, Archive, GitBranch,
+  Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug, Droplets, UtensilsCrossed, ChevronRight, Bird, Archive, GitBranch, Egg, Heart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -42,7 +42,17 @@ const groups: NavGroup[] = [
       { to: "/soil", icon: Beaker, labelKey: "nav.soil" },
       { to: "/pests", icon: Bug, labelKey: "nav.pests" },
       { to: "/water-log", icon: Droplets, labelKey: "nav.waterLog" },
+    ],
+  },
+  {
+    labelKey: "nav.group.livestock",
+    icon: Bird,
+    color: "text-orange-500",
+    items: [
       { to: "/livestock", icon: Bird, labelKey: "nav.livestock" },
+      { to: "/livestock/production", icon: Egg, labelKey: "nav.livestockProduction" },
+      { to: "/livestock/feed", icon: Wheat, labelKey: "nav.livestockFeed" },
+      { to: "/livestock/health", icon: Heart, labelKey: "nav.livestockHealth" },
     ],
   },
   {
