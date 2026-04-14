@@ -19,7 +19,13 @@
     "foodplan": "Food Plan",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI",
-    "more": "More"
+    "more": "More",
+    "group": {
+      "planning": "Planning",
+      "fieldwork": "Field Work",
+      "records": "Records",
+      "analysis": "Analysis"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

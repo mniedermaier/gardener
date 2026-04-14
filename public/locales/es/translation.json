@@ -19,7 +19,13 @@
     "foodplan": "Plan alimentario",
     "sufficiency": "Autosuficiencia",
     "expenses": "Costos y ROI",
-    "more": "Mas"
+    "more": "Mas",
+    "group": {
+      "planning": "Planificación",
+      "fieldwork": "Trabajo de campo",
+      "records": "Registros",
+      "analysis": "Análisis"
+    }
   },
   "dashboard": {
     "title": "Panel",
