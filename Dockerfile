@@ -21,7 +21,7 @@ RUN apk add --no-cache nginx
 # Copy frontend
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
 COPY --from=frontend-build /app/public/locales /usr/share/nginx/html/locales
-COPY nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
 # Copy backend
 WORKDIR /app
