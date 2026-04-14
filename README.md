@@ -1,11 +1,12 @@
 <p align="center">
-  <img src="public/favicon.svg" width="64" height="64" alt="Gardener">
+  <img src="public/favicon.svg" width="80" height="80" alt="Gardener">
 </p>
 
 <h1 align="center">Gardener</h1>
 
 <p align="center">
-  <strong>Open-source garden planner for self-sufficiency</strong>
+  <strong>The open-source toolkit for self-sufficient living</strong><br>
+  <em>Plan beds. Raise animals. Preserve harvests. Feed your family.</em>
 </p>
 
 <p align="center">
@@ -13,36 +14,59 @@
   <a href="https://github.com/mniedermaier/gardener/actions/workflows/deploy.yml"><img src="https://github.com/mniedermaier/gardener/actions/workflows/deploy.yml/badge.svg" alt="Deploy"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/plants-45+-228B22" alt="45+ plants">
-  <img src="https://img.shields.io/badge/tests-95-brightgreen" alt="95 tests">
-  <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20FR-blue" alt="DE | EN | ES | FR">
+  <img src="https://img.shields.io/badge/tests-311-brightgreen" alt="311 tests">
+  <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20FR-blue" alt="4 languages">
   <a href="https://buymeacoffee.com/mniedermaier"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee"></a>
 </p>
 
 <p align="center">
-  <a href="https://mniedermaier.github.io/gardener/"><strong>Live Demo</strong></a>
+  <a href="https://mniedermaier.github.io/gardener/"><strong>Try the Live Demo</strong></a>
   &nbsp;&middot;&nbsp;
   <a href="#quick-start">Quick Start</a>
+  &nbsp;&middot;&nbsp;
+  <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
 ---
 
-Plan your beds. Track your harvests. Manage your livestock. Calculate if your garden can feed your family.
+## What is Gardener?
 
-Available in **4 languages**: Deutsch, English, Español, Français. Works as a **static site** (GitHub Pages), **offline PWA**, or **Docker container** with backend sync.
+Gardener is a **complete self-sufficiency planner** — not just for your garden, but for your entire homestead. It answers the question every self-sufficiency beginner asks: **"Can my garden feed my family?"**
 
-## Highlights
+Works **offline as a PWA**, runs as a **static site** (GitHub Pages), or as a **Docker container** with backend sync. Available in **Deutsch, English, Español, Français**.
 
-| | |
-|---|---|
-| **Smart Planner** | Drag-and-drop beds with companion/antagonist validation, 6 auto-fill strategies, walkway drawing, permaculture guild templates |
-| **45 Plants** | Custom SVG icons, full data: timing, spacing, nutrition, yield, companions, preservation, seed saving |
-| **Livestock** | Track chickens, ducks, rabbits, bees — log animals, production (eggs, honey, meat), and feed costs |
-| **Self-Sufficiency** | Nutrition calculator (kcal, protein, vitamin C, fiber) from plants + animals, gap analysis, preservation guide |
-| **Food Planning** | Annual crop targets per person, animal product yields, deficit warnings with area recommendations |
-| **Weather** | Frost alerts, greenhouse warnings, watering advice, sunlight simulation |
-| **Tracking** | Harvest log, garden journal, seed inventory, soil tests, pest tracker, expense tracking with ROI |
-| **Environments** | Outdoor, raised bed, greenhouse, cold frame, polytunnel, container, windowsill, vertical |
-| **Mobile-First** | Responsive design with bottom navigation, compact planner palette, bottom sheet editing |
+## Features at a Glance
+
+**Garden Planning**
+- Drag & drop bed planner with 8 environments (outdoor, greenhouse, polytunnel, raised bed, ...)
+- 45 plants with hand-drawn SVG icons, companion/antagonist validation
+- 6 auto-fill strategies (calories, yield, beginner, ...) with 4 planting directions
+- Companion planting matrix — see all relationships at a glance
+- Crop rotation warnings, permaculture guild templates, walkway drawing
+
+**Livestock Management**
+- 7 animal types: chickens, ducks, rabbits, bees, goats, sheep, quail
+- Production tracking with quick-log (tap +5 eggs), trends chart, per-animal analytics
+- Feed cost management with monthly comparison and per-animal ROI
+- Health records: vaccinations, deworming, illness — with overdue warnings
+
+**Self-Sufficiency Calculator**
+- Monthly nutrition coverage (calories, protein, vitamin C, fiber)
+- Uses **real production data** when available, falls back to estimates
+- Winter gap analysis with preservation recommendations
+- Annual food plan with crop targets and animal product yields
+
+**Preservation & Pantry**
+- Track stored food: jars, frozen bags, dried herbs — with expiry warnings
+- 5 methods: canning, freezing, fermenting, drying, root cellar
+- Per-plant preservation guides and practical tips
+
+**Everything Else**
+- Task calendar, harvest log, garden journal (with photos), seed inventory
+- Soil tests (pH, N-P-K), pest tracker, irrigation logging, expense tracking with ROI
+- Weather dashboard with frost alerts and sunlight simulation
+- Full data backup/restore (17 data types), CSV export
+- Print-friendly bed layouts
 
 ## Quick Start
 
@@ -51,7 +75,7 @@ git clone https://github.com/mniedermaier/gardener.git
 cd gardener && npm install && npm run dev
 ```
 
-Or with Docker:
+Docker:
 
 ```bash
 docker compose up --build    # http://localhost:8080
@@ -59,84 +83,31 @@ docker compose up --build    # http://localhost:8080
 
 ## Commands
 
-```bash
-npm run dev          # Dev server at localhost:5173
-npm run build        # TypeScript + production build
-npm run test         # 87 unit tests (Vitest)
-npm run test:e2e     # 8 E2E tests (Playwright)
-```
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Dev server (localhost:5173) |
+| `npm run build` | TypeScript check + production build |
+| `npm run test` | 311 unit tests (Vitest) |
+| `npm run test:e2e` | 8 E2E tests (Playwright) |
 
-## Tech
+## Tech Stack
 
-React 19 &middot; TypeScript &middot; Vite &middot; Tailwind CSS &middot; Zustand &middot; @dnd-kit &middot; react-i18next &middot; date-fns &middot; SunCalc &middot; Playwright &middot; PWA
+React 19 · TypeScript · Vite · Tailwind CSS · Zustand · @dnd-kit · react-i18next · date-fns · SunCalc · Vitest · Playwright · PWA (Workbox)
 
-Optional backend: Express + SQLite in Docker.
-
-## Architecture
-
-```
-src/
-  components/     15 feature modules (planner, plants, calendar, harvest,
-                  journal, seeds, soil, pests, livestock, sufficiency,
-                  foodplan, expenses, weather, dashboard, settings)
-  store/          13 Zustand slices with persist + migration
-  lib/            Pure engines: recommendation, validation, alerts, sufficiency,
-                  sunlight, succession, sharing, iCal, data export/import
-  data/           45 plants (JSON), plant families, permaculture guilds
-  types/          TypeScript interfaces for all data models
-  test/           14 test suites
-e2e/              Playwright browser tests
-backend/          Express + SQLite (Docker only)
-```
-
-## Features
-
-### Garden Planning
-- Drag-and-drop plant placement on grid beds
-- 8 growing environments with frost protection offsets
-- Companion/antagonist planting validation
-- 6 auto-fill strategies (balanced, calories, beginner, companion, diverse, intensive)
-- Permaculture guild templates (Three Sisters, Tomato & Basil, Salad Bed)
-- Walkway/path drawing on beds
-- Crop rotation warnings by plant family
-- Zoom controls for large gardens
-
-### Livestock Management
-- Register animals: chickens, ducks, rabbits, bees
-- Log production: eggs, honey, meat, wax with quick-log buttons
-- Track feed: type, quantity, cost per animal
-- Stats: weekly eggs, annual honey, monthly feed costs
-- Integrates into self-sufficiency calculator and food plan
-
-### Self-Sufficiency Calculator
-- Monthly food availability chart (fresh + preserved)
-- Nutrition coverage: calories, protein, vitamin C, fiber
-- Plant yields + animal product yields combined
-- Winter gap analysis with storage recommendations
-- Preservation guide (freezing, canning, fermenting, drying, root cellar)
-
-### Additional Modules
-- **Calendar**: Season timeline + succession planting generator
-- **Task Manager**: Central task management with due dates and categories
-- **Harvest Log**: Weight, quality, notes per harvest
-- **Seed Inventory**: Track seeds by source, viability, cost
-- **Soil Management**: pH/N-P-K tests + amendment history
-- **Pest Tracker**: Pest & disease incidents with severity and treatment
-- **Expense Dashboard**: 9 categories, ROI calculation vs. market prices
-- **Weather**: Alerts, frost warnings, sunlight hours (SunCalc)
-- **Journal**: Garden diary with tags
+Optional backend: Express + SQLite + rate limiting (Docker only)
 
 ## Data Safety
 
-All data lives in your browser. Settings > Data Management lets you:
-- **Full backup** as JSON — all 14 data types (gardens, tasks, harvests, journal, seeds, soil, pests, livestock, feed, expenses, settings, weather)
-- **Restore** with merge or overwrite mode
+All data stays in your browser. No account needed, no data sent anywhere.
+
+- **Full JSON backup** — 17 data types (gardens, animals, pantry, ...)
 - **CSV export** for harvests and expenses
+- **Backend sync** optional via Docker (SQLite)
 - Dashboard reminds you if no backup in 7+ days
 
 ## Contributing
 
-Fork, branch, code, `npm run test && npm run build`, PR. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Issues and PRs welcome!
 
 ## License
 
