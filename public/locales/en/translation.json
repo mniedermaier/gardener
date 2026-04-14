@@ -400,7 +400,9 @@
     "tags": "Tags (comma separated)",
     "tagsPlaceholder": "e.g. sowing, pests, weather",
     "noEntries": "Your garden journal is empty. Start documenting your garden journey!",
-    "linkedTo": "Linked to"
+    "linkedTo": "Linked to",
+    "animal": "Animal",
+    "all": "All"
   },
   "season": {
     "current": "Season {{year}}",

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Tag, Sprout, LayoutGrid } from "lucide-react";
+import { Plus, Trash2, Tag, Sprout, LayoutGrid, Bird } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
 import { useStore } from "@/store";
@@ -10,12 +10,16 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { ANIMAL_ICONS } from "@/types/animal";
 import { format } from "date-fns";
 
 export function GardenJournal() {
   const { t } = useTranslation();
   const { confirm } = useToast();
-  const { journalEntries, gardens, addJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({ journalEntries: s.journalEntries, gardens: s.gardens, addJournalEntry: s.addJournalEntry, deleteJournalEntry: s.deleteJournalEntry })));
+  const { journalEntries, gardens, animals, addJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({
+    journalEntries: s.journalEntries, gardens: s.gardens, animals: s.animals,
+    addJournalEntry: s.addJournalEntry, deleteJournalEntry: s.deleteJournalEntry,
+  })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [showAdd, setShowAdd] = useState(false);
@@ -26,8 +30,13 @@ export function GardenJournal() {
   const [gardenId, setGardenId] = useState(gardens[0]?.id ?? "");
   const [bedId, setBedId] = useState("");
   const [plantId, setPlantId] = useState("");
+  const [animalId, setAnimalId] = useState("");
+  const [filterTag, setFilterTag] = useState<string | null>(null);
 
   const selectedGarden = gardens.find((g) => g.id === gardenId);
+
+  // Collect all unique tags
+  const allTags = [...new Set(journalEntries.flatMap((e) => e.tags ?? []))].sort();
 
   const handleAdd = () => {
     if (!title.trim() || !text.trim()) return;
@@ -39,26 +48,52 @@ export function GardenJournal() {
       tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : undefined,
       bedId: bedId || undefined,
       plantId: plantId || undefined,
+      animalId: animalId || undefined,
     });
     setTitle("");
     setText("");
     setTags("");
     setBedId("");
     setPlantId("");
+    setAnimalId("");
     setShowAdd(false);
   };
 
-  const sorted = [...journalEntries].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = [...journalEntries]
+    .filter((e) => !filterTag || e.tags?.includes(filterTag))
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">{t("journal.title")}</h1>
         <Button size="sm" onClick={() => setShowAdd(true)}>
           <Plus size={16} />
           {t("journal.add")}
         </Button>
       </div>
+
+      {/* Tag filter */}
+      {allTags.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-1">
+          <button
+            onClick={() => setFilterTag(null)}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${!filterTag ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"}`}
+          >
+            {t("journal.all")}
+          </button>
+          {allTags.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${filterTag === tag ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"}`}
+            >
+              <Tag size={8} className="mr-0.5 inline" />
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
 
       {sorted.length === 0 ? (
         <Card>
@@ -70,6 +105,7 @@ export function GardenJournal() {
             const plant = entry.plantId ? plantMap.get(entry.plantId) : undefined;
             const garden = gardens.find((g) => g.id === entry.gardenId);
             const bed = garden?.beds.find((b) => b.id === entry.bedId);
+            const animal = entry.animalId ? animals.find((a) => a.id === entry.animalId) : undefined;
 
             return (
               <Card key={entry.id}>
@@ -87,7 +123,7 @@ export function GardenJournal() {
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">{entry.text}</p>
 
-                {(plant || bed) && (
+                {(plant || bed || animal) && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {plant && (
                       <span className="flex items-center gap-1 rounded-full bg-garden-50 px-2 py-0.5 text-xs text-garden-700 dark:bg-garden-900/30 dark:text-garden-400">
@@ -101,16 +137,26 @@ export function GardenJournal() {
                         {bed.name}
                       </span>
                     )}
+                    {animal && (
+                      <span className="flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                        <Bird size={10} />
+                        {ANIMAL_ICONS[animal.type]} {animal.name || t(`livestock.types.${animal.type}`)}
+                      </span>
+                    )}
                   </div>
                 )}
 
                 {entry.tags && entry.tags.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {entry.tags.map((tag) => (
-                      <span key={tag} className="flex items-center gap-0.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                      <button
+                        key={tag}
+                        onClick={() => setFilterTag(tag)}
+                        className="flex items-center gap-0.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                      >
                         <Tag size={8} />
                         {tag}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -137,7 +183,7 @@ export function GardenJournal() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {gardens.length > 0 && (
               <div>
-                <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.bed")}</label>
+                <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.garden")}</label>
                 <select
                   value={gardenId}
                   onChange={(e) => { setGardenId(e.target.value); setBedId(""); }}
@@ -165,18 +211,35 @@ export function GardenJournal() {
               </div>
             )}
           </div>
-          <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.plant")}</label>
-            <select
-              value={plantId}
-              onChange={(e) => setPlantId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-            >
-              <option value="">--</option>
-              {plants.map((p) => (
-                <option key={p.id} value={p.id}>{p.icon} {t(`plants.catalog.${p.id}.name`)}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.plant")}</label>
+              <select
+                value={plantId}
+                onChange={(e) => setPlantId(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
+              >
+                <option value="">--</option>
+                {plants.map((p) => (
+                  <option key={p.id} value={p.id}>{p.icon} {t(`plants.catalog.${p.id}.name`)}</option>
+                ))}
+              </select>
+            </div>
+            {animals.length > 0 && (
+              <div>
+                <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("journal.animal")}</label>
+                <select
+                  value={animalId}
+                  onChange={(e) => setAnimalId(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
+                >
+                  <option value="">--</option>
+                  {animals.map((a) => (
+                    <option key={a.id} value={a.id}>{ANIMAL_ICONS[a.type]} {a.name || t(`livestock.types.${a.type}`)} ({a.count}×)</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>

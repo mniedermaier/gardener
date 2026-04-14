@@ -400,7 +400,9 @@
     "tags": "Etiquetas (separadas por coma)",
     "tagsPlaceholder": "ej. siembra, plagas, clima",
     "noEntries": "Tu diario del huerto esta vacio. Comienza a documentar tu experiencia en el huerto!",
-    "linkedTo": "Vinculado a"
+    "linkedTo": "Vinculado a",
+    "animal": "Animal",
+    "all": "Todos"
   },
   "season": {
     "current": "Temporada {{year}}",

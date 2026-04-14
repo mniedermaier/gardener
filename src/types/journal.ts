@@ -7,4 +7,5 @@ export interface JournalEntry {
   tags?: string[];
   bedId?: string;
   plantId?: string;
+  animalId?: string;
 }
