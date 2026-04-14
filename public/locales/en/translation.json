@@ -16,6 +16,7 @@
     "seeds": "Seeds",
     "soil": "Soil",
     "pests": "Pests",
+    "foodplan": "Food Plan",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI"
   },
@@ -271,6 +272,10 @@
       "transplant": "Transplant",
       "water": "Water",
       "harvest": "Harvest",
+      "fertilize": "Fertilize",
+      "scout": "Scout/Inspect",
+      "preserve": "Preserve",
+      "soil_test": "Soil Test",
       "custom": "Custom"
     }
   },
@@ -386,6 +391,17 @@
     "noArchives": "No archived seasons yet.",
     "beds": "{{count}} beds",
     "plants": "{{count}} plants"
+  },
+  "foodplan": {
+    "title": "Annual Food Plan",
+    "subtitle": "Plan how much to grow to feed your family for a year.",
+    "coverage": "Self-sufficiency",
+    "produced": "Produced / Target",
+    "area": "Planted / Needed",
+    "deficits": "Crop deficits",
+    "deficitsTitle": "Need more of these crops",
+    "needMore": "-{{kg}} kg (need +{{m2}} m²)",
+    "cropPlan": "Crop Plan"
   },
   "sufficiency": {
     "title": "Self-Sufficiency Calculator",

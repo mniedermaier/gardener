@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Home, LayoutGrid, Sprout, Cloud, CalendarDays, ClipboardList, Settings, X, Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug } from "lucide-react";
+import { Home, LayoutGrid, Sprout, Cloud, CalendarDays, ClipboardList, Settings, X, Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug, UtensilsCrossed } from "lucide-react";
 
 const navItems = [
   { to: "/", icon: Home, labelKey: "nav.dashboard" },
@@ -13,6 +13,7 @@ const navItems = [
   { to: "/pests", icon: Bug, labelKey: "nav.pests" },
   { to: "/harvest", icon: Apple, labelKey: "nav.harvest" },
   { to: "/journal", icon: BookOpen, labelKey: "nav.journal" },
+  { to: "/foodplan", icon: UtensilsCrossed, labelKey: "nav.foodplan" },
   { to: "/sufficiency", icon: Scale, labelKey: "nav.sufficiency" },
   { to: "/expenses", icon: Wallet, labelKey: "nav.expenses" },
   { to: "/weather", icon: Cloud, labelKey: "nav.weather" },

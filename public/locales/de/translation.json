@@ -16,6 +16,7 @@
     "seeds": "Saatgut",
     "soil": "Boden",
     "pests": "Schädlinge",
+    "foodplan": "Ernährungsplan",
     "sufficiency": "Selbstversorgung",
     "expenses": "Kosten & ROI"
   },
@@ -271,6 +272,10 @@
       "transplant": "Auspflanzen",
       "water": "Gie\u00dfen",
       "harvest": "Ernten",
+      "fertilize": "D\u00fcngen",
+      "scout": "Kontrollgang",
+      "preserve": "Konservieren",
+      "soil_test": "Bodentest",
       "custom": "Eigene"
     }
   },
@@ -386,6 +391,17 @@
     "noArchives": "Noch keine archivierten Saisons.",
     "beds": "{{count}} Beete",
     "plants": "{{count}} Pflanzen"
+  },
+  "foodplan": {
+    "title": "Jährlicher Ernährungsplan",
+    "subtitle": "Plane wie viel du anbauen musst um deine Familie ein Jahr zu ernähren.",
+    "coverage": "Selbstversorgung",
+    "produced": "Produziert / Ziel",
+    "area": "Bepflanzt / Benötigt",
+    "deficits": "Fehlende Kulturen",
+    "deficitsTitle": "Mehr von diesen Kulturen benötigt",
+    "needMore": "-{{kg}} kg (brauche +{{m2}} m²)",
+    "cropPlan": "Anbauplan"
   },
   "sufficiency": {
     "title": "Selbstversorger-Rechner",

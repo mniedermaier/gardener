@@ -4,6 +4,10 @@ export type TaskType =
   | "transplant"
   | "water"
   | "harvest"
+  | "fertilize"
+  | "scout"
+  | "preserve"
+  | "soil_test"
   | "custom";
 
 export interface Task {
