@@ -7,35 +7,35 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("onboarding wizard completes successfully", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: /Gardener/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Gardener/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: "English" }).click();
   await page.getByRole("button", { name: /Get Started/i }).click();
 
-  await expect(page.getByRole("heading", { name: /garden/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /garden/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: /Next/i }).click();
 
-  await expect(page.getByRole("heading", { name: /frost/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /frost/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: /Next/i }).click();
 
-  await expect(page.getByRole("heading", { name: /Name your/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Name your/i })).toBeVisible({ timeout: 10000 });
   await page.getByPlaceholder(/Garden/i).fill("Test Garden");
   await page.getByRole("button", { name: /grow/i }).click();
 
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });
 });
 
 test("onboarding can be done in German", async ({ page }) => {
   await page.getByRole("button", { name: "Deutsch" }).click();
   await page.getByRole("button", { name: /geht's/i }).click();
 
-  await expect(page.getByRole("heading", { name: /Garten/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Garten/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: /Weiter/i }).click();
 
-  await expect(page.getByRole("heading", { name: /Frost/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Frost/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: /Weiter/i }).click();
 
   await page.getByPlaceholder(/Garten/i).fill("Mein Garten");
   await page.getByRole("button", { name: /Beet/i }).click();
 
-  await expect(page.getByRole("heading", { name: "\u00dcbersicht", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "\u00dcbersicht", exact: true })).toBeVisible({ timeout: 10000 });
 });

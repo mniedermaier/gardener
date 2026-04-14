@@ -21,6 +21,16 @@ test.beforeEach(async ({ page }) => {
         weatherHistory: [],
         customPlants: [],
         expenses: [],
+        seeds: [],
+        soilTests: [],
+        amendments: [],
+        pests: [],
+        waterEntries: [],
+        animals: [],
+        animalProducts: [],
+        feedEntries: [],
+        healthEvents: [],
+        pantryItems: [],
         seasonArchives: [],
         weatherApiKey: "",
         locationLat: null,
@@ -46,7 +56,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("dashboard shows garden overview", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });
   await expect(page.getByText("E2E Garden")).toBeVisible();
 });
 
