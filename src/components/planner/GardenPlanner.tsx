@@ -288,7 +288,7 @@ function BedGrid({
         />
       )}
 
-      <div className="overflow-x-auto pb-2">
+      <div className="overflow-x-auto pb-2" style={{ touchAction: "pan-y pinch-zoom" }}>
       <div
         className={`inline-grid gap-0.5 rounded-lg border p-1 ${ENVIRONMENT_COLORS[envType]} ${ENVIRONMENT_BORDERS[envType]}`}
         style={{ gridTemplateColumns: `repeat(${bed.width}, ${gridCellRem})` }}
