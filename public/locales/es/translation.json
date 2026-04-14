@@ -579,6 +579,13 @@
     "updated": "¡Animal actualizado!",
     "since": "desde",
     "allAnimals": "Todos los animales",
+    "animalNotFound": "Animal no encontrado.",
+    "days": "días",
+    "totalCosts": "Costos totales",
+    "productionValue": "Valor de producción",
+    "perEgg": "huevo",
+    "deleteAnimal": "Eliminar animal",
+    "noJournal": "Sin entradas de diario para este animal.",
     "notesPlaceholder": "ej. raza, notas especiales...",
     "healthTypes": {
       "vaccination": "Vacunación",

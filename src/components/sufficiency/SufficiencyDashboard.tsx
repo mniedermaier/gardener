@@ -38,7 +38,7 @@ function ProgressBar({ percent, color }: { percent: number; color: string }) {
 
 export function SufficiencyDashboard() {
   const { t, i18n } = useTranslation();
-  const { gardens, gridCellSizeCm, lastFrostDate, animals } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals })));
+  const { gardens, gridCellSizeCm, lastFrostDate, animals, animalProducts } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, animalProducts: s.animalProducts })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [familySize, setFamilySize] = useState(2);
@@ -47,8 +47,8 @@ export function SufficiencyDashboard() {
     const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
     const hasAnimals = animals.length > 0;
     if (!hasPlantings && !hasAnimals) return null;
-    return calculateSufficiency(gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals);
-  }, [gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals]);
+    return calculateSufficiency(gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals, animalProducts);
+  }, [gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals, animalProducts]);
 
   return (
     <div>
