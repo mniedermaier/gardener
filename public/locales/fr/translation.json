@@ -50,6 +50,8 @@
     "totalHarvest": "Récolte totale",
     "totalExpenses": "Dépenses totales",
     "harvestEntries": "Entrées de récolte",
+    "totalAnimals": "Total animaux",
+    "totalEggs": "Total œufs",
     "noBackup": "Aucune sauvegarde. Vos données n'existent que dans ce navigateur.",
     "backupOld": "La dernière sauvegarde date de {{days}} jours.",
     "backupNow": "Sauvegarder maintenant"
@@ -410,7 +412,8 @@
     "deficits": "Déficits de cultures",
     "deficitsTitle": "Besoin de davantage de ces cultures",
     "needMore": "-{{kg}} kg (besoin de +{{m2}} m²)",
-    "cropPlan": "Plan de culture"
+    "cropPlan": "Plan de culture",
+    "animalProducts": "Produits animaux"
   },
   "sufficiency": {
     "title": "Calculateur d'autosuffisance",
@@ -438,7 +441,8 @@
     "months": "mois de conservation",
     "winterGap": "Déficit alimentaire hivernal",
     "winterGapDesc": "Faible couverture alimentaire en {{months}}. Vous avez besoin d'environ {{kg}} kg de nourriture stockée pour combler ce déficit.",
-    "storageTitle": "Stockage et conservation nécessaires"
+    "storageTitle": "Stockage et conservation nécessaires",
+    "animalYields": "Production animale"
   },
   "pests": {
     "title": "Suivi des ravageurs et maladies",
@@ -637,6 +641,8 @@
       "fertilizer": "Engrais",
       "infrastructure": "Infrastructure",
       "water": "Eau",
+      "animal_feed": "Nourriture animale",
+      "veterinary": "Vétérinaire",
       "other": "Autre"
     }
   },

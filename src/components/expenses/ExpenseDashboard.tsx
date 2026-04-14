@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/Input";
 import type { ExpenseCategory } from "@/types/expense";
 import { format } from "date-fns";
 
-const CATEGORIES: ExpenseCategory[] = ["seeds", "soil", "tools", "fertilizer", "infrastructure", "water", "other"];
+const CATEGORIES: ExpenseCategory[] = ["seeds", "soil", "tools", "fertilizer", "infrastructure", "water", "animal_feed", "veterinary", "other"];
 
 const CATEGORY_ICONS: Record<ExpenseCategory, string> = {
   seeds: "\ud83c\udf31",
@@ -20,6 +20,8 @@ const CATEGORY_ICONS: Record<ExpenseCategory, string> = {
   fertilizer: "\ud83d\udca9",
   infrastructure: "\ud83c\udfd7\ufe0f",
   water: "\ud83d\udca7",
+  animal_feed: "\ud83c\udf3e",
+  veterinary: "\ud83e\ude7a",
   other: "\ud83d\udce6",
 };
 

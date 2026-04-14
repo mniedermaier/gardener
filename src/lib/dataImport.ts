@@ -14,8 +14,21 @@ export interface ImportResult {
     expenses: number;
     customPlants: number;
     seasonArchives: number;
+    animals: number;
+    animalProducts: number;
+    feedEntries: number;
+    seeds: number;
+    soilTests: number;
+    amendments: number;
+    pests: number;
   };
 }
+
+const EMPTY_STATS: ImportResult["stats"] = {
+  gardens: 0, tasks: 0, harvests: 0, journalEntries: 0, expenses: 0,
+  customPlants: 0, seasonArchives: 0, animals: 0, animalProducts: 0,
+  feedEntries: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0,
+};
 
 export function validateExportFile(json: unknown): json is GardenerExport {
   if (!json || typeof json !== "object") return false;
@@ -42,11 +55,7 @@ export function importAllData(
       return importMerge(data, store);
     }
   } catch (e) {
-    return {
-      success: false,
-      error: String(e),
-      stats: { gardens: 0, tasks: 0, harvests: 0, journalEntries: 0, expenses: 0, customPlants: 0, seasonArchives: 0 },
-    };
+    return { success: false, error: String(e), stats: EMPTY_STATS };
   }
 }
 
@@ -65,6 +74,10 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
     animals: data.animals ?? [],
     animalProducts: data.animalProducts ?? [],
     feedEntries: data.feedEntries ?? [],
+    seeds: data.seeds ?? [],
+    soilTests: data.soilTests ?? [],
+    amendments: data.amendments ?? [],
+    pests: data.pests ?? [],
     weatherHistory: data.weatherHistory ?? [],
   });
 
@@ -72,7 +85,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
   if (data.settings) {
     const s = data.settings;
     set({
-      locale: (s.locale as "de" | "en") ?? "de",
+      locale: (s.locale as "de" | "en" | "es" | "fr") ?? "de",
       lastFrostDate: s.lastFrostDate ?? "2026-05-15",
       gridCellSizeCm: s.gridCellSizeCm ?? 30,
       locationLat: s.locationLat ?? null,
@@ -95,6 +108,13 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
       expenses: data.expenses?.length ?? 0,
       customPlants: data.customPlants?.length ?? 0,
       seasonArchives: data.seasonArchives?.length ?? 0,
+      animals: data.animals?.length ?? 0,
+      animalProducts: data.animalProducts?.length ?? 0,
+      feedEntries: data.feedEntries?.length ?? 0,
+      seeds: data.seeds?.length ?? 0,
+      soilTests: data.soilTests?.length ?? 0,
+      amendments: data.amendments?.length ?? 0,
+      pests: data.pests?.length ?? 0,
     },
   };
 }
@@ -121,6 +141,10 @@ function importMerge(
   const mergedAnimals = mergeById(current.animals, data.animals ?? []);
   const mergedAnimalProducts = mergeById(current.animalProducts, data.animalProducts ?? []);
   const mergedFeedEntries = mergeById(current.feedEntries, data.feedEntries ?? []);
+  const mergedSeeds = mergeById(current.seeds, data.seeds ?? []);
+  const mergedSoilTests = mergeById(current.soilTests, data.soilTests ?? []);
+  const mergedAmendments = mergeById(current.amendments, data.amendments ?? []);
+  const mergedPests = mergeById(current.pests, data.pests ?? []);
 
   // Season archives: merge by gardenId+season combo
   const existingArchiveKeys = new Set(
@@ -148,6 +172,10 @@ function importMerge(
     animals: mergedAnimals,
     animalProducts: mergedAnimalProducts,
     feedEntries: mergedFeedEntries,
+    seeds: mergedSeeds,
+    soilTests: mergedSoilTests,
+    amendments: mergedAmendments,
+    pests: mergedPests,
     seasonArchives: mergedArchives,
     weatherHistory: mergedWeather,
   });
@@ -162,6 +190,13 @@ function importMerge(
       expenses: mergedExpenses.length - current.expenses.length,
       customPlants: mergedCustomPlants.length - current.customPlants.length,
       seasonArchives: mergedArchives.length - current.seasonArchives.length,
+      animals: mergedAnimals.length - current.animals.length,
+      animalProducts: mergedAnimalProducts.length - current.animalProducts.length,
+      feedEntries: mergedFeedEntries.length - current.feedEntries.length,
+      seeds: mergedSeeds.length - current.seeds.length,
+      soilTests: mergedSoilTests.length - current.soilTests.length,
+      amendments: mergedAmendments.length - current.amendments.length,
+      pests: mergedPests.length - current.pests.length,
     },
   };
 }

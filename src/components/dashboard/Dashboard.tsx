@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid, Sprout, CalendarDays, Apple, TrendingUp,
-  AlertTriangle, ArrowRight, Star,
+  AlertTriangle, ArrowRight, Star, Bird,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -36,7 +36,7 @@ function StatCard({ icon: Icon, value, label, color, onClick }: {
 export function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { gardens, tasks, harvests, expenses, lastBackupDate } = useStore(useShallow((s) => ({ gardens: s.gardens, tasks: s.tasks, harvests: s.harvests, expenses: s.expenses, lastBackupDate: s.lastBackupDate })));
+  const { gardens, tasks, harvests, expenses, animals, animalProducts, lastBackupDate } = useStore(useShallow((s) => ({ gardens: s.gardens, tasks: s.tasks, harvests: s.harvests, expenses: s.expenses, animals: s.animals, animalProducts: s.animalProducts, lastBackupDate: s.lastBackupDate })));
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
@@ -61,6 +61,8 @@ export function Dashboard() {
 
   const totalHarvestKg = harvests.reduce((s, h) => s + (h.weightGrams ?? 0), 0) / 1000;
   const totalExpenseEur = expenses.reduce((s, e) => s + e.amountCents, 0) / 100;
+  const totalAnimals = animals.reduce((s, a) => s + a.count, 0);
+  const totalEggs = animalProducts.filter((p) => p.type === "eggs").reduce((s, p) => s + p.quantity, 0);
 
   const recentHarvests = useMemo(() =>
     [...harvests].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3),
@@ -228,6 +230,20 @@ export function Dashboard() {
               <span className="text-sm text-gray-600 dark:text-gray-400">{t("dashboard.harvestEntries")}</span>
               <span className="text-sm font-bold">{harvests.length}</span>
             </div>
+            {totalAnimals > 0 && (
+              <>
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
+                  <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+                    <Bird size={14} /> {t("dashboard.totalAnimals")}
+                  </span>
+                  <span className="text-sm font-bold">{totalAnimals}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("dashboard.totalEggs")}</span>
+                  <span className="text-sm font-bold">{totalEggs} 🥚</span>
+                </div>
+              </>
+            )}
           </div>
         </Card>
       </div>

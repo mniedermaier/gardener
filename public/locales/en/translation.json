@@ -50,6 +50,8 @@
     "totalHarvest": "Total harvest",
     "totalExpenses": "Total expenses",
     "harvestEntries": "Harvest entries",
+    "totalAnimals": "Total animals",
+    "totalEggs": "Total eggs",
     "noBackup": "No backup yet. Your data only exists in this browser.",
     "backupOld": "Last backup was {{days}} days ago.",
     "backupNow": "Backup now"
@@ -410,7 +412,8 @@
     "deficits": "Crop deficits",
     "deficitsTitle": "Need more of these crops",
     "needMore": "-{{kg}} kg (need +{{m2}} m²)",
-    "cropPlan": "Crop Plan"
+    "cropPlan": "Crop Plan",
+    "animalProducts": "Animal Products"
   },
   "sufficiency": {
     "title": "Self-Sufficiency Calculator",
@@ -438,7 +441,8 @@
     "months": "months shelf life",
     "winterGap": "Winter Food Gap",
     "winterGapDesc": "Low food coverage in {{months}}. You need approximately {{kg}} kg of stored food to bridge this gap.",
-    "storageTitle": "Storage & Preservation Needed"
+    "storageTitle": "Storage & Preservation Needed",
+    "animalYields": "Animal Yields"
   },
   "pests": {
     "title": "Pest & Disease Tracker",
@@ -637,6 +641,8 @@
       "fertilizer": "Fertilizer",
       "infrastructure": "Infrastructure",
       "water": "Water",
+      "animal_feed": "Animal Feed",
+      "veterinary": "Veterinary",
       "other": "Other"
     }
   },

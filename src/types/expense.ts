@@ -1,4 +1,4 @@
-export type ExpenseCategory = "seeds" | "soil" | "tools" | "fertilizer" | "infrastructure" | "water" | "other";
+export type ExpenseCategory = "seeds" | "soil" | "tools" | "fertilizer" | "infrastructure" | "water" | "animal_feed" | "veterinary" | "other";
 
 export interface Expense {
   id: string;

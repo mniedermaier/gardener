@@ -154,7 +154,7 @@ export function SettingsPage() {
               min={10}
               max={100}
               value={store.gridCellSizeCm}
-              onChange={() => {}}
+              onChange={(e) => store.setGridCellSizeCm(Math.max(10, Math.min(100, Number(e.target.value))))}
             />
           </div>
         </Card>

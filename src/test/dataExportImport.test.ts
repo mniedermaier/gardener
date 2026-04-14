@@ -18,6 +18,10 @@ function makeExport(overrides: Partial<GardenerExport["data"]> = {}): GardenerEx
       animals: [],
       animalProducts: [],
       feedEntries: [],
+      seeds: [],
+      soilTests: [],
+      amendments: [],
+      pests: [],
       settings: {
         locale: "de",
         lastFrostDate: "2026-05-15",

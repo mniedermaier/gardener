@@ -1,5 +1,7 @@
 import type { Plant, PreservationMethod } from "@/types/plant";
 import type { Garden } from "@/types/garden";
+import type { Animal } from "@/types/animal";
+import { ANNUAL_YIELD, PRODUCT_NUTRITION } from "@/types/animal";
 import { addWeeks, addDays, parseISO, getMonth } from "date-fns";
 import { getFrostProtectionWeeks } from "@/types/garden";
 
@@ -54,8 +56,17 @@ export interface WinterGap {
   storedKgNeeded: number;
 }
 
+export interface AnimalYieldEstimate {
+  animalType: string;
+  productType: string;
+  quantityKg: number;
+  calories: number;
+  proteinG: number;
+}
+
 export interface SufficiencyResult {
   plantYields: PlantYieldEstimate[];
+  animalYields: AnimalYieldEstimate[];
   totalYieldKg: number;
   nutrition: NutritionCoverage;
   gaps: NutritionGap[];
@@ -171,6 +182,7 @@ export function calculateSufficiency(
   familySize: number,
   gridCellSizeCm: number,
   lastFrostDate: string = "2026-05-15",
+  animals: Animal[] = [],
 ): SufficiencyResult {
   const plantMap = new Map(plants.map((p) => [p.id, p]));
 
@@ -211,11 +223,45 @@ export function calculateSufficiency(
     plantYields.push(yield_);
   }
 
-  const totalYieldKg = plantYields.reduce((s, y) => s + y.estimatedKg, 0);
+  // --- Animal yields ---
+  const animalYields: AnimalYieldEstimate[] = [];
+  for (const animal of animals) {
+    for (const yield_ of ANNUAL_YIELD[animal.type]) {
+      const totalQty = yield_.quantity * animal.count;
+      // Convert to kg: eggs ~60g each
+      const quantityKg = yield_.unit === "pieces" ? totalQty * 0.06 : totalQty;
+      const nutrition = PRODUCT_NUTRITION[yield_.product];
+      const portions = quantityKg * 10; // per 100g
+      animalYields.push({
+        animalType: animal.type,
+        productType: yield_.product,
+        quantityKg: Math.round(quantityKg * 10) / 10,
+        calories: Math.round(portions * nutrition.caloriesPer100g),
+        proteinG: Math.round(portions * nutrition.proteinPer100g * 10) / 10,
+      });
+    }
+  }
+
+  const totalAnimalKg = animalYields.reduce((s, y) => s + y.quantityKg, 0);
+  const totalYieldKg = plantYields.reduce((s, y) => s + y.estimatedKg, 0) + totalAnimalKg;
 
   // --- Monthly food availability ---
   const monthlyCalories = new Array(12).fill(0);
   const monthlyKg = new Array(12).fill(0);
+
+  // Distribute animal production across months
+  // Eggs: year-round (all 12 months), honey: May-Sep, meat: spread across year
+  for (const ay of animalYields) {
+    const months = ay.productType === "honey"
+      ? [4, 5, 6, 7, 8] // May-Sep
+      : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // year-round
+    const kgPerMonth = ay.quantityKg / months.length;
+    const calPerMonth = ay.calories / months.length;
+    for (const m of months) {
+      monthlyKg[m] += kgPerMonth;
+      monthlyCalories[m] += calPerMonth;
+    }
+  }
 
   // Distribute fresh production across harvest months
   for (const y of plantYields) {
@@ -316,9 +362,11 @@ export function calculateSufficiency(
   const totalNeededCal = monthlyFood.reduce((s, m) => s + m.caloriesNeeded, 0);
   const annualCoveragePercent = Math.min(100, Math.round((totalProducedCal / totalNeededCal) * 100));
 
-  // Overall nutrition (annual)
-  const totalCalories = plantYields.reduce((s, y) => s + y.calories, 0);
-  const totalProtein = plantYields.reduce((s, y) => s + y.proteinG, 0);
+  // Overall nutrition (annual) - plants + animals
+  const animalCalories = animalYields.reduce((s, y) => s + y.calories, 0);
+  const animalProtein = animalYields.reduce((s, y) => s + y.proteinG, 0);
+  const totalCalories = plantYields.reduce((s, y) => s + y.calories, 0) + animalCalories;
+  const totalProtein = plantYields.reduce((s, y) => s + y.proteinG, 0) + animalProtein;
   const totalVitC = plantYields.reduce((s, y) => s + y.vitaminCMg, 0);
   const totalFiber = plantYields.reduce((s, y) => s + y.fiberG, 0);
 
@@ -366,6 +414,7 @@ export function calculateSufficiency(
 
   return {
     plantYields,
+    animalYields,
     totalYieldKg,
     nutrition,
     gaps,

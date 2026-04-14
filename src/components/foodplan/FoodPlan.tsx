@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, Target, ShoppingCart } from "lucide-react";
+import { Users, Target, ShoppingCart, Bird } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
@@ -8,6 +8,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { ANIMAL_ICONS, PRODUCT_ICONS, ANNUAL_YIELD, PRODUCT_NUTRITION } from "@/types/animal";
 
 // Annual kg consumption targets per person (based on average European diet)
 const ANNUAL_KG_TARGETS: Record<string, { kgPerPerson: number; category: string }> = {
@@ -45,7 +46,7 @@ interface CropPlan {
 
 export function FoodPlan() {
   const { t } = useTranslation();
-  const { gardens, gridCellSizeCm } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm })));
+  const { gardens, gridCellSizeCm, animals } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, animals: s.animals })));
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [familySize, setFamilySize] = useState(2);
@@ -147,6 +148,43 @@ export function FoodPlan() {
                   <span>{t("foodplan.needMore", { kg: p.deficit, m2: additionalM2 })}</span>
                 </div>
               );
+            })}
+          </div>
+        </Card>
+      )}
+
+      {/* Animal products */}
+      {animals.length > 0 && (
+        <Card className="mb-6">
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+            <Bird size={18} />
+            {t("foodplan.animalProducts")}
+          </h2>
+          <div className="space-y-1.5">
+            {animals.map((animal) => {
+              const yields = ANNUAL_YIELD[animal.type];
+              return yields.map((y) => {
+                const totalQty = y.quantity * animal.count;
+                const kgTotal = y.unit === "pieces" ? totalQty * 0.06 : totalQty;
+                const nutrition = PRODUCT_NUTRITION[y.product];
+                const calories = Math.round(kgTotal * 10 * nutrition.caloriesPer100g);
+                const protein = Math.round(kgTotal * 10 * nutrition.proteinPer100g);
+                return (
+                  <div key={`${animal.id}-${y.product}`} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
+                    <span className="flex items-center gap-2 text-sm font-medium">
+                      <span>{ANIMAL_ICONS[animal.type]}</span>
+                      <span>{animal.name || t(`livestock.types.${animal.type}`)}</span>
+                      <span className="text-gray-400">→</span>
+                      <span>{PRODUCT_ICONS[y.product]} {t(`livestock.products.${y.product}`)}</span>
+                    </span>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <span className="font-semibold">{totalQty} {y.unit === "pieces" ? t("livestock.pieces") : y.unit}/{t("livestock.year")}</span>
+                      <span>{calories} kcal</span>
+                      <span>{protein}g Protein</span>
+                    </div>
+                  </div>
+                );
+              });
             })}
           </div>
         </Card>

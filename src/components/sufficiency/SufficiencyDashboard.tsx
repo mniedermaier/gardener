@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, TrendingUp, AlertCircle, Apple, Beef, Citrus, Wheat, Snowflake, Archive } from "lucide-react";
+import { Users, TrendingUp, AlertCircle, Apple, Beef, Citrus, Wheat, Snowflake, Archive, Bird } from "lucide-react";
+import { ANIMAL_ICONS, PRODUCT_ICONS } from "@/types/animal";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -37,16 +38,17 @@ function ProgressBar({ percent, color }: { percent: number; color: string }) {
 
 export function SufficiencyDashboard() {
   const { t, i18n } = useTranslation();
-  const { gardens, gridCellSizeCm, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate })));
+  const { gardens, gridCellSizeCm, lastFrostDate, animals } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals })));
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [familySize, setFamilySize] = useState(2);
 
   const result: SufficiencyResult | null = useMemo(() => {
     const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
-    if (!hasPlantings) return null;
-    return calculateSufficiency(gardens, plants, familySize, gridCellSizeCm, lastFrostDate);
-  }, [gardens, plants, familySize, gridCellSizeCm, lastFrostDate]);
+    const hasAnimals = animals.length > 0;
+    if (!hasPlantings && !hasAnimals) return null;
+    return calculateSufficiency(gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals);
+  }, [gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals]);
 
   return (
     <div>
@@ -266,6 +268,33 @@ export function SufficiencyDashboard() {
                 })}
             </div>
           </Card>
+
+          {/* Animal Yields */}
+          {result.animalYields.length > 0 && (
+            <Card className="mt-6">
+              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+                <Bird size={18} />
+                {t("sufficiency.animalYields")}
+              </h2>
+              <div className="space-y-2">
+                {result.animalYields.map((y, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{ANIMAL_ICONS[y.animalType as keyof typeof ANIMAL_ICONS]}</span>
+                      <span className="text-sm font-medium">
+                        {PRODUCT_ICONS[y.productType as keyof typeof PRODUCT_ICONS]} {t(`livestock.products.${y.productType}`)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs">
+                      <span className="font-semibold">{y.quantityKg} kg</span>
+                      <span className="text-gray-500">{y.calories} kcal</span>
+                      <span className="text-gray-500">{y.proteinG}g {t("sufficiency.nutrients.protein")}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           <div className="mt-6">
             <PreservationGuide />

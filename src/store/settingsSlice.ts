@@ -26,6 +26,7 @@ export interface SettingsSlice {
   setLastFrostDate: (date: string) => void;
   setTheme: (theme: "light" | "dark" | "system") => void;
   setBackendUrl: (url: string | null) => void;
+  setGridCellSizeCm: (size: number) => void;
   setAlerts: (alerts: Partial<AlertConfig>) => void;
   setLastBackupDate: (date: string) => void;
 }
@@ -55,6 +56,7 @@ export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
   setLastFrostDate: (lastFrostDate) => set({ lastFrostDate }),
   setTheme: (theme) => set({ theme }),
   setBackendUrl: (backendUrl) => set({ backendUrl }),
+  setGridCellSizeCm: (gridCellSizeCm) => set({ gridCellSizeCm }),
   setAlerts: (updates) =>
     set((state) => ({ alerts: { ...state.alerts, ...updates } })),
   setLastBackupDate: (lastBackupDate) => set({ lastBackupDate }),

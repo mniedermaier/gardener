@@ -50,6 +50,8 @@
     "totalHarvest": "Ernte gesamt",
     "totalExpenses": "Ausgaben gesamt",
     "harvestEntries": "Ernteeintr\u00e4ge",
+    "totalAnimals": "Tiere gesamt",
+    "totalEggs": "Eier gesamt",
     "noBackup": "Noch kein Backup. Deine Daten existieren nur in diesem Browser.",
     "backupOld": "Letztes Backup vor {{days}} Tagen.",
     "backupNow": "Jetzt sichern"
@@ -410,7 +412,8 @@
     "deficits": "Fehlende Kulturen",
     "deficitsTitle": "Mehr von diesen Kulturen benötigt",
     "needMore": "-{{kg}} kg (brauche +{{m2}} m²)",
-    "cropPlan": "Anbauplan"
+    "cropPlan": "Anbauplan",
+    "animalProducts": "Tierische Produkte"
   },
   "sufficiency": {
     "title": "Selbstversorger-Rechner",
@@ -438,7 +441,8 @@
     "months": "Monate haltbar",
     "winterGap": "Winter-Versorgungsl\u00fccke",
     "winterGapDesc": "Geringe Lebensmittelversorgung im {{months}}. Du brauchst ca. {{kg}} kg gelagerte Lebensmittel um diese L\u00fccke zu \u00fcberbr\u00fccken.",
-    "storageTitle": "Lager- & Konservierungsbedarf"
+    "storageTitle": "Lager- & Konservierungsbedarf",
+    "animalYields": "Tierische Erträge"
   },
   "pests": {
     "title": "Schädlings- & Krankheits-Tracker",
@@ -637,6 +641,8 @@
       "fertilizer": "D\u00fcnger",
       "infrastructure": "Infrastruktur",
       "water": "Wasser",
+      "animal_feed": "Tierfutter",
+      "veterinary": "Tierarzt",
       "other": "Sonstiges"
     }
   },
