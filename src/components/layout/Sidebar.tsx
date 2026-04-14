@@ -89,15 +89,15 @@ function NavGroupSection({ group, onClose }: { group: NavGroup; onClose: () => v
       >
         <GroupIcon size={16} className={group.color} />
         <span className={`flex-1 text-left text-xs font-semibold uppercase tracking-wider ${
-          isGroupActive ? "text-gray-700 dark:text-gray-200" : "text-gray-400 dark:text-gray-500"
+          isGroupActive ? "text-gray-800 dark:text-gray-200" : "text-gray-500 dark:text-gray-500"
         }`}>
           {t(group.labelKey)}
         </span>
-        <ChevronRight size={13} className={`text-gray-300 transition-transform dark:text-gray-600 ${expanded ? "rotate-90" : ""}`} />
+        <ChevronRight size={13} className={`text-gray-400 transition-transform dark:text-gray-600 ${expanded ? "rotate-90" : ""}`} />
       </button>
 
       {expanded && (
-        <div className="ml-2 mt-0.5 space-y-0.5 border-l-2 border-gray-100 pl-2 dark:border-gray-800">
+        <div className="ml-2 mt-0.5 space-y-0.5 border-l-2 border-gray-200 pl-2 dark:border-gray-800">
           {group.items.map((item) => (
             <NavLink
               key={item.to}
@@ -107,7 +107,7 @@ function NavGroupSection({ group, onClose }: { group: NavGroup; onClose: () => v
                 `flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-garden-50 text-garden-700 dark:bg-garden-900/30 dark:text-garden-400"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                 }`
               }
             >
@@ -132,7 +132,7 @@ function NavGroupSection({ group, onClose }: { group: NavGroup; onClose: () => v
                 className={`rounded p-1 transition-colors ${
                   isActive
                     ? "bg-garden-100 text-garden-600 dark:bg-garden-900/40 dark:text-garden-400"
-                    : "text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400"
+                    : "text-gray-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
                 }`}
               >
                 <item.icon size={14} />
@@ -204,7 +204,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-garden-50 text-garden-700 dark:bg-garden-900/30 dark:text-garden-400"
-                    : "text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+                    : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
                 }`
               }
             >
