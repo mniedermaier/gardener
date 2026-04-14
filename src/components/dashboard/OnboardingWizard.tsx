@@ -23,7 +23,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
         setLocation(pos.coords.latitude, pos.coords.longitude, locationName);
         setStep("frost");
       },
-      () => setStep("frost")
+      () => setStep("frost"),
+      { timeout: 10000 }
     );
   };
 

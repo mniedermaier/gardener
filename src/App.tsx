@@ -10,21 +10,25 @@ function lazyRetry<T extends Record<string, unknown>>(
   fn: () => Promise<T>,
 ): Promise<T> {
   return fn().catch(async () => {
-    const reloaded = sessionStorage.getItem("chunk-reload");
-    if (!reloaded) {
-      sessionStorage.setItem("chunk-reload", "1");
-      // Clear SW caches before reload
-      if ("caches" in window) {
-        const names = await caches.keys();
-        for (const name of names) await caches.delete(name);
+    try {
+      const reloaded = sessionStorage.getItem("chunk-reload");
+      if (!reloaded) {
+        sessionStorage.setItem("chunk-reload", "1");
+        // Clear SW caches before reload
+        if ("caches" in window) {
+          const names = await caches.keys();
+          for (const name of names) await caches.delete(name);
+        }
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const r of regs) await r.unregister();
+        }
+        window.location.reload();
       }
-      if ("serviceWorker" in navigator) {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        for (const r of regs) await r.unregister();
-      }
-      window.location.reload();
+      sessionStorage.removeItem("chunk-reload");
+    } catch {
+      // sessionStorage may be unavailable in Safari Private Browsing
     }
-    sessionStorage.removeItem("chunk-reload");
     throw new Error("Chunk load failed");
   });
 }

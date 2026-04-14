@@ -677,7 +677,7 @@ export function GardenPlanner() {
               </Button>
             )}
             {activeGarden && (
-              <Button variant="ghost" size="sm" onClick={() => { const url = generateShareUrl(activeGarden); navigator.clipboard.writeText(url); toast(t("planner.shareCopied")); }} title={t("planner.share")}>
+              <Button variant="ghost" size="sm" onClick={() => { const url = generateShareUrl(activeGarden); navigator.clipboard.writeText(url).then(() => toast(t("planner.shareCopied"))).catch(() => { window.prompt("Copy this link:", url); }); }} title={t("planner.share")}>
                 <Share2 size={16} />
               </Button>
             )}

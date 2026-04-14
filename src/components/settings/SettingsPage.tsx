@@ -30,7 +30,8 @@ export function SettingsPage() {
       },
       () => {
         alert("Could not get location");
-      }
+      },
+      { timeout: 10000 }
     );
   };
 
