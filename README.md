@@ -21,8 +21,6 @@
 <p align="center">
   <a href="https://mniedermaier.github.io/gardener/"><strong>Live Demo</strong></a>
   &nbsp;&middot;&nbsp;
-  <a href="ROADMAP.md">Roadmap</a>
-  &nbsp;&middot;&nbsp;
   <a href="#quick-start">Quick Start</a>
 </p>
 
@@ -138,7 +136,7 @@ All data lives in your browser. Settings > Data Management lets you:
 
 ## Contributing
 
-Fork, branch, code, `npm run test && npm run build`, PR. See [ROADMAP.md](ROADMAP.md) for ideas.
+Fork, branch, code, `npm run test && npm run build`, PR. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
