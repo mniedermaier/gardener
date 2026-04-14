@@ -200,9 +200,12 @@ export function SeasonTimeline() {
       {/* Month headers */}
       <div className="mb-2 flex items-center gap-2 text-xs text-gray-400">
         <div className="w-24 sm:w-36 shrink-0" />
-        {months.map((m, i) => (
-          <div key={i} className="flex-1 text-center">{m}</div>
-        ))}
+        <div className="relative flex flex-1">
+          {months.map((m, i) => (
+            <div key={i} className="absolute text-center text-[9px] sm:text-xs" style={{ left: `${(i / 12) * 100}%`, width: `${100 / 12}%` }}>{m}</div>
+          ))}
+          <div className="invisible">X</div>
+        </div>
       </div>
 
       {/* Timeline rows */}
