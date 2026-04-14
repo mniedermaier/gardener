@@ -29,11 +29,32 @@
 
 ---
 
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" width="800" alt="Dashboard">
+</p>
+
 ## What is Gardener?
 
 Gardener is a **complete self-sufficiency planner** — not just for your garden, but for your entire homestead. It answers the question every self-sufficiency beginner asks: **"Can my garden feed my family?"**
 
 Works **offline as a PWA**, runs as a **static site** (GitHub Pages), or as a **Docker container** with backend sync. Available in **Deutsch, English, Español, Français**.
+
+<details>
+<summary><strong>More screenshots</strong></summary>
+
+| Bed Planner | Plant Database |
+|:-:|:-:|
+| <img src="docs/screenshots/planner.png" width="400" alt="Planner"> | <img src="docs/screenshots/plants.png" width="400" alt="Plants"> |
+
+| Season Calendar | Self-Sufficiency |
+|:-:|:-:|
+| <img src="docs/screenshots/calendar.png" width="400" alt="Calendar"> | <img src="docs/screenshots/sufficiency.png" width="400" alt="Sufficiency"> |
+
+| Livestock | Mobile |
+|:-:|:-:|
+| <img src="docs/screenshots/livestock.png" width="400" alt="Livestock"> | <img src="docs/screenshots/mobile-dashboard.png" width="200" alt="Mobile"> |
+
+</details>
 
 ## Features at a Glance
 
