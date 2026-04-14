@@ -11,6 +11,7 @@ import type { Animal, AnimalProduct, FeedEntry, HealthEvent } from "@/types/anim
 import type { SeedItem } from "@/types/seed";
 import type { SoilTest, Amendment } from "@/types/soil";
 import type { PestEntry } from "@/types/pest";
+import type { PantryItem } from "@/types/pantry";
 
 export interface GardenerExport {
   version: 1;
@@ -32,6 +33,7 @@ export interface GardenerExport {
     soilTests: SoilTest[];
     amendments: Amendment[];
     pests: PestEntry[];
+    pantryItems: PantryItem[];
     settings: {
       locale: string;
       lastFrostDate: string;
@@ -68,6 +70,7 @@ export function buildExportData(): GardenerExport {
       soilTests: state.soilTests,
       amendments: state.amendments,
       pests: state.pests,
+      pantryItems: state.pantryItems,
       settings: {
         locale: state.locale,
         lastFrostDate: state.lastFrostDate,

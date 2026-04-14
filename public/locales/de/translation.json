@@ -13,6 +13,7 @@
     "settings": "Einstellungen",
     "harvest": "Ernteprotokoll",
     "journal": "Tagebuch",
+    "pantry": "Vorratskammer",
     "seeds": "Saatgut",
     "soil": "Boden",
     "pests": "Schädlinge",
@@ -405,6 +406,69 @@
     "linkedTo": "Verkn\u00fcpft mit",
     "animal": "Tier",
     "all": "Alle"
+  },
+  "pantry": {
+    "title": "Vorratskammer",
+    "add": "Vorrat hinzufügen",
+    "added": "Vorrat hinzugefügt!",
+    "totalStored": "Eingelagert",
+    "totalUnits": "Einheiten",
+    "expiringSoon": "Bald ablaufend",
+    "expired": "Abgelaufen",
+    "stockTab": "Bestand",
+    "guidesTab": "Anleitungen",
+    "consumed": "Verbraucht",
+    "noConsumed": "Noch nichts verbraucht.",
+    "empty": "Deine Vorratskammer ist leer. Beginne Ernteüberschüsse einzulagern!",
+    "method": "Methode",
+    "quantity": "Menge",
+    "unitCount": "Einheiten (Gläser, Beutel...)",
+    "unitCountPlaceholder": "z.B. 12",
+    "defaultUnit": "Stk.",
+    "label": "Bezeichnung",
+    "labelPlaceholder": "z.B. Tomatensauce August 2026",
+    "supplyCost": "Zubehörkosten",
+    "storedOn": "eingelagert am",
+    "expiresOn": "haltbar bis",
+    "consumedOn": "verbraucht am",
+    "markConsumed": "Als verbraucht markieren",
+    "expiredBadge": "Abgelaufen",
+    "expiringSoonBadge": "Noch {{days}} Tage",
+    "expiredWarning": "{{count}} Vorräte sind abgelaufen! Bitte prüfen und verbrauchen oder entsorgen.",
+    "allMethods": "Alle Methoden",
+    "shelfLife": "Haltbarkeit",
+    "yield": "Ausbeute",
+    "months": "Monate",
+    "plantGuides": "Konservierung nach Pflanze",
+    "tipsTitle": "Tipps zur Vorratshaltung",
+    "tip1": "Immer das Einfülldatum und den Inhalt auf Gläsern und Gefrierbeuteln beschriften.",
+    "tip2": "Eingekochtes kühl, dunkel und trocken lagern. Direkte Sonneneinstrahlung vermeiden.",
+    "tip3": "Gefrorenes Gemüse vorher blanchieren für bessere Farbe, Textur und Nährstofferhalt.",
+    "tip4": "Fermentiertes regelmäßig prüfen — Schimmel an der Oberfläche sofort entfernen.",
+    "tip5": "Erdkeller-Lagerung braucht 1-4°C und hohe Luftfeuchtigkeit. Kartoffeln dunkel lagern.",
+    "tip6": "Nach dem Prinzip 'First In, First Out' verbrauchen — älteste Vorräte zuerst verwenden.",
+    "methodInfo": {
+      "canning": {
+        "shelf": "24 Monate haltbar",
+        "desc": "Obst, Gemüse und Saucen in Gläsern einkochen. Wasserbad für saure Lebensmittel, Druckkochtopf für Gemüse."
+      },
+      "freezing": {
+        "shelf": "12 Monate haltbar",
+        "desc": "Schnelles Einfrieren erhält Nährstoffe und Geschmack. Gemüse vorher blanchieren. Luftdicht verpacken."
+      },
+      "fermenting": {
+        "shelf": "6 Monate haltbar",
+        "desc": "Milchsäuregärung konserviert und schafft Probiotika. Salz, Wasser und Zeit — keine Hitze nötig."
+      },
+      "drying": {
+        "shelf": "12 Monate haltbar",
+        "desc": "Dörrgerät oder Backofen bei niedriger Temperatur. Ideal für Kräuter, Tomaten, Äpfel, Pilze."
+      },
+      "root_cellar": {
+        "shelf": "6 Monate haltbar",
+        "desc": "Kühle, feuchte Lagerung für Wurzelgemüse, Kartoffeln, Äpfel, Kohl. 1-4°C optimal."
+      }
+    }
   },
   "season": {
     "current": "Saison {{year}}",

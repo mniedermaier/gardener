@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Home, LayoutGrid, Sprout, Cloud, CalendarDays, ClipboardList, Settings, X,
-  Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug, UtensilsCrossed, ChevronRight, Bird,
+  Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug, UtensilsCrossed, ChevronRight, Bird, Archive,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -57,6 +57,7 @@ const groups: NavGroup[] = [
     items: [
       { to: "/harvest", icon: Apple, labelKey: "nav.harvest" },
       { to: "/journal", icon: BookOpen, labelKey: "nav.journal" },
+      { to: "/pantry", icon: Archive, labelKey: "nav.pantry" },
     ],
   },
   {

@@ -13,6 +13,7 @@
     "settings": "Settings",
     "harvest": "Harvest Log",
     "journal": "Journal",
+    "pantry": "Pantry",
     "seeds": "Seeds",
     "soil": "Soil",
     "pests": "Pests",
@@ -405,6 +406,69 @@
     "linkedTo": "Linked to",
     "animal": "Animal",
     "all": "All"
+  },
+  "pantry": {
+    "title": "Pantry",
+    "add": "Add Preserves",
+    "added": "Preserves added!",
+    "totalStored": "Stored",
+    "totalUnits": "Units",
+    "expiringSoon": "Expiring soon",
+    "expired": "Expired",
+    "stockTab": "Stock",
+    "guidesTab": "Guides",
+    "consumed": "Consumed",
+    "noConsumed": "Nothing consumed yet.",
+    "empty": "Your pantry is empty. Start preserving your harvest surplus!",
+    "method": "Method",
+    "quantity": "Quantity",
+    "unitCount": "Units (jars, bags...)",
+    "unitCountPlaceholder": "e.g. 12",
+    "defaultUnit": "pcs",
+    "label": "Label",
+    "labelPlaceholder": "e.g. Tomato Sauce August 2026",
+    "supplyCost": "Supply cost",
+    "storedOn": "stored on",
+    "expiresOn": "expires",
+    "consumedOn": "consumed on",
+    "markConsumed": "Mark as consumed",
+    "expiredBadge": "Expired",
+    "expiringSoonBadge": "{{days}} days left",
+    "expiredWarning": "{{count}} items have expired! Please check and consume or discard.",
+    "allMethods": "All methods",
+    "shelfLife": "Shelf life",
+    "yield": "Yield",
+    "months": "months",
+    "plantGuides": "Preservation by Plant",
+    "tipsTitle": "Preservation Tips",
+    "tip1": "Always label jars and freezer bags with the date and contents.",
+    "tip2": "Store canned goods in a cool, dark, dry place. Avoid direct sunlight.",
+    "tip3": "Blanch vegetables before freezing for better color, texture and nutrient retention.",
+    "tip4": "Check fermented foods regularly — remove any surface mold immediately.",
+    "tip5": "Root cellar storage needs 1-4°C and high humidity. Keep potatoes in the dark.",
+    "tip6": "Use the 'First In, First Out' principle — consume oldest preserves first.",
+    "methodInfo": {
+      "canning": {
+        "shelf": "24 months shelf life",
+        "desc": "Preserve fruits, vegetables and sauces in jars. Water bath for acidic foods, pressure canner for vegetables."
+      },
+      "freezing": {
+        "shelf": "12 months shelf life",
+        "desc": "Quick freezing preserves nutrients and flavor. Blanch vegetables first. Pack airtight."
+      },
+      "fermenting": {
+        "shelf": "6 months shelf life",
+        "desc": "Lacto-fermentation preserves and creates probiotics. Salt, water and time — no heat needed."
+      },
+      "drying": {
+        "shelf": "12 months shelf life",
+        "desc": "Dehydrator or oven at low temperature. Ideal for herbs, tomatoes, apples, mushrooms."
+      },
+      "root_cellar": {
+        "shelf": "6 months shelf life",
+        "desc": "Cool, humid storage for root vegetables, potatoes, apples, cabbage. 1-4°C optimal."
+      }
+    }
   },
   "season": {
     "current": "Season {{year}}",
