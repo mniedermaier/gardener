@@ -8,4 +8,5 @@ export interface JournalEntry {
   bedId?: string;
   plantId?: string;
   animalId?: string;
+  photos?: string[];
 }

@@ -103,6 +103,9 @@
     "placeMode": "Colocando: {{plant}} - haz clic en las celdas para colocar, ESC para cancelar",
     "share": "Compartir plan de huerto",
     "shareCopied": "Enlace de compartir copiado al portapapeles!",
+    "print": "Imprimir",
+    "printTitle": "Imprimir plan de canteros",
+    "legend": "Leyenda",
     "importTemplate": "Importar plantilla de huerto",
     "importNow": "Importar",
     "importError": "Enlace de compartir invalido o expirado.",
@@ -407,7 +410,10 @@
     "noEntries": "Tu diario del huerto esta vacio. Comienza a documentar tu experiencia en el huerto!",
     "linkedTo": "Vinculado a",
     "animal": "Animal",
-    "all": "Todos"
+    "all": "Todos",
+    "addPhotos": "Agregar fotos (max. 3)",
+    "photoLimit": "Maximo 3 fotos",
+    "photoTooLarge": "Redimensionando foto..."
   },
   "pantry": {
     "title": "Despensa",

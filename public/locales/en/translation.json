@@ -103,6 +103,9 @@
     "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
     "share": "Share garden plan",
     "shareCopied": "Share link copied to clipboard!",
+    "print": "Print",
+    "printTitle": "Print bed layout",
+    "legend": "Legend",
     "importTemplate": "Import Garden Template",
     "importNow": "Import",
     "importError": "Invalid or expired share link.",
@@ -407,7 +410,10 @@
     "noEntries": "Your garden journal is empty. Start documenting your garden journey!",
     "linkedTo": "Linked to",
     "animal": "Animal",
-    "all": "All"
+    "all": "All",
+    "addPhotos": "Add photos (max. 3)",
+    "photoLimit": "Maximum 3 photos",
+    "photoTooLarge": "Resizing photo..."
   },
   "pantry": {
     "title": "Pantry",

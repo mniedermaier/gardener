@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect, memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2, Footprints, Copy } from "lucide-react";
+import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2, Footprints, Copy, Printer } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -25,6 +25,7 @@ import { GuildPicker } from "./GuildPicker";
 import { PlantPalette } from "./PlantPalette";
 import { PlantInfoPanel } from "./PlantInfoPanel";
 import { BedStats } from "./BedStats";
+import { PrintBedLayout } from "./PrintBedLayout";
 import { generateShareUrl } from "@/lib/sharing";
 import { useToast } from "@/components/ui/Toast";
 import { useUndo } from "@/hooks/useUndo";
@@ -474,6 +475,7 @@ export function GardenPlanner() {
   const [pathMode, setPathMode] = useState(false);
   const [expandedBedId, setExpandedBedId] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<{ gardenId: string; bedId: string; cellX: number; cellY: number } | null>(null);
+  const [showPrint, setShowPrint] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeGarden = gardens.find((g) => g.id === activeGardenId);
@@ -497,6 +499,13 @@ export function GardenPlanner() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Close print view via custom event from PrintBedLayout
+  useEffect(() => {
+    const handler = () => setShowPrint(false);
+    window.addEventListener("close-print-view", handler);
+    return () => window.removeEventListener("close-print-view", handler);
   }, []);
 
   // Clear feedback after 3s
@@ -678,6 +687,11 @@ export function GardenPlanner() {
               </Button>
             )}
             {activeGarden && (
+              <Button variant="ghost" size="sm" onClick={() => setShowPrint(true)} title={t("planner.printTitle")}>
+                <Printer size={16} />
+              </Button>
+            )}
+            {activeGarden && (
               <Button variant="ghost" size="sm" onClick={() => { const url = generateShareUrl(activeGarden); navigator.clipboard.writeText(url).then(() => toast(t("planner.shareCopied"))).catch(() => { window.prompt("Copy this link:", url); }); }} title={t("planner.share")}>
                 <Share2 size={16} />
               </Button>
@@ -713,7 +727,14 @@ export function GardenPlanner() {
           </div>
         )}
 
-        {activeGarden ? (
+        {activeGarden && showPrint ? (
+          <PrintBedLayout
+            garden={activeGarden}
+            plants={plants}
+            gridCellSizeCm={gridCellSizeCm}
+            getPlantName={getPlantName}
+          />
+        ) : activeGarden ? (
           <div className="grid gap-6 md:grid-cols-[1fr_280px]">
             {/* Main area: beds */}
             <div className="min-w-0">

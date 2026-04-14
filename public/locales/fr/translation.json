@@ -103,6 +103,9 @@
     "placeMode": "Placement : {{plant}} - cliquez sur les cellules pour placer, Échap pour annuler",
     "share": "Partager le plan du jardin",
     "shareCopied": "Lien de partage copié dans le presse-papiers !",
+    "print": "Imprimer",
+    "printTitle": "Imprimer le plan",
+    "legend": "Légende",
     "importTemplate": "Importer un modèle de jardin",
     "importNow": "Importer",
     "importError": "Lien de partage invalide ou expiré.",
@@ -407,7 +410,10 @@
     "noEntries": "Votre journal de jardin est vide. Commencez à documenter votre aventure au jardin !",
     "linkedTo": "Lié à",
     "animal": "Animal",
-    "all": "Tous"
+    "all": "Tous",
+    "addPhotos": "Ajouter des photos (max. 3)",
+    "photoLimit": "Maximum 3 photos",
+    "photoTooLarge": "Redimensionnement..."
   },
   "pantry": {
     "title": "Garde-manger",

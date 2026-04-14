@@ -87,4 +87,36 @@ describe("Sufficiency calculator", () => {
     expect(result.plantYields).toHaveLength(0);
     expect(result.totalYieldKg).toBe(0);
   });
+
+  it("should include animal yields when animals are passed", () => {
+    const animals = [
+      { id: "a1", type: "chicken" as const, count: 5, acquiredDate: "2026-01-01" },
+    ];
+    const result = calculateSufficiency([], [tomato, bean], 2, 30, "2026-05-15", animals);
+    expect(result.animalYields.length).toBeGreaterThan(0);
+    // 5 chickens * 250 eggs * 0.06 kg/egg = 75 kg
+    const eggYield = result.animalYields.find((y) => y.productType === "eggs");
+    expect(eggYield).toBeDefined();
+    expect(eggYield!.quantityKg).toBe(75);
+    expect(eggYield!.calories).toBeGreaterThan(0);
+    expect(eggYield!.proteinG).toBeGreaterThan(0);
+    expect(result.totalYieldKg).toBeGreaterThan(0);
+  });
+
+  it("should have monthly food distribution with values in harvest months", () => {
+    const result = calculateSufficiency([garden], [tomato, bean], 2, 30);
+    expect(result.monthlyFood).toHaveLength(12);
+    // Each month should have caloriesNeeded > 0
+    for (const m of result.monthlyFood) {
+      expect(m.caloriesNeeded).toBeGreaterThan(0);
+    }
+    // At least some months should have non-zero food production
+    const monthsWithFood = result.monthlyFood.filter((m) => m.calories > 0);
+    expect(monthsWithFood.length).toBeGreaterThan(0);
+  });
+
+  it("should return zero animal yields when no animals passed", () => {
+    const result = calculateSufficiency([garden], [tomato, bean], 2, 30);
+    expect(result.animalYields).toHaveLength(0);
+  });
 });

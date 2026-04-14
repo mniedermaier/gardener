@@ -103,6 +103,9 @@
     "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
     "share": "Gartenplan teilen",
     "shareCopied": "Teilen-Link in die Zwischenablage kopiert!",
+    "print": "Drucken",
+    "printTitle": "Beetplan drucken",
+    "legend": "Legende",
     "importTemplate": "Garten-Vorlage importieren",
     "importNow": "Importieren",
     "importError": "Ung\u00fcltiger oder abgelaufener Teilen-Link.",
@@ -407,7 +410,10 @@
     "noEntries": "Dein Gartentagebuch ist leer. Dokumentiere deine Gartenreise!",
     "linkedTo": "Verkn\u00fcpft mit",
     "animal": "Tier",
-    "all": "Alle"
+    "all": "Alle",
+    "addPhotos": "Fotos hinzufügen (max. 3)",
+    "photoLimit": "Maximal 3 Fotos",
+    "photoTooLarge": "Foto wird verkleinert..."
   },
   "pantry": {
     "title": "Vorratskammer",

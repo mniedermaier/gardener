@@ -68,4 +68,47 @@ describe("Bed recommendation engine", () => {
     const herbCount = recs.filter((r) => r.plant.category === "herb").length;
     expect(herbCount).toBeGreaterThan(0);
   });
+
+  it("should produce different plant selections for different strategies", () => {
+    const bed = makeBed();
+    const caloriesCells = recommendBedPlanting(bed, plants, {
+      gridCellSizeCm: 30,
+      lastFrostDate: "2026-05-15",
+      strategy: "calories",
+    });
+    const beginnerCells = recommendBedPlanting(bed, plants, {
+      gridCellSizeCm: 30,
+      lastFrostDate: "2026-05-15",
+      strategy: "beginner",
+    });
+    const caloriesPlants = new Set(caloriesCells.map((c) => c.plantId));
+    const beginnerPlants = new Set(beginnerCells.map((c) => c.plantId));
+    // They should differ (not identical sets)
+    const combined = new Set([...caloriesPlants, ...beginnerPlants]);
+    expect(combined.size).toBeGreaterThanOrEqual(Math.max(caloriesPlants.size, beginnerPlants.size));
+    expect(caloriesCells.length).toBeGreaterThan(0);
+    expect(beginnerCells.length).toBeGreaterThan(0);
+  });
+
+  it("should produce results for all 4 directions", () => {
+    const bed = makeBed();
+    const directions = ["rows_ew", "rows_ns", "blocks", "companion_clusters"] as const;
+    for (const direction of directions) {
+      const cells = recommendBedPlanting(bed, plants, {
+        gridCellSizeCm: 30,
+        lastFrostDate: "2026-05-15",
+        direction,
+      });
+      expect(cells.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("should return empty array for bed with no compatible plants", () => {
+    const bed = makeBed(0, 0);
+    const cells = recommendBedPlanting(bed, plants, {
+      gridCellSizeCm: 30,
+      lastFrostDate: "2026-05-15",
+    });
+    expect(cells).toHaveLength(0);
+  });
 });

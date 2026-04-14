@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Tag, Sprout, LayoutGrid, Bird } from "lucide-react";
+import { Plus, Trash2, Tag, Sprout, LayoutGrid, Bird, Camera, X } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
 import { useStore } from "@/store";
@@ -12,6 +12,27 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { ANIMAL_ICONS } from "@/types/animal";
 import { format } from "date-fns";
+
+function resizeImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+        if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
+        if (height > maxHeight) { width = (width * maxHeight) / height; height = maxHeight; }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d")!.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = e.target!.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export function GardenJournal() {
   const { t } = useTranslation();
@@ -32,11 +53,28 @@ export function GardenJournal() {
   const [plantId, setPlantId] = useState("");
   const [animalId, setAnimalId] = useState("");
   const [filterTag, setFilterTag] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [viewPhoto, setViewPhoto] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedGarden = gardens.find((g) => g.id === gardenId);
 
   // Collect all unique tags
   const allTags = [...new Set(journalEntries.flatMap((e) => e.tags ?? []))].sort();
+
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const remaining = 3 - photos.length;
+    const toProcess = Array.from(files).slice(0, remaining);
+    const resized: string[] = [];
+    for (const file of toProcess) {
+      const dataUrl = await resizeImage(file, 800, 600, 0.7);
+      resized.push(dataUrl);
+    }
+    setPhotos((prev) => [...prev, ...resized].slice(0, 3));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleAdd = () => {
     if (!title.trim() || !text.trim()) return;
@@ -49,6 +87,7 @@ export function GardenJournal() {
       bedId: bedId || undefined,
       plantId: plantId || undefined,
       animalId: animalId || undefined,
+      photos: photos.length > 0 ? photos : undefined,
     });
     setTitle("");
     setText("");
@@ -56,6 +95,7 @@ export function GardenJournal() {
     setBedId("");
     setPlantId("");
     setAnimalId("");
+    setPhotos([]);
     setShowAdd(false);
   };
 
@@ -122,6 +162,16 @@ export function GardenJournal() {
                   </button>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">{entry.text}</p>
+
+                {entry.photos && entry.photos.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.photos.map((photo, idx) => (
+                      <button key={idx} onClick={() => setViewPhoto(photo)} className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                        <img src={photo} alt={`${entry.title} ${idx + 1}`} className="h-20 w-20 object-cover transition-opacity hover:opacity-80" />
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {(plant || bed || animal) && (
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -241,12 +291,57 @@ export function GardenJournal() {
               </div>
             )}
           </div>
+          {/* Photo upload */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Camera size={14} className="mr-1 inline" />
+              {t("journal.addPhotos")}
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoSelect}
+              disabled={photos.length >= 3}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-garden-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-garden-700 hover:file:bg-garden-100 dark:text-gray-400 dark:file:bg-garden-900/30 dark:file:text-garden-400"
+            />
+            {photos.length >= 3 && (
+              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">{t("journal.photoLimit")}</p>
+            )}
+            {photos.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {photos.map((photo, idx) => (
+                  <div key={idx} className="relative">
+                    <img src={photo} alt={`Preview ${idx + 1}`} className="h-16 w-16 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                    <button
+                      type="button"
+                      onClick={() => setPhotos((prev) => prev.filter((_, i) => i !== idx))}
+                      className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white shadow hover:bg-red-600"
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAdd}>{t("common.add")}</Button>
           </div>
         </div>
       </Modal>
+
+      {/* Photo viewer overlay */}
+      {viewPhoto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setViewPhoto(null)}>
+          <button className="absolute right-4 top-4 rounded-full bg-white/20 p-2 text-white hover:bg-white/40" onClick={() => setViewPhoto(null)}>
+            <X size={20} />
+          </button>
+          <img src={viewPhoto} alt="Photo" className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain" onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   );
 }

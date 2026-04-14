@@ -30,5 +30,11 @@ function migrate(db: Database.Database) {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (garden_id) REFERENCES gardens(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS state_snapshot (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      data TEXT NOT NULL,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 }
