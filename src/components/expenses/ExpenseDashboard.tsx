@@ -95,7 +95,7 @@ export function ExpenseDashboard() {
         </Button>
       </div>
 
-      <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
         <Card className="text-center">
           <TrendingDown size={20} className="mx-auto mb-1 text-red-500" />
           <p className="text-lg font-bold sm:text-2xl text-red-600">{formatCents(totalExpenses)}</p>
@@ -162,7 +162,7 @@ export function ExpenseDashboard() {
           <Input label={t("expenses.amount")} type="number" step="0.01" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} />
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("expenses.category")}</label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}

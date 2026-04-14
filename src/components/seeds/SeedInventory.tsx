@@ -84,7 +84,7 @@ export function SeedInventory() {
 
       {/* Stats */}
       {seeds.length > 0 && (
-        <div className="mb-6 grid grid-cols-3 gap-2">
+        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
           <Card className="text-center">
             <Package size={18} className="mx-auto mb-1 text-garden-500" />
             <p className="text-xl font-bold">{seeds.length}</p>

@@ -76,7 +76,7 @@ export function HarvestLog() {
       </div>
 
       {harvests.length > 0 && (
-        <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
           <Card className="text-center">
             <p className="text-xl font-bold text-garden-600 sm:text-3xl">{harvests.length}</p>
             <p className="text-xs text-gray-500">{t("harvest.entries")}</p>

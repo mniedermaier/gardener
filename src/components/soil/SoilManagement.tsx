@@ -210,11 +210,11 @@ export function SoilManagement() {
             </select>
           </div>
           <Input label={t("harvest.date")} type="date" value={testDate} onChange={(e) => setTestDate(e.target.value)} />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Input label="pH" type="number" step="0.1" min={3} max={10} value={testPh} onChange={(e) => setTestPh(e.target.value)} />
             <Input label={`${t("soil.organicMatter")} (%)`} type="number" step="0.1" min={0} value={testOm} onChange={(e) => setTestOm(e.target.value)} />
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <Input label="N (ppm)" type="number" min={0} value={testN} onChange={(e) => setTestN(e.target.value)} />
             <Input label="P (ppm)" type="number" min={0} value={testP} onChange={(e) => setTestP(e.target.value)} />
             <Input label="K (ppm)" type="number" min={0} value={testK} onChange={(e) => setTestK(e.target.value)} />
@@ -239,7 +239,7 @@ export function SoilManagement() {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("soil.amendmentType")}</label>
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
               {(["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"] as AmendmentType[]).map((type) => (
                 <button key={type} onClick={() => setAmendType(type)}
                   className={`flex flex-col items-center gap-0.5 rounded-lg border p-1.5 text-[10px] ${amendType === type ? "border-garden-500 bg-garden-50 dark:bg-garden-900/30" : "border-gray-200 dark:border-gray-700"}`}>

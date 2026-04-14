@@ -111,7 +111,7 @@ export function PlantDetail({ plant, onBack }: PlantDetailProps) {
       </Button>
 
       <Card>
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:gap-4">
           <span
             className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl text-4xl"
             style={{ backgroundColor: plant.color + "20" }}

@@ -198,7 +198,7 @@ export function SeasonTimeline() {
 
       {/* Month headers */}
       <div className="mb-2 flex items-center gap-2 text-xs text-gray-400">
-        <div className="w-36 shrink-0" />
+        <div className="w-24 sm:w-36 shrink-0" />
         {months.map((m, i) => (
           <div key={i} className="flex-1 text-center">{m}</div>
         ))}
@@ -212,11 +212,11 @@ export function SeasonTimeline() {
           const name = getPlantName(tl.plantId);
           return (
             <div key={`${tl.bedId}-${tl.plantId}-${idx}`} className="flex items-center gap-2">
-              <div className="flex w-36 shrink-0 items-center gap-1.5 truncate text-xs">
+              <div className="flex w-24 sm:w-36 shrink-0 items-center gap-1.5 truncate text-xs">
                 <PlantIconDisplay plantId={tl.plantId} emoji={plant.icon} size={16} />
                 <span className="truncate font-medium">{name}</span>
                 {filter === "all" && allBeds.length > 1 && (
-                  <span className="shrink-0 text-[9px] text-gray-400" title={tl.bedName}>{tl.envIcon}</span>
+                  <span className="shrink-0 text-[10px] sm:text-xs text-gray-400" title={tl.bedName}>{tl.envIcon}</span>
                 )}
               </div>
               <div className="relative flex-1 rounded bg-gray-100 dark:bg-gray-800" style={{ height: `${ROW_HEIGHT}px` }}>
