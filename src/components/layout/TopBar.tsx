@@ -80,8 +80,10 @@ export function TopBar({ onMenuClick }: TopBarProps) {
     return items.slice(0, 8);
   }, [debouncedQuery, plants, journalEntries, tasks, getPlantName, t]);
 
+  const locales = ["de", "en", "es", "fr"] as const;
   const toggleLocale = () => {
-    const newLocale = locale === "de" ? "en" : "de";
+    const idx = locales.indexOf(locale as typeof locales[number]);
+    const newLocale = locales[(idx + 1) % locales.length];
     setLocale(newLocale);
     i18n.changeLanguage(newLocale);
   };

@@ -17,7 +17,7 @@ i18n
   .init({
     lng: getStoredLocale(),
     fallbackLng: "en",
-    supportedLngs: ["en", "de"],
+    supportedLngs: ["en", "de", "es", "fr"],
     backend: {
       loadPath: `${import.meta.env.BASE_URL}locales/{{lng}}/{{ns}}.json`,
     },

@@ -43,8 +43,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             <Sprout size={48} className="mx-auto mb-4 text-garden-600" />
             <h1 className="mb-2 text-2xl font-bold">{t("onboarding.welcome")}</h1>
             <p className="mb-6 text-sm text-gray-500">{t("onboarding.welcomeDesc")}</p>
-            <div className="mb-6 flex justify-center gap-3">
-              {(["de", "en"] as const).map((lang) => (
+            <div className="mb-6 flex flex-wrap justify-center gap-2">
+              {(["de", "en", "es", "fr"] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => { setLocale(lang); i18n.changeLanguage(lang); }}
@@ -54,7 +54,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800"
                   }`}
                 >
-                  {lang === "de" ? "Deutsch" : "English"}
+                  {{ de: "Deutsch", en: "English", es: "Español", fr: "Français" }[lang]}
                 </button>
               ))}
             </div>

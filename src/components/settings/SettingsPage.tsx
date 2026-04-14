@@ -13,7 +13,7 @@ export function SettingsPage() {
   const store = useStore();
   const [saved, setSaved] = useState(false);
 
-  const handleLocaleChange = (locale: "de" | "en") => {
+  const handleLocaleChange = (locale: "de" | "en" | "es" | "fr") => {
     store.setLocale(locale);
     i18n.changeLanguage(locale);
   };
@@ -47,7 +47,7 @@ export function SettingsPage() {
         <Card>
           <h2 className="mb-4 text-lg font-semibold">{t("settings.language")}</h2>
           <div className="flex gap-2">
-            {(["de", "en"] as const).map((lang) => (
+            {(["de", "en", "es", "fr"] as const).map((lang) => (
               <button
                 key={lang}
                 onClick={() => handleLocaleChange(lang)}
@@ -57,7 +57,7 @@ export function SettingsPage() {
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
                 }`}
               >
-                {lang === "de" ? "Deutsch" : "English"}
+                {{ de: "Deutsch", en: "English", es: "Español", fr: "Français" }[lang]}
               </button>
             ))}
           </div>

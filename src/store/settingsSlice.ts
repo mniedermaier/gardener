@@ -9,7 +9,7 @@ export interface AlertConfig {
 }
 
 export interface SettingsSlice {
-  locale: "de" | "en";
+  locale: "de" | "en" | "es" | "fr";
   weatherApiKey: string;
   locationLat: number | null;
   locationLon: number | null;
@@ -20,7 +20,7 @@ export interface SettingsSlice {
   theme: "light" | "dark" | "system";
   alerts: AlertConfig;
   lastBackupDate: string | null;
-  setLocale: (locale: "de" | "en") => void;
+  setLocale: (locale: "de" | "en" | "es" | "fr") => void;
   setWeatherApiKey: (key: string) => void;
   setLocation: (lat: number, lon: number, name: string) => void;
   setLastFrostDate: (date: string) => void;
