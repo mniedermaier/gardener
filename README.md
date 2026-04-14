@@ -27,7 +27,7 @@
 
 ---
 
-Plan your beds. Track your harvests. Get weather alerts. Calculate if your garden can feed your family.
+Plan your beds. Track your harvests. Manage your livestock. Calculate if your garden can feed your family.
 
 Available in **4 languages**: Deutsch, English, Español, Français. Works as a **static site** (GitHub Pages), **offline PWA**, or **Docker container** with backend sync.
 
@@ -37,10 +37,13 @@ Available in **4 languages**: Deutsch, English, Español, Français. Works as a 
 |---|---|
 | **Smart Planner** | Drag-and-drop beds with companion/antagonist validation, 6 auto-fill strategies, walkway drawing, permaculture guild templates |
 | **45 Plants** | Custom SVG icons, full data: timing, spacing, nutrition, yield, companions, preservation, seed saving |
-| **Self-Sufficiency** | Nutrition calculator (kcal, protein, vitamin C, fiber), gap analysis, preservation guide |
+| **Livestock** | Track chickens, ducks, rabbits, bees — log animals, production (eggs, honey, meat), and feed costs |
+| **Self-Sufficiency** | Nutrition calculator (kcal, protein, vitamin C, fiber) from plants + animals, gap analysis, preservation guide |
+| **Food Planning** | Annual crop targets per person, animal product yields, deficit warnings with area recommendations |
 | **Weather** | Frost alerts, greenhouse warnings, watering advice, sunlight simulation |
-| **Tracking** | Harvest log, garden journal, expense tracking with ROI |
+| **Tracking** | Harvest log, garden journal, seed inventory, soil tests, pest tracker, expense tracking with ROI |
 | **Environments** | Outdoor, raised bed, greenhouse, cold frame, polytunnel, container, windowsill, vertical |
+| **Mobile-First** | Responsive design with bottom navigation, compact planner palette, bottom sheet editing |
 
 ## Quick Start
 
@@ -74,22 +77,61 @@ Optional backend: Express + SQLite in Docker.
 
 ```
 src/
-  components/     11 feature modules (planner, plants, calendar, harvest,
-                  journal, sufficiency, expenses, weather, dashboard, settings, ui)
-  store/          9 Zustand slices with persist + migration
+  components/     15 feature modules (planner, plants, calendar, harvest,
+                  journal, seeds, soil, pests, livestock, sufficiency,
+                  foodplan, expenses, weather, dashboard, settings)
+  store/          13 Zustand slices with persist + migration
   lib/            Pure engines: recommendation, validation, alerts, sufficiency,
                   sunlight, succession, sharing, iCal, data export/import
   data/           45 plants (JSON), plant families, permaculture guilds
+  types/          TypeScript interfaces for all data models
   test/           14 test suites
 e2e/              Playwright browser tests
 backend/          Express + SQLite (Docker only)
 ```
 
+## Features
+
+### Garden Planning
+- Drag-and-drop plant placement on grid beds
+- 8 growing environments with frost protection offsets
+- Companion/antagonist planting validation
+- 6 auto-fill strategies (balanced, calories, beginner, companion, diverse, intensive)
+- Permaculture guild templates (Three Sisters, Tomato & Basil, Salad Bed)
+- Walkway/path drawing on beds
+- Crop rotation warnings by plant family
+- Zoom controls for large gardens
+
+### Livestock Management
+- Register animals: chickens, ducks, rabbits, bees
+- Log production: eggs, honey, meat, wax with quick-log buttons
+- Track feed: type, quantity, cost per animal
+- Stats: weekly eggs, annual honey, monthly feed costs
+- Integrates into self-sufficiency calculator and food plan
+
+### Self-Sufficiency Calculator
+- Monthly food availability chart (fresh + preserved)
+- Nutrition coverage: calories, protein, vitamin C, fiber
+- Plant yields + animal product yields combined
+- Winter gap analysis with storage recommendations
+- Preservation guide (freezing, canning, fermenting, drying, root cellar)
+
+### Additional Modules
+- **Calendar**: Season timeline + succession planting generator
+- **Task Manager**: Central task management with due dates and categories
+- **Harvest Log**: Weight, quality, notes per harvest
+- **Seed Inventory**: Track seeds by source, viability, cost
+- **Soil Management**: pH/N-P-K tests + amendment history
+- **Pest Tracker**: Pest & disease incidents with severity and treatment
+- **Expense Dashboard**: 9 categories, ROI calculation vs. market prices
+- **Weather**: Alerts, frost warnings, sunlight hours (SunCalc)
+- **Journal**: Garden diary with tags
+
 ## Data Safety
 
 All data lives in your browser. Settings > Data Management lets you:
-- **Full backup** as JSON (gardens, harvests, journal, expenses, plants, settings)
-- **Restore** with merge or overwrite
+- **Full backup** as JSON — all 14 data types (gardens, tasks, harvests, journal, seeds, soil, pests, livestock, feed, expenses, settings, weather)
+- **Restore** with merge or overwrite mode
 - **CSV export** for harvests and expenses
 - Dashboard reminds you if no backup in 7+ days
 

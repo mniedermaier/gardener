@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-Gardener is a self-sufficiency garden planning application. Plan vegetables, fruit, berries, and herbs. Runs as a static GitHub Pages site and as a Docker container with an optional backend.
+Gardener is a self-sufficiency garden planning application. Plan vegetables, fruit, berries, herbs, and manage livestock (chickens, ducks, rabbits, bees). Runs as a static GitHub Pages site and as a Docker container with an optional backend.
 
 ## Tech Stack
 
 - **Frontend:** React 19 + Vite + TypeScript + Tailwind CSS 3
-- **State:** Zustand with useShallow selectors + localStorage persistence (12 slices)
+- **State:** Zustand with useShallow selectors + localStorage persistence (13 slices)
 - **Routing:** HashRouter (GitHub Pages compatible)
 - **i18n:** react-i18next with HTTP backend — German, English, Spanish, French
 - **DnD:** @dnd-kit/core for garden planner drag-and-drop
@@ -34,9 +34,10 @@ docker compose up --build  # Docker (localhost:8080)
 ```
 src/
   components/
-    layout/        AppShell, Sidebar, TopBar, BottomNav (mobile)
+    layout/        AppShell, Sidebar (grouped nav), TopBar, BottomNav (mobile)
     planner/       GardenPlanner (accordion+zoom), PlantPalette, PlantInfoPanel,
-                   BedStats, CropRotation, GuildPicker, cell editing
+                   BedStats, CropRotation, GuildPicker, cell editing,
+                   mobile bottom sheet for info/edit panels
     plants/        PlantList, PlantDetail, PlantCard, CustomPlantForm
     calendar/      CalendarPage (timeline + succession), SeasonTimeline,
                    SuccessionPlanner, TaskCalendar
@@ -45,22 +46,24 @@ src/
     seeds/         Seed inventory with viability tracking
     soil/          Soil tests (pH, N-P-K) + amendment tracking
     pests/         Pest & disease tracker
-    sufficiency/   Self-sufficiency calculator (monthly), PreservationGuide
-    foodplan/      Annual food plan with crop targets
-    expenses/      Cost tracking, ROI dashboard
+    livestock/     LivestockPage (animals, production, feed tracking)
+    sufficiency/   Self-sufficiency calculator (plants + animals), PreservationGuide
+    foodplan/      Annual food plan with crop targets + animal products
+    expenses/      Cost tracking (9 categories incl. animal_feed, veterinary), ROI
     weather/       Weather dashboard, alerts, SunlightWidget
-    dashboard/     Dashboard, PlantingAdvisor, OnboardingWizard
+    dashboard/     Dashboard (incl. livestock stats), PlantingAdvisor, OnboardingWizard
     settings/      SettingsPage, DataManagement (backup/restore)
     ui/            Button, Card, Modal, Input, Toast, ErrorBoundary,
                    PlantIcon (45 SVGs, cached), PlantIconDisplay (memo)
-  store/           12 Zustand slices: garden, task, harvest, journal, settings,
-                   weather, customPlants, expense, seed, soil, pest + seasonArchives
+  store/           13 Zustand slices: garden, task, harvest, journal, settings,
+                   weather, customPlants, expense, seed, soil, pest, livestock
+                   + seasonArchives
   types/           TypeScript interfaces: plant, garden, task, harvest, journal,
-                   weather, expense, seed, soil, pest
+                   weather, expense, seed, soil, pest, animal (incl. FeedEntry)
   data/            plants.json (45 plants), plantFamilies.ts, guilds.ts
   lib/             bedRecommendation (6 strategies), placementValidation,
-                   weatherAlerts, sufficiency (monthly), sunlight, succession,
-                   sharing, iCal, dataExport/Import, advisor, theme
+                   weatherAlerts, sufficiency (monthly, plants + livestock),
+                   sunlight, succession, sharing, iCal, dataExport/Import, advisor, theme
   hooks/           usePlants, usePlantName, useBackendSync, useUndo
   test/            14 test suites, 87 tests
 public/locales/    Translation JSON files (de/, en/, es/, fr/)
@@ -79,6 +82,8 @@ backend/           Express + SQLite (Docker only)
 - **Lazy loading:** All routes lazy-loaded with retry wrapper for stale PWA cache
 - **Environment-aware:** Greenhouse frost protection offsets shift all planting dates
 - **Bottom nav:** 5-tab mobile bar (sm:hidden), sidebar for full navigation
+- **Sidebar groups:** 5 groups (Planning, Fieldwork, Livestock, Records, Analysis)
+- **Data export:** Full backup includes all 14 data types (gardens, tasks, harvests, journal, expenses, customPlants, seasonArchives, animals, animalProducts, feedEntries, seeds, soilTests, amendments, pests)
 
 ## Adding a New Plant
 
@@ -96,6 +101,14 @@ backend/           Express + SQLite (Docker only)
 4. Add translations in all 4 locale files
 5. Use `useStore(useShallow(...))` — never bare `useStore()`
 
+## Adding a New Data Type to Export/Import
+
+1. Add to `GardenerExport` interface in `src/lib/dataExport.ts`
+2. Add to `buildExportData()` in `src/lib/dataExport.ts`
+3. Add to `ImportResult.stats` in `src/lib/dataImport.ts`
+4. Add to both `importOverwrite()` and `importMerge()` in `src/lib/dataImport.ts`
+5. Update test helper `makeExport()` in `src/test/dataExportImport.test.ts`
+
 ## Performance Rules
 
 - Always use `useShallow()` selectors with Zustand
@@ -112,3 +125,4 @@ backend/           Express + SQLite (Docker only)
 - Dark mode via `dark:` prefix, class strategy
 - German is the default locale
 - All destructive actions require confirmation dialog
+- Expense categories: seeds, soil, tools, fertilizer, infrastructure, water, animal_feed, veterinary, other
