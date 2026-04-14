@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Menu, Globe, Cloud, CloudOff, RefreshCw, Search, X } from "lucide-react";
+import { Menu, Cloud, CloudOff, RefreshCw, Search, X } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants } from "@/hooks/usePlants";
@@ -13,9 +13,9 @@ interface TopBarProps {
 }
 
 export function TopBar({ onMenuClick }: TopBarProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { locale, setLocale, backendUrl, journalEntries, tasks } = useStore(useShallow((s) => ({ locale: s.locale, setLocale: s.setLocale, backendUrl: s.backendUrl, journalEntries: s.journalEntries, tasks: s.tasks })));
+  const { backendUrl, journalEntries, tasks } = useStore(useShallow((s) => ({ backendUrl: s.backendUrl, journalEntries: s.journalEntries, tasks: s.tasks })));
   const { connected, syncing } = useBackendSync();
   const plants = usePlants();
   const getPlantName = usePlantName();
@@ -79,14 +79,6 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
     return items.slice(0, 8);
   }, [debouncedQuery, plants, journalEntries, tasks, getPlantName, t]);
-
-  const locales = ["de", "en", "es", "fr"] as const;
-  const toggleLocale = () => {
-    const idx = locales.indexOf(locale as typeof locales[number]);
-    const newLocale = locales[(idx + 1) % locales.length];
-    setLocale(newLocale);
-    i18n.changeLanguage(newLocale);
-  };
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-900">
@@ -156,14 +148,6 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             )}
           </span>
         )}
-        <button
-          onClick={toggleLocale}
-          aria-label="Toggle language"
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-        >
-          <Globe size={16} />
-          {locale.toUpperCase()}
-        </button>
       </div>
     </header>
   );
