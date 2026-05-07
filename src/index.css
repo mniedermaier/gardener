@@ -1,6 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Class-based dark mode (v4 defaults to media query) */
+@variant dark (&:where(.dark, .dark *));
+
+/* Custom theme tokens (migrated from tailwind.config.ts) */
+@theme {
+  --color-garden-50: #f0fdf0;
+  --color-garden-100: #dcfce7;
+  --color-garden-200: #bbf7d0;
+  --color-garden-300: #86efac;
+  --color-garden-400: #4ade80;
+  --color-garden-500: #22c55e;
+  --color-garden-600: #16a34a;
+  --color-garden-700: #15803d;
+  --color-garden-800: #166534;
+  --color-garden-900: #14532d;
+
+  --color-earth-100: #fef3c7;
+  --color-earth-200: #e8d5b7;
+  --color-earth-300: #d4a574;
+  --color-earth-400: #b8854a;
+  --color-earth-500: #92643a;
+  --color-earth-600: #7a5230;
+  --color-earth-700: #5c3a1e;
+
+  --font-sans: "Inter", "system-ui", sans-serif;
+}
 
 body {
   @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
