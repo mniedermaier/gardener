@@ -73,6 +73,36 @@ describe("safeLocalStorage", () => {
     stop();
   });
 
+  it("recognises a quota error that is not a DOMException of this realm", () => {
+    // jsdom and node each bring their own DOMException, so instanceof cannot be
+    // relied on — detection goes by name/code instead.
+    const seen: string[] = [];
+    const stop = onStorageFailure(({ kind }) => seen.push(kind));
+    safeLocalStorage.setItem("k", "ok");
+
+    setItem.mockImplementationOnce(() => {
+      throw Object.assign(new Error("exceeded"), { name: "QuotaExceededError", code: 22 });
+    });
+    safeLocalStorage.setItem("k", "v");
+
+    expect(seen).toEqual(["quota"]);
+    stop();
+  });
+
+  it("reports a non-quota failure as such", () => {
+    const seen: string[] = [];
+    const stop = onStorageFailure(({ kind }) => seen.push(kind));
+    safeLocalStorage.setItem("k", "ok");
+
+    setItem.mockImplementationOnce(() => {
+      throw Object.assign(new Error("blocked"), { name: "SecurityError" });
+    });
+    safeLocalStorage.setItem("k", "v");
+
+    expect(seen).toEqual(["other"]);
+    stop();
+  });
+
   it("survives a getItem that throws", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new DOMException("blocked", "SecurityError");

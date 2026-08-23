@@ -20,12 +20,17 @@ export function onStorageFailure(listener: (failure: StorageFailure) => void): (
   return () => listeners.delete(listener);
 }
 
+// Duck-typed on purpose: instanceof DOMException is unreliable across realms
+// (jsdom vs. node, iframes), and browsers disagree on the name.
 function isQuotaError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const { name, code } = error as { name?: unknown; code?: unknown };
   return (
-    error instanceof DOMException &&
-    (error.name === "QuotaExceededError" ||
-      error.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
-      error.code === 22)
+    name === "QuotaExceededError" ||
+    name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+    name === "QUOTA_EXCEEDED_ERR" ||
+    code === 22 ||
+    code === 1014
   );
 }
 
