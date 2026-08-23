@@ -33,4 +33,22 @@ describe("Sunlight calculations", () => {
     const december = monthly[11];
     expect(june.daylightHours).toBeGreaterThan(december.daylightHours);
   });
+
+  it("should handle polar night where the sun never rises", () => {
+    // Svalbard in December: sun stays below the horizon all day
+    const info = getDaylightInfo(new Date(2026, 11, 21), 78.2232, 15.6267);
+
+    expect(info.daylightHours).toBe(0);
+    expect(info.sunrise).toBe("--:--");
+    expect(info.sunset).toBe("--:--");
+  });
+
+  it("should handle polar day where the sun never sets", () => {
+    // Svalbard in June: sun stays above the horizon all day
+    const info = getDaylightInfo(new Date(2026, 5, 21), 78.2232, 15.6267);
+
+    expect(info.daylightHours).toBe(24);
+    expect(info.sunrise).toBe("--:--");
+    expect(info.sunset).toBe("--:--");
+  });
 });

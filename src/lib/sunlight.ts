@@ -1,4 +1,4 @@
-import SunCalc from "suncalc";
+import * as SunCalc from "suncalc";
 
 export interface SunPosition {
   altitude: number; // radians above horizon
@@ -15,17 +15,20 @@ export interface DaylightInfo {
   maxAltitudeDeg: number;
 }
 
+const DEG_TO_RAD = Math.PI / 180;
+
 export function getSunPosition(
   date: Date,
   lat: number,
   lon: number,
 ): SunPosition {
+  // SunCalc v2 returns degrees, azimuth north-based clockwise (0 = N, 180 = S)
   const pos = SunCalc.getPosition(date, lat, lon);
   return {
-    altitude: pos.altitude,
-    azimuth: pos.azimuth,
-    altitudeDeg: (pos.altitude * 180) / Math.PI,
-    azimuthDeg: ((pos.azimuth * 180) / Math.PI + 180) % 360, // convert to degrees from north
+    altitude: pos.altitude * DEG_TO_RAD,
+    azimuth: (pos.azimuth - 180) * DEG_TO_RAD, // radians from south
+    altitudeDeg: pos.altitude,
+    azimuthDeg: pos.azimuth,
   };
 }
 
@@ -35,17 +38,26 @@ export function getDaylightInfo(
   lon: number,
 ): DaylightInfo {
   const times = SunCalc.getTimes(date, lat, lon);
-  const daylightMs = times.sunset.getTime() - times.sunrise.getTime();
-  const daylightHours = Math.round((daylightMs / (1000 * 60 * 60)) * 10) / 10;
-
   const noonPos = SunCalc.getPosition(times.solarNoon, lat, lon);
+
+  // At high latitudes the sun may never rise or set — sunrise/sunset are then null
+  const hasRiseAndSet = times.sunrise !== null && times.sunset !== null;
+  const daylightHours = hasRiseAndSet
+    ? Math.round(
+        ((times.sunset!.getTime() - times.sunrise!.getTime()) /
+          (1000 * 60 * 60)) *
+          10,
+      ) / 10
+    : times.alwaysUp
+      ? 24
+      : 0;
 
   return {
     sunrise: formatTime(times.sunrise),
     sunset: formatTime(times.sunset),
     daylightHours,
     solarNoon: formatTime(times.solarNoon),
-    maxAltitudeDeg: Math.round((noonPos.altitude * 180) / Math.PI),
+    maxAltitudeDeg: Math.round(noonPos.altitude),
   };
 }
 
@@ -68,6 +80,7 @@ export function getMonthlyDaylight(
   return results;
 }
 
-function formatTime(date: Date): string {
+function formatTime(date: Date | null): string {
+  if (!date) return "--:--";
   return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
