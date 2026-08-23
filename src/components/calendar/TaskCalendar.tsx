@@ -194,7 +194,7 @@ export function TaskCalendar() {
       {/* Type filter */}
       {tasks.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-1">
-          <button onClick={() => setShowFilters(!showFilters)} className="mr-1 text-gray-400 hover:text-gray-600">
+          <button aria-label={t("common.filter")} onClick={() => setShowFilters(!showFilters)} className="mr-1 text-gray-400 hover:text-gray-600">
             <Filter size={14} />
           </button>
           {(showFilters || typeFilter !== "all") && (
@@ -270,7 +270,7 @@ export function TaskCalendar() {
                   {t(`calendar.taskTypes.${task.type}`)}
                 </span>
 
-                <button
+                <button aria-label={t("common.delete")}
                   onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteTask(task.id); }}
                   className="shrink-0 rounded p-1 text-gray-300 hover:text-red-500"
                 >

@@ -6,7 +6,11 @@ services:
     volumes:
       - gardener-data:/app/data
     environment:
+      - NODE_ENV=production
       - DB_PATH=/app/data/gardener.db
+      # Set a token as soon as this container is reachable beyond a trusted
+      # network — without it the API accepts unauthenticated requests.
+      # - GARDENER_TOKEN=change-me
 
 volumes:
   gardener-data:

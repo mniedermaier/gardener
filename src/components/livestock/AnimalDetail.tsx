@@ -163,7 +163,7 @@ export function AnimalDetail() {
     <div>
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <button onClick={() => navigate("/livestock")} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800">
+        <button aria-label={t("common.back")} onClick={() => navigate("/livestock")} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800">
           <ArrowLeft size={20} />
         </button>
         <span className="text-4xl">{ANIMAL_ICONS[animal.type]}</span>
@@ -269,7 +269,7 @@ export function AnimalDetail() {
                   <p className="text-sm font-medium">{prod.quantity} {prod.unit === "pieces" ? t("livestock.pieces") : prod.unit} {t(`livestock.products.${prod.type}`)}</p>
                   <p className="text-xs text-gray-400">{prod.date}{prod.notes ? ` · ${prod.notes}` : ""}</p>
                 </div>
-                <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteProduct(prod.id); }} className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
+                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteProduct(prod.id); }} className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
@@ -289,7 +289,7 @@ export function AnimalDetail() {
                   <p className="text-sm font-medium">{entry.quantity} {entry.unit} {entry.feedType}</p>
                   <p className="text-xs text-gray-400">{entry.date}{entry.cost ? ` · ${entry.cost.toFixed(2)} €` : ""}{entry.notes ? ` · ${entry.notes}` : ""}</p>
                 </div>
-                <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteFeedEntry(entry.id); }} className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
+                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteFeedEntry(entry.id); }} className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
@@ -309,7 +309,7 @@ export function AnimalDetail() {
                   <p className="text-sm font-medium">{t(`livestock.healthTypes.${event.type}`)} — {event.description}</p>
                   <p className="text-xs text-gray-400">{event.date}{event.cost ? ` · ${event.cost.toFixed(2)} €` : ""}{event.notes ? ` · ${event.notes}` : ""}</p>
                 </div>
-                <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHealthEvent(event.id); }} className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
+                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHealthEvent(event.id); }} className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>

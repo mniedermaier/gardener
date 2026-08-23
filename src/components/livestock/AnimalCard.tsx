@@ -61,10 +61,10 @@ export const AnimalCard = memo(function AnimalCard({
           </div>
         </div>
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <button onClick={onEdit} className="rounded p-1 text-gray-300 hover:text-garden-500">
+          <button aria-label={t("common.edit")} onClick={onEdit} className="rounded p-1 text-gray-300 hover:text-garden-500">
             <Pencil size={14} />
           </button>
-          <button onClick={onDelete} className="rounded p-1 text-gray-300 hover:text-red-500">
+          <button aria-label={t("common.delete")} onClick={onDelete} className="rounded p-1 text-gray-300 hover:text-red-500">
             <Trash2 size={14} />
           </button>
         </div>

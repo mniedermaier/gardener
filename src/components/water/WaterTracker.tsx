@@ -189,7 +189,7 @@ export function WaterTracker() {
                     {entry.duration ? ` — ${entry.duration} ${t("water.minutes")}` : ""}
                   </p>
                 </div>
-                <button
+                <button aria-label={t("common.delete")}
                   onClick={() => deleteWaterEntry(entry.id)}
                   className="ml-2 rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
                   title={t("common.delete")}

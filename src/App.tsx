@@ -1,5 +1,7 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
+import { migrateLegacyPhotos } from "@/lib/migratePhotos";
+import { useStorageHealth } from "@/hooks/useStorageHealth";
 import { AppShell } from "@/components/layout/AppShell";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
@@ -68,6 +70,12 @@ function L({ children }: { children: React.ReactNode }) {
 export default function App() {
   const gardens = useStore((s) => s.gardens);
   const [onboardingDone, setOnboardingDone] = useState(gardens.length > 0);
+  useStorageHealth();
+
+  // Photos written before v4 still sit in localStorage; move them once.
+  useEffect(() => {
+    void migrateLegacyPhotos();
+  }, []);
 
   if (!onboardingDone) {
     return <OnboardingWizard onComplete={() => setOnboardingDone(true)} />;

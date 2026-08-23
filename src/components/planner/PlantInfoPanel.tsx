@@ -53,7 +53,7 @@ export function PlantInfoPanel({ plant, onClose }: Props) {
             <p className="text-xs text-gray-500">{t(`plants.category.${plant.category}`)}</p>
           </div>
         </div>
-        <button onClick={onClose} className="rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <button aria-label={t("common.close")} onClick={onClose} className="rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           <X size={16} />
         </button>
       </div>

@@ -140,12 +140,12 @@ export function PestTracker() {
                         <button onClick={() => handleAddTreatment(pest.id)} className="rounded p-1 text-blue-400 hover:text-blue-600" title={t("pests.addTreatment")}>
                           <Bug size={14} />
                         </button>
-                        <button onClick={() => handleResolve(pest.id)} className="rounded p-1 text-green-400 hover:text-green-600" title={t("pests.resolve")}>
+                        <button aria-label={t("common.confirm")} onClick={() => handleResolve(pest.id)} className="rounded p-1 text-green-400 hover:text-green-600" title={t("pests.resolve")}>
                           <Check size={14} />
                         </button>
                       </>
                     )}
-                    <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePest(pest.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
+                    <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePest(pest.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
                       <Trash2 size={14} />
                     </button>
                   </div>

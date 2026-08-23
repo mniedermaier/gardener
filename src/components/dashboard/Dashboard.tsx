@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -40,9 +40,18 @@ export function Dashboard() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
-  const now = new Date();
+  // Beim Mounten einmal festhalten: new Date() im Render ist unrein und macht
+  // jede darauf aufbauende Memoisierung bei jedem Render ungültig.
+  const [now] = useState(() => new Date());
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+  const daysSinceBackup = useMemo(
+    () =>
+      lastBackupDate
+        ? Math.floor((now.getTime() - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24))
+        : null,
+    [lastBackupDate, now],
+  );
 
   const totalBeds = gardens.reduce((s, g) => s + g.beds.length, 0);
   const totalPlantings = gardens.reduce((s, g) => s + g.beds.reduce((sb, b) => sb + b.cells.length, 0), 0);
@@ -86,9 +95,6 @@ export function Dashboard() {
 
       {/* Backup reminder */}
       {(() => {
-        const daysSinceBackup = lastBackupDate
-          ? Math.floor((Date.now() - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24))
-          : null;
         if (daysSinceBackup === null || daysSinceBackup >= 7) {
           return (
             <div className="mb-4 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">

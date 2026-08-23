@@ -242,7 +242,7 @@ function BedGrid({
               </div>
               {bed.cells.length > 0 && (
                 <button
-                  onClick={() => { for (const cell of [...bed.cells]) removeCell(gardenId, bed.id, cell.cellX, cell.cellY); }}
+                  onClick={() => { for (const cell of bed.cells) removeCell(gardenId, bed.id, cell.cellX, cell.cellY); }}
                   className="rounded-lg p-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
                   title={t("planner.clearBed")}
                 >
@@ -250,7 +250,7 @@ function BedGrid({
                 </button>
               )}
               {(envType === "greenhouse" || envType === "cold_frame" || envType === "raised_bed" || envType === "container") && (
-                <button
+                <button aria-label={t("common.settings")}
                   onClick={() => setShowConfig(!showConfig)}
                   className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
                 >
@@ -340,106 +340,14 @@ function BedGrid({
   );
 }
 
-// --- Environment config panels (compact) ---
+import {
+  ColdFrameConfigPanel,
+  ContainerConfigPanel,
+  GreenhouseConfigPanel,
+  RaisedBedConfigPanel,
+} from "./EnvironmentConfigPanels";
 
-function GreenhouseConfigPanel({ config, onChange }: { config: GreenhouseConfig; onChange: (c: GreenhouseConfig) => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="mb-4 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
-      <h4 className="mb-2 text-xs font-semibold text-green-700 dark:text-green-400">{t("planner.greenhouse.title")}</h4>
-      <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.material")}</label>
-          <select value={config.material} onChange={(e) => onChange({ ...config, material: e.target.value as GreenhouseConfig["material"] })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800">
-            <option value="glass">{t("planner.greenhouse.materials.glass")}</option>
-            <option value="polycarbonate">{t("planner.greenhouse.materials.polycarbonate")}</option>
-            <option value="plastic">{t("planner.greenhouse.materials.plastic")}</option>
-          </select>
-        </div>
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.ventilation")}</label>
-          <select value={config.ventilation} onChange={(e) => onChange({ ...config, ventilation: e.target.value as "manual" | "automatic" })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800">
-            <option value="manual">{t("planner.greenhouse.ventilationTypes.manual")}</option>
-            <option value="automatic">{t("planner.greenhouse.ventilationTypes.automatic")}</option>
-          </select>
-        </div>
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.frostProtection")}</label>
-          <input type="number" min={0} max={20} value={config.frostProtectionWeeks} onChange={(e) => onChange({ ...config, frostProtectionWeeks: Number(e.target.value) })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800" />
-        </div>
-        <div className="flex items-center gap-2">
-          <input type="checkbox" checked={config.heated} onChange={(e) => onChange({ ...config, heated: e.target.checked })} className="rounded border-gray-300" />
-          <label className="text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.heated")}</label>
-        </div>
-        {config.heated && (
-          <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.heatingType")}</label>
-            <select value={config.heatingType ?? "electric"} onChange={(e) => onChange({ ...config, heatingType: e.target.value as GreenhouseConfig["heatingType"] })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800">
-              <option value="electric">{t("planner.greenhouse.heatingTypes.electric")}</option>
-              <option value="gas">{t("planner.greenhouse.heatingTypes.gas")}</option>
-              <option value="passive_solar">{t("planner.greenhouse.heatingTypes.passive_solar")}</option>
-            </select>
-          </div>
-        )}
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.minTemp")}</label>
-          <input type="number" value={config.minTempC} onChange={(e) => onChange({ ...config, minTempC: Number(e.target.value) })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800" />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.greenhouse.maxTemp")}</label>
-          <input type="number" value={config.maxTempC} onChange={(e) => onChange({ ...config, maxTempC: Number(e.target.value) })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ColdFrameConfigPanel({ config, onChange }: { config: ColdFrameConfig; onChange: (c: ColdFrameConfig) => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="mb-4 rounded-lg bg-sky-50 p-3 dark:bg-sky-900/20">
-      <div className="flex items-center gap-4">
-        <label className="text-xs text-gray-600 dark:text-gray-400">{t("planner.coldFrame.frostProtection")}</label>
-        <input type="number" min={0} max={10} value={config.frostProtectionWeeks} onChange={(e) => onChange({ frostProtectionWeeks: Number(e.target.value) })} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800" />
-      </div>
-    </div>
-  );
-}
-
-function RaisedBedConfigPanel({ config, onChange }: { config: RaisedBedConfig; onChange: (c: RaisedBedConfig) => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="mb-4 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20">
-      <div className="flex items-center gap-4">
-        <label className="text-xs text-gray-600 dark:text-gray-400">{t("planner.raisedBed.height")}</label>
-        <input type="number" min={20} max={150} value={config.heightCm} onChange={(e) => onChange({ ...config, heightCm: Number(e.target.value) })} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800" />
-      </div>
-    </div>
-  );
-}
-
-function ContainerConfigPanel({ config, onChange }: { config: ContainerConfig; onChange: (c: ContainerConfig) => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="mb-4 rounded-lg bg-orange-50 p-3 dark:bg-orange-900/20">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.container.volume")}</label>
-          <input type="number" min={1} max={500} value={config.volumeLiters} onChange={(e) => onChange({ ...config, volumeLiters: Number(e.target.value) })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800" />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("planner.container.material")}</label>
-          <select value={config.material} onChange={(e) => onChange({ ...config, material: e.target.value as ContainerConfig["material"] })} className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-600 dark:bg-gray-800">
-            {(["terracotta", "plastic", "fabric", "wood", "metal"] as const).map((m) => (
-              <option key={m} value={m}>{t(`planner.container.materials.${m}`)}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+// --- Main GardenPlanner ---
 // --- Main GardenPlanner ---
 
 export function GardenPlanner() {
@@ -830,14 +738,14 @@ export function GardenPlanner() {
                           </div>
                         )}
                       </div>
-                      <button
+                      <button aria-label={t("common.copy")}
                         onClick={() => duplicateBed(activeGardenId!, bed.id)}
                         className="rounded-full bg-gray-100 p-1 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
                         title={t("common.duplicate")}
                       >
                         <Copy size={14} />
                       </button>
-                      <button
+                      <button aria-label={t("common.delete")}
                         onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteBed(activeGardenId!, bed.id); }}
                         className="rounded-full bg-red-100 p-1 text-red-600 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400"
                         title={t("planner.deleteBed")}

@@ -171,7 +171,7 @@ export function ProductionPage() {
                     {prod.notes ? ` · ${prod.notes}` : ""}
                   </p>
                 </div>
-                <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteProduct(prod.id); }}
+                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteProduct(prod.id); }}
                   className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
               </div>
             );

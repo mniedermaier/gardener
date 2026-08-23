@@ -150,7 +150,7 @@ export function ExpenseDashboard() {
                 <p className="text-xs text-gray-400">{e.date}</p>
               </div>
               <span className="text-sm font-semibold text-red-600">{formatCents(e.amountCents)}</span>
-              <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteExpense(e.id); }} className="rounded p-1 text-gray-400 hover:text-red-500">
+              <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteExpense(e.id); }} className="rounded p-1 text-gray-400 hover:text-red-500">
                 <Trash2 size={14} />
               </button>
             </div>

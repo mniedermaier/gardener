@@ -160,7 +160,7 @@ export function SoilManagement() {
                     <p className="text-xs text-gray-500">{getPhRecommendation(test.ph)}</p>
                     {test.notes && <p className="mt-1 text-xs text-gray-400">{test.notes}</p>}
                   </div>
-                  <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteSoilTest(test.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
+                  <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteSoilTest(test.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -190,7 +190,7 @@ export function SoilManagement() {
                     {a.cost && <><span>·</span><span>{a.cost.toFixed(2)} €</span></>}
                   </div>
                 </div>
-                <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteAmendment(a.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
+                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteAmendment(a.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
                   <Trash2 size={14} />
                 </button>
               </div>

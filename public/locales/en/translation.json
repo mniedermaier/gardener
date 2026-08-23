@@ -175,7 +175,8 @@
       "rows_ns": "Rows from north to south (vertical)",
       "blocks": "Rectangular blocks per plant",
       "companion_clusters": "Companion plant groups side by side"
-    }
+    },
+    "bed": "Bed"
   },
   "plants": {
     "title": "Plant Database",
@@ -217,52 +218,188 @@
       "high": "High"
     },
     "catalog": {
-      "tomato": { "name": "Tomato", "description": "Warm-season crop, needs staking. Very productive in good conditions." },
-      "zucchini": { "name": "Zucchini", "description": "Prolific summer squash. One or two plants are usually enough." },
-      "carrot": { "name": "Carrot", "description": "Root vegetable that prefers loose, sandy soil. Direct sow only." },
-      "lettuce": { "name": "Lettuce", "description": "Fast-growing salad green. Prefers cooler temperatures." },
-      "bean": { "name": "Bush Bean", "description": "Nitrogen-fixing legume. Easy to grow, productive." },
-      "pea": { "name": "Pea", "description": "Cool-season crop. Sow early in spring, harvest before heat." },
-      "radish": { "name": "Radish", "description": "Very fast-growing root vegetable. Ready in 25-30 days." },
-      "cucumber": { "name": "Cucumber", "description": "Needs warmth and consistent watering. Great for trellising." },
-      "pepper": { "name": "Bell Pepper", "description": "Heat-loving plant. Start indoors early for best results." },
-      "onion": { "name": "Onion", "description": "Long-season crop. Start from sets or transplants for best results." },
-      "garlic": { "name": "Garlic", "description": "Plant in autumn, harvest next summer. Very low maintenance." },
-      "potato": { "name": "Potato", "description": "Staple crop. Needs hilling as it grows. Good for beginners." },
-      "strawberry": { "name": "Strawberry", "description": "Perennial berry. Produces fruit for several years." },
-      "raspberry": { "name": "Raspberry", "description": "Perennial berry bush. Needs a trellis or support." },
-      "blueberry": { "name": "Blueberry", "description": "Needs acidic soil. Produces fruit after 2-3 years." },
-      "basil": { "name": "Basil", "description": "Annual herb, great companion for tomatoes. Loves warmth." },
-      "parsley": { "name": "Parsley", "description": "Biennial herb. Slow to germinate but very versatile." },
-      "dill": { "name": "Dill", "description": "Annual herb. Attracts beneficial insects. Self-seeds readily." },
-      "chives": { "name": "Chives", "description": "Perennial herb with mild onion flavor. Very easy to grow." },
-      "kale": { "name": "Kale", "description": "Hardy leafy green. Tastes sweeter after frost." },
-      "spinach": { "name": "Spinach", "description": "Cool-season green. Bolts quickly in heat." },
-      "beetroot": { "name": "Beetroot", "description": "Dual-purpose: eat both roots and leaves. Easy to grow." },
-      "leek": { "name": "Leek", "description": "Hardy allium. Needs blanching for white stems." },
-      "pumpkin": { "name": "Pumpkin", "description": "Needs lots of space. Great for storage over winter." },
-      "chard": { "name": "Swiss Chard", "description": "Colorful, productive green. Harvest outer leaves for continuous yield." },
-      "kohlrabi": { "name": "Kohlrabi", "description": "Fast-growing brassica. Eat the swollen stem raw or cooked." },
-      "fennel": { "name": "Fennel", "description": "Anise-flavored bulb vegetable. Does not grow well near most other plants." },
-      "corn": { "name": "Corn", "description": "Tall-growing cereal. Plant in blocks for good pollination." },
-      "sunflower": { "name": "Sunflower", "description": "Attracts pollinators. Edible seeds and great for companion planting." },
-      "cabbage": { "name": "Cabbage", "description": "Cool-season brassica. Good for sauerkraut and storage." },
-      "broccoli": { "name": "Broccoli", "description": "Harvest the main head, then side shoots keep producing." },
-      "cauliflower": { "name": "Cauliflower", "description": "Needs consistent conditions. Blanch heads by tying leaves." },
-      "celery": { "name": "Celery", "description": "Long-season crop that needs rich soil and consistent moisture." },
-      "turnip": { "name": "Turnip", "description": "Quick-growing root vegetable. Both roots and greens are edible." },
-      "mint": { "name": "Mint", "description": "Vigorous perennial herb. Best grown in containers to prevent spreading." },
-      "rosemary": { "name": "Rosemary", "description": "Woody perennial herb. Drought-tolerant once established." },
-      "thyme": { "name": "Thyme", "description": "Low-growing perennial herb. Excellent ground cover." },
-      "currant": { "name": "Currant", "description": "Hardy berry bush. Red and black varieties available." },
-      "gooseberry": { "name": "Gooseberry", "description": "Thorny berry bush. Excellent for jams and desserts." },
-      "eggplant": { "name": "Eggplant", "description": "Heat-loving solanaceous fruit. Needs warm conditions and rich soil." },
-      "arugula": { "name": "Arugula", "description": "Peppery salad green. Fast-growing cool-season crop, ready in weeks." },
-      "squash": { "name": "Butternut Squash", "description": "Winter squash with sweet, nutty flesh. Stores well for months." },
-      "asparagus": { "name": "Asparagus", "description": "Perennial vegetable. Takes 2-3 years to establish but produces for 15+ years." },
-      "pak_choi": { "name": "Pak Choi", "description": "Fast-growing Asian green with crisp white stems and tender leaves." },
-      "endive": { "name": "Endive", "description": "Slightly bitter salad green. Blanch hearts for milder flavor." }
-    }
+      "tomato": {
+        "name": "Tomato",
+        "description": "Warm-season crop, needs staking. Very productive in good conditions."
+      },
+      "zucchini": {
+        "name": "Zucchini",
+        "description": "Prolific summer squash. One or two plants are usually enough."
+      },
+      "carrot": {
+        "name": "Carrot",
+        "description": "Root vegetable that prefers loose, sandy soil. Direct sow only."
+      },
+      "lettuce": {
+        "name": "Lettuce",
+        "description": "Fast-growing salad green. Prefers cooler temperatures."
+      },
+      "bean": {
+        "name": "Bush Bean",
+        "description": "Nitrogen-fixing legume. Easy to grow, productive."
+      },
+      "pea": {
+        "name": "Pea",
+        "description": "Cool-season crop. Sow early in spring, harvest before heat."
+      },
+      "radish": {
+        "name": "Radish",
+        "description": "Very fast-growing root vegetable. Ready in 25-30 days."
+      },
+      "cucumber": {
+        "name": "Cucumber",
+        "description": "Needs warmth and consistent watering. Great for trellising."
+      },
+      "pepper": {
+        "name": "Bell Pepper",
+        "description": "Heat-loving plant. Start indoors early for best results."
+      },
+      "onion": {
+        "name": "Onion",
+        "description": "Long-season crop. Start from sets or transplants for best results."
+      },
+      "garlic": {
+        "name": "Garlic",
+        "description": "Plant in autumn, harvest next summer. Very low maintenance."
+      },
+      "potato": {
+        "name": "Potato",
+        "description": "Staple crop. Needs hilling as it grows. Good for beginners."
+      },
+      "strawberry": {
+        "name": "Strawberry",
+        "description": "Perennial berry. Produces fruit for several years."
+      },
+      "raspberry": {
+        "name": "Raspberry",
+        "description": "Perennial berry bush. Needs a trellis or support."
+      },
+      "blueberry": {
+        "name": "Blueberry",
+        "description": "Needs acidic soil. Produces fruit after 2-3 years."
+      },
+      "basil": {
+        "name": "Basil",
+        "description": "Annual herb, great companion for tomatoes. Loves warmth."
+      },
+      "parsley": {
+        "name": "Parsley",
+        "description": "Biennial herb. Slow to germinate but very versatile."
+      },
+      "dill": {
+        "name": "Dill",
+        "description": "Annual herb. Attracts beneficial insects. Self-seeds readily."
+      },
+      "chives": {
+        "name": "Chives",
+        "description": "Perennial herb with mild onion flavor. Very easy to grow."
+      },
+      "kale": {
+        "name": "Kale",
+        "description": "Hardy leafy green. Tastes sweeter after frost."
+      },
+      "spinach": {
+        "name": "Spinach",
+        "description": "Cool-season green. Bolts quickly in heat."
+      },
+      "beetroot": {
+        "name": "Beetroot",
+        "description": "Dual-purpose: eat both roots and leaves. Easy to grow."
+      },
+      "leek": {
+        "name": "Leek",
+        "description": "Hardy allium. Needs blanching for white stems."
+      },
+      "pumpkin": {
+        "name": "Pumpkin",
+        "description": "Needs lots of space. Great for storage over winter."
+      },
+      "chard": {
+        "name": "Swiss Chard",
+        "description": "Colorful, productive green. Harvest outer leaves for continuous yield."
+      },
+      "kohlrabi": {
+        "name": "Kohlrabi",
+        "description": "Fast-growing brassica. Eat the swollen stem raw or cooked."
+      },
+      "fennel": {
+        "name": "Fennel",
+        "description": "Anise-flavored bulb vegetable. Does not grow well near most other plants."
+      },
+      "corn": {
+        "name": "Corn",
+        "description": "Tall-growing cereal. Plant in blocks for good pollination."
+      },
+      "sunflower": {
+        "name": "Sunflower",
+        "description": "Attracts pollinators. Edible seeds and great for companion planting."
+      },
+      "cabbage": {
+        "name": "Cabbage",
+        "description": "Cool-season brassica. Good for sauerkraut and storage."
+      },
+      "broccoli": {
+        "name": "Broccoli",
+        "description": "Harvest the main head, then side shoots keep producing."
+      },
+      "cauliflower": {
+        "name": "Cauliflower",
+        "description": "Needs consistent conditions. Blanch heads by tying leaves."
+      },
+      "celery": {
+        "name": "Celery",
+        "description": "Long-season crop that needs rich soil and consistent moisture."
+      },
+      "turnip": {
+        "name": "Turnip",
+        "description": "Quick-growing root vegetable. Both roots and greens are edible."
+      },
+      "mint": {
+        "name": "Mint",
+        "description": "Vigorous perennial herb. Best grown in containers to prevent spreading."
+      },
+      "rosemary": {
+        "name": "Rosemary",
+        "description": "Woody perennial herb. Drought-tolerant once established."
+      },
+      "thyme": {
+        "name": "Thyme",
+        "description": "Low-growing perennial herb. Excellent ground cover."
+      },
+      "currant": {
+        "name": "Currant",
+        "description": "Hardy berry bush. Red and black varieties available."
+      },
+      "gooseberry": {
+        "name": "Gooseberry",
+        "description": "Thorny berry bush. Excellent for jams and desserts."
+      },
+      "eggplant": {
+        "name": "Eggplant",
+        "description": "Heat-loving solanaceous fruit. Needs warm conditions and rich soil."
+      },
+      "arugula": {
+        "name": "Arugula",
+        "description": "Peppery salad green. Fast-growing cool-season crop, ready in weeks."
+      },
+      "squash": {
+        "name": "Butternut Squash",
+        "description": "Winter squash with sweet, nutty flesh. Stores well for months."
+      },
+      "asparagus": {
+        "name": "Asparagus",
+        "description": "Perennial vegetable. Takes 2-3 years to establish but produces for 15+ years."
+      },
+      "pak_choi": {
+        "name": "Pak Choi",
+        "description": "Fast-growing Asian green with crisp white stems and tender leaves."
+      },
+      "endive": {
+        "name": "Endive",
+        "description": "Slightly bitter salad green. Blanch hearts for milder flavor."
+      }
+    },
+    "customIcon": "Icon"
   },
   "weather": {
     "title": "Weather",
@@ -401,7 +538,8 @@
     "entries": "entries",
     "totalWeight": "Total weight",
     "avgQuality": "Avg. quality",
-    "stars": "{{count}} stars"
+    "stars": "{{count}} stars",
+    "garden": "Garden"
   },
   "journal": {
     "title": "Garden Journal",
@@ -416,7 +554,8 @@
     "all": "All",
     "addPhotos": "Add photos (max. 3)",
     "photoLimit": "Maximum 3 photos",
-    "photoTooLarge": "Resizing photo..."
+    "photoTooLarge": "Resizing photo...",
+    "photoError": "Could not save photo"
   },
   "pantry": {
     "title": "Pantry",
@@ -741,11 +880,11 @@
     "balanced": "Balanced Mix",
     "balancedDesc": "Diverse selection of vegetables, herbs, and more",
     "calories": "Maximum Calories",
-    "caloriesDesc": "Potato, corn, beans - highest calorie output per m\u00b2",
+    "caloriesDesc": "Potato, corn, beans - highest calorie output per m²",
     "selfsufficient": "Self-Sufficiency",
     "selfsufficientDesc": "Cover all nutrients: calories, protein, vitamins, fiber + preservable",
     "yield": "Maximum Yield",
-    "yieldDesc": "Tomato, zucchini, cucumber - most kg per m\u00b2",
+    "yieldDesc": "Tomato, zucchini, cucumber - most kg per m²",
     "beginner": "Beginner Friendly",
     "beginnerDesc": "Easy to grow, low maintenance, direct sow, fast results",
     "quickharvest": "Quick Harvest",
@@ -812,12 +951,30 @@
   },
   "guilds": {
     "title": "Plant Guilds",
-    "threeSisters": { "name": "Three Sisters", "desc": "Traditional: Corn + Beans + Squash support each other." },
-    "tomatoBasil": { "name": "Tomato & Basil", "desc": "Classic Mediterranean pairing with carrots and parsley." },
-    "saladBed": { "name": "Salad Bed", "desc": "Quick-growing salad mix with radish, spinach and herbs." },
-    "mediterranean": { "name": "Mediterranean", "desc": "Sun-loving mix: tomato, pepper, zucchini with herbs." },
-    "rootVegetables": { "name": "Root Vegetables", "desc": "Underground harvest: carrots, beets, turnips with alliums." },
-    "brassica": { "name": "Brassica Guild", "desc": "Cabbage family with protective herbs and root vegetables." }
+    "threeSisters": {
+      "name": "Three Sisters",
+      "desc": "Traditional: Corn + Beans + Squash support each other."
+    },
+    "tomatoBasil": {
+      "name": "Tomato & Basil",
+      "desc": "Classic Mediterranean pairing with carrots and parsley."
+    },
+    "saladBed": {
+      "name": "Salad Bed",
+      "desc": "Quick-growing salad mix with radish, spinach and herbs."
+    },
+    "mediterranean": {
+      "name": "Mediterranean",
+      "desc": "Sun-loving mix: tomato, pepper, zucchini with herbs."
+    },
+    "rootVegetables": {
+      "name": "Root Vegetables",
+      "desc": "Underground harvest: carrots, beets, turnips with alliums."
+    },
+    "brassica": {
+      "name": "Brassica Guild",
+      "desc": "Cabbage family with protective herbs and root vegetables."
+    }
   },
   "sunlight": {
     "title": "Sunlight & Daylight",
@@ -838,7 +995,16 @@
     "loading": "Loading...",
     "noResults": "No results found.",
     "cm": "cm",
-    "confirmDelete": "Are you sure you want to delete this?"
+    "confirmDelete": "Are you sure you want to delete this?",
+    "back": "Back",
+    "days": "days",
+    "optional": "optional",
+    "search": "Search",
+    "filter": "Filter",
+    "copy": "Copy",
+    "settings": "Settings",
+    "confirm": "Confirm",
+    "favorite": "Favourite"
   },
   "companions": {
     "title": "Companion Planting Matrix",
@@ -867,5 +1033,10 @@
       "sprinkler": "Sprinkler",
       "rain": "Rain"
     }
+  },
+  "storage": {
+    "full": "Storage full — changes are no longer being saved. Export a backup and remove old entries.",
+    "failed": "Changes could not be saved.",
+    "almostFull": "Storage is {{percent}}% full. Export a backup and remove old entries to free space."
   }
 }

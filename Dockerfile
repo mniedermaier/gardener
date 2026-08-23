@@ -24,6 +24,7 @@ RUN apk add --no-cache nginx
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
 COPY --from=frontend-build /app/public/locales /usr/share/nginx/html/locales
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/security-headers.conf /etc/nginx/security-headers.conf
 
 # Copy backend
 WORKDIR /app
@@ -35,6 +36,7 @@ COPY --from=backend-build /app/backend/package.json ./backend/
 RUN mkdir -p /app/data
 VOLUME /app/data
 
+ENV NODE_ENV=production
 ENV DB_PATH=/app/data/gardener.db
 ENV PORT=3001
 

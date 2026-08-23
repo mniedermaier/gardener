@@ -283,8 +283,8 @@ export function calculateSufficiency(
   const totalYieldKg = plantYields.reduce((s, y) => s + y.estimatedKg, 0) + totalAnimalKg;
 
   // --- Monthly food availability ---
-  const monthlyCalories = new Array(12).fill(0);
-  const monthlyKg = new Array(12).fill(0);
+  const monthlyCalories = Array.from({ length: 12 }, () => 0);
+  const monthlyKg = Array.from({ length: 12 }, () => 0);
 
   // Distribute animal production across months
   // Eggs: year-round (all 12 months), honey: May-Sep, meat: spread across year
@@ -312,8 +312,8 @@ export function calculateSufficiency(
   }
 
   // Calculate storage: surplus from harvest months extends to winter months
-  const storedKg = new Array(12).fill(0);
-  const storedCalories = new Array(12).fill(0);
+  const storedKg = Array.from({ length: 12 }, () => 0);
+  const storedCalories = Array.from({ length: 12 }, () => 0);
 
   // Preserve surplus: if a month produces > 50% more than monthly need, preserve the rest
   const monthlyCalNeed = (DAILY_NEEDS.calories * familySize * 30.5);

@@ -23,6 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm audit --audit-level=high
+      - run: npm run lint
       - run: npx tsc -b
 
   test:
@@ -76,3 +77,26 @@ jobs:
           du -sh dist/assets/*.js | sort -rh | head -10 >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "Total: $(du -sh dist | cut -f1)" >> $GITHUB_STEP_SUMMARY
+
+  docker:
+    name: Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t gardener:ci .
+      - name: Smoke-test the container
+        run: |
+          docker run -d --name gardener-ci -p 8080:80 gardener:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/api/health > /dev/null; then
+              echo "backend healthy"; break
+            fi
+            if [ "$i" = "30" ]; then
+              echo "backend did not become healthy"; docker logs gardener-ci; exit 1
+            fi
+            sleep 1
+          done
+          curl -fsS http://localhost:8080/ > /dev/null || { echo "frontend not served"; exit 1; }
+          docker rm -f gardener-ci

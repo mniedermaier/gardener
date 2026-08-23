@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { X, CheckCircle, AlertTriangle, Info } from "lucide-react";
 
 type ToastType = "success" | "warning" | "error" | "info";
@@ -40,6 +41,9 @@ const STYLES = {
 let nextId = 0;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  // Der Provider liegt außerhalb der Suspense-Grenze, deshalb darf
+  // useTranslation hier nicht suspendieren.
+  const { t: translate } = useTranslation(undefined, { useSuspense: false });
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [confirmState, setConfirmState] = useState<{
     message: string;
@@ -79,7 +83,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               <Icon size={16} />
               <span className="flex-1">{t.message}</span>
-              <button onClick={() => setToasts((prev) => prev.filter((tt) => tt.id !== t.id))}>
+              <button aria-label={translate("common.close")} onClick={() => setToasts((prev) => prev.filter((tt) => tt.id !== t.id))}>
                 <X size={14} />
               </button>
             </div>
@@ -98,13 +102,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 onClick={() => handleConfirm(false)}
                 className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
               >
-                Cancel
+                {translate("common.cancel")}
               </button>
               <button
                 onClick={() => handleConfirm(true)}
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
               >
-                OK
+                {translate("common.confirm")}
               </button>
             </div>
           </div>

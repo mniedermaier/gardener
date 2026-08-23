@@ -199,7 +199,7 @@ export function SeedInventory() {
                     {isExpired ? t("seeds.expired") : `${yearsLeft} ${t("seeds.yearsLeft")}`}
                   </span>
                 </div>
-                <button
+                <button aria-label={t("common.delete")}
                   onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteSeed(seed.id); }}
                   className="shrink-0 rounded p-1 text-gray-300 hover:text-red-500"
                 >

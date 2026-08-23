@@ -39,7 +39,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,json,png,svg}"],
+        globPatterns: ["**/*.{js,css,html,json,png,svg,woff2}"],
         skipWaiting: true,
         clientsClaim: true,
         navigateFallback: "index.html",
@@ -74,5 +74,12 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["e2e/**", "**/node_modules/**"],
+    coverage: {
+      provider: "v8",
+      reportsDirectory: "coverage",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/test/**", "src/**/*.d.ts", "src/main.tsx", "src/lib/i18n.ts"],
+      reporter: ["text-summary", "html"],
+    },
   },
 });

@@ -26,4 +26,11 @@ i18n
     },
   });
 
+// Screen readers and browser translation rely on this matching the UI language.
+function syncDocumentLanguage(lng: string) {
+  if (typeof document !== "undefined") document.documentElement.lang = lng;
+}
+syncDocumentLanguage(i18n.language ?? getStoredLocale());
+i18n.on("languageChanged", syncDocumentLanguage);
+
 export default i18n;
