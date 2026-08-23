@@ -1,7 +1,7 @@
 import type { StateStorage } from "zustand/middleware";
 
 /**
- * localStorage wrapper that reports write failures.
+ * Storage wrapper that reports write failures.
  *
  * Zustand's persist middleware routes storage errors through an internal
  * thenable whose rejection nobody observes, so a QuotaExceededError there is
@@ -13,7 +13,6 @@ import type { StateStorage } from "zustand/middleware";
 export type StorageFailure = { kind: "quota" | "other"; error: unknown };
 
 const listeners = new Set<(failure: StorageFailure) => void>();
-let lastFailureKind: StorageFailure["kind"] | null = null;
 
 export function onStorageFailure(listener: (failure: StorageFailure) => void): () => void {
   listeners.add(listener);
@@ -34,39 +33,68 @@ function isQuotaError(error: unknown): boolean {
   );
 }
 
-function report(error: unknown) {
-  const kind: StorageFailure["kind"] = isQuotaError(error) ? "quota" : "other";
-  // Only announce a change in condition — persist writes on every mutation.
-  if (kind === lastFailureKind) return;
-  lastFailureKind = kind;
-  for (const listener of listeners) listener({ kind, error });
+/** Minimal surface of what this wrapper needs — makes the backing store injectable. */
+export interface BackingStore {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
 }
 
-export const safeLocalStorage: StateStorage = {
-  getItem: (name) => {
-    try {
-      return localStorage.getItem(name);
-    } catch (error) {
-      report(error);
-      return null;
-    }
-  },
-  setItem: (name, value) => {
-    try {
-      localStorage.setItem(name, value);
-      lastFailureKind = null;
-    } catch (error) {
-      report(error);
-    }
-  },
-  removeItem: (name) => {
-    try {
-      localStorage.removeItem(name);
-    } catch (error) {
-      report(error);
-    }
-  },
-};
+export function createSafeStorage(backing: BackingStore): StateStorage {
+  // Only announce a change in condition — persist writes on every mutation.
+  let lastFailureKind: StorageFailure["kind"] | null = null;
+
+  const report = (error: unknown) => {
+    const kind: StorageFailure["kind"] = isQuotaError(error) ? "quota" : "other";
+    if (kind === lastFailureKind) return;
+    lastFailureKind = kind;
+    for (const listener of listeners) listener({ kind, error });
+  };
+
+  return {
+    getItem: (name) => {
+      try {
+        return backing.getItem(name);
+      } catch (error) {
+        report(error);
+        return null;
+      }
+    },
+    setItem: (name, value) => {
+      try {
+        backing.setItem(name, value);
+        lastFailureKind = null;
+      } catch (error) {
+        report(error);
+      }
+    },
+    removeItem: (name) => {
+      try {
+        backing.removeItem(name);
+      } catch (error) {
+        report(error);
+      }
+    },
+  };
+}
+
+const memoryFallback = new Map<string, string>();
+
+/** localStorage itself throws in some privacy modes, so even reaching it is guarded. */
+function resolveBackingStore(): BackingStore {
+  try {
+    if (typeof localStorage !== "undefined") return localStorage;
+  } catch {
+    // fall through
+  }
+  return {
+    getItem: (key) => memoryFallback.get(key) ?? null,
+    setItem: (key, value) => void memoryFallback.set(key, value),
+    removeItem: (key) => void memoryFallback.delete(key),
+  };
+}
+
+export const safeLocalStorage: StateStorage = createSafeStorage(resolveBackingStore());
 
 /** Share of the storage quota already used, or null when unavailable. */
 export async function storagePressure(): Promise<number | null> {
