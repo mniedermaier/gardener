@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MapPin, Check, Coffee } from "lucide-react";
 import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +11,28 @@ import { DataManagement } from "./DataManagement";
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation();
-  const store = useStore();
+  const store = useStore(
+    useShallow((s) => ({
+      locale: s.locale,
+      theme: s.theme,
+      weatherApiKey: s.weatherApiKey,
+      locationLat: s.locationLat,
+      locationLon: s.locationLon,
+      locationName: s.locationName,
+      lastFrostDate: s.lastFrostDate,
+      gridCellSizeCm: s.gridCellSizeCm,
+      backendUrl: s.backendUrl,
+      alerts: s.alerts,
+      setLocale: s.setLocale,
+      setTheme: s.setTheme,
+      setWeatherApiKey: s.setWeatherApiKey,
+      setLocation: s.setLocation,
+      setLastFrostDate: s.setLastFrostDate,
+      setGridCellSizeCm: s.setGridCellSizeCm,
+      setBackendUrl: s.setBackendUrl,
+      setAlerts: s.setAlerts,
+    })),
+  );
   const [saved, setSaved] = useState(false);
 
   const handleLocaleChange = (locale: "de" | "en" | "es" | "fr") => {

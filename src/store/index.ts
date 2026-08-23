@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { safeLocalStorage } from "@/lib/persistStorage";
 import { createSettingsSlice, type SettingsSlice } from "./settingsSlice";
 import { createGardenSlice, type GardenSlice } from "./gardenSlice";
 import { createTaskSlice, type TaskSlice } from "./taskSlice";
@@ -25,6 +26,18 @@ interface PersistedState {
   gardens?: Garden[];
   seasonArchives?: SeasonArchive[];
 }
+
+const PERSISTED_KEYS = [
+  // Sammlungen
+  "gardens", "tasks", "harvests", "journalEntries", "expenses", "seeds",
+  "soilTests", "amendments", "pests", "waterEntries", "animals",
+  "animalProducts", "feedEntries", "healthEvents", "pantryItems",
+  "customPlants", "seasonArchives", "weatherHistory",
+  // Einstellungen
+  "locale", "weatherApiKey", "locationLat", "locationLon", "locationName",
+  "lastFrostDate", "gridCellSizeCm", "backendUrl", "theme", "alerts",
+  "lastBackupDate", "lastSyncedAt",
+] as const satisfies ReadonlyArray<keyof AppStore>;
 
 export const useStore = create<AppStore>()(
   persist(
@@ -68,7 +81,14 @@ export const useStore = create<AppStore>()(
     }),
     {
       name: "gardener-storage",
-      version: 3,
+      version: 4,
+      storage: createJSONStorage(() => safeLocalStorage),
+      // Only data is persisted — actions are functions and would be dropped by
+      // JSON anyway, but listing the fields keeps derived/transient state out.
+      partialize: (state) =>
+        Object.fromEntries(
+          PERSISTED_KEYS.map((key) => [key, state[key]]),
+        ) as unknown as AppStore,
       migrate: (persisted, version) => {
         const state = persisted as PersistedState;
         if (version < 2 && state.gardens) {
@@ -90,6 +110,9 @@ export const useStore = create<AppStore>()(
             state.seasonArchives = [];
           }
         }
+        // v4 moved journal photos to IndexedDB. The entries keep whatever they
+        // hold; migrateLegacyPhotos() rewrites them in the background, so a
+        // half-finished migration still renders.
         return state as AppStore;
       },
     }

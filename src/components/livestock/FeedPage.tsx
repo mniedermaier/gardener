@@ -163,7 +163,7 @@ export function FeedPage() {
                     {entry.notes ? ` · ${entry.notes}` : ""}
                   </p>
                 </div>
-                <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteFeedEntry(entry.id); }}
+                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteFeedEntry(entry.id); }}
                   className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
               </div>
             );

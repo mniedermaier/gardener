@@ -14,6 +14,7 @@ function MatrixView({ plants, plantName }: {
   plants: Plant[];
   plantName: (id: string) => string;
 }) {
+  const { t } = useTranslation();
   const companionSets = useMemo(() => {
     const map = new Map<string, Set<string>>();
     for (const p of plants) {
@@ -42,7 +43,9 @@ function MatrixView({ plants, plantName }: {
       <table className="border-collapse text-xs">
         <thead>
           <tr>
-            <th className="sticky left-0 top-0 z-20 min-w-[120px] border-b border-r border-gray-200 bg-gray-50 p-1 dark:border-gray-700 dark:bg-gray-800" />
+            <th className="sticky left-0 top-0 z-20 min-w-[120px] border-b border-r border-gray-200 bg-gray-50 p-1 dark:border-gray-700 dark:bg-gray-800">
+              <span className="sr-only">{t("plants.title")}</span>
+            </th>
             {plants.map((p) => (
               <th
                 key={p.id}

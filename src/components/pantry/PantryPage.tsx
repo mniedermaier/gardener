@@ -221,11 +221,11 @@ export function PantryPage() {
                       {item.notes && <p className="mt-0.5 text-xs italic text-gray-400">{item.notes}</p>}
                     </div>
                     <div className="flex gap-1">
-                      <button onClick={() => consumePantryItem(item.id)}
+                      <button aria-label={t("common.confirm")} onClick={() => consumePantryItem(item.id)}
                         className="rounded p-1 text-gray-300 hover:text-green-500" title={t("pantry.markConsumed")}>
                         <Check size={14} />
                       </button>
-                      <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePantryItem(item.id); }}
+                      <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePantryItem(item.id); }}
                         className="rounded p-1 text-gray-300 hover:text-red-500">
                         <Trash2 size={14} />
                       </button>
@@ -258,7 +258,7 @@ export function PantryPage() {
                       {item.consumedDate ? ` · ${t("pantry.consumedOn")} ${item.consumedDate}` : ""}
                     </p>
                   </div>
-                  <button onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePantryItem(item.id); }}
+                  <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePantryItem(item.id); }}
                     className="rounded p-1 text-gray-300 hover:text-red-500">
                     <Trash2 size={14} />
                   </button>

@@ -108,7 +108,8 @@ docker compose up --build    # http://localhost:8080
 |---------|-------------|
 | `npm run dev` | Dev server (localhost:5173) |
 | `npm run build` | TypeScript check + production build |
-| `npm run test` | 311 unit tests (Vitest) |
+| `npm run lint` | oxlint (correctness, accessibility, react-hooks) |
+| `npm run test` | 134 unit tests (Vitest) |
 | `npm run test:e2e` | 8 E2E tests (Playwright) |
 
 ## Tech Stack
@@ -116,6 +117,32 @@ docker compose up --build    # http://localhost:8080
 React 19 · TypeScript · Vite · Tailwind CSS · Zustand · @dnd-kit · react-i18next · date-fns · SunCalc · Vitest · Playwright · PWA (Workbox)
 
 Optional backend: Express + SQLite + rate limiting (Docker only)
+
+## Running the backend safely
+
+The container ships without authentication, which is fine on a trusted home
+network and not fine anywhere else. Set `GARDENER_TOKEN` as soon as the backend
+is reachable beyond it — every `/api` route except `/api/health` then requires
+`Authorization: Bearer <token>`. The container logs a warning while the variable
+is unset.
+
+```yaml
+# docker-compose.yml
+environment:
+  - GARDENER_TOKEN=your-secret
+```
+
+### How sync behaves
+
+The backend stores one snapshot of the whole state, so this is single-user sync
+with last-write-wins at snapshot level:
+
+- A device pulls before its first push, so a freshly connected device picks up
+  what is already there instead of overwriting it.
+- Deletions and edits propagate: each pushed snapshot is authoritative, and the
+  backend drops what the snapshot no longer contains.
+- If both sides changed since they last agreed, nothing is discarded — the
+  collections are merged by id and the local copy wins on conflict.
 
 ## Data Safety
 

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Upload, FileSpreadsheet, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
 import { useStore } from "@/store";
@@ -65,9 +65,15 @@ export function DataManagement() {
     }
   };
 
-  const backupAge = lastBackupDate
-    ? Math.floor((Date.now() - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24))
-    : null;
+  // Beim Mounten festhalten, damit der Render rein bleibt
+  const [mountedAt] = useState(() => Date.now());
+  const backupAge = useMemo(
+    () =>
+      lastBackupDate
+        ? Math.floor((mountedAt - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24))
+        : null,
+    [lastBackupDate, mountedAt],
+  );
 
   return (
     <Card>

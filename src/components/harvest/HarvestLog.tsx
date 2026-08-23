@@ -166,7 +166,7 @@ export function HarvestLog() {
                       <Star key={i} size={10} fill="currentColor" />
                     ))}
                   </div>
-                  <button
+                  <button aria-label={t("common.delete")}
                     onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHarvest(h.id); }}
                     className="rounded p-1 text-gray-400 hover:text-red-500"
                   >
@@ -228,7 +228,7 @@ export function HarvestLog() {
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.quality")}</label>
             <div className="flex gap-1">
               {([1, 2, 3, 4, 5] as const).map((q) => (
-                <button
+                <button aria-label={t("common.favorite")}
                   key={q}
                   onClick={() => setQuality(q)}
                   className="rounded p-1 transition-colors"

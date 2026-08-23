@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
@@ -12,30 +12,17 @@ export function ImportPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addGarden, addBed, setCell } = useStore(useShallow((s) => ({ addGarden: s.addGarden, addBed: s.addBed, setCell: s.setCell })));
-  const [status, setStatus] = useState<"loading" | "preview" | "done" | "error">("loading");
-  const [templateName, setTemplateName] = useState("");
-  const [bedCount, setBedCount] = useState(0);
+  const [imported, setImported] = useState(false);
 
   const encoded = searchParams.get("t");
 
-  useEffect(() => {
-    if (!encoded) {
-      setStatus("error");
-      return;
-    }
-    const template = decodeGardenFromUrl(encoded);
-    if (!template) {
-      setStatus("error");
-      return;
-    }
-    setTemplateName(template.name);
-    setBedCount(template.beds.length);
-    setStatus("preview");
-  }, [encoded]);
+  // Rein aus der URL abgeleitet — dafür braucht es keinen Effekt und keinen State.
+  const template = useMemo(() => (encoded ? decodeGardenFromUrl(encoded) : null), [encoded]);
+  const status: "preview" | "done" | "error" = imported ? "done" : template ? "preview" : "error";
+  const templateName = template?.name ?? "";
+  const bedCount = template?.beds.length ?? 0;
 
   const handleImport = () => {
-    if (!encoded) return;
-    const template = decodeGardenFromUrl(encoded);
     if (!template) return;
     importTemplateToStore(
       template,
@@ -44,7 +31,7 @@ export function ImportPage() {
       setCell,
       useStore.getState,
     );
-    setStatus("done");
+    setImported(true);
     setTimeout(() => navigate("/"), 1500);
   };
 

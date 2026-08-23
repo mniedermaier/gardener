@@ -7,7 +7,6 @@ const OUT = "docs/screenshots";
 const sampleState = {
   state: {
     locale: "en",
-    theme: "dark",
     gardens: [{
       id: "demo", name: "My Garden", season: "2026",
       beds: [

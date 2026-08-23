@@ -7,7 +7,9 @@ Gardener is a self-sufficiency garden planning application. Plan vegetables, fru
 ## Tech Stack
 
 - **Frontend:** React 19 + Vite + TypeScript + Tailwind CSS 3
-- **State:** Zustand with useShallow selectors + localStorage persistence (13 slices)
+- **State:** Zustand with useShallow selectors + localStorage persistence (14 slices)
+- **Photos:** journal photos live in IndexedDB (`lib/photoStore.ts`), never in the persisted store
+- **Linting:** oxlint (`npm run lint`) — typescript-eslint does not support TypeScript 7 yet
 - **Routing:** HashRouter (GitHub Pages compatible)
 - **i18n:** react-i18next with HTTP backend — German, English, Spanish, French
 - **DnD:** @dnd-kit/core for garden planner drag-and-drop
@@ -22,7 +24,9 @@ Gardener is a self-sufficiency garden planning application. Plan vegetables, fru
 ```bash
 npm run dev          # Dev server (localhost:5173)
 npm run build        # TypeScript check + Vite production build
-npm run test         # Unit tests (Vitest, 87 tests)
+npm run lint         # oxlint (correctness + jsx-a11y + react-hooks)
+npm run test         # Unit tests (Vitest, 134 tests)
+npm run test:coverage # Unit tests with coverage report
 npm run test:e2e     # E2E tests (Playwright, 8 tests)
 npm run preview      # Preview production build
 
@@ -65,7 +69,7 @@ src/
                    weatherAlerts, sufficiency (monthly, plants + livestock),
                    sunlight, succession, sharing, iCal, dataExport/Import, advisor, theme
   hooks/           usePlants, usePlantName, useBackendSync, useUndo
-  test/            14 test suites, 87 tests
+  test/            21 test suites, 134 tests (incl. i18n integrity, component tests)
 public/locales/    Translation JSON files (de/, en/, es/, fr/)
 e2e/               8 Playwright E2E tests
 backend/           Express + SQLite (Docker only)
@@ -108,6 +112,23 @@ backend/           Express + SQLite (Docker only)
 3. Add to `ImportResult.stats` in `src/lib/dataImport.ts`
 4. Add to both `importOverwrite()` and `importMerge()` in `src/lib/dataImport.ts`
 5. Update test helper `makeExport()` in `src/test/dataExportImport.test.ts`
+
+## Storage Rules
+
+- The persisted store is a single localStorage entry with a ~5 MB budget — keep
+  binary data out of it. Photos and anything comparable go to IndexedDB.
+- Writes go through `safeLocalStorage`; a failed write surfaces as a toast
+  instead of vanishing. Never bypass it with a direct `localStorage.setItem`.
+- New persisted fields must be added to `PERSISTED_KEYS` in `store/index.ts`,
+  otherwise they are silently dropped by `partialize`.
+
+## Accessibility Rules
+
+- Icon-only buttons need an `aria-label`; `npm run lint` enforces the rest.
+- Use the `Input` primitive rather than a bare `<input>` — it generates the id
+  that ties label and field together.
+- Dialogs go through `ui/Modal`, which is built on `<dialog>` and brings the
+  focus trap, Esc handling and focus restoration with it.
 
 ## Performance Rules
 

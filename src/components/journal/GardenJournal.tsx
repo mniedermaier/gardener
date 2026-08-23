@@ -12,9 +12,24 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { ANIMAL_ICONS } from "@/types/animal";
 import { format } from "date-fns";
+import { putPhoto, deletePhotos } from "@/lib/photoStore";
+import { JournalPhoto, useResolvedPhoto } from "./JournalPhoto";
 
-function resizeImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
-  return new Promise((resolve) => {
+function FullPhoto({ photo }: { photo: string }) {
+  const src = useResolvedPhoto(photo);
+  if (!src) return null;
+  return (
+    <img
+      src={src}
+      alt=""
+      className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+      onClick={(e) => e.stopPropagation()}
+    />
+  );
+}
+
+function resizeImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -26,17 +41,23 @@ function resizeImage(file: File, maxWidth: number, maxHeight: number, quality: n
         canvas.width = width;
         canvas.height = height;
         canvas.getContext("2d")!.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", quality));
+        canvas.toBlob(
+          (blob) => (blob ? resolve(blob) : reject(new Error("Could not encode image"))),
+          "image/jpeg",
+          quality,
+        );
       };
+      img.onerror = () => reject(new Error("Could not read image"));
       img.src = e.target!.result as string;
     };
+    reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
 }
 
 export function GardenJournal() {
   const { t } = useTranslation();
-  const { confirm } = useToast();
+  const { confirm, toast } = useToast();
   const { journalEntries, gardens, animals, addJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({
     journalEntries: s.journalEntries, gardens: s.gardens, animals: s.animals,
     addJournalEntry: s.addJournalEntry, deleteJournalEntry: s.deleteJournalEntry,
@@ -67,12 +88,16 @@ export function GardenJournal() {
     if (!files) return;
     const remaining = 3 - photos.length;
     const toProcess = Array.from(files).slice(0, remaining);
-    const resized: string[] = [];
+    const refs: string[] = [];
     for (const file of toProcess) {
-      const dataUrl = await resizeImage(file, 800, 600, 0.7);
-      resized.push(dataUrl);
+      try {
+        const blob = await resizeImage(file, 800, 600, 0.7);
+        refs.push(await putPhoto(blob));
+      } catch {
+        toast(t("journal.photoError"), "error");
+      }
     }
-    setPhotos((prev) => [...prev, ...resized].slice(0, 3));
+    setPhotos((prev) => [...prev, ...refs].slice(0, 3));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -154,8 +179,12 @@ export function GardenJournal() {
                     <h3 className="font-semibold">{entry.title}</h3>
                     <p className="text-xs text-gray-400">{entry.date}</p>
                   </div>
-                  <button
-                    onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteJournalEntry(entry.id); }}
+                  <button aria-label={t("common.delete")}
+                    onClick={async () => {
+                      if (!(await confirm(t("common.confirmDelete")))) return;
+                      if (entry.photos) void deletePhotos(entry.photos);
+                      deleteJournalEntry(entry.id);
+                    }}
                     className="rounded p-1 text-gray-400 hover:text-red-500"
                   >
                     <Trash2 size={14} />
@@ -167,7 +196,7 @@ export function GardenJournal() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     {entry.photos.map((photo, idx) => (
                       <button key={idx} onClick={() => setViewPhoto(photo)} className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                        <img src={photo} alt={`${entry.title} ${idx + 1}`} className="h-20 w-20 object-cover transition-opacity hover:opacity-80" />
+                        <JournalPhoto photo={photo} alt={`${entry.title} ${idx + 1}`} className="h-20 w-20 object-cover transition-opacity hover:opacity-80" />
                       </button>
                     ))}
                   </div>
@@ -313,10 +342,13 @@ export function GardenJournal() {
               <div className="mt-2 flex flex-wrap gap-2">
                 {photos.map((photo, idx) => (
                   <div key={idx} className="relative">
-                    <img src={photo} alt={`Preview ${idx + 1}`} className="h-16 w-16 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
-                    <button
+                    <JournalPhoto photo={photo} alt={`${idx + 1}`} className="h-16 w-16 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                    <button aria-label={t("common.close")}
                       type="button"
-                      onClick={() => setPhotos((prev) => prev.filter((_, i) => i !== idx))}
+                      onClick={() => {
+                        void deletePhotos([photo]);
+                        setPhotos((prev) => prev.filter((_, i) => i !== idx));
+                      }}
                       className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white shadow hover:bg-red-600"
                     >
                       <X size={10} />
@@ -336,10 +368,10 @@ export function GardenJournal() {
       {/* Photo viewer overlay */}
       {viewPhoto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setViewPhoto(null)}>
-          <button className="absolute right-4 top-4 rounded-full bg-white/20 p-2 text-white hover:bg-white/40" onClick={() => setViewPhoto(null)}>
+          <button aria-label={t("common.close")} className="absolute right-4 top-4 rounded-full bg-white/20 p-2 text-white hover:bg-white/40" onClick={() => setViewPhoto(null)}>
             <X size={20} />
           </button>
-          <img src={viewPhoto} alt="Photo" className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain" onClick={(e) => e.stopPropagation()} />
+          <FullPhoto photo={viewPhoto} />
         </div>
       )}
     </div>

@@ -42,14 +42,22 @@ router.post("/", (req, res) => {
   res.status(201).json(task);
 });
 
+// Every field optional, but no unknown fields and no id — the URL owns the id.
+const TaskPatchSchema = TaskSchema.omit({ id: true }).partial().strict();
+
 router.patch("/:id", (req, res) => {
+  const parsed = TaskPatchSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
   const db = getDb();
   const existing = db.prepare("SELECT data FROM tasks WHERE id = ?").get(req.params.id) as { data: string } | undefined;
   if (!existing) {
     res.status(404).json({ error: "Task not found" });
     return;
   }
-  const merged = { ...JSON.parse(existing.data), ...req.body };
+  const merged = { ...JSON.parse(existing.data), ...parsed.data, id: req.params.id };
   db.prepare("UPDATE tasks SET data = ? WHERE id = ?").run(JSON.stringify(merged), req.params.id);
   res.json(merged);
 });

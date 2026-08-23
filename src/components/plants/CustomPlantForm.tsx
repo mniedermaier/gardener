@@ -57,12 +57,17 @@ export function CustomPlantForm({ open, onClose }: Props) {
         <Input label={t("plants.customName")} value={name} onChange={(e) => setName(e.target.value)} autoFocus />
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Icon</label>
-          <div className="flex gap-1">
+          <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t("plants.customIcon")}
+          </span>
+          <div className="flex gap-1" role="group" aria-labelledby="custom-plant-icon-label">
             {ICONS.map((ic) => (
               <button
                 key={ic}
+                type="button"
                 onClick={() => setIcon(ic)}
+                aria-label={ic}
+                aria-pressed={icon === ic}
                 className={`flex h-9 w-9 items-center justify-center rounded text-lg ${icon === ic ? "ring-2 ring-garden-500 bg-garden-50 dark:bg-garden-900/30" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
               >
                 {ic}

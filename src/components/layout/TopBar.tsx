@@ -105,7 +105,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             className="w-full rounded-lg border border-gray-200 bg-gray-50 py-1.5 pl-9 pr-8 text-sm placeholder:text-gray-400 focus:border-garden-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-700 dark:bg-gray-800 dark:focus:bg-gray-800"
           />
           {query && (
-            <button onClick={() => { setQuery(""); setSearchOpen(false); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
+            <button aria-label={t("common.close")} onClick={() => { setQuery(""); setSearchOpen(false); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
               <X size={14} />
             </button>
           )}
@@ -129,7 +129,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
       </div>
 
       {/* Mobile search button */}
-      <button
+      <button aria-label={t("common.search")}
         onClick={() => setSearchOpen(!searchOpen)}
         className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 sm:hidden dark:text-gray-400 dark:hover:bg-gray-800"
       >
