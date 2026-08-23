@@ -8,6 +8,8 @@ RUN npm run build
 
 # Stage 2: Build backend
 FROM node:26-alpine AS backend-build
+# better-sqlite3 ships no prebuilt binary for this platform, so it is compiled from source
+RUN apk add --no-cache python3 make g++
 WORKDIR /app/backend
 COPY backend/package.json backend/package-lock.json* ./
 RUN npm ci
