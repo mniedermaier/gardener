@@ -139,3 +139,22 @@ describe("safeLocalStorage", () => {
     stop();
   });
 });
+
+describe("write mirror", () => {
+  it("forwards successful writes and removals, but not failed writes", async () => {
+    const { setWriteMirror } = await import("@/lib/persistStorage");
+    const store = fakeStore();
+    const storage = createSafeStorage(store);
+    const seen: Array<[string, string | null]> = [];
+    setWriteMirror((key, value) => seen.push([key, value]));
+
+    storage.setItem("k", "v1");
+    store.failOnce(quotaError);
+    storage.setItem("k", "v2");
+    storage.removeItem("k");
+    setWriteMirror(null);
+    storage.setItem("k", "v3");
+
+    expect(seen).toEqual([["k", "v1"], ["k", null]]);
+  });
+});

@@ -3,6 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Plus, Trash2, Download, Upload, Settings, Archive, Share2, Wand2, AlertTriangle, Undo2, Footprints, Copy, Printer } from "lucide-react";
 import {
   DndContext,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
   DragOverlay,
   useDroppable,
   type DragStartEvent,
@@ -189,10 +194,10 @@ function BedGrid({
     <Card className={`overflow-hidden ${ENVIRONMENT_BORDERS[envType]}`}>
       {/* Clickable header - accordion toggle */}
       <div
-        className="flex cursor-pointer items-center justify-between"
+        className="flex cursor-pointer flex-wrap items-center justify-between gap-x-2 gap-y-1"
         onClick={onToggleExpand}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-gray-400"><path d="M4 2l4 4-4 4"/></svg>
           </span>
@@ -236,14 +241,14 @@ function BedGrid({
             <>
               {/* Zoom controls */}
               <div className="mr-2 flex items-center gap-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
-                <button onClick={() => setZoom(Math.max(0.5, zoom - 0.15))} className="rounded-l-lg px-1.5 py-0.5 text-xs text-gray-500 hover:text-gray-700" title="Zoom out">−</button>
-                <span className="px-1 text-[10px] text-gray-400">{Math.round(zoom * 100)}%</span>
-                <button onClick={() => setZoom(Math.min(1.5, zoom + 0.15))} className="rounded-r-lg px-1.5 py-0.5 text-xs text-gray-500 hover:text-gray-700" title="Zoom in">+</button>
+                <button onClick={() => setZoom(Math.max(0.5, zoom - 0.15))} className="min-h-8 min-w-8 rounded-l-lg px-2 text-sm text-gray-500 hover:text-gray-700" title="Zoom out" aria-label="Zoom out">−</button>
+                <span className="px-1 text-[11px] tabular-nums text-gray-400">{Math.round(zoom * 100)}%</span>
+                <button onClick={() => setZoom(Math.min(1.5, zoom + 0.15))} className="min-h-8 min-w-8 rounded-r-lg px-2 text-sm text-gray-500 hover:text-gray-700" title="Zoom in" aria-label="Zoom in">+</button>
               </div>
               {bed.cells.length > 0 && (
                 <button
                   onClick={() => { for (const cell of bed.cells) removeCell(gardenId, bed.id, cell.cellX, cell.cellY); }}
-                  className="rounded-lg p-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                  className="min-h-8 rounded-lg px-2 text-xs text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
                   title={t("planner.clearBed")}
                 >
                   {t("planner.clearBed")}
@@ -353,7 +358,7 @@ import {
 export function GardenPlanner() {
   const { t } = useTranslation();
   const {
-    gardens, activeGardenId, addGarden, setActiveGarden, addBed, deleteBed,
+    gardens, activeGardenId: storedActiveGardenId, addGarden, setActiveGarden, addBed, deleteBed,
     deleteGarden, setCell, updateCell, archiveSeason, seasonArchives, gridCellSizeCm, lastFrostDate,
     duplicateGarden, duplicateBed,
   } = useStore(useShallow((s) => ({ gardens: s.gardens, activeGardenId: s.activeGardenId, addGarden: s.addGarden, setActiveGarden: s.setActiveGarden, addBed: s.addBed, deleteBed: s.deleteBed, deleteGarden: s.deleteGarden, setCell: s.setCell, updateCell: s.updateCell, archiveSeason: s.archiveSeason, seasonArchives: s.seasonArchives, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, duplicateGarden: s.duplicateGarden, duplicateBed: s.duplicateBed })));
@@ -386,7 +391,10 @@ export function GardenPlanner() {
   const [showPrint, setShowPrint] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const activeGarden = gardens.find((g) => g.id === activeGardenId);
+  // Fall back to the first garden: a stale or missing selection must not hide
+  // the beds behind a "no garden yet" message.
+  const activeGarden = gardens.find((g) => g.id === storedActiveGardenId) ?? gardens[0];
+  const activeGardenId = activeGarden?.id ?? null;
 
   // Get recommended plants for the active garden
   const recommendedIds = useMemo(() => {
@@ -583,12 +591,20 @@ export function GardenPlanner() {
     setShowNewBed(false);
   };
 
+  // Touch: a short press-and-hold starts a drag, a swipe still scrolls the
+  // palette. Mouse: a few pixels of movement, so plain clicks keep selecting.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+    useSensor(KeyboardSensor),
+  );
+
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div>
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("planner.title")}</h1>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {canUndo && (
               <Button variant="ghost" size="sm" onClick={undo} title="Undo (Ctrl+Z)">
                 <Undo2 size={16} />
@@ -643,7 +659,7 @@ export function GardenPlanner() {
             getPlantName={getPlantName}
           />
         ) : activeGarden ? (
-          <div className="grid gap-6 md:grid-cols-[1fr_280px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,1fr)_280px]">
             {/* Main area: beds */}
             <div className="min-w-0">
               {/* Placement feedback */}
@@ -771,7 +787,7 @@ export function GardenPlanner() {
                 ))}
               </div>
               {activeGarden.beds.length === 0 && (
-                <p className="mt-4 text-center text-gray-500">{t("planner.noGarden")}</p>
+                <p className="mt-4 text-center text-gray-500">{t("planner.noBeds")}</p>
               )}
               <CropRotation />
               {seasonArchives.filter((a) => a.gardenId === activeGardenId).length > 0 && (
@@ -798,7 +814,7 @@ export function GardenPlanner() {
             {/* Plant palette (compact on mobile, sidebar on desktop) */}
             <div className="order-first md:order-last">
               <Card>
-                <div className="max-h-[200px] overflow-y-auto sm:max-h-[300px] md:max-h-none">
+                <div className="md:max-h-none">
                   <PlantPalette
                     selectedPlantId={selectedPlant?.id ?? null}
                     onSelectPlant={handleSelectPlant}

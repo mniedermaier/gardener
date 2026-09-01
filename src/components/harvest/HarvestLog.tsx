@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { Plus, Trash2, Star, TrendingUp } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
@@ -19,6 +20,8 @@ export function HarvestLog() {
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [showAdd, setShowAdd] = useState(false);
+  const openAdd = useCallback(() => setShowAdd(true), []);
+  useOpenAddOnNavigate(openAdd);
   const [plantId, setPlantId] = useState(plants[0]?.id ?? "");
   const [gardenId, setGardenId] = useState(gardens[0]?.id ?? "");
   const [bedId, setBedId] = useState("");
@@ -231,7 +234,7 @@ export function HarvestLog() {
                 <button aria-label={t("common.favorite")}
                   key={q}
                   onClick={() => setQuality(q)}
-                  className="rounded p-1 transition-colors"
+                  className="flex h-10 w-10 items-center justify-center rounded transition-colors"
                 >
                   <Star size={24} className={q <= quality ? "text-amber-400" : "text-gray-300"} fill={q <= quality ? "currentColor" : "none"} />
                 </button>

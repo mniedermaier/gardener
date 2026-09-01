@@ -144,7 +144,7 @@ export function ProductionPage() {
             ))}
           </select>
         )}
-        <span className="text-xs text-gray-400">{filtered.length} {t("livestock.productionEntries", { count: filtered.length })}</span>
+        <span className="text-xs text-gray-400">{t("livestock.productionEntries", { count: filtered.length })}</span>
       </div>
 
       {/* List */}

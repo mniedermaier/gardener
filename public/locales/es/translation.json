@@ -33,7 +33,11 @@
       "livestock": "Ganadería",
       "records": "Registros",
       "analysis": "Análisis"
-    }
+    },
+    "mobileNav": "Navegación principal",
+    "openMenu": "Abrir menú",
+    "harvestShort": "Cosecha",
+    "plannerShort": "Planificador"
   },
   "dashboard": {
     "title": "Panel",
@@ -63,7 +67,8 @@
     "backupNow": "Respaldar ahora"
   },
   "search": {
-    "placeholder": "Buscar plantas, tareas, diario..."
+    "placeholder": "Buscar plantas, tareas, diario...",
+    "noResults": "Sin resultados"
   },
   "onboarding": {
     "welcome": "Bienvenido a Gardener!",
@@ -77,7 +82,8 @@
     "gardenDesc": "Puedes crear varios huertos despues (ej. jardin delantero, patio trasero, balcon).",
     "gardenPlaceholder": "ej. Mi Huerto",
     "next": "Siguiente",
-    "finish": "A cultivar!"
+    "finish": "A cultivar!",
+    "defaultGardenName": "Mi huerto"
   },
   "planner": {
     "title": "Planificador de huerto",
@@ -176,7 +182,8 @@
       "blocks": "Bloques rectangulares por planta",
       "companion_clusters": "Grupos de plantas compañeras"
     },
-    "bed": "Bancal"
+    "bed": "Bancal",
+    "noBeds": "Aún no hay bancales. ¡Empieza con «Nuevo bancal»!"
   },
   "plants": {
     "title": "Base de plantas",
@@ -1038,5 +1045,11 @@
     "full": "Almacenamiento lleno: los cambios ya no se guardan. Exporta una copia y elimina entradas antiguas.",
     "failed": "No se pudieron guardar los cambios.",
     "almostFull": "Almacenamiento al {{percent}} %. Exporta una copia y elimina entradas antiguas."
+  },
+  "quickAdd": {
+    "title": "Añadir rápido",
+    "harvest": "Registrar cosecha",
+    "task": "Nueva tarea",
+    "journal": "Entrada del diario"
   }
 }
