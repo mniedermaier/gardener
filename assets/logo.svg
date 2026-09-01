@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Sprout: two leaves on a stem. Pure paths, no fonts, so every renderer agrees. -->
+  <rect width="1024" height="1024" rx="220" fill="#15803d"/>
+  <g fill="none" stroke="#ffffff" stroke-width="44" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M512 860 C512 700 512 600 512 470"/>
+    <path d="M512 640 C512 520 420 430 280 430 C280 570 380 640 512 640 Z" fill="#ffffff"/>
+    <path d="M512 520 C512 380 620 300 760 300 C760 450 650 520 512 520 Z" fill="#ffffff"/>
+  </g>
+  <ellipse cx="512" cy="880" rx="240" ry="34" fill="#0f5c2c"/>
+</svg>

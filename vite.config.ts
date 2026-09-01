@@ -51,7 +51,7 @@ export default defineConfig({
           },
           {
             urlPattern: /locales\/.*\.json$/,
-            handler: "CacheFirst",
+            handler: "StaleWhileRevalidate",
             options: { cacheName: "translations-cache", expiration: { maxEntries: 10, maxAgeSeconds: 86400 * 30 } },
           },
           {

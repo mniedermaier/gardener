@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu, Cloud, CloudOff, RefreshCw, Search, X } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -15,6 +15,7 @@ interface TopBarProps {
 export function TopBar({ onMenuClick }: TopBarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { backendUrl, journalEntries, tasks } = useStore(useShallow((s) => ({ backendUrl: s.backendUrl, journalEntries: s.journalEntries, tasks: s.tasks })));
   const { connected, syncing } = useBackendSync();
   const plants = usePlants();
@@ -27,6 +28,15 @@ export function TopBar({ onMenuClick }: TopBarProps) {
   useEffect(() => {
     if (searchOpen) inputRef.current?.focus();
   }, [searchOpen]);
+
+  // Leaving the page (bottom nav, back button) closes the mobile search panel.
+  // Derived-state reset during render, as React recommends, instead of an effect.
+  const [seenPath, setSeenPath] = useState(pathname);
+  if (seenPath !== pathname) {
+    setSeenPath(pathname);
+    setSearchOpen(false);
+    setQuery("");
+  }
 
   // Debounce search query by 200ms
   useEffect(() => {
@@ -80,23 +90,42 @@ export function TopBar({ onMenuClick }: TopBarProps) {
     return items.slice(0, 8);
   }, [debouncedQuery, plants, journalEntries, tasks, getPlantName, t]);
 
+  const closeSearch = () => { setQuery(""); setSearchOpen(false); };
+
+  const resultList = results.length > 0 && (
+    <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+      {results.map((r, i) => (
+        <li key={i}>
+          <button
+            onClick={() => { navigate(r.path); closeSearch(); }}
+            className="flex min-h-11 w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            <span>{r.icon}</span>
+            <span className="flex-1 truncate">{r.label}</span>
+            <span className="text-xs text-gray-400">{r.type}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
-    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-900">
+    <header className="relative flex min-h-16 items-center justify-between border-b border-gray-200 bg-white px-4 pt-safe dark:border-gray-700 dark:bg-gray-900">
       <button
         onClick={onMenuClick}
-        aria-label="Open menu"
+        aria-label={t("nav.openMenu")}
         className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
       >
         <Menu size={24} />
       </button>
 
-      {/* Search */}
+      {/* Desktop search */}
       <div className="relative mx-4 hidden flex-1 sm:block">
         <div className="relative max-w-md">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             ref={inputRef}
-            type="text"
+            type="search"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
             onFocus={() => setSearchOpen(true)}
@@ -105,36 +134,50 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             className="w-full rounded-lg border border-gray-200 bg-gray-50 py-1.5 pl-9 pr-8 text-sm placeholder:text-gray-400 focus:border-garden-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-700 dark:bg-gray-800 dark:focus:bg-gray-800"
           />
           {query && (
-            <button aria-label={t("common.close")} onClick={() => { setQuery(""); setSearchOpen(false); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
+            <button aria-label={t("common.close")} onClick={closeSearch} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400">
               <X size={14} />
             </button>
           )}
         </div>
 
         {searchOpen && results.length > 0 && (
-          <div className="absolute left-0 top-full z-50 mt-1 w-full max-w-md rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
-            {results.map((r, i) => (
-              <button
-                key={i}
-                onClick={() => { navigate(r.path); setQuery(""); setSearchOpen(false); }}
-                className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                <span>{r.icon}</span>
-                <span className="flex-1 truncate">{r.label}</span>
-                <span className="text-xs text-gray-400">{r.type}</span>
-              </button>
-            ))}
+          <div className="absolute left-0 top-full z-50 mt-1 w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+            {resultList}
           </div>
         )}
       </div>
 
-      {/* Mobile search button */}
-      <button aria-label={t("common.search")}
-        onClick={() => setSearchOpen(!searchOpen)}
-        className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 sm:hidden dark:text-gray-400 dark:hover:bg-gray-800"
+      {/* Mobile search toggle */}
+      <button
+        aria-label={searchOpen ? t("common.close") : t("common.search")}
+        aria-expanded={searchOpen}
+        onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
+        className="rounded-lg p-2.5 text-gray-600 hover:bg-gray-100 sm:hidden dark:text-gray-400 dark:hover:bg-gray-800"
       >
-        <Search size={20} />
+        {searchOpen ? <X size={22} /> : <Search size={22} />}
       </button>
+
+      {/* Mobile search panel: drops down below the header, full width */}
+      {searchOpen && (
+        <div className="absolute inset-x-0 top-full z-50 border-b border-gray-200 bg-white shadow-lg sm:hidden dark:border-gray-700 dark:bg-gray-900">
+          <div className="relative p-3">
+            <Search size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              ref={inputRef}
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label={t("search.placeholder")}
+              placeholder={t("search.placeholder")}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-base focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-700 dark:bg-gray-800"
+            />
+          </div>
+          {resultList}
+          {debouncedQuery.length >= 2 && results.length === 0 && (
+            <p className="px-4 pb-3 text-sm text-gray-500">{t("search.noResults")}</p>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center gap-2">
         {backendUrl && (

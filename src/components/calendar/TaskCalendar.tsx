@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { Plus, Check, Calendar, Download, Trash2, Filter } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -46,6 +47,8 @@ export function TaskCalendar() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [showAddTask, setShowAddTask] = useState(false);
+  const openAdd = useCallback(() => setShowAddTask(true), []);
+  useOpenAddOnNavigate(openAdd);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<TaskType>("custom");
   const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -201,7 +204,7 @@ export function TaskCalendar() {
             <>
               <button
                 onClick={() => setTypeFilter("all")}
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeFilter === "all" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}
+                className={`min-h-8 rounded-full px-2.5 py-1 text-xs font-medium ${typeFilter === "all" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}
               >
                 {t("plants.allCategories")}
               </button>
@@ -209,7 +212,7 @@ export function TaskCalendar() {
                 <button
                   key={type}
                   onClick={() => setTypeFilter(typeFilter === type ? "all" : type)}
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeFilter === type ? taskTypeColors[type] : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}
+                  className={`min-h-8 rounded-full px-2.5 py-1 text-xs font-medium ${typeFilter === type ? taskTypeColors[type] : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}
                 >
                   {t(`calendar.taskTypes.${type}`)}
                 </button>
@@ -301,7 +304,7 @@ export function TaskCalendar() {
                 <button
                   key={type}
                   onClick={() => setNewType(type)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  className={`min-h-10 rounded-full px-3 py-1.5 text-xs font-medium transition-colors touch-manipulation ${
                     newType === type ? taskTypeColors[type] + " ring-2 ring-offset-1 ring-garden-500" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                   }`}
                 >

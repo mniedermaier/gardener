@@ -215,7 +215,7 @@ export function FoodPlan() {
                       style={{ width: `${Math.min(100, percent)}%` }}
                     />
                   </div>
-                  <div className="mt-0.5 flex justify-between text-[10px] text-gray-400">
+                  <div className="mt-1 flex justify-between text-xs tabular-nums text-gray-500 dark:text-gray-400">
                     <span>{plan.currentYieldKg} / {plan.targetKg} kg</span>
                     <span>{plan.currentAreaM2} / {plan.neededAreaM2} m²</span>
                   </div>

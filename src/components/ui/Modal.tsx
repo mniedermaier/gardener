@@ -51,7 +51,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         // Clicks land on the dialog itself only when they hit the backdrop.
         if (e.target === dialogRef.current) dialogRef.current?.close();
       }}
-      className="m-0 max-h-[90vh] w-full max-w-none translate-y-0 self-end overflow-y-auto rounded-t-xl bg-white p-4 text-gray-900 backdrop:bg-black/50 sm:m-auto sm:max-w-lg sm:self-center sm:rounded-xl sm:p-6 dark:bg-gray-900 dark:text-gray-100"
+      className="m-0 max-h-[90dvh] w-full max-w-none translate-y-0 self-end overflow-y-auto rounded-t-xl bg-white p-4 pb-sheet text-gray-900 backdrop:bg-black/50 sm:m-auto sm:max-w-lg sm:self-center sm:rounded-xl sm:p-6 dark:bg-gray-900 dark:text-gray-100"
     >
       <div className="mb-4 flex items-center justify-between">
         <h2 id={titleId} className="text-lg font-semibold">{title}</h2>

@@ -28,7 +28,7 @@ const DraggableItem = memo(function DraggableItem({ plant, isSelected, isRecomme
       {...listeners}
       {...attributes}
       onClick={(e) => { e.stopPropagation(); onSelect(); }}
-      className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs transition-all cursor-grab active:cursor-grabbing ${
+      className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1 text-xs transition-all cursor-grab active:cursor-grabbing touch-manipulation select-none md:shrink ${
         isDragging ? "opacity-40" : ""
       } ${isSelected
         ? "border-garden-500 bg-garden-50 text-garden-700 ring-1 ring-garden-500 dark:bg-garden-900/30 dark:text-garden-400"
@@ -82,7 +82,7 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, recommendedIds }:
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("plants.search")}
-            className="w-full rounded-lg border border-gray-300 bg-white py-1.5 pl-7 pr-2 text-xs shadow-sm placeholder:text-gray-400 focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-7 pr-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
       </div>
@@ -94,7 +94,7 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, recommendedIds }:
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+              className={`min-h-8 rounded-md px-2.5 py-1 text-xs font-medium transition-colors touch-manipulation ${
                 category === cat
                   ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400"
                   : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
@@ -108,7 +108,8 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, recommendedIds }:
         })}
       </div>
 
-      <div className="flex flex-wrap gap-1">
+      {/* Mobile: one horizontally scrollable row so the beds stay on screen; desktop: wrapping grid */}
+      <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
         {filtered.map((p) => (
           <DraggableItem
             key={p.id}

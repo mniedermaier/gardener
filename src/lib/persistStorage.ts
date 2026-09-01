@@ -40,6 +40,19 @@ export interface BackingStore {
   removeItem(key: string): void;
 }
 
+/**
+ * Optional secondary sink for successful writes. The native app uses it to
+ * copy the snapshot into an app-private file, see `lib/nativeStorage.ts`.
+ * `null` means the key was removed.
+ */
+export type WriteMirror = (key: string, value: string | null) => void;
+
+let writeMirror: WriteMirror | null = null;
+
+export function setWriteMirror(mirror: WriteMirror | null): void {
+  writeMirror = mirror;
+}
+
 export function createSafeStorage(backing: BackingStore): StateStorage {
   // Only announce a change in condition — persist writes on every mutation.
   let lastFailureKind: StorageFailure["kind"] | null = null;
@@ -64,6 +77,7 @@ export function createSafeStorage(backing: BackingStore): StateStorage {
       try {
         backing.setItem(name, value);
         lastFailureKind = null;
+        writeMirror?.(name, value);
       } catch (error) {
         report(error);
       }
@@ -71,6 +85,7 @@ export function createSafeStorage(backing: BackingStore): StateStorage {
     removeItem: (name) => {
       try {
         backing.removeItem(name);
+        writeMirror?.(name, null);
       } catch (error) {
         report(error);
       }

@@ -33,7 +33,11 @@
       "livestock": "Livestock",
       "records": "Records",
       "analysis": "Analysis"
-    }
+    },
+    "mobileNav": "Main navigation",
+    "openMenu": "Open menu",
+    "harvestShort": "Harvest",
+    "plannerShort": "Planner"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -63,7 +67,8 @@
     "backupNow": "Backup now"
   },
   "search": {
-    "placeholder": "Search plants, tasks, journal..."
+    "placeholder": "Search plants, tasks, journal...",
+    "noResults": "No results"
   },
   "onboarding": {
     "welcome": "Welcome to Gardener!",
@@ -77,7 +82,8 @@
     "gardenDesc": "You can create multiple gardens later (e.g. front yard, back yard, balcony).",
     "gardenPlaceholder": "e.g. My Garden",
     "next": "Next",
-    "finish": "Let's grow!"
+    "finish": "Let's grow!",
+    "defaultGardenName": "My Garden"
   },
   "planner": {
     "title": "Garden Planner",
@@ -176,7 +182,8 @@
       "blocks": "Rectangular blocks per plant",
       "companion_clusters": "Companion plant groups side by side"
     },
-    "bed": "Bed"
+    "bed": "Bed",
+    "noBeds": "No beds yet. Start with “New Bed”!"
   },
   "plants": {
     "title": "Plant Database",
@@ -1038,5 +1045,11 @@
     "full": "Storage full — changes are no longer being saved. Export a backup and remove old entries.",
     "failed": "Changes could not be saved.",
     "almostFull": "Storage is {{percent}}% full. Export a backup and remove old entries to free space."
+  },
+  "quickAdd": {
+    "title": "Quick add",
+    "harvest": "Log a harvest",
+    "task": "Add a task",
+    "journal": "Journal entry"
   }
 }

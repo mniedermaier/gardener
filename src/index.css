@@ -103,3 +103,22 @@ aside::-webkit-scrollbar-thumb,
     overflow: visible !important;
   }
 }
+
+/* Safe areas (iPhone notch / home indicator, Android gesture bar).
+   env() is 0 outside standalone/native mode, so these are no-ops on desktop. */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pb-safe-nav {
+  /* bottom nav (3.5rem) + floating quick-add button (4.5rem) + gesture bar */
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+}
+@utility bottom-safe-nav {
+  bottom: calc(4.25rem + env(safe-area-inset-bottom));
+}
+@utility pb-sheet {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}

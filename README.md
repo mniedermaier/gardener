@@ -118,6 +118,19 @@ React 19 · TypeScript · Vite · Tailwind CSS · Zustand · @dnd-kit · react-i
 
 Optional backend: Express + SQLite + rate limiting (Docker only)
 
+## Mobile App (iOS & Android)
+
+The same build runs as a native app through [Capacitor](https://capacitorjs.com):
+
+```bash
+npm run cap:android   # build + open in Android Studio
+npm run cap:ios       # build + open in Xcode (macOS)
+```
+
+Native projects live in `android/` and `ios/`. Store release steps, signing and
+the data-safety answers are in [docs/MOBILE.md](docs/MOBILE.md). The privacy
+policy served to the stores is [public/privacy.html](public/privacy.html).
+
 ## Running the backend safely
 
 The container ships without authentication, which is fine on a trusted home

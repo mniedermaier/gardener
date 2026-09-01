@@ -12,9 +12,17 @@
     "test:e2e": "playwright test --config e2e/playwright.config.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "build:native": "tsc -b && vite build && cap sync",
+    "cap:sync": "cap sync",
+    "cap:android": "npm run build:native && cap open android",
+    "cap:ios": "npm run build:native && cap open ios",
+    "cap:run:android": "npm run build:native && cap run android"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/filesystem": "^8.1.3",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -32,6 +40,9 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/ios": "^8.5.1",
     "@playwright/test": "^1.62.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.0",

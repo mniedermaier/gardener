@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { safeLocalStorage } from "@/lib/persistStorage";
+import { withNativeRestore } from "@/lib/nativeStorage";
 import { createSettingsSlice, type SettingsSlice } from "./settingsSlice";
 import { createGardenSlice, type GardenSlice } from "./gardenSlice";
 import { createTaskSlice, type TaskSlice } from "./taskSlice";
@@ -32,7 +33,7 @@ const PERSISTED_KEYS = [
   "gardens", "tasks", "harvests", "journalEntries", "expenses", "seeds",
   "soilTests", "amendments", "pests", "waterEntries", "animals",
   "animalProducts", "feedEntries", "healthEvents", "pantryItems",
-  "customPlants", "seasonArchives", "weatherHistory",
+  "customPlants", "seasonArchives", "weatherHistory", "activeGardenId",
   // Einstellungen
   "locale", "weatherApiKey", "locationLat", "locationLon", "locationName",
   "lastFrostDate", "gridCellSizeCm", "backendUrl", "theme", "alerts",
@@ -82,7 +83,8 @@ export const useStore = create<AppStore>()(
     {
       name: "gardener-storage",
       version: 4,
-      storage: createJSONStorage(() => safeLocalStorage),
+      // Synchronous in the browser; on native the first read may come from the file mirror.
+      storage: createJSONStorage(() => withNativeRestore(safeLocalStorage)),
       // Only data is persisted — actions are functions and would be dropped by
       // JSON anyway, but listing the fields keeps derived/transient state out.
       partialize: (state) =>

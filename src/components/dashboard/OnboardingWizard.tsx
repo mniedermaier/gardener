@@ -30,9 +30,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
 
   const handleFinish = () => {
     setLastFrostDate(frostDate);
-    if (gardenName.trim()) {
-      addGarden(gardenName.trim());
-    }
+    // An empty name must not leave the app without a garden: every page
+    // would then greet the new user with "no garden yet".
+    addGarden(gardenName.trim() || t("onboarding.defaultGardenName"));
     onComplete();
   };
 

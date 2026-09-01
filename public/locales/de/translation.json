@@ -33,7 +33,11 @@
       "livestock": "Tierhaltung",
       "records": "Dokumentation",
       "analysis": "Analyse"
-    }
+    },
+    "mobileNav": "Hauptnavigation",
+    "openMenu": "Menü öffnen",
+    "harvestShort": "Ernte",
+    "plannerShort": "Planer"
   },
   "dashboard": {
     "title": "Übersicht",
@@ -74,10 +78,12 @@
     "gardenDesc": "Du kannst später weitere Gärten anlegen (z.B. Vorgarten, Hinterhof, Balkon).",
     "gardenPlaceholder": "z.B. Mein Garten",
     "next": "Weiter",
-    "finish": "Ab ins Beet!"
+    "finish": "Ab ins Beet!",
+    "defaultGardenName": "Mein Garten"
   },
   "search": {
-    "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen..."
+    "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen...",
+    "noResults": "Keine Treffer"
   },
   "planner": {
     "title": "Gartenplaner",
@@ -176,7 +182,8 @@
       "blocks": "Rechteckige Blöcke pro Pflanze",
       "companion_clusters": "Begleitpflanzen-Gruppen nebeneinander"
     },
-    "bed": "Beet"
+    "bed": "Beet",
+    "noBeds": "Noch kein Beet angelegt. Lege mit „Neues Beet“ los!"
   },
   "plants": {
     "title": "Pflanzendatenbank",
@@ -1038,5 +1045,11 @@
     "full": "Speicher voll — Änderungen werden nicht mehr gesichert. Exportiere ein Backup und lösche alte Einträge.",
     "failed": "Änderungen konnten nicht gespeichert werden.",
     "almostFull": "Speicher zu {{percent}} % belegt. Ein Backup und das Aufräumen alter Einträge schaffen Platz."
+  },
+  "quickAdd": {
+    "title": "Schnell erfassen",
+    "harvest": "Ernte eintragen",
+    "task": "Aufgabe anlegen",
+    "journal": "Tagebucheintrag"
   }
 }

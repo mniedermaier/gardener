@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { Plus, Trash2, Tag, Sprout, LayoutGrid, Bird, Camera, X } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
@@ -65,6 +66,8 @@ export function GardenJournal() {
   const plants = usePlants();
   const plantMap = usePlantMap();
   const [showAdd, setShowAdd] = useState(false);
+  const openAdd = useCallback(() => setShowAdd(true), []);
+  useOpenAddOnNavigate(openAdd);
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));

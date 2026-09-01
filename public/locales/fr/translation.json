@@ -33,7 +33,11 @@
       "livestock": "Élevage",
       "records": "Documentation",
       "analysis": "Analyse"
-    }
+    },
+    "mobileNav": "Navigation principale",
+    "openMenu": "Ouvrir le menu",
+    "harvestShort": "Récolte",
+    "plannerShort": "Planificateur"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -63,7 +67,8 @@
     "backupNow": "Sauvegarder maintenant"
   },
   "search": {
-    "placeholder": "Rechercher plantes, tâches, journal..."
+    "placeholder": "Rechercher plantes, tâches, journal...",
+    "noResults": "Aucun résultat"
   },
   "onboarding": {
     "welcome": "Bienvenue sur Gardener !",
@@ -77,7 +82,8 @@
     "gardenDesc": "Vous pourrez créer d'autres jardins plus tard (ex : jardin avant, arrière-cour, balcon).",
     "gardenPlaceholder": "ex : Mon jardin",
     "next": "Suivant",
-    "finish": "C'est parti !"
+    "finish": "C'est parti !",
+    "defaultGardenName": "Mon jardin"
   },
   "planner": {
     "title": "Planificateur de jardin",
@@ -176,7 +182,8 @@
       "blocks": "Blocs rectangulaires par plante",
       "companion_clusters": "Groupes de plantes compagnes"
     },
-    "bed": "Planche"
+    "bed": "Planche",
+    "noBeds": "Aucune planche pour l’instant. Commencez par « Nouvelle planche » !"
   },
   "plants": {
     "title": "Base de plantes",
@@ -1038,5 +1045,11 @@
     "full": "Stockage plein — les modifications ne sont plus enregistrées. Exportez une sauvegarde et supprimez d'anciennes entrées.",
     "failed": "Les modifications n'ont pas pu être enregistrées.",
     "almostFull": "Stockage rempli à {{percent}} %. Exportez une sauvegarde et supprimez d'anciennes entrées."
+  },
+  "quickAdd": {
+    "title": "Saisie rapide",
+    "harvest": "Noter une récolte",
+    "task": "Nouvelle tâche",
+    "journal": "Entrée de journal"
   }
 }

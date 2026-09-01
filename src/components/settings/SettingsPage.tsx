@@ -69,7 +69,7 @@ export function SettingsPage() {
       <div className="space-y-6">
         <Card>
           <h2 className="mb-4 text-lg font-semibold">{t("settings.language")}</h2>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(["de", "en", "es", "fr"] as const).map((lang) => (
               <button
                 key={lang}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Gardener</string>
+    <string name="title_activity_main">Gardener</string>
+    <string name="package_name">io.github.mniedermaier.gardener</string>
+    <string name="custom_url_scheme">io.github.mniedermaier.gardener</string>
+</resources>

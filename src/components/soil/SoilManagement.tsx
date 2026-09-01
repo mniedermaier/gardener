@@ -110,7 +110,7 @@ export function SoilManagement() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{t("soil.title")}</h1>
         <div className="flex gap-2">
           <Button variant="secondary" size="sm" onClick={() => setShowAddAmend(true)}>

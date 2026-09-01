@@ -142,13 +142,13 @@ function NavGroupSection({ group, onClose }: { group: NavGroup; onClose: () => v
                 to={item.to}
                 onClick={onClose}
                 title={t(item.labelKey)}
-                className={`rounded p-1 transition-colors ${
+                className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
                   isActive
                     ? "bg-garden-100 text-garden-600 dark:bg-garden-900/40 dark:text-garden-400"
                     : "text-gray-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
                 }`}
               >
-                <item.icon size={14} />
+                <item.icon size={16} />
               </NavLink>
             );
           })}

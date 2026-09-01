@@ -18,6 +18,7 @@ Gardener is a self-sufficiency garden planning application. Plan vegetables, fru
 - **Solar:** SunCalc
 - **Backend (Docker only):** Express 5 + better-sqlite3 + Zod
 - **PWA:** vite-plugin-pwa with Workbox (CacheFirst for assets/translations)
+- **Native (stores):** Capacitor 8 wraps the same build; native-only code lives in `lib/nativeStorage.ts` (file mirror of the store) and `lib/native.ts` (Android back button). See `docs/MOBILE.md`.
 
 ## Commands
 
@@ -25,12 +26,16 @@ Gardener is a self-sufficiency garden planning application. Plan vegetables, fru
 npm run dev          # Dev server (localhost:5173)
 npm run build        # TypeScript check + Vite production build
 npm run lint         # oxlint (correctness + jsx-a11y + react-hooks)
-npm run test         # Unit tests (Vitest, 134 tests)
+npm run test         # Unit tests (Vitest, 143 tests)
 npm run test:coverage # Unit tests with coverage report
 npm run test:e2e     # E2E tests (Playwright, 8 tests)
 npm run preview      # Preview production build
 
 docker compose up --build  # Docker (localhost:8080)
+
+npm run build:native # Web build + cap sync into android/ and ios/
+npm run cap:android  # Open in Android Studio (needs JDK 21 + SDK)
+npm run cap:ios      # Open in Xcode (macOS only)
 ```
 
 ## Project Structure
@@ -69,7 +74,7 @@ src/
                    weatherAlerts, sufficiency (monthly, plants + livestock),
                    sunlight, succession, sharing, iCal, dataExport/Import, advisor, theme
   hooks/           usePlants, usePlantName, useBackendSync, useUndo
-  test/            21 test suites, 134 tests (incl. i18n integrity, component tests)
+  test/            23 test suites, 143 tests (incl. i18n integrity, component tests)
 public/locales/    Translation JSON files (de/, en/, es/, fr/)
 e2e/               8 Playwright E2E tests
 backend/           Express + SQLite (Docker only)
@@ -121,6 +126,16 @@ backend/           Express + SQLite (Docker only)
   instead of vanishing. Never bypass it with a direct `localStorage.setItem`.
 - New persisted fields must be added to `PERSISTED_KEYS` in `store/index.ts`,
   otherwise they are silently dropped by `partialize`.
+- On native the first store read may be asynchronous (file mirror, see
+  `lib/nativeStorage.ts`); `main.tsx` gates `App` on `persist.hasHydrated()`.
+
+## Mobile Rules
+
+- Touch targets are at least 44 px (`min-h-11`/`min-h-14`); bottom nav and
+  floating buttons respect the safe area (`pb-safe`, `bottom-safe-nav`).
+- Pages with an "add" dialog expose it to the quick-add button via
+  `useOpenAddOnNavigate()`; add new quick actions in `layout/QuickAdd.tsx`.
+- dnd-kit needs `TouchSensor` with a delay so dragging does not fight scrolling.
 
 ## Accessibility Rules
 
