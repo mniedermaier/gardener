@@ -44,7 +44,7 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: gardener-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
