@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Printer, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { useFormat } from "@/hooks/useFormat";
 import type { Garden } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 
@@ -14,6 +16,7 @@ interface PrintBedLayoutProps {
 
 export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }: PrintBedLayoutProps) {
   const { t } = useTranslation();
+  const { formatDate, formatNumber } = useFormat();
 
   const plantMap = useMemo(() => {
     const map = new Map<string, Plant>();
@@ -21,7 +24,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
     return map;
   }, [plants]);
 
-  const today = new Date().toLocaleDateString();
+  const today = formatDate(new Date(), "long");
 
   return (
     <>
@@ -45,7 +48,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
         {/* Header controls - hidden when printing */}
         <div className="no-print mb-4 flex items-center gap-3">
           <Button onClick={() => window.print()} size="sm">
-            <Printer size={16} />
+            <Printer size={16} aria-hidden="true" />
             {t("planner.print")}
           </Button>
           <Button
@@ -56,7 +59,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
               window.dispatchEvent(new CustomEvent("close-print-view"));
             }}
           >
-            <X size={16} />
+            <X size={16} aria-hidden="true" />
             {t("common.close")}
           </Button>
         </div>
@@ -67,7 +70,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
             {garden.name} — {t("planner.printTitle")}
           </h1>
           <p className="mt-1 text-sm text-gray-500 print:text-gray-700">
-            {t("season.current", { year: garden.season })} | {today}
+            {t("season.current", { year: garden.season })} · {today}
           </p>
         </div>
 
@@ -93,7 +96,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
                 <h2 className="mb-2 text-lg font-semibold text-gray-800 print:text-black">
                   {bed.name}
                   <span className="ml-2 text-sm font-normal text-gray-500 print:text-gray-700">
-                    {widthCm} × {heightCm} cm
+                    {formatNumber(widthCm / 100)} × {formatNumber(heightCm / 100)} m
                   </span>
                 </h2>
 
@@ -109,9 +112,6 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
                         const isPath = pathSet.has(key);
                         const plantId = cellMap.get(key);
                         const plant = plantId ? plantMap.get(plantId) : undefined;
-                        const shortName = plant
-                          ? getPlantName(plant.id).slice(0, 3)
-                          : "";
 
                         return (
                           <div
@@ -126,14 +126,9 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
                             style={{ width: 48, height: 48 }}
                           >
                             {isPath ? (
-                              <span className="text-[10px] text-gray-500">///</span>
+                              <span className="text-[11px] text-gray-500" aria-label={t("planner.path")}>{"///"}</span>
                             ) : plant ? (
-                              <>
-                                <span className="text-sm leading-none">{plant.icon}</span>
-                                <span className="text-[8px] leading-tight text-gray-600 print:text-black">
-                                  {shortName}
-                                </span>
-                              </>
+                              <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
                             ) : null}
                           </div>
                         );
@@ -157,7 +152,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
                             key={pid}
                             className="inline-flex items-center gap-1 text-xs text-gray-700 print:text-black"
                           >
-                            <span>{p.icon}</span>
+                            <PlantIconDisplay plantId={pid} emoji={p.icon} size={16} />
                             {getPlantName(pid)}
                           </span>
                         );

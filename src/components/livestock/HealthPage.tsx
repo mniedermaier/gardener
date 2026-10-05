@@ -1,221 +1,182 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, Filter, AlertTriangle } from "lucide-react";
-import { useStore } from "@/store";
+import { AlertTriangle, Bird, ClipboardList, Coins, HeartCrack, HeartPulse, Pencil, Plus, Syringe, Trash2 } from "lucide-react";
+import { differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
+import { useStore } from "@/store";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { toDate } from "@/lib/format";
+import type { AnimalType, HealthEvent, HealthEventType } from "@/types/animal";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
-import { Input } from "@/components/ui/Input";
-import { useToast } from "@/components/ui/Toast";
-import { ANIMAL_ICONS, type HealthEventType } from "@/types/animal";
-import { format, differenceInDays, parseISO } from "date-fns";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatCard } from "@/components/ui/StatCard";
+import { Select } from "@/components/ui/Select";
+import { List, ListRow } from "@/components/ui/List";
+import { Menu } from "@/components/ui/Menu";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { HowCalculated } from "@/components/ui/charts";
+import { HEALTH_ICON, HEALTH_TONE } from "./icons";
+import { HEALTH_EVENT_TYPES, HealthDialog, IconTile, animalLabel, useRecordActions } from "./shared";
+import { groupByMonth } from "./groupByMonth";
 
-const HEALTH_EVENT_TYPES: HealthEventType[] = ["vaccination", "deworming", "illness", "injury", "checkup", "treatment", "death", "other"];
-const HEALTH_ICONS: Record<HealthEventType, string> = {
-  vaccination: "💉", deworming: "💊", illness: "🤒", injury: "🩹",
-  checkup: "🩺", treatment: "💊", death: "✝️", other: "📋",
-};
+/** Animals with common routine vaccinations (poultry: ND; rabbits: RHD/Myxo; goats/sheep: clostridia). Bees have none. */
+const VACCINATED_TYPES: AnimalType[] = ["chicken", "duck", "quail", "rabbit", "goat", "sheep"];
+const VACCINATION_INTERVAL_DAYS = 180;
 
 export function HealthPage() {
   const { t } = useTranslation();
+  const f = useFormat();
   const navigate = useNavigate();
-  const { toast, confirm } = useToast();
-  const { animals, healthEvents, addHealthEvent, deleteHealthEvent } = useStore(
-    useShallow((s) => ({ animals: s.animals, healthEvents: s.healthEvents, addHealthEvent: s.addHealthEvent, deleteHealthEvent: s.deleteHealthEvent }))
-  );
+  const { deleteHealth } = useRecordActions();
+  const { animals, healthEvents } = useStore(useShallow((s) => ({ animals: s.animals, healthEvents: s.healthEvents })));
 
   const [filterAnimalId, setFilterAnimalId] = useState("");
-  const [filterType, setFilterType] = useState("");
-  const [showAdd, setShowAdd] = useState(false);
-  const [healthAnimalId, setHealthAnimalId] = useState("");
-  const [healthType, setHealthType] = useState<HealthEventType>("checkup");
-  const [healthDesc, setHealthDesc] = useState("");
-  const [healthCost, setHealthCost] = useState("");
-  const [healthDate, setHealthDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [healthNotes, setHealthNotes] = useState("");
+  const [filterType, setFilterType] = useState<"" | HealthEventType>("");
+  const [dialog, setDialog] = useState<{ open: boolean; entry?: HealthEvent; animalId?: string; type?: HealthEventType }>({ open: false });
+  const openAdd = useCallback(() => setDialog({ open: true }), []);
+  useOpenAddOnNavigate(openAdd);
 
   const animalMap = useMemo(() => new Map(animals.map((a) => [a.id, a])), [animals]);
-
-  const filtered = useMemo(() => {
-    let items = healthEvents;
-    if (filterAnimalId) items = items.filter((h) => h.animalId === filterAnimalId);
-    if (filterType) items = items.filter((h) => h.type === filterType);
-    return [...items].sort((a, b) => b.date.localeCompare(a.date));
-  }, [healthEvents, filterAnimalId, filterType]);
+  const filtered = useMemo(
+    () => healthEvents
+      .filter((h) => (!filterAnimalId || h.animalId === filterAnimalId) && (!filterType || h.type === filterType))
+      .sort((a, b) => b.date.localeCompare(a.date)),
+    [healthEvents, filterAnimalId, filterType],
+  );
 
   const stats = useMemo(() => {
-    const totalCost = Math.round(healthEvents.reduce((s, h) => s + (h.cost ?? 0), 0) * 100) / 100;
-    const deaths = healthEvents.filter((h) => h.type === "death").length;
-    const openIllnesses = healthEvents.filter((h) => (h.type === "illness" || h.type === "injury")).length;
-
-    // Last vaccination per animal
-    const lastVaccination = new Map<string, string>();
+    const lastVacc = new Map<string, string>();
     for (const h of healthEvents) {
-      if (h.type === "vaccination") {
-        const current = lastVaccination.get(h.animalId);
-        if (!current || h.date > current) lastVaccination.set(h.animalId, h.date);
-      }
+      if (h.type !== "vaccination") continue;
+      const cur = lastVacc.get(h.animalId);
+      if (!cur || h.date > cur) lastVacc.set(h.animalId, h.date);
     }
-
-    // Animals overdue for vaccination (>180 days since last)
-    const overdueVaccinations: Array<{ animalId: string; daysSince: number }> = [];
-    for (const animal of animals) {
-      const lastDate = lastVaccination.get(animal.id);
-      if (lastDate) {
-        const days = differenceInDays(new Date(), parseISO(lastDate));
-        if (days > 180) overdueVaccinations.push({ animalId: animal.id, daysSince: days });
-      } else if (healthEvents.some((h) => h.animalId === animal.id)) {
-        // Has health records but no vaccination
-        overdueVaccinations.push({ animalId: animal.id, daysSince: -1 });
-      }
+    const due: { animalId: string; lastDate?: string; days?: number }[] = [];
+    for (const a of animals) {
+      if (!VACCINATED_TYPES.includes(a.type)) continue;
+      const last = lastVacc.get(a.id);
+      const d = last ? toDate(last) : null;
+      const days = d ? differenceInCalendarDays(new Date(), d) : undefined;
+      if (days === undefined || days > VACCINATION_INTERVAL_DAYS) due.push({ animalId: a.id, lastDate: last, days });
     }
-
-    return { totalCost, deaths, openIllnesses, overdueVaccinations };
+    return {
+      cost: healthEvents.reduce((s, h) => s + (h.cost ?? 0), 0),
+      losses: healthEvents.filter((h) => h.type === "death").length,
+      due,
+    };
   }, [healthEvents, animals]);
 
-  const handleAdd = () => {
-    if (!healthAnimalId || !healthDesc) return;
-    addHealthEvent({ animalId: healthAnimalId, date: healthDate, type: healthType, description: healthDesc, cost: healthCost ? Number(healthCost) : undefined, notes: healthNotes || undefined });
-    setHealthDesc(""); setHealthCost(""); setHealthNotes(""); setShowAdd(false);
-    toast(t("livestock.healthAdded"), "success");
-  };
+  const groups = groupByMonth(filtered);
+  const addButton = (
+    <Button onClick={openAdd}>
+      <Plus size={16} aria-hidden="true" />
+      {t("livestock.addHealth")}
+    </Button>
+  );
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("livestock.health.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} /> {t("livestock.addHealth")}
-        </Button>
-      </div>
+      <PageHeader title={t("livestock.health.title")} description={t("livestock.health.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
-      {/* Stats */}
-      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Card className="text-center">
-          <p className="text-2xl font-bold">{healthEvents.length}</p>
-          <p className="text-xs text-gray-500">{t("livestock.health.totalEvents")}</p>
+      {animals.length === 0 ? (
+        <Card>
+          <EmptyState icon={Bird} title={t("livestock.emptyTitle")} description={t("livestock.emptyText")} action={<Button onClick={() => navigate("/livestock")}>{t("livestock.toHerd")}</Button>} />
         </Card>
-        <Card className="text-center">
-          <p className="text-2xl font-bold text-rose-600">{stats.totalCost.toFixed(2)} €</p>
-          <p className="text-xs text-gray-500">{t("livestock.health.totalCost")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className={`text-2xl font-bold ${stats.deaths > 0 ? "text-red-600" : "text-green-600"}`}>{stats.deaths}</p>
-          <p className="text-xs text-gray-500">{t("livestock.health.losses")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className={`text-2xl font-bold ${stats.overdueVaccinations.length > 0 ? "text-amber-600" : "text-green-600"}`}>{stats.overdueVaccinations.length}</p>
-          <p className="text-xs text-gray-500">{t("livestock.health.overdueVacc")}</p>
-        </Card>
-      </div>
-
-      {/* Overdue vaccinations warning */}
-      {stats.overdueVaccinations.length > 0 && (
-        <Card className="mb-4 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/10">
-          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
-            <AlertTriangle size={14} /> {t("livestock.health.overdueWarning")}
-          </h3>
-          <div className="space-y-1">
-            {stats.overdueVaccinations.map(({ animalId, daysSince }) => {
-              const animal = animalMap.get(animalId);
-              if (!animal) return null;
-              return (
-                <button key={animalId} onClick={() => navigate(`/livestock/${animalId}`)}
-                  className="flex w-full items-center justify-between rounded px-2 py-1 text-xs text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/20">
-                  <span>{ANIMAL_ICONS[animal.type]} {animal.name || t(`livestock.types.${animal.type}`)}</span>
-                  <span>{daysSince > 0 ? t("livestock.health.daysSince", { days: daysSince }) : t("livestock.health.neverVaccinated")}</span>
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-      )}
-
-      {/* Filters */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Filter size={14} className="text-gray-400" />
-        {animals.length > 1 && (
-          <select value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800">
-            <option value="">{t("livestock.allAnimals")}</option>
-            {animals.map((a) => (
-              <option key={a.id} value={a.id}>{ANIMAL_ICONS[a.type]} {a.name || t(`livestock.types.${a.type}`)}</option>
-            ))}
-          </select>
-        )}
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)}
-          className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800">
-          <option value="">{t("livestock.health.allTypes")}</option>
-          {HEALTH_EVENT_TYPES.map((type) => (
-            <option key={type} value={type}>{HEALTH_ICONS[type]} {t(`livestock.healthTypes.${type}`)}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* List */}
-      {filtered.length === 0 ? (
-        <Card><p className="text-center text-gray-500">{t("livestock.noHealth")}</p></Card>
       ) : (
-        <div className="space-y-2">
-          {filtered.map((event) => {
-            const animal = animalMap.get(event.animalId);
-            return (
-              <div key={event.id} className={`flex items-center gap-3 rounded-lg border p-3 ${event.type === "death" ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/10" : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"}`}>
-                <span className="text-lg">{HEALTH_ICONS[event.type]}</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard label={t("livestock.health.totalEvents")} value={f.formatNumber(healthEvents.length, { maximumFractionDigits: 0 })} icon={ClipboardList} tone="neutral" />
+            <StatCard label={t("livestock.health.totalCost")} value={f.formatCurrency(stats.cost)} icon={Coins} tone="neutral" />
+            <StatCard label={t("livestock.health.losses")} value={f.formatNumber(stats.losses, { maximumFractionDigits: 0 })} icon={HeartCrack} tone={stats.losses > 0 ? "danger" : "neutral"} />
+            <StatCard label={t("livestock.health.overdueVacc")} value={f.formatNumber(stats.due.length, { maximumFractionDigits: 0 })} icon={Syringe} tone={stats.due.length > 0 ? "warning" : "neutral"} />
+          </div>
+
+          {stats.due.length > 0 && (
+            <Card padding="none">
+              <div className="flex items-start gap-3 px-4 pt-4">
+                <IconTile icon={AlertTriangle} tone="warning" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{t(`livestock.healthTypes.${event.type}`)} — {event.description}</p>
-                  <p className="text-xs text-gray-400">
-                    {animal && (
-                      <button onClick={() => navigate(`/livestock/${animal.id}`)} className="hover:underline">
-                        {ANIMAL_ICONS[animal.type]} {animal.name || t(`livestock.types.${animal.type}`)}
-                      </button>
-                    )}
-                    {" · "}{event.date}
-                    {event.cost ? ` · ${event.cost.toFixed(2)} €` : ""}
-                    {event.notes ? ` · ${event.notes}` : ""}
-                  </p>
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("livestock.health.dueTitle", { count: stats.due.length })}</h2>
+                  <HowCalculated className="mt-1">{t("livestock.health.dueHow", { days: VACCINATION_INTERVAL_DAYS })}</HowCalculated>
                 </div>
-                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHealthEvent(event.id); }}
-                  className="rounded p-1 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>
               </div>
-            );
-          })}
+              <ul className="mt-2 divide-y divide-gray-100 dark:divide-white/5">
+                {stats.due.map(({ animalId, lastDate }) => {
+                  const animal = animalMap.get(animalId);
+                  if (!animal) return null;
+                  return (
+                    <li key={animalId} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900 dark:text-gray-100">{animalLabel(animal, t)}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {lastDate ? t("livestock.health.lastVaccination", { date: f.formatDate(lastDate, "short") }) : t("livestock.health.neverVaccinated")}
+                        </p>
+                      </div>
+                      <Button size="sm" variant="secondary" onClick={() => setDialog({ open: true, animalId, type: "vaccination" })}>
+                        <Syringe size={14} aria-hidden="true" />
+                        {t("livestock.health.logVaccination")}
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          )}
+
+          {healthEvents.length === 0 ? (
+            <Card>
+              <EmptyState icon={HeartPulse} title={t("livestock.noHealthTitle")} description={t("livestock.noHealth")} action={addButton} />
+            </Card>
+          ) : (
+            <section className="space-y-3">
+              <div className="grid gap-3 sm:max-w-lg sm:grid-cols-2">
+                {animals.length > 1 && (
+                  <Select label={t("livestock.filterAnimal")} value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
+                )}
+                <Select label={t("livestock.healthType")} value={filterType} onChange={(e) => setFilterType(e.target.value as "" | HealthEventType)} placeholder={t("livestock.health.allTypes")} options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))} />
+              </div>
+              {groups.length === 0 ? (
+                <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
+              ) : groups.map((g) => (
+                <List key={g.key} header={f.formatDate(g.date, "monthYear")}>
+                  {g.items.map((h) => {
+                    const animal = animalMap.get(h.animalId);
+                    return (
+                      <ListRow
+                        key={h.id}
+                        leading={<IconTile icon={HEALTH_ICON[h.type]} tone={HEALTH_TONE[h.type]} />}
+                        title={h.description}
+                        badges={<Badge tone={HEALTH_TONE[h.type]}>{t(`livestock.healthTypes.${h.type}`)}</Badge>}
+                        meta={[animal ? animalLabel(animal, t) : null, f.formatDate(h.date, "relative")].filter(Boolean).join(" · ")}
+                        description={h.notes}
+                        trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : undefined}
+                        onClick={() => setDialog({ open: true, entry: h })}
+                        actions={
+                          <Menu
+                            label={t("common.moreActions")}
+                            items={[
+                              { label: t("common.edit"), icon: Pencil, onSelect: () => setDialog({ open: true, entry: h }) },
+                              ...(animal ? [{ label: t("livestock.openAnimal"), icon: Bird, onSelect: () => navigate(`/livestock/${animal.id}`) }] : []),
+                              "separator" as const,
+                              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void deleteHealth(h) },
+                            ]}
+                          />
+                        }
+                      />
+                    );
+                  })}
+                </List>
+              ))}
+            </section>
+          )}
         </div>
       )}
 
-      {/* Add modal */}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("livestock.addHealth")}>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.selectAnimal")}</label>
-            <select value={healthAnimalId} onChange={(e) => setHealthAnimalId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-              <option value="">--</option>
-              {animals.map((a) => (
-                <option key={a.id} value={a.id}>{ANIMAL_ICONS[a.type]} {a.name || t(`livestock.types.${a.type}`)} ({a.count}×)</option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-            {HEALTH_EVENT_TYPES.map((type) => (
-              <button key={type} onClick={() => setHealthType(type)}
-                className={`rounded-lg border px-2 py-1.5 text-xs ${healthType === type ? "border-garden-500 bg-garden-50 font-medium dark:bg-garden-900/30" : "border-gray-200 dark:border-gray-700"}`}>
-                {HEALTH_ICONS[type]} {t(`livestock.healthTypes.${type}`)}
-              </button>
-            ))}
-          </div>
-          <Input label={t("livestock.healthDesc")} value={healthDesc} onChange={(e) => setHealthDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} />
-          <Input label={t("livestock.feedCost")} type="number" min={0} step={0.01} value={healthCost} onChange={(e) => setHealthCost(e.target.value)} placeholder="0.00" />
-          <Input label={t("harvest.date")} type="date" value={healthDate} onChange={(e) => setHealthDate(e.target.value)} />
-          <Input label={t("harvest.notes")} value={healthNotes} onChange={(e) => setHealthNotes(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
-          </div>
-        </div>
-      </Modal>
+      <HealthDialog open={dialog.open} entry={dialog.entry} presetAnimalId={dialog.animalId} presetType={dialog.type} onClose={() => setDialog({ open: false })} />
     </div>
   );
 }

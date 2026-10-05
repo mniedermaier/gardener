@@ -1,230 +1,160 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, Target, ShoppingCart, Bird } from "lucide-react";
-import { useStore } from "@/store";
+import { useNavigate } from "react-router-dom";
+import { LayoutGrid, Ruler, Scale, ShoppingBasket, Target } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
+import { useStore } from "@/store";
+import { useAnalysisPrefs } from "@/store/analysisPrefs";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { getCropPlan, getForecastProducts, PRODUCT_TYPES } from "@/lib/metrics";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { ANIMAL_ICONS, PRODUCT_ICONS, ANNUAL_YIELD, PRODUCT_NUTRITION } from "@/types/animal";
-
-// Annual kg consumption targets per person (based on average European diet)
-const ANNUAL_KG_TARGETS: Record<string, { kgPerPerson: number; category: string }> = {
-  potato: { kgPerPerson: 30, category: "starch" },
-  carrot: { kgPerPerson: 8, category: "root" },
-  onion: { kgPerPerson: 10, category: "allium" },
-  tomato: { kgPerPerson: 15, category: "fruit_veg" },
-  cucumber: { kgPerPerson: 5, category: "fruit_veg" },
-  zucchini: { kgPerPerson: 5, category: "fruit_veg" },
-  pepper: { kgPerPerson: 4, category: "fruit_veg" },
-  lettuce: { kgPerPerson: 5, category: "leafy" },
-  cabbage: { kgPerPerson: 8, category: "brassica" },
-  bean: { kgPerPerson: 5, category: "legume" },
-  pea: { kgPerPerson: 3, category: "legume" },
-  spinach: { kgPerPerson: 3, category: "leafy" },
-  kale: { kgPerPerson: 3, category: "leafy" },
-  beetroot: { kgPerPerson: 4, category: "root" },
-  leek: { kgPerPerson: 3, category: "allium" },
-  garlic: { kgPerPerson: 1, category: "allium" },
-  pumpkin: { kgPerPerson: 5, category: "fruit_veg" },
-  squash: { kgPerPerson: 5, category: "fruit_veg" },
-  strawberry: { kgPerPerson: 3, category: "berry" },
-  raspberry: { kgPerPerson: 1, category: "berry" },
-};
-
-interface CropPlan {
-  plantId: string;
-  targetKg: number;
-  currentAreaM2: number;
-  neededAreaM2: number;
-  currentYieldKg: number;
-  deficit: number;
-  surplus: number;
-}
+import { Card, CardHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatCard } from "@/components/ui/StatCard";
+import { List, ListRow } from "@/components/ui/List";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { HowCalculated, Legend, Meter } from "@/components/ui/charts";
+import { HouseholdSizeField } from "@/components/sufficiency/HouseholdSizeField";
+import { PRODUCT_ICON } from "@/components/livestock/icons";
+import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 
 export function FoodPlan() {
   const { t } = useTranslation();
-  const { gardens, gridCellSizeCm, animals } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, animals: s.animals })));
+  const f = useFormat();
+  const navigate = useNavigate();
+  const { gardens, gridCellSizeCm, harvests, animals } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, harvests: s.harvests, animals: s.animals })),
+  );
+  const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const plantMap = usePlantMap();
-  const getPlantName = usePlantName();
-  const [familySize, setFamilySize] = useState(2);
+  const plantName = usePlantName();
+  const year = new Date().getFullYear();
 
-  const cropPlans = useMemo(() => {
-    const plans: CropPlan[] = [];
-    const cellAreaM2 = (gridCellSizeCm / 100) ** 2;
-
-    for (const [plantId, target] of Object.entries(ANNUAL_KG_TARGETS)) {
-      const plant = plantMap.get(plantId);
-      if (!plant) continue;
-
-      const targetKg = Math.round(target.kgPerPerson * familySize);
-      const yieldPerM2 = plant.expectedYieldKgPerM2 ?? 0;
-      const neededAreaM2 = yieldPerM2 > 0 ? Math.round((targetKg / yieldPerM2) * 10) / 10 : 0;
-
-      // Count current area
-      let cellCount = 0;
-      for (const g of gardens) for (const b of g.beds) cellCount += b.cells.filter((c) => c.plantId === plantId).length;
-      const currentAreaM2 = Math.round(cellCount * cellAreaM2 * 10) / 10;
-      const currentYieldKg = Math.round(currentAreaM2 * yieldPerM2 * 10) / 10;
-
-      plans.push({
-        plantId,
-        targetKg,
-        currentAreaM2,
-        neededAreaM2,
-        currentYieldKg,
-        deficit: Math.round(Math.max(0, targetKg - currentYieldKg) * 10) / 10,
-        surplus: Math.round(Math.max(0, currentYieldKg - targetKg) * 10) / 10,
-      });
-    }
-
-    return plans.sort((a, b) => b.deficit - a.deficit);
-  }, [familySize, gardens, plantMap, gridCellSizeCm]);
-
-  const totalTargetKg = Math.round(cropPlans.reduce((s, p) => s + p.targetKg, 0) * 10) / 10;
-  const totalCurrentKg = Math.round(cropPlans.reduce((s, p) => s + p.currentYieldKg, 0) * 10) / 10;
-  const totalNeededM2 = Math.round(cropPlans.reduce((s, p) => s + p.neededAreaM2, 0) * 10) / 10;
-  const totalCurrentM2 = Math.round(cropPlans.reduce((s, p) => s + p.currentAreaM2, 0) * 10) / 10;
-  const coveragePercent = totalTargetKg > 0 ? Math.round((totalCurrentKg / totalTargetKg) * 100) : 0;
-  const deficits = cropPlans.filter((p) => p.deficit > 0);
+  const plan = useMemo(
+    () => getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: year }),
+    [gardens, plantMap, gridCellSizeCm, harvests, householdSize, year],
+  );
+  const animalForecast = useMemo(() => getForecastProducts(animals), [animals]);
+  const deficits = plan.rows.filter((r) => r.deficitKg > 0.05);
+  const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
+  const kg = (v: number) => f.formatWeight(v * 1000, "kg");
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{t("foodplan.title")}</h1>
-        <p className="text-sm text-gray-500">{t("foodplan.subtitle")}</p>
-      </div>
+      <PageHeader title={t("foodplan.title")} description={t("foodplan.subtitle")} actions={<HouseholdSizeField />} />
 
-      <Card className="mb-6">
-        <div className="flex items-center gap-4">
-          <Users size={20} className="text-garden-600" />
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium">{t("sufficiency.familySize")}</label>
-            <Input type="number" min={1} max={20} value={familySize} onChange={(e) => setFamilySize(Math.max(1, Number(e.target.value)))} className="w-20" />
+      {!hasPlantings && animals.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={Target}
+            title={t("foodplan.emptyTitle")}
+            description={t("foodplan.emptyText", { kg: kg(plan.targetKg) })}
+            action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
+          />
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard label={t("foodplan.coverageForecast")} value={f.formatPercent(plan.forecastCoverage)} icon={Target} tone="brand" hint={t("foodplan.ofTarget", { kg: kg(plan.targetKg) })} />
+            <StatCard label={t("foodplan.coverageActual")} value={f.formatPercent(plan.actualCoverage)} icon={Scale} tone="neutral" hint={t("foodplan.actualKg", { kg: kg(plan.actualKg) })} />
+            <StatCard label={t("foodplan.area")} value={f.formatArea(plan.areaM2)} icon={Ruler} tone="neutral" hint={t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) })} />
+            <StatCard label={t("foodplan.deficits")} value={f.formatNumber(deficits.length, { maximumFractionDigits: 0 })} icon={ShoppingBasket} tone="neutral" hint={t("foodplan.ofCrops", { count: plan.rows.length })} />
           </div>
-        </div>
-      </Card>
+          <HowCalculated>
+            <p>{t("foodplan.howTargets")}</p>
+            <p>{t("foodplan.howCoverage")}</p>
+            <p>{t("metrics.howActual")}</p>
+          </HowCalculated>
 
-      {/* Overview stats */}
-      <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Card className="text-center">
-          <p className="text-2xl font-bold text-garden-600">{coveragePercent}%</p>
-          <p className="text-xs text-gray-500">{t("foodplan.coverage")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-2xl font-bold">{totalCurrentKg}<span className="text-sm text-gray-400">/{totalTargetKg} kg</span></p>
-          <p className="text-xs text-gray-500">{t("foodplan.produced")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-2xl font-bold">{totalCurrentM2}<span className="text-sm text-gray-400">/{totalNeededM2} m²</span></p>
-          <p className="text-xs text-gray-500">{t("foodplan.area")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className={`text-2xl font-bold ${deficits.length > 0 ? "text-amber-600" : "text-green-600"}`}>{deficits.length}</p>
-          <p className="text-xs text-gray-500">{t("foodplan.deficits")}</p>
-        </Card>
-      </div>
+          {deficits.length > 0 && (
+            <Card padding="none">
+              <div className="px-4 pt-4 sm:px-6 sm:pt-5"><CardHeader title={t("foodplan.deficitsTitle")} description={t("foodplan.deficitsDesc")} /></div>
+              <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
+                {deficits.slice(0, 5).map((r) => {
+                  const p = plantMap.get(r.plantId)!;
+                  return (
+                    <li key={r.plantId} className="flex items-center gap-3 px-4 py-2.5 sm:px-6">
+                      <PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />
+                      <span className="flex-1 text-sm font-medium text-gray-900 dark:text-gray-100">{plantName(p.id)}</span>
+                      <span className="text-right text-sm tabular-nums text-gray-700 dark:text-gray-300">
+                        {t("foodplan.missing", { kg: kg(r.deficitKg) })}
+                        <span className="block text-xs text-gray-500 dark:text-gray-400">{t("foodplan.extraArea", { area: f.formatArea(r.extraAreaM2) })}</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          )}
 
-      {/* Deficits warning */}
-      {deficits.length > 0 && (
-        <Card className="mb-6 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/10">
-          <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
-            <ShoppingCart size={14} />
-            {t("foodplan.deficitsTitle")}
-          </h2>
-          <div className="space-y-1">
-            {deficits.slice(0, 5).map((p) => {
-              const plant = plantMap.get(p.plantId);
-              if (!plant) return null;
-              const additionalM2 = Math.round((p.deficit / (plant.expectedYieldKgPerM2 ?? 1)) * 10) / 10;
-              return (
-                <div key={p.plantId} className="flex items-center justify-between text-xs text-amber-700 dark:text-amber-400">
-                  <span className="flex items-center gap-1">
-                    <PlantIconDisplay plantId={p.plantId} emoji={plant.icon} size={14} />
-                    {getPlantName(p.plantId)}
-                  </span>
-                  <span>{t("foodplan.needMore", { kg: p.deficit, m2: additionalM2 })}</span>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
-
-      {/* Animal products */}
-      {animals.length > 0 && (
-        <Card className="mb-6">
-          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-            <Bird size={18} />
-            {t("foodplan.animalProducts")}
-          </h2>
-          <div className="space-y-1.5">
-            {animals.map((animal) => {
-              const yields = ANNUAL_YIELD[animal.type];
-              return yields.map((y) => {
-                const totalQty = y.quantity * animal.count;
-                const kgTotal = y.unit === "pieces" ? totalQty * 0.06 : totalQty;
-                const nutrition = PRODUCT_NUTRITION[y.product];
-                const calories = Math.round(kgTotal * 10 * nutrition.caloriesPer100g);
-                const protein = Math.round(kgTotal * 10 * nutrition.proteinPer100g);
+          <section aria-labelledby="crop-plan" className="space-y-3">
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <h2 id="crop-plan" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.cropPlan")}</h2>
+              <Legend
+                items={[
+                  { label: t("metrics.actual"), color: "brand" },
+                  { label: t("metrics.forecast"), color: "brand", swatch: "hatched" },
+                  { label: t("foodplan.target"), color: "muted", swatch: "line" },
+                ]}
+              />
+            </div>
+            <List label={t("foodplan.cropPlan")}>
+              {plan.rows.map((r) => {
+                const p = plantMap.get(r.plantId)!;
+                const ratio = r.targetKg > 0 ? Math.min(1, r.forecastKg / r.targetKg) : 0;
+                const actualRatio = r.targetKg > 0 ? Math.min(1, r.actualKg / r.targetKg) : 0;
                 return (
-                  <div key={`${animal.id}-${y.product}`} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                    <span className="flex items-center gap-2 text-sm font-medium">
-                      <span>{ANIMAL_ICONS[animal.type]}</span>
-                      <span>{animal.name || t(`livestock.types.${animal.type}`)}</span>
-                      <span className="text-gray-400">→</span>
-                      <span>{PRODUCT_ICONS[y.product]} {t(`livestock.products.${y.product}`)}</span>
-                    </span>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <span className="font-semibold">{totalQty} {y.unit === "pieces" ? t("livestock.pieces") : y.unit}/{t("livestock.year")}</span>
-                      <span>{calories} kcal</span>
-                      <span>{protein}g Protein</span>
-                    </div>
-                  </div>
+                  <ListRow
+                    key={r.plantId}
+                    leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
+                    title={plantName(p.id)}
+                    badges={Math.max(ratio, actualRatio) >= 1 ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : r.areaM2 === 0 ? <Badge variant="outline">{t("foodplan.notPlanted")}</Badge> : undefined}
+                    meta={t("foodplan.rowMeta", { actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg), area: f.formatArea(r.areaM2), needed: f.formatArea(r.neededAreaM2) })}
+                    description={
+                      <Meter
+                        className="mt-1.5"
+                        size={6}
+                        actual={r.actualKg}
+                        forecast={r.forecastKg}
+                        max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}
+                        target={r.targetKg}
+                        label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
+                      />
+                    }
+                    trailing={
+                      <span className="block text-right text-xs leading-5 text-gray-500 dark:text-gray-400">
+                        <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">{t("foodplan.pctActual", { percent: f.formatPercent(actualRatio) })}</span>
+                        {t("foodplan.pctForecast", { percent: f.formatPercent(ratio) })}
+                      </span>
+                    }
+                  />
                 );
-              });
-            })}
-          </div>
-        </Card>
-      )}
+              })}
+            </List>
+          </section>
 
-      {/* Crop plan table */}
-      <Card>
-        <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-          <Target size={18} />
-          {t("foodplan.cropPlan")}
-        </h2>
-        <div className="space-y-1.5">
-          {cropPlans.map((plan) => {
-            const plant = plantMap.get(plan.plantId);
-            if (!plant) return null;
-            const percent = plan.targetKg > 0 ? Math.min(100, Math.round((plan.currentYieldKg / plan.targetKg) * 100)) : 0;
-            return (
-              <div key={plan.plantId} className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                <PlantIconDisplay plantId={plan.plantId} emoji={plant.icon} size={18} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{getPlantName(plan.plantId)}</span>
-                    <span className={`text-xs font-bold ${percent >= 100 ? "text-green-600" : percent >= 50 ? "text-amber-600" : "text-red-600"}`}>{percent}%</span>
-                  </div>
-                  <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div
-                      className={`h-full rounded-full ${percent >= 100 ? "bg-green-500" : percent >= 50 ? "bg-amber-500" : "bg-red-500"}`}
-                      style={{ width: `${Math.min(100, percent)}%` }}
-                    />
-                  </div>
-                  <div className="mt-1 flex justify-between text-xs tabular-nums text-gray-500 dark:text-gray-400">
-                    <span>{plan.currentYieldKg} / {plan.targetKg} kg</span>
-                    <span>{plan.currentAreaM2} / {plan.neededAreaM2} m²</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {animals.length > 0 && (
+            <section aria-labelledby="animal-products" className="space-y-3">
+              <h2 id="animal-products" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.animalProducts")}</h2>
+              <List label={t("foodplan.animalProducts")}>
+                {PRODUCT_TYPES.filter((ty) => animalForecast[ty] > 0).map((ty) => (
+                  <ListRow
+                    key={ty}
+                    leading={<IconTile icon={PRODUCT_ICON[ty]} />}
+                    title={t(`livestock.products.${ty}`)}
+                    meta={t("foodplan.animalMeta")}
+                    trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, animalForecast[ty], f, t) })}
+                  />
+                ))}
+              </List>
+            </section>
+          )}
         </div>
-      </Card>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ export interface TaskSlice {
   generateTasks: (gardenId: string, plantings: Array<{ plantId: string; bedId: string; type: TaskType; title: string; dueDate: string }>) => void;
 }
 
+const GENERATED_TYPES = new Set<TaskType>(["sow_indoors", "sow_outdoors", "transplant"]);
+
 let nextId = Date.now();
 const genId = () => `task-${nextId++}`;
 
@@ -38,10 +40,12 @@ export const createTaskSlice: StateCreator<TaskSlice> = (set) => ({
       ),
     })),
 
+  // Regenerating replaces only the open, plan-derived tasks of that garden.
+  // Custom, recurring and completed tasks survive (they used to be wiped).
   generateTasks: (gardenId, plantings) =>
     set((state) => ({
       tasks: [
-        ...state.tasks.filter((t) => t.gardenId !== gardenId),
+        ...state.tasks.filter((t) => !(t.gardenId === gardenId && !t.completedDate && t.bedId && t.plantId && GENERATED_TYPES.has(t.type))),
         ...plantings.map((p) => ({
           id: genId(),
           gardenId,

@@ -1,133 +1,112 @@
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Droplets, Ruler, Clock, Apple, X } from "lucide-react";
+import { Sun, Droplets, Ruler, Check, X, CalendarDays } from "lucide-react";
+import { addWeeks } from "date-fns";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant } from "@/types/plant";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { toDate } from "@/lib/format";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { addWeeks, parseISO, format } from "date-fns";
 
 interface Props {
   plant: Plant;
-  onClose: () => void;
+  /** Weeks of frost protection of the bed (greenhouse etc.) — shifts dates earlier. */
+  frostProtectionWeeks?: number;
 }
 
-export function PlantInfoPanel({ plant, onClose }: Props) {
+/**
+ * Compact plant facts for the planner side panel: needs, dates for this
+ * season (already shifted for the bed's frost protection) and neighbours.
+ */
+export const PlantInfoPanel = memo(function PlantInfoPanel({ plant, frostProtectionWeeks = 0 }: Props) {
   const { t } = useTranslation();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
+  const { formatDate, formatNumber } = useFormat();
   const { lastFrostDate } = useStore(useShallow((s) => ({ lastFrostDate: s.lastFrostDate })));
 
-  const frostDate = parseISO(lastFrostDate);
+  // This season's frost day, even if the stored date is from an earlier year.
+  const stored = toDate(lastFrostDate) ?? new Date();
+  const frost = new Date(new Date().getFullYear(), stored.getMonth(), stored.getDate());
+  const timings: Array<{ label: string; date: Date }> = [];
+  const add = (label: string, weeks: number | null) => {
+    if (weeks !== null) timings.push({ label, date: addWeeks(frost, weeks - frostProtectionWeeks) });
+  };
+  add(t("plants.details.sowIndoors"), plant.sowIndoorsWeeks);
+  add(t("plants.details.sowOutdoors"), plant.sowOutdoorsWeeks);
+  add(t("plants.details.transplant"), plant.transplantWeeks);
 
-  const timings: Array<{ label: string; date: string }> = [];
-  if (plant.sowIndoorsWeeks !== null) {
-    timings.push({
-      label: t("plants.details.sowIndoors"),
-      date: format(addWeeks(frostDate, plant.sowIndoorsWeeks), "dd.MM"),
-    });
-  }
-  if (plant.sowOutdoorsWeeks !== null) {
-    timings.push({
-      label: t("plants.details.sowOutdoors"),
-      date: format(addWeeks(frostDate, plant.sowOutdoorsWeeks), "dd.MM"),
-    });
-  }
-  if (plant.transplantWeeks !== null) {
-    timings.push({
-      label: t("plants.details.transplant"),
-      date: format(addWeeks(frostDate, plant.transplantWeeks), "dd.MM"),
-    });
-  }
+  const facts = [
+    { icon: Sun, text: t(`plants.sun.${plant.sunRequirement}`) },
+    { icon: Droplets, text: t(`plants.water.${plant.waterNeed}`) },
+    { icon: Ruler, text: t("planner.spacing", { value: formatNumber(plant.spacingCm) }) },
+  ];
+
+  const neighbourChips = (ids: string[], good: boolean) => (
+    <ul className="flex flex-wrap gap-1.5">
+      {ids.map((id) => {
+        const p = plantMap.get(id);
+        if (!p) return null;
+        return (
+          <li key={id} className="inline-flex items-center gap-1 rounded-md bg-gray-100 py-0.5 pr-2 pl-1 text-xs text-gray-700 dark:bg-white/10 dark:text-gray-300">
+            {good
+              ? <Check size={12} aria-hidden="true" className="text-positive" />
+              : <X size={12} aria-hidden="true" className="text-danger" />}
+            <PlantIconDisplay plantId={id} emoji={p.icon} size={14} />
+            {getPlantName(id)}
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
-    <div className="rounded-xl border border-garden-200 bg-garden-50/50 p-4 dark:border-garden-800 dark:bg-garden-900/20">
-      <div className="mb-3 flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: plant.color + "20" }}>
-            <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
-          </span>
-          <div>
-            <h3 className="font-semibold">{getPlantName(plant.id)}</h3>
-            <p className="text-xs text-gray-500">{t(`plants.category.${plant.category}`)}</p>
-          </div>
-        </div>
-        <button aria-label={t("common.close")} onClick={onClose} className="rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-          <X size={16} />
-        </button>
-      </div>
+    <div className="space-y-4 text-sm">
+      <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-gray-700 dark:text-gray-300">
+        {facts.map(({ icon: Icon, text }) => (
+          <li key={text} className="inline-flex items-center gap-1.5">
+            <Icon size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
+            {text}
+          </li>
+        ))}
+      </ul>
 
-      <div className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
-        <div className="flex items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 dark:bg-gray-800">
-          <Sun size={12} className="text-amber-500" />
-          <span>{t(`plants.sun.${plant.sunRequirement}`)}</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 dark:bg-gray-800">
-          <Droplets size={12} className="text-sky-500" />
-          <span>{t(`plants.water.${plant.waterNeed}`)}</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 dark:bg-gray-800">
-          <Ruler size={12} className="text-gray-500" />
-          <span>{plant.spacingCm} cm</span>
-        </div>
-      </div>
-
-      {timings.length > 0 && (
-        <div className="mb-3 flex flex-wrap gap-1.5">
-          {timings.map((t) => (
-            <span key={t.label} className="flex items-center gap-1 rounded bg-white px-2 py-0.5 text-xs dark:bg-gray-800">
-              <Clock size={10} className="text-gray-400" />
-              {t.label}: <strong>{t.date}</strong>
-            </span>
-          ))}
+      {(timings.length > 0 || plant.harvestDaysMin > 0) && (
+        <div>
+          <h4 className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+            <CalendarDays size={14} aria-hidden="true" />
+            {t("planner.thisSeason")}
+          </h4>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            {timings.map((tm) => (
+              <div key={tm.label} className="contents">
+                <dt className="text-gray-500 dark:text-gray-400">{tm.label}</dt>
+                <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">{formatDate(tm.date, "short")}</dd>
+              </div>
+            ))}
+            <dt className="text-gray-500 dark:text-gray-400">{t("planner.harvestAfter")}</dt>
+            <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">
+              {t("planner.daysRange", { min: formatNumber(plant.harvestDaysMin), max: formatNumber(plant.harvestDaysMax) })}
+            </dd>
+          </dl>
         </div>
       )}
-
-      <div className="mb-3 flex items-center gap-3 text-xs">
-        {plant.expectedYieldKgPerM2 && (
-          <span className="flex items-center gap-1">
-            <Apple size={10} className="text-garden-500" />
-            {plant.expectedYieldKgPerM2} kg/m²
-          </span>
-        )}
-        {plant.caloriesPer100g && (
-          <span className="text-gray-500">{plant.caloriesPer100g} kcal/100g</span>
-        )}
-        <span className="text-gray-500">{plant.harvestDaysMin}-{plant.harvestDaysMax} {t("common.days", { defaultValue: "days" })}</span>
-      </div>
 
       {plant.companions.length > 0 && (
-        <div className="mb-2">
-          <p className="mb-1 text-xs font-medium text-green-700 dark:text-green-400">{t("planner.companions")}</p>
-          <div className="flex flex-wrap gap-1">
-            {plant.companions.map((id) => {
-              const p = plantMap.get(id);
-              return p ? (
-                <span key={id} className="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  <PlantIconDisplay plantId={id} emoji={p.icon} size={14} /> {getPlantName(id)}
-                </span>
-              ) : null;
-            })}
-          </div>
+        <div>
+          <h4 className="mb-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">{t("planner.companions")}</h4>
+          {neighbourChips(plant.companions, true)}
         </div>
       )}
-
       {plant.antagonists.length > 0 && (
         <div>
-          <p className="mb-1 text-xs font-medium text-red-700 dark:text-red-400">{t("planner.antagonists")}</p>
-          <div className="flex flex-wrap gap-1">
-            {plant.antagonists.map((id) => {
-              const p = plantMap.get(id);
-              return p ? (
-                <span key={id} className="rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                  <PlantIconDisplay plantId={id} emoji={p.icon} size={14} /> {getPlantName(id)}
-                </span>
-              ) : null;
-            })}
-          </div>
+          <h4 className="mb-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">{t("planner.antagonists")}</h4>
+          {neighbourChips(plant.antagonists, false)}
         </div>
       )}
     </div>
   );
-}
+});

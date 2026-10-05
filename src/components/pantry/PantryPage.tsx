@@ -1,330 +1,440 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Check, AlertTriangle, Archive, BookOpen, Filter } from "lucide-react";
+import {
+  AlertTriangle, Archive, Check, CookingPot, FlaskRound, Lightbulb, Package, Pencil, Plus, RotateCcw, Snowflake, Sun, Trash2, Warehouse, type LucideIcon,
+} from "lucide-react";
+import { addMonths, differenceInCalendarDays } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { toDate, toISODate, todayISO } from "@/lib/format";
+import type { PreservationMethod } from "@/types/plant";
+import type { PantryItem } from "@/types/pantry";
+import { SHELF_LIFE_MONTHS, PRESERVATION_YIELD, PLANT_PRESERVATION_GUIDES } from "@/types/pantry";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { Card } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Badge } from "@/components/ui/Badge";
+import { IconButton } from "@/components/ui/IconButton";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { StatCard } from "@/components/ui/StatCard";
+import { Tabs } from "@/components/ui/Tabs";
+import { LABEL_CLASS } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
-import type { PreservationMethod } from "@/types/plant";
-import { SHELF_LIFE_MONTHS, PRESERVATION_YIELD, METHOD_ICONS, PLANT_PRESERVATION_GUIDES } from "@/types/pantry";
-import { format, addMonths, differenceInDays, parseISO } from "date-fns";
+import { DateField } from "@/components/records/DateField";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
+import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 
 const METHODS: PreservationMethod[] = ["canning", "freezing", "fermenting", "drying", "root_cellar"];
+const METHOD_ICON: Record<PreservationMethod, LucideIcon> = {
+  canning: CookingPot, freezing: Snowflake, fermenting: FlaskRound, drying: Sun, root_cellar: Warehouse,
+};
+const SOON_DAYS = 30;
+
+type Tab = "stock" | "consumed" | "guides";
+
+interface Draft {
+  plantId: string;
+  method: PreservationMethod;
+  quantity: string;
+  units: string;
+  unitLabel: string;
+  date: string;
+  label: string;
+  notes: string;
+  supplyCost: string;
+}
+
+const emptyDraft = (plantId = "", method: PreservationMethod = "freezing"): Draft => ({
+  plantId, method, quantity: "", units: "", unitLabel: "", date: todayISO(), label: "", notes: "", supplyCost: "",
+});
+const num = (s: string) => Number(s.trim().replace(",", "."));
+
+function MethodIcon({ method }: { method: PreservationMethod }) {
+  const Icon = METHOD_ICON[method];
+  return <Icon size={12} aria-hidden="true" className="shrink-0" />;
+}
+
+/** Radio cards for the preservation method (icon + name), arrow keys move. */
+function MethodPicker({ label, value, options, onChange }: { label: string; value: PreservationMethod; options: PreservationMethod[]; onChange: (m: PreservationMethod) => void }) {
+  const { t } = useTranslation();
+  const refs = useRef<Array<HTMLButtonElement | null>>([]);
+  const onKeyDown = (e: KeyboardEvent, i: number) => {
+    const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+    if (!delta) return;
+    e.preventDefault();
+    const next = (i + delta + options.length) % options.length;
+    onChange(options[next]);
+    refs.current[next]?.focus();
+  };
+  return (
+    <div>
+      <p className={LABEL_CLASS}>{label}</p>
+      <div role="radiogroup" aria-label={label} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {options.map((m, i) => {
+          const Icon = METHOD_ICON[m];
+          const selected = m === value;
+          return (
+            <button
+              key={m}
+              ref={(el) => { refs.current[i] = el; }}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => onChange(m)}
+              onKeyDown={(e) => onKeyDown(e, i)}
+              className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-left text-sm font-medium transition-colors ${
+                selected
+                  ? "border-garden-600 bg-garden-50 text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
+                  : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+              }`}
+            >
+              <Icon size={16} aria-hidden="true" className="shrink-0" />
+              {t(`preservation.methods.${m}`)}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function PantryPage() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
-  const { pantryItems, addPantryItem, deletePantryItem, consumePantryItem } = useStore(
+  const { formatDate, formatWeight, formatNumber, formatCurrency, formatPercent, locale } = useFormat();
+  const { pantryItems, addPantryItem, updatePantryItem, deletePantryItem, consumePantryItem } = useStore(
     useShallow((s) => ({
-      pantryItems: s.pantryItems, addPantryItem: s.addPantryItem,
+      pantryItems: s.pantryItems, addPantryItem: s.addPantryItem, updatePantryItem: s.updatePantryItem,
       deletePantryItem: s.deletePantryItem, consumePantryItem: s.consumePantryItem,
-    }))
+    })),
   );
   const plants = usePlants();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
-  const [tab, setTab] = useState<"stock" | "guides">("stock");
-  const [showAdd, setShowAdd] = useState(false);
-  const [showConsumed, setShowConsumed] = useState(false);
+  const [tab, setTab] = useState<Tab>("stock");
   const [filterMethod, setFilterMethod] = useState<string>("");
 
-  // Add form
-  const [plantId, setPlantId] = useState("");
-  const [method, setMethod] = useState<PreservationMethod>("freezing");
-  const [quantity, setQuantity] = useState("");
-  const [units, setUnits] = useState("");
-  const [unitLabel, setUnitLabel] = useState("");
-  const [dateVal, setDateVal] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [label, setLabel] = useState("");
-  const [notes, setNotes] = useState("");
-  const [supplyCost, setSupplyCost] = useState("");
+  // ---------------------------------------------------------------- dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft());
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  const today = new Date();
+  const preservable = useMemo(() => plants.filter((p) => (p.preservationMethods?.length ?? 0) > 0 || PLANT_PRESERVATION_GUIDES[p.id]), [plants]);
+  const methodsFor = useCallback(
+    (plantId: string): PreservationMethod[] => (plantId ? PLANT_PRESERVATION_GUIDES[plantId] ?? plantMap.get(plantId)?.preservationMethods ?? METHODS : METHODS),
+    [plantMap],
+  );
 
-  // Stats
-  const activeItems = pantryItems.filter((p) => !p.consumed);
-  const consumedItems = pantryItems.filter((p) => p.consumed);
+  const openAdd = useCallback((params: AddParams = {}) => {
+    const plantId = params.plant && plantMap.has(params.plant) ? params.plant : "";
+    setEditingId(null);
+    setSubmitted(false);
+    setDraft(emptyDraft(plantId, plantId ? methodsFor(plantId)[0] : "freezing"));
+    setDialogOpen(true);
+  }, [plantMap, methodsFor]);
+  const openAddPlain = useCallback(() => openAdd(), [openAdd]);
+  useOpenAddOnNavigate(openAddPlain);
+  useAddFromUrl(openAdd);
 
-  const stats = useMemo(() => {
-    const totalKg = Math.round(activeItems.reduce((s, p) => s + p.quantityKg, 0) * 10) / 10;
-    const totalUnits = activeItems.reduce((s, p) => s + (p.units ?? 0), 0);
-    const expiringSoon = activeItems.filter((p) => {
-      const daysLeft = differenceInDays(parseISO(p.expiresDate), today);
-      return daysLeft >= 0 && daysLeft <= 30;
-    }).length;
-    const expired = activeItems.filter((p) => differenceInDays(parseISO(p.expiresDate), today) < 0).length;
-    const totalCost = Math.round(activeItems.reduce((s, p) => s + (p.supplyCost ?? 0), 0) * 100) / 100;
-    const byMethod: Record<string, number> = {};
-    for (const item of activeItems) {
-      byMethod[item.method] = (byMethod[item.method] ?? 0) + item.quantityKg;
-    }
-    return { totalKg, totalUnits, expiringSoon, expired, totalCost, byMethod };
-  }, [activeItems, today]);
-
-  const filteredItems = filterMethod
-    ? activeItems.filter((p) => p.method === filterMethod)
-    : activeItems;
-
-  const handleAdd = () => {
-    if (!plantId || !quantity) return;
-    const expiresDate = format(addMonths(parseISO(dateVal), SHELF_LIFE_MONTHS[method]), "yyyy-MM-dd");
-    addPantryItem({
-      plantId, method,
-      quantityKg: Number(quantity),
-      units: units ? Number(units) : undefined,
-      unitLabel: unitLabel || undefined,
-      date: dateVal, expiresDate,
-      label: label || undefined,
-      notes: notes || undefined,
-      consumed: false,
-      supplyCost: supplyCost ? Number(supplyCost) : undefined,
+  const local = (n: number) => n.toLocaleString(locale, { useGrouping: false, maximumFractionDigits: 2 });
+  const openEdit = (item: PantryItem) => {
+    setEditingId(item.id);
+    setSubmitted(false);
+    setDraft({
+      plantId: item.plantId, method: item.method, quantity: local(item.quantityKg), units: item.units ? String(item.units) : "",
+      unitLabel: item.unitLabel ?? "", date: item.date, label: item.label ?? "", notes: item.notes ?? "",
+      supplyCost: item.supplyCost ? local(item.supplyCost) : "",
     });
-    setQuantity(""); setUnits(""); setUnitLabel(""); setLabel(""); setNotes(""); setSupplyCost("");
-    setShowAdd(false);
-    toast(t("pantry.added"), "success");
+    setDialogOpen(true);
   };
 
-  // Available methods for selected plant
-  const plantMethods = plantId
-    ? (plantMap.get(plantId)?.preservationMethods ?? METHODS)
-    : METHODS;
+  const quantityNum = num(draft.quantity);
+  const unitsNum = draft.units.trim() ? Math.round(num(draft.units)) : 0;
+  const costNum = draft.supplyCost.trim() ? num(draft.supplyCost) : 0;
+  const expiresDate = toISODate(addMonths(toDate(draft.date) ?? new Date(), SHELF_LIFE_MONTHS[draft.method]));
+  const errors = {
+    plant: submitted && !draft.plantId ? t("pantry.needPlant") : undefined,
+    quantity: (submitted || draft.quantity.trim()) && !(quantityNum > 0) ? t("pantry.needQuantity") : undefined,
+    units: !(unitsNum >= 0) ? t("pantry.invalidNumber") : undefined,
+    cost: !(costNum >= 0) ? t("pantry.invalidNumber") : undefined,
+  };
 
-  // Plants that have preservation guides
-  const guidePlants = useMemo(() => {
-    const planted = new Set<string>();
-    // Get all planted plant IDs
-    for (const plant of plants) {
-      if (plant.preservationMethods && plant.preservationMethods.length > 0) {
-        planted.add(plant.id);
-      }
+  const handleSave = () => {
+    setSubmitted(true);
+    if (!draft.plantId || !(quantityNum > 0) || errors.units || errors.cost) return;
+    const fields = {
+      plantId: draft.plantId, method: draft.method, quantityKg: quantityNum,
+      units: unitsNum || undefined, unitLabel: draft.unitLabel.trim() || undefined,
+      date: draft.date, expiresDate, label: draft.label.trim() || undefined, notes: draft.notes.trim() || undefined,
+      supplyCost: costNum || undefined,
+    };
+    if (editingId) {
+      updatePantryItem(editingId, fields);
+      toast(t("pantry.updated"), "success");
+    } else {
+      addPantryItem({ ...fields, consumed: false });
+      toast(t("pantry.added"), "success");
     }
-    return plants.filter((p) => PLANT_PRESERVATION_GUIDES[p.id] || (p.preservationMethods && p.preservationMethods.length > 0));
-  }, [plants]);
+    setDialogOpen(false);
+  };
+
+  const handleConsume = (item: PantryItem) => {
+    consumePantryItem(item.id);
+    toast(t("pantry.consumedToast", { name: item.label || getPlantName(item.plantId) }), "success", {
+      action: { label: t("common.undo"), onClick: () => updatePantryItem(item.id, { consumed: false, consumedDate: undefined }) },
+    });
+  };
+
+  const handleDelete = async (item: PantryItem) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deletePantryItem(item.id);
+    setDialogOpen(false);
+    const { id: _id, ...rest } = item;
+    toast(t("pantry.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addPantryItem(rest) } });
+  };
+
+  // ---------------------------------------------------------------- data
+  const today = useMemo(() => new Date(), []);
+  const daysLeft = useCallback((item: PantryItem) => differenceInCalendarDays(toDate(item.expiresDate) ?? today, today), [today]);
+  const active = useMemo(() => pantryItems.filter((p) => !p.consumed), [pantryItems]);
+  const consumed = useMemo(
+    () => pantryItems.filter((p) => p.consumed).sort((a, b) => (b.consumedDate ?? "").localeCompare(a.consumedDate ?? "")),
+    [pantryItems],
+  );
+  const stats = useMemo(() => {
+    const kg = active.reduce((s, p) => s + p.quantityKg, 0);
+    const units = active.reduce((s, p) => s + (p.units ?? 0), 0);
+    const soon = active.filter((p) => { const d = daysLeft(p); return d >= 0 && d <= SOON_DAYS; }).length;
+    const expired = active.filter((p) => daysLeft(p) < 0).length;
+    return { kg, units, soon, expired };
+  }, [active, daysLeft]);
+  const stock = useMemo(
+    () => active.filter((p) => !filterMethod || p.method === filterMethod).sort((a, b) => a.expiresDate.localeCompare(b.expiresDate)),
+    [active, filterMethod],
+  );
+
+  const editing = editingId ? pantryItems.find((p) => p.id === editingId) : undefined;
+  const draftMethods = methodsFor(draft.plantId);
+  const shelfText = t("pantry.monthsCount", { count: SHELF_LIFE_MONTHS[draft.method] });
+
+  const methodBadge = (m: PreservationMethod) => <Badge variant="outline" icon={METHOD_ICON[m]}>{t(`preservation.methods.${m}`)}</Badge>;
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("pantry.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} />
-          {t("pantry.add")}
-        </Button>
-      </div>
+      <PageHeader
+        title={t("pantry.title")}
+        description={t("pantry.subtitle")}
+        actions={
+          <Button onClick={openAddPlain}>
+            <Plus size={16} aria-hidden="true" />
+            {t("pantry.add")}
+          </Button>
+        }
+        tabs={
+          <Tabs
+            label={t("pantry.title")}
+            value={tab}
+            onChange={setTab}
+            items={[
+              { value: "stock", label: t("pantry.stockTab"), count: active.length },
+              { value: "consumed", label: t("pantry.consumed"), count: consumed.length },
+              { value: "guides", label: t("pantry.guidesTab") },
+            ]}
+          />
+        }
+      />
 
-      {/* Stats */}
-      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Card className="text-center">
-          <p className="text-2xl font-bold">{stats.totalKg} kg</p>
-          <p className="text-xs text-gray-500">{t("pantry.totalStored")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-2xl font-bold">{stats.totalUnits}</p>
-          <p className="text-xs text-gray-500">{t("pantry.totalUnits")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className={`text-2xl font-bold ${stats.expiringSoon > 0 ? "text-amber-600" : "text-green-600"}`}>{stats.expiringSoon}</p>
-          <p className="text-xs text-gray-500">{t("pantry.expiringSoon")}</p>
-        </Card>
-        <Card className="text-center">
-          <p className={`text-2xl font-bold ${stats.expired > 0 ? "text-red-600" : "text-green-600"}`}>{stats.expired}</p>
-          <p className="text-xs text-gray-500">{t("pantry.expired")}</p>
-        </Card>
-      </div>
-
-      {/* Method breakdown */}
-      {Object.keys(stats.byMethod).length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
-          {METHODS.map((m) => {
-            const kg = Math.round((stats.byMethod[m] ?? 0) * 10) / 10;
-            if (kg === 0) return null;
-            return (
-              <span key={m} className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                {METHOD_ICONS[m]} {t(`preservation.methods.${m}`)} {kg} kg
-              </span>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className="mb-4 flex gap-2">
-        <button onClick={() => setTab("stock")} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${tab === "stock" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
-          <Archive size={14} className="mr-1 inline" />
-          {t("pantry.stockTab")} ({activeItems.length})
-        </button>
-        <button onClick={() => setTab("guides")} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${tab === "guides" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
-          <BookOpen size={14} className="mr-1 inline" />
-          {t("pantry.guidesTab")}
-        </button>
-        {consumedItems.length > 0 && (
-          <button onClick={() => setShowConsumed(!showConsumed)} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${showConsumed ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
-            <Check size={14} className="mr-1 inline" />
-            {t("pantry.consumed")} ({consumedItems.length})
-          </button>
-        )}
-      </div>
-
-      {/* Method filter */}
-      {tab === "stock" && activeItems.length > 3 && (
-        <div className="mb-3 flex items-center gap-2">
-          <Filter size={14} className="text-gray-400" />
-          <select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800">
-            <option value="">{t("pantry.allMethods")}</option>
-            {METHODS.map((m) => (
-              <option key={m} value={m}>{METHOD_ICONS[m]} {t(`preservation.methods.${m}`)}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* Stock tab */}
-      {tab === "stock" && !showConsumed && (
-        filteredItems.length === 0 ? (
-          <Card><p className="text-center text-gray-500">{t("pantry.empty")}</p></Card>
+      {tab === "stock" && (
+        active.length === 0 ? (
+          <Card>
+            <EmptyState
+              icon={Archive}
+              title={t("pantry.emptyTitle")}
+              description={t("pantry.emptyText")}
+              action={<Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("pantry.add")}</Button>}
+              secondaryAction={<Button variant="ghost" onClick={() => setTab("guides")}>{t("pantry.showGuides")}</Button>}
+            />
+          </Card>
         ) : (
-          <div className="space-y-2">
-            {[...filteredItems]
-              .sort((a, b) => a.expiresDate.localeCompare(b.expiresDate))
-              .map((item) => {
-                const plant = plantMap.get(item.plantId);
-                const daysLeft = differenceInDays(parseISO(item.expiresDate), today);
-                const isExpired = daysLeft < 0;
-                const isExpiringSoon = daysLeft >= 0 && daysLeft <= 30;
-                return (
-                  <div key={item.id} className={`flex items-center gap-3 rounded-lg border p-3 ${isExpired ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/10" : isExpiringSoon ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/10" : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"}`}>
-                    <span className="text-lg">{METHOD_ICONS[item.method]}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium">
-                          {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={14} />}{" "}
-                          {item.label || getPlantName(item.plantId)}
-                        </p>
-                        {isExpired && <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">{t("pantry.expiredBadge")}</span>}
-                        {isExpiringSoon && <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">{t("pantry.expiringSoonBadge", { days: daysLeft })}</span>}
-                      </div>
-                      <p className="text-xs text-gray-400">
-                        {item.quantityKg} kg
-                        {item.units ? ` · ${item.units} ${item.unitLabel || t("pantry.defaultUnit")}` : ""}
-                        {" · "}{t(`preservation.methods.${item.method}`)}
-                        {" · "}{t("pantry.storedOn")} {item.date}
-                        {" · "}{t("pantry.expiresOn")} {item.expiresDate}
-                        {item.supplyCost ? ` · ${item.supplyCost.toFixed(2)} €` : ""}
-                      </p>
-                      {item.notes && <p className="mt-0.5 text-xs italic text-gray-400">{item.notes}</p>}
-                    </div>
-                    <div className="flex gap-1">
-                      <button aria-label={t("common.confirm")} onClick={() => consumePantryItem(item.id)}
-                        className="rounded p-1 text-gray-300 hover:text-green-500" title={t("pantry.markConsumed")}>
-                        <Check size={14} />
-                      </button>
-                      <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePantryItem(item.id); }}
-                        className="rounded p-1 text-gray-300 hover:text-red-500">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <StatCard label={t("pantry.totalStored")} value={formatWeight(stats.kg * 1000)} icon={Archive} />
+              <StatCard label={t("pantry.totalUnits")} value={formatNumber(stats.units)} icon={Package} tone="neutral" />
+              <StatCard label={t("pantry.expiringSoon")} value={formatNumber(stats.soon)} icon={AlertTriangle} tone={stats.soon ? "warning" : "neutral"} hint={t("pantry.withinDays", { count: SOON_DAYS })} />
+              <StatCard label={t("pantry.expired")} value={formatNumber(stats.expired)} icon={AlertTriangle} tone={stats.expired ? "danger" : "neutral"} />
+            </div>
+
+            {stats.expired > 0 && (
+              <div role="status" className="flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-gray-800 dark:text-gray-200">
+                <AlertTriangle size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-danger" />
+                {t("pantry.expiredWarning", { count: stats.expired })}
+              </div>
+            )}
+
+            <div>
+              {active.length > 3 && (
+                <Select
+                  wrapperClassName="mb-4 max-w-xs"
+                  label={t("pantry.method")}
+                  value={filterMethod}
+                  onChange={(e) => setFilterMethod(e.target.value)}
+                  placeholder={t("pantry.allMethods")}
+                  options={METHODS.map((m) => ({ value: m, label: t(`preservation.methods.${m}`) }))}
+                />
+              )}
+              {stock.length === 0 ? (
+                <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("pantry.emptyFilter")}</p></Card>
+              ) : (
+                <List label={t("pantry.stockTab")}>
+                  {stock.map((item) => {
+                    const plant = plantMap.get(item.plantId);
+                    const d = daysLeft(item);
+                    return (
+                      <ListRow
+                        key={item.id}
+                        onClick={() => openEdit(item)}
+                        leading={plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} /> : <Package size={20} aria-hidden="true" className="text-gray-500" />}
+                        title={item.label || getPlantName(item.plantId)}
+                        badges={
+                          d < 0 ? <Badge tone="danger" dot>{t("pantry.expiredBadge")}</Badge>
+                            : d <= SOON_DAYS ? <Badge tone="warning" dot>{t("pantry.daysLeft", { count: d })}</Badge>
+                              : undefined
+                        }
+                        meta={
+                          <span className="inline-flex flex-wrap items-center gap-x-1.5">
+                            <span className="inline-flex items-center gap-1">
+                              <MethodIcon method={item.method} />
+                              {t(`preservation.methods.${item.method}`)}
+                            </span>
+                            {item.units ? <span>· {formatNumber(item.units)} {item.unitLabel || t("pantry.defaultUnit")}</span> : null}
+                            <span>· {t("pantry.expiresOn")} <time dateTime={item.expiresDate}>{formatDate(item.expiresDate)}</time></span>
+                          </span>
+                        }
+                        description={item.notes}
+                        trailing={formatWeight(item.quantityKg * 1000)}
+                        actions={
+                          <>
+                            <IconButton icon={Check} tone="brand" label={t("pantry.markConsumed")} onClick={() => handleConsume(item)} />
+                            <Menu
+                              label={t("common.moreActions")}
+                              items={[
+                                { label: t("pantry.markConsumed"), icon: Check, onSelect: () => handleConsume(item) },
+                                { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(item) },
+                                "separator",
+                                { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(item) },
+                              ]}
+                            />
+                          </>
+                        }
+                      />
+                    );
+                  })}
+                </List>
+              )}
+            </div>
           </div>
         )
       )}
 
-      {/* Consumed items */}
-      {showConsumed && (
-        <div className="space-y-2">
-          {consumedItems.length === 0 ? (
-            <Card><p className="text-center text-gray-500">{t("pantry.noConsumed")}</p></Card>
-          ) : (
-            [...consumedItems].sort((a, b) => (b.consumedDate ?? "").localeCompare(a.consumedDate ?? "")).map((item) => {
+      {tab === "consumed" && (
+        consumed.length === 0 ? (
+          <Card><EmptyState compact icon={Check} title={t("pantry.noConsumed")} description={t("pantry.noConsumedText")} /></Card>
+        ) : (
+          <List label={t("pantry.consumed")}>
+            {consumed.map((item) => {
               const plant = plantMap.get(item.plantId);
               return (
-                <div key={item.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 opacity-60 dark:border-gray-700 dark:bg-gray-900">
-                  <span className="text-lg">{METHOD_ICONS[item.method]}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium line-through">
-                      {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={14} />}{" "}
-                      {item.label || getPlantName(item.plantId)}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {item.quantityKg} kg · {t(`preservation.methods.${item.method}`)}
-                      {item.consumedDate ? ` · ${t("pantry.consumedOn")} ${item.consumedDate}` : ""}
-                    </p>
-                  </div>
-                  <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePantryItem(item.id); }}
-                    className="rounded p-1 text-gray-300 hover:text-red-500">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+                <ListRow
+                  key={item.id}
+                  muted
+                  onClick={() => openEdit(item)}
+                  leading={plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} /> : <Package size={20} aria-hidden="true" className="text-gray-500" />}
+                  title={item.label || getPlantName(item.plantId)}
+                  badges={methodBadge(item.method)}
+                  meta={item.consumedDate ? <>{t("pantry.consumedOn")} <time dateTime={item.consumedDate}>{formatDate(item.consumedDate, "relative")}</time></> : undefined}
+                  trailing={formatWeight(item.quantityKg * 1000)}
+                  actions={
+                    <Menu
+                      label={t("common.moreActions")}
+                      items={[
+                        { label: t("pantry.restore"), icon: RotateCcw, onSelect: () => updatePantryItem(item.id, { consumed: false, consumedDate: undefined }) },
+                        "separator",
+                        { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(item) },
+                      ]}
+                    />
+                  }
+                />
               );
-            })
-          )}
-        </div>
+            })}
+          </List>
+        )
       )}
 
-      {/* Guides tab */}
       {tab === "guides" && (
-        <div className="space-y-4">
-          {/* Method overview cards */}
+        <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {METHODS.map((m) => (
-              <Card key={m}>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{METHOD_ICONS[m]}</span>
-                  <div>
-                    <h3 className="font-semibold">{t(`preservation.methods.${m}`)}</h3>
-                    <p className="text-xs text-gray-500">{t(`pantry.methodInfo.${m}.shelf`)}</p>
+            {METHODS.map((m) => {
+              const Icon = METHOD_ICON[m];
+              return (
+                <Card key={m} padding="sm">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex size-9 items-center justify-center rounded-lg bg-garden-50 text-garden-700 dark:bg-garden-500/15 dark:text-garden-300" aria-hidden="true">
+                      <Icon size={18} />
+                    </span>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t(`preservation.methods.${m}`)}</h3>
                   </div>
-                </div>
-                <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">{t(`pantry.methodInfo.${m}.desc`)}</p>
-                <div className="mt-2 flex gap-2 text-[10px] text-gray-400">
-                  <span>{t("pantry.yield")}: ~{Math.round(PRESERVATION_YIELD[m] * 100)}%</span>
-                  <span>{t("pantry.shelfLife")}: {SHELF_LIFE_MONTHS[m]} {t("pantry.months")}</span>
-                </div>
-              </Card>
-            ))}
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{t(`pantry.methodInfo.${m}.desc`)}</p>
+                  <dl className="mt-3 flex gap-6 text-xs">
+                    <div>
+                      <dt className="text-gray-500 dark:text-gray-400">{t("pantry.shelfLife")}</dt>
+                      <dd className="font-medium text-gray-900 dark:text-gray-100">{t("pantry.monthsCount", { count: SHELF_LIFE_MONTHS[m] })}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-gray-500 dark:text-gray-400">{t("pantry.yield")}</dt>
+                      <dd className="font-medium text-gray-900 dark:text-gray-100">{t("pantry.about", { value: formatPercent(PRESERVATION_YIELD[m]) })}</dd>
+                    </div>
+                  </dl>
+                </Card>
+              );
+            })}
           </div>
 
-          {/* Per-plant guides */}
-          <Card>
-            <h2 className="mb-3 text-lg font-semibold">{t("pantry.plantGuides")}</h2>
-            <div className="space-y-2">
-              {guidePlants.map((plant) => {
-                const methods = PLANT_PRESERVATION_GUIDES[plant.id] ?? plant.preservationMethods ?? [];
-                if (methods.length === 0) return null;
-                return (
-                  <div key={plant.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                    <div className="flex items-center gap-2">
-                      <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={18} />
-                      <span className="text-sm font-medium">{getPlantName(plant.id)}</span>
-                    </div>
-                    <div className="flex gap-1">
-                      {methods.map((m) => (
-                        <span key={m} className="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] dark:bg-gray-700" title={t(`preservation.methods.${m}`)}>
-                          {METHOD_ICONS[m]}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
+          <List header={t("pantry.plantGuides")}>
+            {preservable.map((plant) => {
+              const methods = methodsFor(plant.id);
+              return (
+                <ListRow
+                  key={plant.id}
+                  leading={<PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />}
+                  title={getPlantName(plant.id)}
+                  meta={<span className="mt-1 flex flex-wrap gap-1">{methods.map((m) => <span key={m}>{methodBadge(m)}</span>)}</span>}
+                  actions={<IconButton icon={Plus} label={t("pantry.addFor", { name: getPlantName(plant.id) })} onClick={() => openAdd({ plant: plant.id })} />}
+                />
+              );
+            })}
+          </List>
 
-          {/* Tips */}
           <Card>
-            <h2 className="mb-3 text-lg font-semibold">{t("pantry.tipsTitle")}</h2>
-            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <CardHeader title={t("pantry.tipsTitle")} />
+            <ul className="space-y-3">
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <li key={n} className="flex gap-2">
-                  <span className="text-garden-500">•</span>
+                <li key={n} className="flex gap-3 text-sm text-gray-700 dark:text-gray-300">
+                  <Lightbulb size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-400" />
                   <span>{t(`pantry.tip${n}`)}</span>
                 </li>
               ))}
@@ -333,61 +443,56 @@ export function PantryPage() {
         </div>
       )}
 
-      {/* Expiring soon warning */}
-      {tab === "stock" && stats.expired > 0 && !showConsumed && (
-        <Card className="mt-4 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/10">
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-red-600" />
-            <p className="text-sm font-medium text-red-700 dark:text-red-400">
-              {t("pantry.expiredWarning", { count: stats.expired })}
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("pantry.edit") : t("pantry.add")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />{t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <div>
+            <PlantCombobox
+              label={t("harvest.plant")}
+              plants={preservable}
+              value={draft.plantId}
+              autoFocus={!draft.plantId}
+              onChange={({ plantId }) => {
+                const ms = methodsFor(plantId);
+                patch({ plantId, method: ms.includes(draft.method) ? draft.method : ms[0] });
+              }}
+            />
+            {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
+          </div>
+          <div>
+            <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method })} />
+            <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+              {t("pantry.methodSummary", { shelf: shelfText, yield: formatPercent(PRESERVATION_YIELD[draft.method]) })}
             </p>
           </div>
-        </Card>
-      )}
-
-      {/* Add item modal */}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("pantry.add")}>
-        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Input label={t("pantry.quantityKg")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={formatNumber(1.5)} error={errors.quantity} />
+            <Input label={t("pantry.unitCount")} inputMode="numeric" value={draft.units} onChange={(e) => patch({ units: e.target.value })} placeholder={t("pantry.unitCountPlaceholder")} error={errors.units} />
+          </div>
+          {unitsNum > 0 && (
+            <Input label={t("pantry.unitLabel")} value={draft.unitLabel} onChange={(e) => patch({ unitLabel: e.target.value })} placeholder={t("pantry.unitLabelPlaceholder")} />
+          )}
+          <Input label={t("pantry.label")} value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.plant")}</label>
-            <select value={plantId} onChange={(e) => { setPlantId(e.target.value); }}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-              <option value="">--</option>
-              {plants.filter((p) => p.preservationMethods && p.preservationMethods.length > 0).map((p) => (
-                <option key={p.id} value={p.id}>{p.icon} {getPlantName(p.id)}</option>
-              ))}
-            </select>
+            <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
+            <p className="mt-1 text-xs font-medium text-gray-700 dark:text-gray-300">{t("pantry.bestBefore", { date: formatDate(expiresDate, "long") })}</p>
           </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("pantry.method")}</label>
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-              {plantMethods.map((m) => (
-                <button key={m} onClick={() => setMethod(m)}
-                  className={`rounded-lg border px-2 py-1.5 text-xs ${method === m ? "border-garden-500 bg-garden-50 font-medium dark:bg-garden-900/30" : "border-gray-200 dark:border-gray-700"}`}>
-                  {METHOD_ICONS[m]} {t(`preservation.methods.${m}`)}
-                </button>
-              ))}
-            </div>
-            <p className="mt-1 text-[10px] text-gray-400">
-              {t("pantry.shelfLife")}: {SHELF_LIFE_MONTHS[method]} {t("pantry.months")} · {t("pantry.yield")}: ~{Math.round(PRESERVATION_YIELD[method] * 100)}%
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Input label={`${t("pantry.quantity")} (kg)`} type="number" min={0} step={0.1} value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-            <Input label={t("pantry.unitCount")} type="number" min={0} value={units} onChange={(e) => setUnits(e.target.value)} placeholder={t("pantry.unitCountPlaceholder")} />
-          </div>
-
-          <Input label={t("pantry.label")} value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t("pantry.labelPlaceholder")} />
-          <Input label={t("harvest.date")} type="date" value={dateVal} onChange={(e) => setDateVal(e.target.value)} />
-          <Input label={`${t("pantry.supplyCost")} (€)`} type="number" min={0} step={0.01} value={supplyCost} onChange={(e) => setSupplyCost(e.target.value)} placeholder="0.00" />
-          <Input label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
-
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
-          </div>
+          <Input label={t("pantry.supplyCost")} inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={formatCurrency(4)} hint={t("pantry.supplyCostHint")} error={errors.cost} />
+          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

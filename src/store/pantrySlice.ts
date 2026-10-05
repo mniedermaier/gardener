@@ -1,5 +1,6 @@
 import type { StateCreator } from "zustand";
 import type { PantryItem } from "@/types/pantry";
+import { todayISO } from "@/lib/format";
 
 export interface PantrySlice {
   pantryItems: PantryItem[];
@@ -27,7 +28,7 @@ export const createPantrySlice: StateCreator<PantrySlice> = (set) => ({
   consumePantryItem: (id) =>
     set((state) => ({
       pantryItems: state.pantryItems.map((p) =>
-        p.id === id ? { ...p, consumed: true, consumedDate: new Date().toISOString().slice(0, 10) } : p
+        p.id === id ? { ...p, consumed: true, consumedDate: todayISO() } : p
       ),
     })),
 });

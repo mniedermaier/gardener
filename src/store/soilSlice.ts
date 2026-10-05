@@ -5,8 +5,10 @@ export interface SoilSlice {
   soilTests: SoilTest[];
   amendments: Amendment[];
   addSoilTest: (test: Omit<SoilTest, "id">) => void;
+  updateSoilTest: (id: string, updates: Partial<SoilTest>) => void;
   deleteSoilTest: (id: string) => void;
   addAmendment: (amendment: Omit<Amendment, "id">) => void;
+  updateAmendment: (id: string, updates: Partial<Amendment>) => void;
   deleteAmendment: (id: string) => void;
 }
 
@@ -22,6 +24,11 @@ export const createSoilSlice: StateCreator<SoilSlice> = (set) => ({
       soilTests: [...state.soilTests, { ...test, id: genId("soil") }],
     })),
 
+  updateSoilTest: (id, updates) =>
+    set((state) => ({
+      soilTests: state.soilTests.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+    })),
+
   deleteSoilTest: (id) =>
     set((state) => ({
       soilTests: state.soilTests.filter((t) => t.id !== id),
@@ -30,6 +37,11 @@ export const createSoilSlice: StateCreator<SoilSlice> = (set) => ({
   addAmendment: (amendment) =>
     set((state) => ({
       amendments: [...state.amendments, { ...amendment, id: genId("amend") }],
+    })),
+
+  updateAmendment: (id, updates) =>
+    set((state) => ({
+      amendments: state.amendments.map((a) => (a.id === id ? { ...a, ...updates } : a)),
     })),
 
   deleteAmendment: (id) =>

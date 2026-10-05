@@ -181,3 +181,45 @@ export function getAllAlerts(
 
   return alerts;
 }
+
+// ---------------------------------------------------------------- grouping
+
+const SEVERITY_RANK: Record<AlertSeverity, number> = { danger: 0, warning: 1, info: 2 };
+const TYPE_RANK: Record<WeatherAlert["type"], number> = {
+  frost: 0, greenhouse_cold: 1, greenhouse_hot: 2, heat: 3, watering: 4, weekly: 5,
+};
+
+/** Several alerts of one kind shown as one card ("Frost in 4 Nächten"). */
+export interface AlertGroup {
+  id: string;
+  type: WeatherAlert["type"];
+  /** Highest severity among the members. */
+  severity: AlertSeverity;
+  /** Members sorted by date. */
+  alerts: WeatherAlert[];
+}
+
+/**
+ * Turns the flat alert list into prioritised groups: all frost nights become
+ * one group, greenhouse alerts are grouped per kind, the weekly digest is left
+ * out (the UI shows it as a quiet summary line). Sorted danger → info, then
+ * frost before greenhouse before watering. Show the first one or two and fold
+ * the rest away.
+ */
+export function groupAlerts(alerts: WeatherAlert[]): AlertGroup[] {
+  const groups = new Map<string, AlertGroup>();
+  for (const a of alerts) {
+    if (a.type === "weekly") continue;
+    const key = a.type === "watering" ? a.id : a.type;
+    const g = groups.get(key);
+    if (!g) groups.set(key, { id: key, type: a.type, severity: a.severity, alerts: [a] });
+    else {
+      g.alerts.push(a);
+      if (SEVERITY_RANK[a.severity] < SEVERITY_RANK[g.severity]) g.severity = a.severity;
+    }
+  }
+  for (const g of groups.values()) g.alerts.sort((x, y) => (x.date ?? "").localeCompare(y.date ?? ""));
+  return [...groups.values()].sort(
+    (x, y) => SEVERITY_RANK[x.severity] - SEVERITY_RANK[y.severity] || TYPE_RANK[x.type] - TYPE_RANK[y.type],
+  );
+}

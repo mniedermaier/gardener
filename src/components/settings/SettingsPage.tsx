@@ -1,16 +1,59 @@
-import { useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, Check, Coffee } from "lucide-react";
+import { Check, Coffee, ExternalLink, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
+import { estimateLastFrost } from "@/lib/location";
+import { clearAllData } from "@/lib/dataImport";
+import { useFormat } from "@/hooks/useFormat";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useToast } from "@/components/ui/Toast";
 import { DataManagement } from "./DataManagement";
+import { LocationPicker, type PickedLocation } from "./LocationPicker";
 
+type Locale = "de" | "en" | "es" | "fr";
+type Theme = "light" | "dark" | "system";
+
+const LANGUAGES: Array<{ value: Locale; label: string }> = [
+  { value: "de", label: "Deutsch" },
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+  { value: "fr", label: "Français" },
+];
+
+const SETTING_KEYS = [
+  "locale", "theme", "weatherApiKey", "locationLat", "locationLon", "locationName",
+  "lastFrostDate", "gridCellSizeCm", "backendUrl", "alerts",
+] as const;
+
+/** Two-column settings row: what it is on the left, the controls in a card on the right. */
+function Section({ id, title, description, children, tone }: { id: string; title: string; description?: string; children: ReactNode; tone?: "danger" }) {
+  return (
+    <section aria-labelledby={id} className="grid gap-3 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-8">
+      <div className="md:pt-1">
+        <h2 id={id} className={`text-base font-semibold ${tone === "danger" ? "text-danger" : "text-gray-900 dark:text-gray-100"}`}>{title}</h2>
+        {description && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
+      </div>
+      <Card className={tone === "danger" ? "border-danger/30 dark:border-danger/30" : ""}>{children}</Card>
+    </section>
+  );
+}
+
+/**
+ * Every control saves immediately (one model for all fields); the header
+ * confirms each save briefly. The irreversible "delete everything" sits
+ * alone in a danger zone at the very end.
+ */
 export function SettingsPage() {
   const { t, i18n } = useTranslation();
+  const { confirm } = useToast();
+  const { formatDate } = useFormat();
   const store = useStore(
     useShallow((s) => ({
       locale: s.locale,
@@ -33,220 +76,220 @@ export function SettingsPage() {
       setAlerts: s.setAlerts,
     })),
   );
-  const [saved, setSaved] = useState(false);
+  const [elevation, setElevation] = useState<number | undefined>(undefined);
 
-  const handleLocaleChange = (locale: "de" | "en" | "es" | "fr") => {
+  // "Gespeichert" flash whenever one of the settings changes.
+  const [savedFlash, setSavedFlash] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    const unsubscribe = useStore.subscribe((state, prev) => {
+      if (!SETTING_KEYS.some((k) => state[k] !== prev[k])) return;
+      setSavedFlash(true);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setSavedFlash(false), 1800);
+    });
+    return () => {
+      unsubscribe();
+      clearTimeout(timer.current);
+    };
+  }, []);
+
+  const handleLocaleChange = (locale: Locale) => {
     store.setLocale(locale);
-    i18n.changeLanguage(locale);
+    void i18n.changeLanguage(locale);
   };
 
-  const handleThemeChange = (theme: "light" | "dark" | "system") => {
+  const handleThemeChange = (theme: Theme) => {
     store.setTheme(theme);
     applyTheme(theme);
   };
 
-  const handleGeolocation = () => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        store.setLocation(pos.coords.latitude, pos.coords.longitude, "");
-      },
-      () => {
-        alert("Could not get location");
-      },
-      { timeout: 10000 }
-    );
+  const handleLocation = (v: PickedLocation) => {
+    setElevation(v.elevation);
+    if (v.lat !== null && v.lon !== null) store.setLocation(v.lat, v.lon, v.name);
+    else useStore.setState({ locationLat: v.lat, locationLon: v.lon, locationName: v.name });
   };
 
-  const showSaved = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleClearAll = async () => {
+    const ok = await confirm(t("settings.danger.confirm"), { confirmLabel: t("settings.danger.action") });
+    if (ok) clearAllData();
   };
+
+  const frostYear = Number(store.lastFrostDate.slice(0, 4)) || new Date().getFullYear();
+  const frostEstimate = store.locationLat !== null && elevation !== undefined ? estimateLastFrost(store.locationLat, elevation, frostYear) : null;
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold">{t("settings.title")}</h1>
+    <div className="pb-8">
+      <PageHeader
+        title={t("settings.title")}
+        description={t("settings.autosave")}
+        actions={
+          <p
+            role="status"
+            aria-live="polite"
+            className={`inline-flex items-center gap-1.5 text-sm font-medium text-positive transition-opacity duration-300 ${savedFlash ? "opacity-100" : "opacity-0"}`}
+          >
+            <Check size={16} aria-hidden="true" />
+            {savedFlash ? t("settings.saved") : ""}
+          </p>
+        }
+      />
 
-      <div className="space-y-6">
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("settings.language")}</h2>
-          <div className="flex flex-wrap gap-2">
-            {(["de", "en", "es", "fr"] as const).map((lang) => (
-              <button
-                key={lang}
-                onClick={() => handleLocaleChange(lang)}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  store.locale === lang
-                    ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
-                }`}
-              >
-                {{ de: "Deutsch", en: "English", es: "Español", fr: "Français" }[lang]}
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("settings.theme")}</h2>
-          <div className="flex gap-2">
-            {(["light", "dark", "system"] as const).map((theme) => (
-              <button
-                key={theme}
-                onClick={() => handleThemeChange(theme)}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  store.theme === theme
-                    ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
-                }`}
-              >
-                {t(`settings.themes.${theme}`)}
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("settings.weather")}</h2>
-          <div className="space-y-4">
-            <Input
-              label={t("settings.apiKey")}
-              type="password"
-              value={store.weatherApiKey}
-              onChange={(e) => store.setWeatherApiKey(e.target.value)}
-              placeholder="your-api-key"
-            />
-            <div className="grid gap-4 sm:grid-cols-3">
-              <Input
-                label={t("settings.latitude")}
-                type="number"
-                step="0.0001"
-                value={store.locationLat ?? ""}
-                onChange={(e) =>
-                  store.setLocation(
-                    Number(e.target.value),
-                    store.locationLon ?? 0,
-                    store.locationName
-                  )
-                }
-              />
-              <Input
-                label={t("settings.longitude")}
-                type="number"
-                step="0.0001"
-                value={store.locationLon ?? ""}
-                onChange={(e) =>
-                  store.setLocation(
-                    store.locationLat ?? 0,
-                    Number(e.target.value),
-                    store.locationName
-                  )
-                }
-              />
-              <Input
-                label={t("settings.locationName")}
-                value={store.locationName}
-                onChange={(e) =>
-                  store.setLocation(
-                    store.locationLat ?? 0,
-                    store.locationLon ?? 0,
-                    e.target.value
-                  )
-                }
+      <div className="max-w-5xl space-y-8">
+        <Section id="settings-appearance" title={t("settings.appearance")} description={t("settings.appearanceDesc")}>
+          <div className="space-y-5">
+            <div>
+              <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("settings.language")}</p>
+              <SegmentedControl label={t("settings.language")} value={store.locale} onChange={handleLocaleChange} options={LANGUAGES} className="max-w-full overflow-x-auto" />
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("settings.theme")}</p>
+              <SegmentedControl
+                label={t("settings.theme")}
+                value={store.theme}
+                onChange={handleThemeChange}
+                options={[
+                  { value: "light", label: t("settings.themes.light"), icon: Sun },
+                  { value: "dark", label: t("settings.themes.dark"), icon: Moon },
+                  { value: "system", label: t("settings.themes.system"), icon: Monitor },
+                ]}
               />
             </div>
-            <Button variant="secondary" size="sm" onClick={handleGeolocation}>
-              <MapPin size={16} />
-              {t("settings.useGeolocation")}
-            </Button>
           </div>
-        </Card>
+        </Section>
 
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("settings.garden")}</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input
-              label={t("settings.lastFrostDate")}
-              type="date"
-              value={store.lastFrostDate}
-              onChange={(e) => store.setLastFrostDate(e.target.value)}
+        <Section id="settings-location" title={t("settings.locationClimate")} description={t("settings.locationClimateDesc")}>
+          <div className="space-y-5">
+            <LocationPicker
+              value={{ name: store.locationName, lat: store.locationLat, lon: store.locationLon, elevation }}
+              onChange={handleLocation}
             />
-            <Input
-              label={t("settings.gridSize")}
-              type="number"
-              min={10}
-              max={100}
-              value={store.gridCellSizeCm}
-              onChange={(e) => store.setGridCellSizeCm(Math.max(10, Math.min(100, Number(e.target.value))))}
-            />
+            <div className="grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 dark:border-white/10">
+              <div>
+                <Input
+                  label={t("settings.lastFrostDate")}
+                  type="date"
+                  lang={i18n.resolvedLanguage}
+                  value={store.lastFrostDate}
+                  onChange={(e) => e.target.value && store.setLastFrostDate(e.target.value)}
+                  hint={frostEstimate ? t("settings.frostEstimate", { date: formatDate(frostEstimate, "short") }) : t("settings.frostHint")}
+                />
+                {frostEstimate && frostEstimate !== store.lastFrostDate && (
+                  <Button variant="ghost" size="sm" className="mt-1 -ml-2" onClick={() => store.setLastFrostDate(frostEstimate)}>
+                    <Sparkles size={14} aria-hidden="true" />
+                    {t("settings.useEstimate")}
+                  </Button>
+                )}
+              </div>
+              <Input
+                label={t("settings.gridSize")}
+                type="number"
+                min={10}
+                max={100}
+                value={store.gridCellSizeCm}
+                onChange={(e) => store.setGridCellSizeCm(Math.max(10, Math.min(100, Number(e.target.value))))}
+                hint={t("settings.gridHint")}
+              />
+            </div>
           </div>
-        </Card>
+        </Section>
 
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("settings.alerts")}</h2>
-          <div className="space-y-3">
+        <Section id="settings-weather" title={t("settings.weather")} description={t("settings.weatherDesc")}>
+          <Input
+            label={t("settings.apiKey")}
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            value={store.weatherApiKey}
+            onChange={(e) => store.setWeatherApiKey(e.target.value.trim())}
+            hint={
+              <>
+                {t("settings.apiKeyHint")}{" "}
+                <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
+                  openweathermap.org <ExternalLink size={12} aria-hidden="true" />
+                </a>
+              </>
+            }
+          />
+        </Section>
+
+        <Section id="settings-alerts" title={t("settings.alerts")} description={t("settings.alertsDesc")}>
+          <div className="divide-y divide-gray-100 dark:divide-white/5">
             {([
-              { key: "frostAlertEnabled" as const, label: "settings.alertTypes.frost" },
-              { key: "wateringReminders" as const, label: "settings.alertTypes.watering" },
-              { key: "greenhouseAlerts" as const, label: "settings.alertTypes.greenhouse" },
-              { key: "weeklyDigest" as const, label: "settings.alertTypes.weekly" },
-            ]).map(({ key, label }) => (
-              <label key={key} className="flex items-center gap-3">
-                <input
-                  type="checkbox"
+              { key: "frostAlertEnabled" as const, label: "settings.alertTypes.frost", desc: "settings.alertTypes.frostDesc" },
+              { key: "wateringReminders" as const, label: "settings.alertTypes.watering", desc: "settings.alertTypes.wateringDesc" },
+              { key: "greenhouseAlerts" as const, label: "settings.alertTypes.greenhouse", desc: "settings.alertTypes.greenhouseDesc" },
+              { key: "weeklyDigest" as const, label: "settings.alertTypes.weekly", desc: "settings.alertTypes.weeklyDesc" },
+            ]).map(({ key, label, desc }) => (
+              <div key={key} className="py-1 first:pt-0 last:pb-0">
+                <Checkbox
+                  label={t(label)}
+                  description={t(desc)}
                   checked={store.alerts[key]}
                   onChange={(e) => store.setAlerts({ [key]: e.target.checked })}
-                  className="rounded border-gray-300"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{t(label)}</span>
-              </label>
-            ))}
-            {store.alerts.frostAlertEnabled && (
-              <div className="ml-7">
-                <Input
-                  label={t("settings.alertTypes.frostThreshold")}
-                  type="number"
-                  min={-5}
-                  max={10}
-                  value={store.alerts.frostThresholdC}
-                  onChange={(e) => store.setAlerts({ frostThresholdC: Number(e.target.value) })}
-                />
+                {key === "frostAlertEnabled" && store.alerts.frostAlertEnabled && (
+                  <div className="mb-2 ml-7">
+                    <Input
+                      label={t("settings.alertTypes.frostThreshold")}
+                      type="number"
+                      min={-5}
+                      max={10}
+                      value={store.alerts.frostThresholdC}
+                      onChange={(e) => store.setAlerts({ frostThresholdC: Number(e.target.value) })}
+                      wrapperClassName="w-40"
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        </Card>
+        </Section>
 
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("settings.backend")}</h2>
+        <Section id="settings-sync" title={t("settings.backend")} description={t("settings.backendDesc")}>
           <Input
             label={t("settings.backendUrl")}
+            type="url"
+            inputMode="url"
             value={store.backendUrl ?? ""}
             onChange={(e) => store.setBackendUrl(e.target.value || null)}
             placeholder="http://localhost:3001"
+            hint={t("settings.backendHint")}
           />
-          <p className="mt-2 text-xs text-gray-500">{t("settings.backendHint")}</p>
-        </Card>
+        </Section>
 
-        <DataManagement />
+        <Section id="settings-data" title={t("dataManagement.title")} description={t("settings.dataDesc")}>
+          <DataManagement />
+        </Section>
 
-        <Button onClick={showSaved}>
-          {saved ? <Check size={16} /> : null}
-          {saved ? t("settings.saved") : t("common.save")}
-        </Button>
+        <Section id="settings-support" title={t("settings.coffeeTitle")} description={t("settings.coffeeDesc")}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t("settings.coffeeText")}</p>
+            <a
+              href="https://buymeacoffee.com/mniedermaier"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-800 shadow-xs hover:bg-gray-50 sm:min-h-10 dark:border-white/15 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10"
+            >
+              <Coffee size={16} aria-hidden="true" className="text-earth-600 dark:text-earth-300" />
+              {t("settings.coffeeButton")}
+              <ExternalLink size={14} aria-hidden="true" className="text-gray-500" />
+            </a>
+          </div>
+        </Section>
 
-        <div className="mt-6 flex flex-col items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center dark:border-amber-800/40 dark:bg-amber-900/10">
-          <Coffee size={24} className="text-amber-600" />
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{t("settings.coffeeTitle")}</p>
-          <p className="text-xs text-amber-600 dark:text-amber-400">{t("settings.coffeeDesc")}</p>
-          <a
-            href="https://buymeacoffee.com/mniedermaier"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 inline-flex items-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-amber-900 shadow-sm transition-colors hover:bg-amber-500"
-          >
-            <Coffee size={16} />
-            Buy me a coffee
-          </a>
-        </div>
+        <Section id="settings-danger" title={t("settings.danger.title")} description={t("settings.danger.desc")} tone="danger">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("settings.danger.action")}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t("settings.danger.actionDesc")}</p>
+            </div>
+            <Button variant="danger" onClick={() => void handleClearAll()}>
+              <Trash2 size={16} aria-hidden="true" />
+              {t("settings.danger.action")}
+            </Button>
+          </div>
+        </Section>
       </div>
     </div>
   );

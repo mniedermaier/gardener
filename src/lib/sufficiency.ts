@@ -50,8 +50,18 @@ export interface NutritionGap {
   suggestion: string;
 }
 
+/**
+ * Months that have to be bridged from storage in a central-European climate
+ * (no meaningful fresh harvest): November–April. Only these count towards
+ * the *winter* gap; low months in summer are a planning gap, not a storage one.
+ */
+export const STORAGE_MONTHS = [10, 11, 0, 1, 2, 3];
+
+/** Below this monthly calorie coverage a month counts as a gap. */
+export const LOW_COVERAGE_PERCENT = 25;
+
 export interface WinterGap {
-  months: number[]; // months with <25% coverage
+  months: number[]; // storage-period months (Nov–Apr) with <25% coverage
   storedCaloriesNeeded: number;
   storedKgNeeded: number;
 }
@@ -73,6 +83,8 @@ export interface SufficiencyResult {
   monthlyFood: MonthlyFood[];
   storageRequirements: StorageRequirement[];
   winterGap: WinterGap | null;
+  /** All months (0–11) below LOW_COVERAGE_PERCENT, summer included. */
+  lowMonths: number[];
   annualCoveragePercent: number;
 }
 
@@ -384,8 +396,9 @@ export function calculateSufficiency(
     };
   });
 
-  // Winter gap
-  const gapMonths = monthlyFood.filter((m) => m.coveragePercent < 25).map((m) => m.month);
+  // Winter gap: only the storage period counts (see STORAGE_MONTHS)
+  const lowMonths = monthlyFood.filter((m) => m.coveragePercent < LOW_COVERAGE_PERCENT).map((m) => m.month);
+  const gapMonths = lowMonths.filter((m) => STORAGE_MONTHS.includes(m)).sort((a, b) => STORAGE_MONTHS.indexOf(a) - STORAGE_MONTHS.indexOf(b));
   const winterGap: WinterGap | null = gapMonths.length > 0
     ? {
         months: gapMonths,
@@ -458,6 +471,7 @@ export function calculateSufficiency(
     monthlyFood,
     storageRequirements,
     winterGap,
+    lowMonths,
     annualCoveragePercent,
   };
 }

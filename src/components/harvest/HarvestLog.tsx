@@ -1,252 +1,468 @@
-import { useState, useMemo, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { Plus, Trash2, Star, TrendingUp } from "lucide-react";
-import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { useToast } from "@/components/ui/Toast";
+import { Apple, Pencil, Plus, Trash2, Hash } from "lucide-react";
+import { startOfMonth, subMonths, addMonths, differenceInCalendarDays } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
-import { Card } from "@/components/ui/Card";
+import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { todayISO, toDate, toISODate } from "@/lib/format";
+import type { HarvestEntry } from "@/types/harvest";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { format } from "date-fns";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { StatCard } from "@/components/ui/StatCard";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useToast } from "@/components/ui/Toast";
+import { DateField } from "@/components/records/DateField";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
+import { BarChart } from "@/components/ui/charts";
+import { QualityInput, QualityStars, type Quality } from "@/components/records/Quality";
+import { useBeds } from "@/components/records/useBeds";
+import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
+
+type Unit = "g" | "kg";
+
+interface Draft {
+  plantId: string;
+  bedId: string;
+  date: string;
+  amount: string;
+  unit: Unit;
+  count: string;
+  showCount: boolean;
+  quality: Quality;
+  notes: string;
+}
+
+const UNIT_STORAGE = "gardener.harvestUnits";
+
+/** Last weight unit per plant — a per-device convenience, never required. */
+function readUnits(): Record<string, Unit> {
+  try {
+    return JSON.parse(localStorage.getItem(UNIT_STORAGE) ?? "{}") as Record<string, Unit>;
+  } catch {
+    return {};
+  }
+}
+function rememberUnit(plantId: string, unit: Unit) {
+  try {
+    localStorage.setItem(UNIT_STORAGE, JSON.stringify({ ...readUnits(), [plantId]: unit }));
+  } catch {
+    /* storage unavailable: just don't remember */
+  }
+}
+
+function parseAmount(text: string): number {
+  const n = Number(text.trim().replace(",", "."));
+  return Number.isFinite(n) ? n : NaN;
+}
 
 export function HarvestLog() {
   const { t } = useTranslation();
-  const { confirm } = useToast();
-  const { harvests, gardens, addHarvest, deleteHarvest } = useStore(useShallow((s) => ({ harvests: s.harvests, gardens: s.gardens, addHarvest: s.addHarvest, deleteHarvest: s.deleteHarvest })));
+  const { toast, confirm } = useToast();
+  const { formatDate, formatWeight, formatNumber, locale } = useFormat();
+  const { harvests, addHarvest, updateHarvest, deleteHarvest } = useStore(
+    useShallow((s) => ({ harvests: s.harvests, addHarvest: s.addHarvest, updateHarvest: s.updateHarvest, deleteHarvest: s.deleteHarvest })),
+  );
   const plants = usePlants();
   const plantMap = usePlantMap();
-  const [showAdd, setShowAdd] = useState(false);
-  const openAdd = useCallback(() => setShowAdd(true), []);
-  useOpenAddOnNavigate(openAdd);
-  const [plantId, setPlantId] = useState(plants[0]?.id ?? "");
-  const [gardenId, setGardenId] = useState(gardens[0]?.id ?? "");
-  const [bedId, setBedId] = useState("");
-  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [weight, setWeight] = useState("");
-  const [count, setCount] = useState("");
-  const [quality, setQuality] = useState<1 | 2 | 3 | 4 | 5>(3);
-  const [notes, setNotes] = useState("");
+  const getPlantName = usePlantName();
+  const beds = useBeds();
 
-  const selectedGarden = gardens.find((g) => g.id === gardenId);
+  const defaultUnit = useCallback((plantId: string): Unit => {
+    const remembered = readUnits()[plantId];
+    if (remembered) return remembered;
+    return plantMap.get(plantId)?.category === "herb" ? "g" : "kg";
+  }, [plantMap]);
 
-  const stats = useMemo(() => {
-    const byPlant = new Map<string, { weight: number; count: number; entries: number; qualitySum: number }>();
-    for (const h of harvests) {
-      const existing = byPlant.get(h.plantId) ?? { weight: 0, count: 0, entries: 0, qualitySum: 0 };
-      existing.weight += h.weightGrams ?? 0;
-      existing.count += h.count ?? 0;
-      existing.entries += 1;
-      existing.qualitySum += h.quality;
-      byPlant.set(h.plantId, existing);
+  // ---------------------------------------------------------------- dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [draft, setDraft] = useState<Draft>(() => ({
+    plantId: "", bedId: "", date: todayISO(), amount: "", unit: "kg", count: "", showCount: false, quality: 4, notes: "",
+  }));
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
+
+  const openAdd = useCallback((params: AddParams = {}) => {
+    const plantId = params.plant && plantMap.has(params.plant) ? params.plant : "";
+    let bedId = params.bed && beds.byId.has(params.bed) ? params.bed : "";
+    // Plant grows in exactly one bed → that bed.
+    if (plantId && !bedId) {
+      const hosts = beds.beds.filter((b) => b.plantIds.has(plantId));
+      if (hosts.length === 1) bedId = hosts[0].id;
     }
-    return byPlant;
-  }, [harvests]);
-
-  const totalWeight = harvests.reduce((sum, h) => sum + (h.weightGrams ?? 0), 0);
-
-  const handleAdd = () => {
-    if (!plantId) return;
-    addHarvest({
-      gardenId: gardenId || gardens[0]?.id || "",
-      bedId: bedId || "",
-      plantId,
-      date,
-      weightGrams: weight ? Number(weight) : undefined,
-      count: count ? Number(count) : undefined,
-      quality,
-      notes: notes || undefined,
+    setEditingId(null);
+    setSubmitted(false);
+    setDraft({
+      plantId, bedId, date: params.date ?? todayISO(), amount: "", unit: plantId ? defaultUnit(plantId) : "kg",
+      count: "", showCount: false, quality: 4, notes: "",
     });
-    setWeight("");
-    setCount("");
-    setNotes("");
-    setShowAdd(false);
+    setDialogOpen(true);
+  }, [plantMap, beds, defaultUnit]);
+  const openAddPlain = useCallback(() => openAdd(), [openAdd]);
+  useOpenAddOnNavigate(openAddPlain);
+  useAddFromUrl(openAdd);
+
+  const openEdit = (h: HarvestEntry) => {
+    const g = h.weightGrams ?? 0;
+    const unit: Unit = g >= 1000 ? "kg" : g > 0 ? "g" : defaultUnit(h.plantId);
+    const amount = g > 0 ? (unit === "kg" ? g / 1000 : g).toLocaleString(locale, { useGrouping: false, maximumFractionDigits: 3 }) : "";
+    setEditingId(h.id);
+    setSubmitted(false);
+    setDraft({
+      plantId: h.plantId, bedId: h.bedId, date: h.date, amount, unit,
+      count: h.count ? String(h.count) : "", showCount: Boolean(h.count), quality: h.quality, notes: h.notes ?? "",
+    });
+    setDialogOpen(true);
   };
 
-  const sortedHarvests = [...harvests].sort((a, b) => b.date.localeCompare(a.date));
+  const amountNum = draft.amount.trim() ? parseAmount(draft.amount) : 0;
+  const countNum = draft.count.trim() ? Math.round(parseAmount(draft.count)) : 0;
+  const grams = Number.isFinite(amountNum) ? Math.round(amountNum * (draft.unit === "kg" ? 1000 : 1)) : NaN;
+  const amountError = Number.isNaN(grams) || grams < 0 ? t("harvest.invalidAmount") : submitted && !grams && !countNum ? t("harvest.needAmount") : undefined;
+  const plantError = submitted && !draft.plantId ? t("harvest.needPlant") : undefined;
+
+  const amountText = (g?: number, c?: number) =>
+    [g ? formatWeight(g) : null, c ? t("harvest.pieces", { count: c }) : null].filter(Boolean).join(" · ");
+
+  const handleSave = () => {
+    setSubmitted(true);
+    if (!draft.plantId || Number.isNaN(grams) || grams < 0 || (!grams && !countNum)) return;
+    const fields = {
+      plantId: draft.plantId,
+      bedId: draft.bedId,
+      gardenId: beds.byId.get(draft.bedId)?.gardenId ?? beds.beds[0]?.gardenId ?? "",
+      date: draft.date,
+      weightGrams: grams || undefined,
+      count: countNum || undefined,
+      quality: draft.quality,
+      notes: draft.notes.trim() || undefined,
+    };
+    if (grams) rememberUnit(draft.plantId, draft.unit);
+    const name = getPlantName(draft.plantId);
+    if (editingId) {
+      const before = harvests.find((h) => h.id === editingId);
+      updateHarvest(editingId, fields);
+      toast(t("harvest.updated"), "success", before ? { action: { label: t("common.undo"), onClick: () => updateHarvest(before.id, before) } } : undefined);
+    } else {
+      addHarvest(fields);
+      const added = useStore.getState().harvests.at(-1);
+      const amount = amountText(fields.weightGrams, fields.count);
+      toast(t("harvest.saved", { name, amount }), "success", {
+        action: added ? { label: t("common.undo"), onClick: () => deleteHarvest(added.id) } : undefined,
+      });
+    }
+    setDialogOpen(false);
+  };
+
+  const handleDelete = async (h: HarvestEntry) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteHarvest(h.id);
+    setDialogOpen(false);
+    const { id: _id, ...rest } = h;
+    toast(t("harvest.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addHarvest(rest) } });
+  };
+
+  // ---------------------------------------------------------------- stats
+  const stats = useMemo(() => {
+    const now = new Date();
+    let total = 0, last30 = 0, qualitySum = 0;
+    const byPlant = new Map<string, { grams: number; count: number; entries: number }>();
+    for (const h of harvests) {
+      const g = h.weightGrams ?? 0;
+      total += g;
+      qualitySum += h.quality;
+      const d = toDate(h.date);
+      if (d && differenceInCalendarDays(now, d) < 30) last30 += g;
+      const p = byPlant.get(h.plantId) ?? { grams: 0, count: 0, entries: 0 };
+      p.grams += g;
+      p.count += h.count ?? 0;
+      p.entries += 1;
+      byPlant.set(h.plantId, p);
+    }
+    const ranking = [...byPlant.entries()].sort((a, b) => b[1].grams - a[1].grams || b[1].entries - a[1].entries);
+    // Last 12 months, oldest first.
+    const first = subMonths(startOfMonth(now), 11);
+    const months = Array.from({ length: 12 }, (_, i) => addMonths(first, i));
+    const perMonth = new Map(months.map((m) => [toISODate(m).slice(0, 7), 0]));
+    for (const h of harvests) {
+      const key = h.date.slice(0, 7);
+      if (perMonth.has(key)) perMonth.set(key, (perMonth.get(key) ?? 0) + (h.weightGrams ?? 0));
+    }
+    return {
+      total, last30, ranking,
+      avgQuality: harvests.length ? qualitySum / harvests.length : 0,
+      months: months.map((m) => {
+        const key = toISODate(m).slice(0, 7);
+        return { key, date: m, kg: (perMonth.get(key) ?? 0) / 1000 };
+      }),
+    };
+  }, [harvests]);
+
+  const [showAllPlants, setShowAllPlants] = useState(false);
+  const top = stats.ranking[0];
+  const maxPlantGrams = Math.max(1, ...stats.ranking.map(([, s]) => s.grams));
+  const rankingShown = showAllPlants ? stats.ranking : stats.ranking.slice(0, 6);
+
+  const groups = useMemo(() => {
+    const sorted = [...harvests].sort((a, b) => b.date.localeCompare(a.date));
+    const map = new Map<string, HarvestEntry[]>();
+    for (const h of sorted) {
+      const key = h.date.slice(0, 7);
+      map.set(key, [...(map.get(key) ?? []), h]);
+    }
+    return [...map.entries()];
+  }, [harvests]);
+
+  const editing = editingId ? harvests.find((h) => h.id === editingId) : undefined;
+  const kgTick = (kg: number) => formatWeight(kg * 1000, "kg");
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("harvest.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} />
-          {t("harvest.add")}
-        </Button>
-      </div>
+      <PageHeader
+        title={t("harvest.title")}
+        description={harvests.length ? t("harvest.summary", { count: harvests.length, weight: formatWeight(stats.total) }) : t("harvest.subtitle")}
+        actions={
+          <Button onClick={openAddPlain}>
+            <Plus size={16} aria-hidden="true" />
+            {t("harvest.add")}
+          </Button>
+        }
+      />
 
-      {harvests.length > 0 && (
-        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
-          <Card className="text-center">
-            <p className="text-xl font-bold text-garden-600 sm:text-3xl">{harvests.length}</p>
-            <p className="text-xs text-gray-500">{t("harvest.entries")}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-xl font-bold text-garden-600 sm:text-3xl">
-              {totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)} kg` : `${totalWeight} g`}
-            </p>
-            <p className="text-xs text-gray-500">{t("harvest.totalWeight")}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-xl font-bold text-amber-500 sm:text-3xl">
-              {(harvests.reduce((s, h) => s + h.quality, 0) / harvests.length).toFixed(1)}
-            </p>
-            <p className="text-xs text-gray-500">{t("harvest.avgQuality")}</p>
-          </Card>
-        </div>
-      )}
-
-      {stats.size > 0 && (
-        <Card className="mb-6">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400">
-            <TrendingUp size={14} /> {t("harvest.total")}
-          </h2>
-          <div className="space-y-2">
-            {Array.from(stats.entries())
-              .sort((a, b) => b[1].weight - a[1].weight)
-              .map(([pid, s]) => {
-                const plant = plantMap.get(pid);
-                if (!plant) return null;
-                return (
-                  <div key={pid} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                    <div className="flex items-center gap-2">
-                      <PlantIconDisplay plantId={pid} emoji={plant.icon} size={20} />
-                      <span className="text-sm font-medium">{t(`plants.catalog.${pid}.name`)}</span>
-                      <span className="text-xs text-gray-400">({s.entries}x)</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      {s.weight > 0 && (
-                        <span className="font-medium">
-                          {s.weight >= 1000 ? `${(s.weight / 1000).toFixed(1)} kg` : `${s.weight} g`}
-                        </span>
-                      )}
-                      {s.count > 0 && <span className="text-gray-500">{s.count} St.</span>}
-                      <span className="flex items-center gap-0.5 text-amber-500">
-                        <Star size={12} fill="currentColor" />
-                        {(s.qualitySum / s.entries).toFixed(1)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </Card>
-      )}
-
-      {sortedHarvests.length === 0 ? (
+      {harvests.length === 0 ? (
         <Card>
-          <p className="text-center text-gray-500">{t("harvest.noEntries")}</p>
+          <EmptyState
+            icon={Apple}
+            title={t("harvest.emptyTitle")}
+            description={t("harvest.emptyText")}
+            action={<Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("harvest.add")}</Button>}
+          />
         </Card>
       ) : (
-        <div className="space-y-2">
-          {sortedHarvests.map((h) => {
-            const plant = plantMap.get(h.plantId);
-            return (
-              <div
-                key={h.id}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"
-              >
-                <span className="text-xl">{plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={24} /> : "?"}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">
-                    {plant ? t(`plants.catalog.${h.plantId}.name`) : h.plantId}
-                  </p>
-                  <p className="text-xs text-gray-400">{h.date}</p>
-                  {h.notes && <p className="mt-0.5 text-xs text-gray-500">{h.notes}</p>}
-                </div>
-                <div className="flex shrink-0 flex-wrap items-center gap-2 text-xs sm:gap-3 sm:text-sm">
-                  {h.weightGrams && (
-                    <span className="font-medium">
-                      {h.weightGrams >= 1000 ? `${(h.weightGrams / 1000).toFixed(1)} kg` : `${h.weightGrams} g`}
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard label={t("harvest.totalWeight")} value={formatWeight(stats.total)} hint={t("harvest.harvestsCount", { count: harvests.length })} icon={Apple} />
+            <StatCard label={t("harvest.last30")} value={formatWeight(stats.last30)} />
+            <StatCard
+              label={t("harvest.avgQuality")}
+              value={formatNumber(stats.avgQuality)}
+              unit={t("harvest.outOfFive")}
+              hint={<QualityStars value={Math.round(stats.avgQuality)} />}
+            />
+            {top && (
+              <StatCard
+                label={t("harvest.topCrop")}
+                value={<span className="block truncate">{getPlantName(top[0])}</span>}
+                hint={top[1].grams ? formatWeight(top[1].grams) : t("harvest.pieces", { count: top[1].count })}
+              />
+            )}
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card className="min-w-0">
+              <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint")} />
+              <BarChart
+                caption={t("harvest.perMonth")}
+                categoryLabel={t("harvest.month")}
+                series={[{ label: t("harvest.totalWeight"), color: "brand" }]}
+                height={240}
+                data={stats.months.map((m) => ({ key: m.key, label: formatDate(m.date, "month"), fullLabel: formatDate(m.date, "monthYear"), values: [m.kg] }))}
+                formatValue={(kg) => formatWeight(kg * 1000)}
+                formatTick={kgTick}
+              />
+            </Card>
+
+            <Card className="min-w-0">
+              <CardHeader title={t("harvest.byPlant")} description={t("harvest.byPlantHint")} />
+              <ul className="space-y-3">
+                {rankingShown.map(([pid, s]) => {
+                  const plant = plantMap.get(pid);
+                  return (
+                    <li key={pid} className="flex items-center gap-3">
+                      {plant ? <PlantIconDisplay plantId={pid} emoji={plant.icon} size={24} /> : <Apple size={20} aria-hidden="true" className="text-gray-500" />}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2 text-sm">
+                          <span className="truncate font-medium text-gray-900 dark:text-gray-100">{getPlantName(pid)}</span>
+                          <span className="shrink-0 font-medium text-gray-900 tabular-nums dark:text-gray-100">
+                            {s.grams ? formatWeight(s.grams) : t("harvest.pieces", { count: s.count })}
+                          </span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-2">
+                          <div className="h-1.5 flex-1 rounded-full bg-gray-100 dark:bg-white/10" aria-hidden="true">
+                            <div className="h-1.5 rounded-full bg-garden-500 dark:bg-garden-400" style={{ width: `${Math.max(2, (s.grams / maxPlantGrams) * 100)}%` }} />
+                          </div>
+                          <span className="w-20 shrink-0 text-right text-xs text-gray-500 dark:text-gray-400">{t("harvest.harvestsCount", { count: s.entries })}</span>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              {stats.ranking.length > 6 && (
+                <Button variant="ghost" size="sm" className="mt-3 -ml-3" onClick={() => setShowAllPlants((v) => !v)}>
+                  {showAllPlants ? t("harvest.showLess") : t("harvest.showAll", { count: stats.ranking.length })}
+                </Button>
+              )}
+            </Card>
+          </div>
+
+          <section aria-label={t("harvest.log")} className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("harvest.log")}</h2>
+            {groups.map(([month, entries]) => {
+              const monthGrams = entries.reduce((s, h) => s + (h.weightGrams ?? 0), 0);
+              return (
+                <List
+                  key={month}
+                  header={
+                    <span className="flex items-center justify-between gap-2">
+                      <span>{formatDate(`${month}-01`, "monthYear")}</span>
+                      {monthGrams > 0 && <span className="font-medium tabular-nums">{formatWeight(monthGrams)}</span>}
                     </span>
-                  )}
-                  {h.count && <span className="text-gray-500">{h.count} St.</span>}
-                  <div className="flex text-amber-400">
-                    {Array.from({ length: h.quality }, (_, i) => (
-                      <Star key={i} size={10} fill="currentColor" />
-                    ))}
-                  </div>
-                  <button aria-label={t("common.delete")}
-                    onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteHarvest(h.id); }}
-                    className="rounded p-1 text-gray-400 hover:text-red-500"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                  }
+                >
+                  {entries.map((h) => {
+                    const plant = plantMap.get(h.plantId);
+                    const bedLabel = beds.label(h.bedId);
+                    return (
+                      <ListRow
+                        key={h.id}
+                        onClick={() => openEdit(h)}
+                        leading={plant ? <PlantIconDisplay plantId={h.plantId} emoji={plant.icon} size={28} /> : <Apple size={20} aria-hidden="true" className="text-gray-500" />}
+                        title={getPlantName(h.plantId)}
+                        meta={
+                          <span className="inline-flex flex-wrap items-center gap-x-1.5">
+                            {bedLabel && <span>{bedLabel}</span>}
+                            {bedLabel && <span aria-hidden="true">·</span>}
+                            <time dateTime={h.date}>{formatDate(h.date, "relative")}</time>
+                            <span aria-hidden="true">·</span>
+                            <QualityStars value={h.quality} />
+                          </span>
+                        }
+                        description={h.notes}
+                        trailing={amountText(h.weightGrams, h.count) || "–"}
+                        actions={
+                          <Menu
+                            label={t("common.moreActions")}
+                            items={[
+                              { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(h) },
+                              "separator",
+                              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(h) },
+                            ]}
+                          />
+                        }
+                      />
+                    );
+                  })}
+                </List>
+              );
+            })}
+          </section>
         </div>
       )}
 
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("harvest.add")}>
-        <div className="space-y-4">
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("harvest.edit") : t("harvest.add")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />
+                {t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave}>{editingId ? t("common.save") : t("harvest.saveAction")}</Button>
+          </>
+        }
+      >
+        <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.plant")}</label>
-            <select
-              value={plantId}
-              onChange={(e) => setPlantId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800"
-            >
-              {plants.map((p) => (
-                <option key={p.id} value={p.id}>{p.icon} {t(`plants.catalog.${p.id}.name`)}</option>
-              ))}
-            </select>
+            <PlantCombobox
+              label={t("harvest.what")}
+              plants={plants}
+              beds={beds.beds}
+              value={draft.plantId}
+              bedId={draft.bedId}
+              autoFocus={!draft.plantId}
+              onChange={({ plantId, bedId }) => {
+                const hosts = beds.beds.filter((b) => b.plantIds.has(plantId));
+                patch({
+                  plantId,
+                  bedId: bedId ?? (hosts.length === 1 ? hosts[0].id : draft.bedId),
+                  ...(!draft.amount && plantId ? { unit: defaultUnit(plantId) } : {}),
+                });
+              }}
+            />
+            {plantError && <p className="mt-1 text-xs font-medium text-danger">{plantError}</p>}
           </div>
-          {gardens.length > 0 && (
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.bed")}</label>
-              <div className="grid grid-cols-2 gap-2">
-                <select
-                  value={gardenId}
-                  onChange={(e) => { setGardenId(e.target.value); setBedId(""); }}
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800"
-                >
-                  {gardens.map((g) => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
-                  ))}
-                </select>
-                <select
-                  value={bedId}
-                  onChange={(e) => setBedId(e.target.value)}
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800"
-                >
-                  <option value="">--</option>
-                  {selectedGarden?.beds.map((b) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+
+          {beds.beds.length > 0 && (
+            <Select
+              label={t("harvest.bed")}
+              value={draft.bedId}
+              onChange={(e) => patch({ bedId: e.target.value })}
+              placeholder={t("harvest.noBed")}
+              options={beds.options}
+            />
           )}
-          <Input label={t("harvest.date")} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("harvest.weight")} type="number" min={0} value={weight} onChange={(e) => setWeight(e.target.value)} />
-            <Input label={t("harvest.count")} type="number" min={0} value={count} onChange={(e) => setCount(e.target.value)} />
-          </div>
+
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.quality")}</label>
-            <div className="flex gap-1">
-              {([1, 2, 3, 4, 5] as const).map((q) => (
-                <button aria-label={t("common.favorite")}
-                  key={q}
-                  onClick={() => setQuality(q)}
-                  className="flex h-10 w-10 items-center justify-center rounded transition-colors"
-                >
-                  <Star size={24} className={q <= quality ? "text-amber-400" : "text-gray-300"} fill={q <= quality ? "currentColor" : "none"} />
-                </button>
-              ))}
+            <div className="flex items-end gap-2">
+              <Input
+                wrapperClassName="flex-1"
+                label={t("harvest.weight")}
+                inputMode="decimal"
+                autoComplete="off"
+                value={draft.amount}
+                onChange={(e) => patch({ amount: e.target.value })}
+                placeholder={draft.unit === "kg" ? formatNumber(1.5) : "250"}
+                error={amountError}
+              />
+              <SegmentedControl
+                className={amountError ? "mb-5" : ""}
+                label={t("harvest.unit")}
+                value={draft.unit}
+                onChange={(unit) => patch({ unit })}
+                options={[{ value: "g", label: "g" }, { value: "kg", label: "kg" }]}
+              />
             </div>
+            {draft.showCount ? (
+              <Input
+                wrapperClassName="mt-3"
+                label={t("harvest.count")}
+                inputMode="numeric"
+                value={draft.count}
+                onChange={(e) => patch({ count: e.target.value })}
+                placeholder="12"
+              />
+            ) : (
+              <Button variant="ghost" size="sm" className="mt-1 -ml-3" onClick={() => patch({ showCount: true })}>
+                <Hash size={14} aria-hidden="true" />
+                {t("harvest.addCount")}
+              </Button>
+            )}
           </div>
-          <Input label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
-          </div>
-        </div>
+
+          <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
+          <QualityInput label={t("harvest.quality")} value={draft.quality} onChange={(quality) => patch({ quality })} />
+          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} placeholder={t("harvest.notesPlaceholder")} />
+          <button type="submit" hidden aria-hidden="true" tabIndex={-1} />
+        </form>
       </Modal>
     </div>
   );

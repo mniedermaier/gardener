@@ -1,264 +1,421 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Trash2, Beaker, Leaf } from "lucide-react";
+import {
+  Beaker, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
+} from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
+import { useFormat } from "@/hooks/useFormat";
+import { todayISO } from "@/lib/format";
+import { NUTRIENT_RANGE, nutrientLevel, phAdvice, targetPh, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
+import type { Amendment, AmendmentType, SoilTest } from "@/types/soil";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Badge } from "@/components/ui/Badge";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Tabs } from "@/components/ui/Tabs";
 import { useToast } from "@/components/ui/Toast";
-import type { AmendmentType } from "@/types/soil";
-import { format } from "date-fns";
-import { ENVIRONMENT_ICONS } from "@/types/garden";
+import type { Tone } from "@/components/ui/tone";
+import { DateField } from "@/components/records/DateField";
+import { useBeds } from "@/components/records/useBeds";
 
-const AMENDMENT_ICONS: Record<AmendmentType, string> = {
-  compost: "\ud83e\udeb1", manure: "\ud83d\udca9", lime: "\u26aa", sulfur: "\ud83d\udfe1",
-  fertilizer: "\ud83c\udf3f", mulch: "\ud83c\udf42", other: "\ud83d\udce6",
+const AMENDMENT_TYPES: AmendmentType[] = ["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"];
+const AMENDMENT_ICONS: Record<AmendmentType, LucideIcon> = {
+  compost: Recycle, manure: Tractor, lime: Mountain, sulfur: FlaskConical, fertilizer: Sprout, mulch: Leaf, other: Package,
 };
+const ADVICE_TONE: Record<PhAdvice, Tone> = { limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "info", sulfur: "warning" };
+const NUTRIENTS: Nutrient[] = ["nitrogen", "phosphorus", "potassium", "organicMatter"];
 
-function PhBadge({ ph }: { ph: number }) {
-  const color = ph < 5.5 ? "text-red-600 bg-red-100 dark:bg-red-900/30" :
-    ph < 6.0 ? "text-amber-600 bg-amber-100 dark:bg-amber-900/30" :
-    ph <= 7.0 ? "text-green-600 bg-green-100 dark:bg-green-900/30" :
-    ph <= 7.5 ? "text-amber-600 bg-amber-100 dark:bg-amber-900/30" :
-    "text-red-600 bg-red-100 dark:bg-red-900/30";
-  return <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${color}`}>pH {ph}</span>;
+const num = (s: string) => Number(s.trim().replace(",", "."));
+
+/**
+ * Bullet scale: grey track, the target band, a marker at the value. The
+ * value and its level are always written out, so colour is never the only cue.
+ */
+function Scale({ value, min, max, scaleMin, scaleMax, label }: { value: number; min: number; max: number; scaleMin: number; scaleMax: number; label: string }) {
+  const pct = (v: number) => `${Math.min(100, Math.max(0, ((v - scaleMin) / (scaleMax - scaleMin)) * 100))}%`;
+  return (
+    <div className="relative h-2 rounded-full bg-gray-100 dark:bg-white/10" role="img" aria-label={label}>
+      <div className="absolute inset-y-0 rounded-full bg-garden-200 dark:bg-garden-500/40" style={{ left: pct(min), right: `calc(100% - ${pct(max)})` }} />
+      <div className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-gray-900 shadow-xs dark:border-gray-900 dark:bg-gray-100" style={{ left: pct(value) }} />
+    </div>
+  );
 }
+
+interface TestDraft { bedId: string; date: string; ph: string; n: string; p: string; k: string; om: string; notes: string }
+interface AmendDraft { bedId: string; date: string; type: AmendmentType; material: string; kg: string; cost: string; notes: string }
+
+const emptyTest = (bedId = ""): TestDraft => ({ bedId, date: todayISO(), ph: "", n: "", p: "", k: "", om: "", notes: "" });
+const emptyAmend = (bedId = ""): AmendDraft => ({ bedId, date: todayISO(), type: "compost", material: "", kg: "", cost: "", notes: "" });
 
 export function SoilManagement() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
-  const { soilTests, amendments, gardens, addSoilTest, deleteSoilTest, addAmendment, deleteAmendment } = useStore(
+  const { formatDate, formatNumber, formatWeight, formatCurrency, locale } = useFormat();
+  const { soilTests, amendments, addSoilTest, updateSoilTest, deleteSoilTest, addAmendment, updateAmendment, deleteAmendment } = useStore(
     useShallow((s) => ({
-      soilTests: s.soilTests, amendments: s.amendments, gardens: s.gardens,
-      addSoilTest: s.addSoilTest, deleteSoilTest: s.deleteSoilTest,
-      addAmendment: s.addAmendment, deleteAmendment: s.deleteAmendment,
-    }))
+      soilTests: s.soilTests, amendments: s.amendments,
+      addSoilTest: s.addSoilTest, updateSoilTest: s.updateSoilTest, deleteSoilTest: s.deleteSoilTest,
+      addAmendment: s.addAmendment, updateAmendment: s.updateAmendment, deleteAmendment: s.deleteAmendment,
+    })),
   );
-
-  const [showAddTest, setShowAddTest] = useState(false);
-  const [showAddAmend, setShowAddAmend] = useState(false);
+  const beds = useBeds();
   const [tab, setTab] = useState<"tests" | "amendments">("tests");
 
-  // Test form
-  const [testBedId, setTestBedId] = useState("");
-  const [testDate, setTestDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [testPh, setTestPh] = useState("6.5");
-  const [testN, setTestN] = useState("40");
-  const [testP, setTestP] = useState("30");
-  const [testK, setTestK] = useState("150");
-  const [testOm, setTestOm] = useState("");
-  const [testNotes, setTestNotes] = useState("");
+  const bedTarget = useCallback((bedId: string): PhRange => targetPh(beds.byId.get(bedId)?.plantIds ?? []), [beds]);
+  const local = (n: number) => n.toLocaleString(locale, { useGrouping: false, maximumFractionDigits: 2 });
 
-  // Amendment form
-  const [amendBedId, setAmendBedId] = useState("");
-  const [amendDate, setAmendDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [amendType, setAmendType] = useState<AmendmentType>("compost");
-  const [amendMaterial, setAmendMaterial] = useState("");
-  const [amendKg, setAmendKg] = useState("");
-  const [amendCost, setAmendCost] = useState("");
+  // ---------------------------------------------------------------- test dialog
+  const [testOpen, setTestOpen] = useState(false);
+  const [testEditing, setTestEditing] = useState<string | null>(null);
+  const [testSubmitted, setTestSubmitted] = useState(false);
+  const [test, setTest] = useState<TestDraft>(() => emptyTest());
+  const patchTest = (p: Partial<TestDraft>) => setTest((d) => ({ ...d, ...p }));
 
-  const allBeds = useMemo(() => {
-    const beds: Array<{ id: string; name: string; gardenName: string; envIcon: string }> = [];
-    for (const g of gardens) {
-      for (const b of g.beds) {
-        beds.push({ id: b.id, name: b.name, gardenName: g.name, envIcon: ENVIRONMENT_ICONS[b.environmentType ?? "outdoor_bed"] });
-      }
-    }
-    return beds;
-  }, [gardens]);
-
-  const handleAddTest = () => {
-    if (!testBedId) return;
-    addSoilTest({
-      bedId: testBedId, date: testDate,
-      ph: Number(testPh), nitrogen: Number(testN), phosphorus: Number(testP), potassium: Number(testK),
-      organicMatter: testOm ? Number(testOm) : undefined, notes: testNotes || undefined,
-    });
-    setShowAddTest(false);
-    toast(t("soil.testAdded"), "success");
+  const openAddTest = () => {
+    setTestEditing(null); setTestSubmitted(false); setTest(emptyTest(beds.beds.length === 1 ? beds.beds[0].id : "")); setTestOpen(true);
+  };
+  const openEditTest = (s: SoilTest) => {
+    setTestEditing(s.id); setTestSubmitted(false);
+    setTest({ bedId: s.bedId, date: s.date, ph: local(s.ph), n: String(s.nitrogen), p: String(s.phosphorus), k: String(s.potassium), om: s.organicMatter != null ? local(s.organicMatter) : "", notes: s.notes ?? "" });
+    setTestOpen(true);
   };
 
-  const handleAddAmendment = () => {
-    if (!amendBedId || !amendMaterial) return;
-    addAmendment({
-      bedId: amendBedId, date: amendDate, type: amendType,
-      material: amendMaterial, quantityKg: Number(amendKg),
-      cost: amendCost ? Number(amendCost) : undefined,
-    });
-    setAmendMaterial("");
-    setAmendKg("");
-    setAmendCost("");
-    setShowAddAmend(false);
-    toast(t("soil.amendmentAdded"), "success");
+  const testValues = { ph: num(test.ph), n: test.n.trim() ? num(test.n) : 0, p: test.p.trim() ? num(test.p) : 0, k: test.k.trim() ? num(test.k) : 0, om: test.om.trim() ? num(test.om) : undefined };
+  const testErrors = {
+    bed: testSubmitted && !test.bedId ? t("soil.needBed") : undefined,
+    ph: (testSubmitted || test.ph.trim()) && !(testValues.ph >= 3 && testValues.ph <= 10) ? t("soil.invalidPh") : undefined,
+    n: !(testValues.n >= 0) ? t("soil.invalidNumber") : undefined,
+    p: !(testValues.p >= 0) ? t("soil.invalidNumber") : undefined,
+    k: !(testValues.k >= 0) ? t("soil.invalidNumber") : undefined,
+    om: testValues.om !== undefined && !(testValues.om >= 0 && testValues.om <= 100) ? t("soil.invalidNumber") : undefined,
   };
 
-  const getBedName = (bedId: string) => {
-    const bed = allBeds.find((b) => b.id === bedId);
-    return bed ? `${bed.envIcon} ${bed.name}` : bedId;
+  const saveTest = () => {
+    setTestSubmitted(true);
+    if (!test.bedId || !(testValues.ph >= 3 && testValues.ph <= 10) || testErrors.n || testErrors.p || testErrors.k || testErrors.om) return;
+    const fields = {
+      bedId: test.bedId, date: test.date, ph: testValues.ph, nitrogen: testValues.n, phosphorus: testValues.p, potassium: testValues.k,
+      organicMatter: testValues.om, notes: test.notes.trim() || undefined,
+    };
+    if (testEditing) { updateSoilTest(testEditing, fields); toast(t("soil.updated"), "success"); }
+    else { addSoilTest(fields); toast(t("soil.testAdded"), "success"); }
+    setTestOpen(false);
   };
 
-  // pH recommendations
-  const getPhRecommendation = (ph: number): string => {
-    if (ph < 5.5) return t("soil.phTooAcid");
-    if (ph < 6.0) return t("soil.phSlightlyAcid");
-    if (ph <= 7.0) return t("soil.phOptimal");
-    if (ph <= 7.5) return t("soil.phSlightlyAlkaline");
-    return t("soil.phTooAlkaline");
+  const removeTest = async (s: SoilTest) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteSoilTest(s.id);
+    setTestOpen(false);
+    const { id: _id, ...rest } = s;
+    toast(t("soil.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addSoilTest(rest) } });
   };
+
+  // ---------------------------------------------------------------- amendment dialog
+  const [amendOpen, setAmendOpen] = useState(false);
+  const [amendEditing, setAmendEditing] = useState<string | null>(null);
+  const [amendSubmitted, setAmendSubmitted] = useState(false);
+  const [amend, setAmend] = useState<AmendDraft>(() => emptyAmend());
+  const patchAmend = (p: Partial<AmendDraft>) => setAmend((d) => ({ ...d, ...p }));
+
+  const openAddAmend = () => {
+    setAmendEditing(null); setAmendSubmitted(false); setAmend(emptyAmend(beds.beds.length === 1 ? beds.beds[0].id : "")); setAmendOpen(true);
+  };
+  const openEditAmend = (a: Amendment) => {
+    setAmendEditing(a.id); setAmendSubmitted(false);
+    setAmend({ bedId: a.bedId, date: a.date, type: a.type, material: a.material, kg: a.quantityKg ? local(a.quantityKg) : "", cost: a.cost != null ? local(a.cost) : "", notes: a.notes ?? "" });
+    setAmendOpen(true);
+  };
+
+  const amendKg = amend.kg.trim() ? num(amend.kg) : 0;
+  const amendCost = amend.cost.trim() ? num(amend.cost) : 0;
+  const amendErrors = {
+    bed: amendSubmitted && !amend.bedId ? t("soil.needBed") : undefined,
+    material: amendSubmitted && !amend.material.trim() ? t("soil.needMaterial") : undefined,
+    kg: !(amendKg >= 0) ? t("soil.invalidNumber") : undefined,
+    cost: !(amendCost >= 0) ? t("soil.invalidNumber") : undefined,
+  };
+
+  const saveAmend = () => {
+    setAmendSubmitted(true);
+    if (!amend.bedId || !amend.material.trim() || amendErrors.kg || amendErrors.cost) return;
+    const fields = {
+      bedId: amend.bedId, date: amend.date, type: amend.type, material: amend.material.trim(),
+      quantityKg: amendKg, cost: amendCost || undefined, notes: amend.notes.trim() || undefined,
+    };
+    if (amendEditing) { updateAmendment(amendEditing, fields); toast(t("soil.updated"), "success"); }
+    else { addAmendment(fields); toast(t("soil.amendmentAdded"), "success"); }
+    setAmendOpen(false);
+  };
+
+  const removeAmend = async (a: Amendment) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteAmendment(a.id);
+    setAmendOpen(false);
+    const { id: _id, ...rest } = a;
+    toast(t("soil.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addAmendment(rest) } });
+  };
+
+  // ---------------------------------------------------------------- views
+  const sortedTests = useMemo(() => [...soilTests].sort((a, b) => b.date.localeCompare(a.date)), [soilTests]);
+  const sortedAmendments = useMemo(() => [...amendments].sort((a, b) => b.date.localeCompare(a.date)), [amendments]);
+  const bedName = (id: string) => beds.label(id) ?? t("soil.unknownBed");
+  const rangeText = (r: PhRange) => t("soil.phRange", { min: formatNumber(r.min, { minimumFractionDigits: 1 }), max: formatNumber(r.max, { minimumFractionDigits: 1 }) });
+  const nutrientValue = (n: Nutrient, v: number) => (n === "organicMatter" ? `${formatNumber(v)} %` : t("soil.ppm", { value: formatNumber(v, { maximumFractionDigits: 0 }) }));
+
+  const testEditingItem = testEditing ? soilTests.find((s) => s.id === testEditing) : undefined;
+  const amendEditingItem = amendEditing ? amendments.find((a) => a.id === amendEditing) : undefined;
+  const draftTarget = test.bedId ? bedTarget(test.bedId) : undefined;
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{t("soil.title")}</h1>
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" onClick={() => setShowAddAmend(true)}>
-            <Leaf size={16} />
-            {t("soil.addAmendment")}
-          </Button>
-          <Button size="sm" onClick={() => setShowAddTest(true)}>
-            <Beaker size={16} />
-            {t("soil.addTest")}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t("soil.title")}
+        description={t("soil.subtitle")}
+        actions={
+          <>
+            <Button variant="secondary" onClick={openAddAmend}>
+              <Leaf size={16} aria-hidden="true" />
+              {t("soil.addAmendment")}
+            </Button>
+            <Button onClick={openAddTest}>
+              <Beaker size={16} aria-hidden="true" />
+              {t("soil.addTest")}
+            </Button>
+          </>
+        }
+        tabs={
+          <Tabs
+            label={t("soil.title")}
+            value={tab}
+            onChange={setTab}
+            items={[
+              { value: "tests", label: t("soil.tests"), count: soilTests.length },
+              { value: "amendments", label: t("soil.amendments"), count: amendments.length },
+            ]}
+          />
+        }
+      />
 
-      {/* Tab toggle */}
-      <div className="mb-4 flex gap-2">
-        <button onClick={() => setTab("tests")} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${tab === "tests" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
-          <Beaker size={14} className="mr-1 inline" /> {t("soil.tests")} ({soilTests.length})
-        </button>
-        <button onClick={() => setTab("amendments")} className={`rounded-lg px-3 py-1.5 text-sm font-medium ${tab === "amendments" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}>
-          <Leaf size={14} className="mr-1 inline" /> {t("soil.amendments")} ({amendments.length})
-        </button>
-      </div>
-
-      {/* Soil Tests */}
       {tab === "tests" && (
-        soilTests.length === 0 ? (
-          <Card><p className="text-center text-gray-500">{t("soil.noTests")}</p></Card>
+        sortedTests.length === 0 ? (
+          <Card>
+            <EmptyState
+              icon={Beaker}
+              title={t("soil.emptyTestsTitle")}
+              description={t("soil.emptyTestsText")}
+              action={<Button onClick={openAddTest}><Plus size={16} aria-hidden="true" />{t("soil.addTest")}</Button>}
+            />
+          </Card>
         ) : (
-          <div className="space-y-2">
-            {[...soilTests].sort((a, b) => b.date.localeCompare(a.date)).map((test) => (
-              <Card key={test.id}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="mb-1 flex items-center gap-2">
-                      <span className="text-sm font-medium">{getBedName(test.bedId)}</span>
-                      <span className="text-xs text-gray-400">{test.date}</span>
+          <div className="grid gap-4 md:grid-cols-2">
+            {sortedTests.map((s) => {
+              const target = bedTarget(s.bedId);
+              const advice = phAdvice(s.ph, target);
+              return (
+                <article key={s.id} className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        <button type="button" onClick={() => openEditTest(s)} className="text-left after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-xl focus-visible:after:outline-2 focus-visible:after:outline-focus">
+                          {bedName(s.bedId)}
+                        </button>
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400"><time dateTime={s.date}>{formatDate(s.date)}</time></p>
                     </div>
-                    <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <PhBadge ph={test.ph} />
-                      <span className="rounded bg-blue-50 px-2 py-0.5 text-xs dark:bg-blue-900/20">N: {test.nitrogen} ppm</span>
-                      <span className="rounded bg-orange-50 px-2 py-0.5 text-xs dark:bg-orange-900/20">P: {test.phosphorus} ppm</span>
-                      <span className="rounded bg-purple-50 px-2 py-0.5 text-xs dark:bg-purple-900/20">K: {test.potassium} ppm</span>
-                      {test.organicMatter !== undefined && (
-                        <span className="rounded bg-earth-100 px-2 py-0.5 text-xs dark:bg-earth-700/30">OM: {test.organicMatter}%</span>
-                      )}
+                    <div className="relative z-10 -mt-1 -mr-2">
+                      <Menu
+                        label={t("common.moreActions")}
+                        items={[
+                          { label: t("common.edit"), icon: Pencil, onSelect: () => openEditTest(s) },
+                          "separator",
+                          { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void removeTest(s) },
+                        ]}
+                      />
                     </div>
-                    <p className="text-xs text-gray-500">{getPhRecommendation(test.ph)}</p>
-                    {test.notes && <p className="mt-1 text-xs text-gray-400">{test.notes}</p>}
                   </div>
-                  <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteSoilTest(test.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </Card>
-            ))}
+
+                  <div className="mt-4">
+                    <div className="mb-1.5 flex items-baseline justify-between gap-2">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("soil.ph")}</span>
+                      <span className="flex items-baseline gap-2">
+                        <span className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-50">{formatNumber(s.ph)}</span>
+                        <Badge tone={ADVICE_TONE[advice]} dot>{t(`soil.phStatus.${advice}`)}</Badge>
+                      </span>
+                    </div>
+                    <Scale value={s.ph} min={target.min} max={target.max} scaleMin={4} scaleMax={9} label={`${t("soil.ph")} ${formatNumber(s.ph)}, ${t("soil.target")} ${rangeText(target)}`} />
+                    <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
+                      <span>{formatNumber(4)}</span>
+                      <span>{t("soil.target")} {rangeText(target)}</span>
+                      <span>{formatNumber(9)}</span>
+                    </div>
+                  </div>
+
+                  <p className="mt-3 flex gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
+                    <Lightbulb size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
+                    <span>{t(`soil.phAdvice.${advice}`, { range: rangeText(target) })}</span>
+                  </p>
+
+                  <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3">
+                    {NUTRIENTS.map((n) => {
+                      const value = n === "nitrogen" ? s.nitrogen : n === "phosphorus" ? s.phosphorus : n === "potassium" ? s.potassium : s.organicMatter;
+                      // 0 ppm means "not measured" (the fields are optional).
+                      if (value === undefined || (n !== "organicMatter" && value === 0)) return null;
+                      const r = NUTRIENT_RANGE[n];
+                      const level = nutrientLevel(n, value);
+                      return (
+                        <div key={n}>
+                          <dt className="flex items-baseline justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+                            <span>{t(`soil.nutrients.${n}`)}</span>
+                            <span className={level === "optimal" ? "" : "font-medium text-warning"}>{t(`soil.levels.${level}`)}</span>
+                          </dt>
+                          <dd className="mt-0.5">
+                            <span className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{nutrientValue(n, value)}</span>
+                            <div className="mt-1">
+                              <Scale value={value} min={r.min} max={r.max} scaleMin={0} scaleMax={r.scaleMax} label={`${t(`soil.nutrients.${n}`)}: ${t(`soil.levels.${level}`)}`} />
+                            </div>
+                          </dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                  {s.notes && <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">{s.notes}</p>}
+                </article>
+              );
+            })}
           </div>
         )
       )}
 
-      {/* Amendments */}
       {tab === "amendments" && (
-        amendments.length === 0 ? (
-          <Card><p className="text-center text-gray-500">{t("soil.noAmendments")}</p></Card>
+        sortedAmendments.length === 0 ? (
+          <Card>
+            <EmptyState
+              icon={Layers}
+              title={t("soil.emptyAmendmentsTitle")}
+              description={t("soil.emptyAmendmentsText")}
+              action={<Button onClick={openAddAmend}><Plus size={16} aria-hidden="true" />{t("soil.addAmendment")}</Button>}
+            />
+          </Card>
         ) : (
-          <div className="space-y-2">
-            {[...amendments].sort((a, b) => b.date.localeCompare(a.date)).map((a) => (
-              <div key={a.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-                <span className="text-lg">{AMENDMENT_ICONS[a.type]}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{a.material}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span>{getBedName(a.bedId)}</span>
-                    <span>·</span>
-                    <span>{a.date}</span>
-                    <span>·</span>
-                    <span>{a.quantityKg} kg</span>
-                    {a.cost && <><span>·</span><span>{a.cost.toFixed(2)} €</span></>}
-                  </div>
-                </div>
-                <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteAmendment(a.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
+          <List label={t("soil.amendments")}>
+            {sortedAmendments.map((a) => {
+              const Icon = AMENDMENT_ICONS[a.type];
+              return (
+                <ListRow
+                  key={a.id}
+                  onClick={() => openEditAmend(a)}
+                  leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-earth-100 text-earth-700 dark:bg-earth-500/15 dark:text-earth-300"><Icon size={16} aria-hidden="true" /></span>}
+                  title={a.material}
+                  badges={<Badge variant="outline">{t(`soil.types.${a.type}`)}</Badge>}
+                  meta={<>{bedName(a.bedId)} · <time dateTime={a.date}>{formatDate(a.date, "relative")}</time></>}
+                  description={a.notes}
+                  trailing={
+                    <span className="flex flex-col items-end">
+                      {a.quantityKg > 0 && <span>{formatWeight(a.quantityKg * 1000)}</span>}
+                      {a.cost ? <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{formatCurrency(a.cost)}</span> : null}
+                    </span>
+                  }
+                  actions={
+                    <Menu
+                      label={t("common.moreActions")}
+                      items={[
+                        { label: t("common.edit"), icon: Pencil, onSelect: () => openEditAmend(a) },
+                        "separator",
+                        { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void removeAmend(a) },
+                      ]}
+                    />
+                  }
+                />
+              );
+            })}
+          </List>
         )
       )}
 
-      {/* Add Test Modal */}
-      <Modal open={showAddTest} onClose={() => setShowAddTest(false)} title={t("soil.addTest")}>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.bed")}</label>
-            <select value={testBedId} onChange={(e) => setTestBedId(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-              <option value="">--</option>
-              {allBeds.map((b) => <option key={b.id} value={b.id}>{b.envIcon} {b.gardenName} / {b.name}</option>)}
-            </select>
+      {/* Soil test: add and edit */}
+      <Modal
+        open={testOpen}
+        onClose={() => setTestOpen(false)}
+        title={testEditing ? t("soil.editTest") : t("soil.addTest")}
+        footer={
+          <>
+            {testEditingItem && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void removeTest(testEditingItem)}>
+                <Trash2 size={16} aria-hidden="true" />{t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setTestOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={saveTest}>{testEditing ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <Select
+            label={t("harvest.bed")}
+            value={test.bedId}
+            onChange={(e) => patchTest({ bedId: e.target.value })}
+            placeholder={t("soil.chooseBed")}
+            options={beds.options}
+            error={testErrors.bed}
+            hint={draftTarget ? t("soil.targetHint", { range: rangeText(draftTarget) }) : undefined}
+          />
+          <DateField label={t("harvest.date")} value={test.date} onChange={(date) => patchTest({ date })} />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label={t("soil.ph")} inputMode="decimal" value={test.ph} onChange={(e) => patchTest({ ph: e.target.value })} placeholder={formatNumber(6.5)} error={testErrors.ph} />
+            <Input label={`${t("soil.nutrients.organicMatter")} (%)`} inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={formatNumber(4.5)} error={testErrors.om} />
           </div>
-          <Input label={t("harvest.date")} type="date" value={testDate} onChange={(e) => setTestDate(e.target.value)} />
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Input label="pH" type="number" step="0.1" min={3} max={10} value={testPh} onChange={(e) => setTestPh(e.target.value)} />
-            <Input label={`${t("soil.organicMatter")} (%)`} type="number" step="0.1" min={0} value={testOm} onChange={(e) => setTestOm(e.target.value)} />
+          <div className="grid grid-cols-3 gap-3">
+            <Input label={t("soil.nShort")} inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder="40" error={testErrors.n} />
+            <Input label={t("soil.pShort")} inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder="30" error={testErrors.p} />
+            <Input label={t("soil.kShort")} inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder="150" error={testErrors.k} />
           </div>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Input label="N (ppm)" type="number" min={0} value={testN} onChange={(e) => setTestN(e.target.value)} />
-            <Input label="P (ppm)" type="number" min={0} value={testP} onChange={(e) => setTestP(e.target.value)} />
-            <Input label="K (ppm)" type="number" min={0} value={testK} onChange={(e) => setTestK(e.target.value)} />
-          </div>
-          <Input label={t("harvest.notes")} value={testNotes} onChange={(e) => setTestNotes(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAddTest(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAddTest}>{t("common.add")}</Button>
-          </div>
+          <p className="-mt-2 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
+          <Textarea label={t("harvest.notes")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
         </div>
       </Modal>
 
-      {/* Add Amendment Modal */}
-      <Modal open={showAddAmend} onClose={() => setShowAddAmend(false)} title={t("soil.addAmendment")}>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.bed")}</label>
-            <select value={amendBedId} onChange={(e) => setAmendBedId(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-              <option value="">--</option>
-              {allBeds.map((b) => <option key={b.id} value={b.id}>{b.envIcon} {b.gardenName} / {b.name}</option>)}
-            </select>
+      {/* Amendment: add and edit */}
+      <Modal
+        open={amendOpen}
+        onClose={() => setAmendOpen(false)}
+        title={amendEditing ? t("soil.editAmendment") : t("soil.addAmendment")}
+        footer={
+          <>
+            {amendEditingItem && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void removeAmend(amendEditingItem)}>
+                <Trash2 size={16} aria-hidden="true" />{t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setAmendOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={saveAmend}>{amendEditing ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select label={t("harvest.bed")} value={amend.bedId} onChange={(e) => patchAmend({ bedId: e.target.value })} placeholder={t("soil.chooseBed")} options={beds.options} error={amendErrors.bed} />
+            <Select
+              label={t("soil.amendmentType")}
+              value={amend.type}
+              onChange={(e) => patchAmend({ type: e.target.value as AmendmentType })}
+              options={AMENDMENT_TYPES.map((type) => ({ value: type, label: t(`soil.types.${type}`) }))}
+            />
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("soil.amendmentType")}</label>
-            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-              {(["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"] as AmendmentType[]).map((type) => (
-                <button key={type} onClick={() => setAmendType(type)}
-                  className={`flex flex-col items-center gap-0.5 rounded-lg border p-1.5 text-[10px] ${amendType === type ? "border-garden-500 bg-garden-50 dark:bg-garden-900/30" : "border-gray-200 dark:border-gray-700"}`}>
-                  <span>{AMENDMENT_ICONS[type]}</span>
-                  {t(`soil.types.${type}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <Input label={t("soil.material")} value={amendMaterial} onChange={(e) => setAmendMaterial(e.target.value)} placeholder={t("soil.materialPlaceholder")} />
+          <Input label={t("soil.material")} value={amend.material} onChange={(e) => patchAmend({ material: e.target.value })} placeholder={t("soil.materialPlaceholder")} error={amendErrors.material} />
           <div className="grid grid-cols-2 gap-4">
-            <Input label={`${t("seeds.quantity")} (kg)`} type="number" min={0} step="0.1" value={amendKg} onChange={(e) => setAmendKg(e.target.value)} />
-            <Input label={`${t("expenses.amount")} (€)`} type="number" step="0.01" min={0} value={amendCost} onChange={(e) => setAmendCost(e.target.value)} />
+            <Input label={t("soil.quantityKg")} inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder="10" error={amendErrors.kg} />
+            <Input label={t("soil.cost")} inputMode="decimal" value={amend.cost} onChange={(e) => patchAmend({ cost: e.target.value })} placeholder={formatCurrency(12.5)} hint={t("common.optional")} error={amendErrors.cost} />
           </div>
-          <Input label={t("harvest.date")} type="date" value={amendDate} onChange={(e) => setAmendDate(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAddAmend(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAddAmendment}>{t("common.add")}</Button>
-          </div>
+          <DateField label={t("harvest.date")} value={amend.date} onChange={(date) => patchAmend({ date })} />
+          <Textarea label={t("harvest.notes")} rows={2} value={amend.notes} onChange={(e) => patchAmend({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

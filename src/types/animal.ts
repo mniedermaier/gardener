@@ -53,11 +53,15 @@ export const ANIMAL_ICONS: Record<AnimalType, string> = {
   quail: "🐦",
 };
 
+/**
+ * Legacy emoji maps. The UI uses Lucide icons from
+ * `components/livestock/icons.ts`; these stay only for older call sites.
+ */
 export const PRODUCT_ICONS: Record<ProductType, string> = {
   eggs: "\ud83e\udd5a",
   honey: "\ud83c\udf6f",
   meat: "\ud83e\udd69",
-  wax: "\ud83d\udeaf",
+  wax: "\ud83d\udd6f\ufe0f",
   milk: "🥛",
   wool: "🧶",
 };
@@ -82,3 +86,27 @@ export const ANNUAL_YIELD: Record<AnimalType, { product: ProductType; quantity: 
   sheep: [{ product: "wool", quantity: 4, unit: "kg" }, { product: "meat", quantity: 20, unit: "kg" }],
   quail: [{ product: "eggs", quantity: 300, unit: "pieces" }],
 };
+
+/** Unit each product is recorded in. Eggs are counted, milk in litres, the rest in kg. */
+export const PRODUCT_UNIT: Record<ProductType, AnimalProduct["unit"]> = {
+  eggs: "pieces",
+  honey: "kg",
+  meat: "kg",
+  wax: "kg",
+  milk: "liters",
+  wool: "kg",
+};
+
+/** Which products an animal type yields — drives the product picker. */
+export const PRODUCT_TYPES_BY_ANIMAL: Record<AnimalType, ProductType[]> = {
+  chicken: ["eggs", "meat"],
+  duck: ["eggs", "meat"],
+  rabbit: ["meat"],
+  bee: ["honey", "wax"],
+  goat: ["milk", "meat"],
+  sheep: ["wool", "meat"],
+  quail: ["eggs"],
+};
+
+/** Animal types that lay eggs (quick egg log). */
+export const EGG_LAYERS: AnimalType[] = ["chicken", "duck", "quail"];

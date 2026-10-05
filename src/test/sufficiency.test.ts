@@ -120,3 +120,16 @@ describe("Sufficiency calculator", () => {
     expect(result.animalYields).toHaveLength(0);
   });
 });
+
+describe("winter gap", () => {
+  it("only counts storage months (Nov–Apr), never summer", async () => {
+    const { STORAGE_MONTHS } = await import("@/lib/sufficiency");
+    const result = calculateSufficiency([garden], [tomato, bean], 2, 30);
+    // A tiny garden is below 25 % in every month …
+    expect(result.lowMonths.length).toBe(12);
+    // … but the *winter* gap lists only the storage period.
+    expect(result.winterGap).not.toBeNull();
+    for (const m of result.winterGap!.months) expect(STORAGE_MONTHS).toContain(m);
+    expect(result.winterGap!.months).not.toContain(6); // July
+  });
+});

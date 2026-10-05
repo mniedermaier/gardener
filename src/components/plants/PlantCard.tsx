@@ -1,45 +1,57 @@
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Droplets } from "lucide-react";
+import { Sun, Droplets, Ruler } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { Badge } from "@/components/ui/Badge";
+import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
 import type { Plant } from "@/types/plant";
 
 interface PlantCardProps {
   plant: Plant;
-  onClick?: () => void;
+  /** Stands in at least one bed. */
+  planted?: boolean;
+  custom?: boolean;
+  onOpen: (id: string) => void;
 }
 
-export function PlantCard({ plant, onClick }: PlantCardProps) {
+/** Catalogue tile: icon, name, category and the three facts people filter by. */
+export const PlantCard = memo(function PlantCard({ plant, planted, custom, onOpen }: PlantCardProps) {
   const { t } = useTranslation();
+  const getPlantName = usePlantName();
+  const { formatNumber } = useFormat();
 
   return (
     <button
-      onClick={onClick}
-      className="flex w-full items-start gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-garden-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-900 dark:hover:border-garden-600"
+      type="button"
+      onClick={() => onOpen(plant.id)}
+      className="flex w-full items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xs transition-colors hover:border-garden-300 hover:bg-gray-50/60 dark:border-white/10 dark:bg-gray-900 dark:hover:border-garden-500/40 dark:hover:bg-white/5"
     >
-      <span
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-2xl"
-        style={{ backgroundColor: plant.color + "20" }}
-      >
-        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5" aria-hidden="true">
+        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={30} />
       </span>
-      <div className="min-w-0 flex-1">
-        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-          {t(`plants.catalog.${plant.id}.name`)}
-        </h3>
-        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-          {t(`plants.category.${plant.category}`)}
-        </p>
-        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-          <span className="flex items-center gap-1">
-            <Sun size={12} />
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{getPlantName(plant.id)}</span>
+          {planted && <Badge tone="brand" size="sm">{t("plants.inGarden")}</Badge>}
+          {custom && <Badge variant="outline" size="sm">{t("plants.custom")}</Badge>}
+        </span>
+        <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">{t(`plants.category.${plant.category}`)}</span>
+        <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 dark:text-gray-300">
+          <span className="inline-flex items-center gap-1">
+            <Sun size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
             {t(`plants.sun.${plant.sunRequirement}`)}
           </span>
-          <span className="flex items-center gap-1">
-            <Droplets size={12} />
+          <span className="inline-flex items-center gap-1">
+            <Droplets size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
             {t(`plants.water.${plant.waterNeed}`)}
           </span>
-        </div>
-      </div>
+          <span className="inline-flex items-center gap-1 tabular-nums">
+            <Ruler size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
+            {formatNumber(plant.spacingCm)} {t("common.cm")}
+          </span>
+        </span>
+      </span>
     </button>
   );
-}
+});

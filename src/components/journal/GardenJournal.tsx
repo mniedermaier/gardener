@@ -1,33 +1,36 @@
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { Plus, Trash2, Tag, Sprout, LayoutGrid, Bird, Camera, X } from "lucide-react";
-import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { useToast } from "@/components/ui/Toast";
+import { BookOpen, Camera, ImagePlus, LayoutGrid, PawPrint, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
+import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { todayISO } from "@/lib/format";
+import { putPhoto, deletePhotos } from "@/lib/photoStore";
+import type { JournalEntry } from "@/types/journal";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { ANIMAL_ICONS } from "@/types/animal";
-import { format } from "date-fns";
-import { putPhoto, deletePhotos } from "@/lib/photoStore";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Badge } from "@/components/ui/Badge";
+import { Menu } from "@/components/ui/Menu";
+import { IconButton } from "@/components/ui/IconButton";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { LABEL_CLASS } from "@/components/ui/Field";
+import { useToast } from "@/components/ui/Toast";
+import { DateField } from "@/components/records/DateField";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
+import { useBeds } from "@/components/records/useBeds";
+import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 import { JournalPhoto, useResolvedPhoto } from "./JournalPhoto";
 
-function FullPhoto({ photo }: { photo: string }) {
-  const src = useResolvedPhoto(photo);
-  if (!src) return null;
-  return (
-    <img
-      src={src}
-      alt=""
-      className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
-      onClick={(e) => e.stopPropagation()}
-    />
-  );
-}
+const MAX_PHOTOS = 3;
 
 function resizeImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -56,327 +59,414 @@ function resizeImage(file: File, maxWidth: number, maxHeight: number, quality: n
   });
 }
 
+function FullPhoto({ photo, alt }: { photo: string; alt: string }) {
+  const src = useResolvedPhoto(photo);
+  if (!src) return <div className="aspect-video w-full animate-pulse rounded-lg bg-gray-100 dark:bg-white/5" />;
+  return <img src={src} alt={alt} className="max-h-[70dvh] w-full rounded-lg object-contain" />;
+}
+
+interface Draft {
+  title: string;
+  text: string;
+  date: string;
+  tags: string;
+  plantId: string;
+  bedId: string;
+  animalId: string;
+  photos: string[];
+}
+
+const emptyDraft = (): Draft => ({ title: "", text: "", date: todayISO(), tags: "", plantId: "", bedId: "", animalId: "", photos: [] });
+
+const parseTags = (s: string) => [...new Set(s.split(",").map((x) => x.trim().replace(/^#/, "")).filter(Boolean))];
+
 export function GardenJournal() {
   const { t } = useTranslation();
   const { confirm, toast } = useToast();
-  const { journalEntries, gardens, animals, addJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({
+  const { formatDate } = useFormat();
+  const { journalEntries, gardens, animals, addJournalEntry, updateJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({
     journalEntries: s.journalEntries, gardens: s.gardens, animals: s.animals,
-    addJournalEntry: s.addJournalEntry, deleteJournalEntry: s.deleteJournalEntry,
+    addJournalEntry: s.addJournalEntry, updateJournalEntry: s.updateJournalEntry, deleteJournalEntry: s.deleteJournalEntry,
   })));
   const plants = usePlants();
   const plantMap = usePlantMap();
-  const [showAdd, setShowAdd] = useState(false);
-  const openAdd = useCallback(() => setShowAdd(true), []);
-  useOpenAddOnNavigate(openAdd);
-  const [title, setTitle] = useState("");
-  const [text, setText] = useState("");
-  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [tags, setTags] = useState("");
-  const [gardenId, setGardenId] = useState(gardens[0]?.id ?? "");
-  const [bedId, setBedId] = useState("");
-  const [plantId, setPlantId] = useState("");
-  const [animalId, setAnimalId] = useState("");
+  const getPlantName = usePlantName();
+  const beds = useBeds();
+
   const [filterTag, setFilterTag] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [viewPhoto, setViewPhoto] = useState<string | null>(null);
+  const [viewPhoto, setViewPhoto] = useState<{ photo: string; title: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedGarden = gardens.find((g) => g.id === gardenId);
+  // ---------------------------------------------------------------- dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [originalPhotos, setOriginalPhotos] = useState<string[]>([]);
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  // Collect all unique tags
-  const allTags = [...new Set(journalEntries.flatMap((e) => e.tags ?? []))].sort();
+  const openAdd = useCallback((params: AddParams = {}) => {
+    setEditingId(null);
+    setSubmitted(false);
+    setOriginalPhotos([]);
+    setDraft({
+      ...emptyDraft(),
+      plantId: params.plant ?? "",
+      bedId: params.bed ?? "",
+      animalId: params.animal ?? "",
+      date: params.date ?? todayISO(),
+    });
+    setDialogOpen(true);
+  }, []);
+  const openAddPlain = useCallback(() => openAdd(), [openAdd]);
+  useOpenAddOnNavigate(openAddPlain);
+  useAddFromUrl(openAdd);
+
+  const openEdit = (e: JournalEntry) => {
+    setEditingId(e.id);
+    setSubmitted(false);
+    setOriginalPhotos(e.photos ?? []);
+    setDraft({
+      title: e.title, text: e.text, date: e.date, tags: (e.tags ?? []).join(", "),
+      plantId: e.plantId ?? "", bedId: e.bedId ?? "", animalId: e.animalId ?? "", photos: e.photos ?? [],
+    });
+    setDialogOpen(true);
+  };
+
+  /** Closing without saving drops photos uploaded in this session only. */
+  const closeDialog = () => {
+    const fresh = draft.photos.filter((p) => !originalPhotos.includes(p));
+    if (fresh.length) void deletePhotos(fresh);
+    setDialogOpen(false);
+  };
 
   const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const remaining = 3 - photos.length;
-    const toProcess = Array.from(files).slice(0, remaining);
+    const toProcess = Array.from(files).slice(0, MAX_PHOTOS - draft.photos.length);
+    setUploading(true);
     const refs: string[] = [];
     for (const file of toProcess) {
       try {
-        const blob = await resizeImage(file, 800, 600, 0.7);
+        const blob = await resizeImage(file, 1200, 900, 0.75);
         refs.push(await putPhoto(blob));
       } catch {
         toast(t("journal.photoError"), "error");
       }
     }
-    setPhotos((prev) => [...prev, ...refs].slice(0, 3));
+    setUploading(false);
+    setDraft((d) => ({ ...d, photos: [...d.photos, ...refs].slice(0, MAX_PHOTOS) }));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleAdd = () => {
-    if (!title.trim() || !text.trim()) return;
-    addJournalEntry({
-      gardenId: gardenId || gardens[0]?.id || "",
-      date,
-      title: title.trim(),
-      text: text.trim(),
-      tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : undefined,
-      bedId: bedId || undefined,
-      plantId: plantId || undefined,
-      animalId: animalId || undefined,
-      photos: photos.length > 0 ? photos : undefined,
-    });
-    setTitle("");
-    setText("");
-    setTags("");
-    setBedId("");
-    setPlantId("");
-    setAnimalId("");
-    setPhotos([]);
-    setShowAdd(false);
+  const removeDraftPhoto = (photo: string) => {
+    // Unsaved uploads can go right away; saved ones only when the change is saved.
+    if (!originalPhotos.includes(photo)) void deletePhotos([photo]);
+    setDraft((d) => ({ ...d, photos: d.photos.filter((p) => p !== photo) }));
   };
 
-  const sorted = [...journalEntries]
-    .filter((e) => !filterTag || e.tags?.includes(filterTag))
-    .sort((a, b) => b.date.localeCompare(a.date));
+  const titleError = submitted && !draft.title.trim() ? t("journal.needTitle") : undefined;
+
+  const handleSave = () => {
+    setSubmitted(true);
+    if (!draft.title.trim()) return;
+    const tags = parseTags(draft.tags);
+    const fields = {
+      gardenId: beds.byId.get(draft.bedId)?.gardenId ?? gardens[0]?.id ?? "",
+      date: draft.date,
+      title: draft.title.trim(),
+      text: draft.text.trim(),
+      tags: tags.length ? tags : undefined,
+      bedId: draft.bedId || undefined,
+      plantId: draft.plantId || undefined,
+      animalId: draft.animalId || undefined,
+      photos: draft.photos.length ? draft.photos : undefined,
+    };
+    if (editingId) {
+      const removed = originalPhotos.filter((p) => !draft.photos.includes(p));
+      if (removed.length) void deletePhotos(removed);
+      updateJournalEntry(editingId, fields);
+      toast(t("journal.updated"), "success");
+    } else {
+      addJournalEntry(fields);
+      toast(t("journal.added"), "success");
+    }
+    setDialogOpen(false);
+  };
+
+  const handleDelete = async (entry: JournalEntry) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteJournalEntry(entry.id);
+    setDialogOpen(false);
+    // Keep the photos until the undo window has passed.
+    let undone = false;
+    if (entry.photos?.length) setTimeout(() => { if (!undone) void deletePhotos(entry.photos!); }, 7000);
+    const { id: _id, ...rest } = entry;
+    toast(t("journal.deleted"), "success", {
+      action: { label: t("common.undo"), onClick: () => { undone = true; addJournalEntry(rest); } },
+    });
+  };
+
+  // ---------------------------------------------------------------- list
+  const allTags = useMemo(() => [...new Set(journalEntries.flatMap((e) => e.tags ?? []))].sort(), [journalEntries]);
+  const groups = useMemo(() => {
+    const sorted = journalEntries
+      .filter((e) => !filterTag || e.tags?.includes(filterTag))
+      .sort((a, b) => b.date.localeCompare(a.date));
+    const map = new Map<string, JournalEntry[]>();
+    for (const e of sorted) map.set(e.date.slice(0, 7), [...(map.get(e.date.slice(0, 7)) ?? []), e]);
+    return [...map.entries()];
+  }, [journalEntries, filterTag]);
+
+  const animalLabel = (id: string) => {
+    const a = animals.find((x) => x.id === id);
+    return a ? a.name || t(`livestock.types.${a.type}`) : undefined;
+  };
+
+  const chip = (active: boolean) =>
+    `inline-flex min-h-9 items-center rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-8 ${
+      active
+        ? "border-garden-600 bg-garden-600 text-white dark:border-garden-500 dark:bg-garden-500/20 dark:text-garden-200"
+        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+    }`;
+
+  const editing = editingId ? journalEntries.find((e) => e.id === editingId) : undefined;
+  const draftTags = parseTags(draft.tags);
+  const suggestedTags = allTags.filter((tag) => !draftTags.includes(tag)).slice(0, 8);
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("journal.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} />
-          {t("journal.add")}
-        </Button>
-      </div>
+      <PageHeader
+        title={t("journal.title")}
+        description={t("journal.subtitle")}
+        actions={
+          <Button onClick={openAddPlain}>
+            <Plus size={16} aria-hidden="true" />
+            {t("journal.add")}
+          </Button>
+        }
+      />
 
-      {/* Tag filter */}
-      {allTags.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-1">
-          <button
-            onClick={() => setFilterTag(null)}
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${!filterTag ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"}`}
-          >
-            {t("journal.all")}
-          </button>
-          {allTags.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => setFilterTag(filterTag === tag ? null : tag)}
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${filterTag === tag ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40 dark:text-garden-400" : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"}`}
-            >
-              <Tag size={8} className="mr-0.5 inline" />
-              {tag}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {sorted.length === 0 ? (
+      {journalEntries.length === 0 ? (
         <Card>
-          <p className="text-center text-gray-500">{t("journal.noEntries")}</p>
+          <EmptyState
+            icon={BookOpen}
+            title={t("journal.emptyTitle")}
+            description={t("journal.emptyText")}
+            action={<Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("journal.add")}</Button>}
+          />
         </Card>
       ) : (
-        <div className="space-y-4">
-          {sorted.map((entry) => {
-            const plant = entry.plantId ? plantMap.get(entry.plantId) : undefined;
-            const garden = gardens.find((g) => g.id === entry.gardenId);
-            const bed = garden?.beds.find((b) => b.id === entry.bedId);
-            const animal = entry.animalId ? animals.find((a) => a.id === entry.animalId) : undefined;
+        <>
+          {allTags.length > 0 && (
+            <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label={t("journal.filterByTag")}>
+              <button type="button" aria-pressed={!filterTag} onClick={() => setFilterTag(null)} className={chip(!filterTag)}>
+                {t("journal.all")}
+              </button>
+              {allTags.map((tag) => (
+                <button key={tag} type="button" aria-pressed={filterTag === tag} onClick={() => setFilterTag(filterTag === tag ? null : tag)} className={chip(filterTag === tag)}>
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
 
-            return (
-              <Card key={entry.id}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold">{entry.title}</h3>
-                    <p className="text-xs text-gray-400">{entry.date}</p>
-                  </div>
-                  <button aria-label={t("common.delete")}
-                    onClick={async () => {
-                      if (!(await confirm(t("common.confirmDelete")))) return;
-                      if (entry.photos) void deletePhotos(entry.photos);
-                      deleteJournalEntry(entry.id);
-                    }}
-                    className="rounded p-1 text-gray-400 hover:text-red-500"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+          <div className="max-w-3xl space-y-8">
+            {groups.map(([month, entries]) => (
+              <section key={month} aria-label={formatDate(`${month}-01`, "monthYear")}>
+                <h2 className="mb-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                  {formatDate(`${month}-01`, "monthYear")}
+                </h2>
+                <div className="space-y-4">
+                  {entries.map((entry) => {
+                    const plant = entry.plantId ? plantMap.get(entry.plantId) : undefined;
+                    const bedLabel = beds.label(entry.bedId);
+                    const animal = entry.animalId ? animalLabel(entry.animalId) : undefined;
+                    const photos = entry.photos ?? [];
+                    return (
+                      <article key={entry.id} className="relative rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
+                        {photos.length > 0 && (
+                          <div className={`grid gap-0.5 overflow-hidden rounded-t-xl ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                            {photos.map((photo, idx) => (
+                              <button
+                                key={photo}
+                                type="button"
+                                onClick={() => setViewPhoto({ photo, title: entry.title })}
+                                aria-label={t("journal.openPhoto", { title: entry.title, n: idx + 1 })}
+                                className="relative z-10 block bg-gray-100 dark:bg-white/5"
+                              >
+                                <JournalPhoto photo={photo} alt="" className={`w-full object-cover ${photos.length === 1 ? "aspect-[16/9] max-h-80" : "aspect-square sm:aspect-[4/3]"}`} />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="p-4 sm:p-5">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <time dateTime={entry.date}>{formatDate(entry.date, "relative")}</time>
+                              </p>
+                              <h3 className="mt-0.5 text-base font-semibold text-gray-900 dark:text-gray-100">
+                                <button
+                                  type="button"
+                                  onClick={() => openEdit(entry)}
+                                  className="text-left after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-xl focus-visible:after:outline-2 focus-visible:after:outline-focus"
+                                >
+                                  {entry.title}
+                                </button>
+                              </h3>
+                            </div>
+                            <div className="relative z-10 -mt-1 -mr-2">
+                              <Menu
+                                label={t("common.moreActions")}
+                                items={[
+                                  { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(entry) },
+                                  "separator",
+                                  { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(entry) },
+                                ]}
+                              />
+                            </div>
+                          </div>
+                          {entry.text && <p className="mt-2 line-clamp-6 text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">{entry.text}</p>}
+                          {(plant || bedLabel || animal || entry.tags?.length) && (
+                            <div className="relative z-10 mt-3 flex flex-wrap items-center gap-1.5">
+                              {plant && (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-gray-300 py-0.5 pr-2 pl-1 text-xs font-medium text-gray-700 dark:border-white/20 dark:text-gray-300">
+                                  <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={16} />
+                                  {getPlantName(plant.id)}
+                                </span>
+                              )}
+                              {bedLabel && <Badge variant="outline" icon={LayoutGrid}>{bedLabel}</Badge>}
+                              {animal && <Badge variant="outline" icon={PawPrint}>{animal}</Badge>}
+                              {entry.tags?.map((tag) => (
+                                <button
+                                  key={tag}
+                                  type="button"
+                                  onClick={() => setFilterTag(tag)}
+                                  aria-label={t("journal.filterTag", { tag })}
+                                  className="inline-flex min-h-6 items-center rounded px-1 text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
+                                >
+                                  #{tag}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">{entry.text}</p>
-
-                {entry.photos && entry.photos.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.photos.map((photo, idx) => (
-                      <button key={idx} onClick={() => setViewPhoto(photo)} className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                        <JournalPhoto photo={photo} alt={`${entry.title} ${idx + 1}`} className="h-20 w-20 object-cover transition-opacity hover:opacity-80" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {(plant || bed || animal) && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {plant && (
-                      <span className="flex items-center gap-1 rounded-full bg-garden-50 px-2 py-0.5 text-xs text-garden-700 dark:bg-garden-900/30 dark:text-garden-400">
-                        <Sprout size={10} />
-                        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={14} /> {t(`plants.catalog.${plant.id}.name`)}
-                      </span>
-                    )}
-                    {bed && (
-                      <span className="flex items-center gap-1 rounded-full bg-earth-100 px-2 py-0.5 text-xs text-earth-700 dark:bg-earth-700/30 dark:text-earth-300">
-                        <LayoutGrid size={10} />
-                        {bed.name}
-                      </span>
-                    )}
-                    {animal && (
-                      <span className="flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                        <Bird size={10} />
-                        {ANIMAL_ICONS[animal.type]} {animal.name || t(`livestock.types.${animal.type}`)}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {entry.tags && entry.tags.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {entry.tags.map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => setFilterTag(tag)}
-                        className="flex items-center gap-0.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
-                      >
-                        <Tag size={8} />
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </Card>
-            );
-          })}
-        </div>
+              </section>
+            ))}
+          </div>
+          {groups.length === 0 && (
+            <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("journal.emptyFilter")}</p></Card>
+          )}
+        </>
       )}
 
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("journal.add")}>
-        <div className="space-y-4">
-          <Input label={t("journal.entryTitle")} value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
-          <Input label={t("harvest.date")} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      <Modal
+        open={dialogOpen}
+        onClose={closeDialog}
+        title={editingId ? t("journal.edit") : t("journal.add")}
+        size="lg"
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />
+                {t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={closeDialog}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave} disabled={uploading}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <Input label={t("journal.entryTitle")} value={draft.title} onChange={(e) => patch({ title: e.target.value })} placeholder={t("journal.titlePlaceholder")} error={titleError} autoFocus />
+          <Textarea label={t("journal.textLabel")} value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
+          <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
+
+          {/* Photos */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("journal.text")}</label>
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={4}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-            />
-          </div>
-          <Input label={t("journal.tags")} value={tags} onChange={(e) => setTags(e.target.value)} placeholder={t("journal.tagsPlaceholder")} />
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {gardens.length > 0 && (
-              <div>
-                <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.garden")}</label>
-                <select
-                  value={gardenId}
-                  onChange={(e) => { setGardenId(e.target.value); setBedId(""); }}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-                >
-                  {gardens.map((g) => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-            {selectedGarden && (
-              <div>
-                <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.bed")}</label>
-                <select
-                  value={bedId}
-                  onChange={(e) => setBedId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-                >
-                  <option value="">--</option>
-                  {selectedGarden.beds.map((b) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("harvest.plant")}</label>
-              <select
-                value={plantId}
-                onChange={(e) => setPlantId(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-              >
-                <option value="">--</option>
-                {plants.map((p) => (
-                  <option key={p.id} value={p.id}>{p.icon} {t(`plants.catalog.${p.id}.name`)}</option>
-                ))}
-              </select>
+            <p className={LABEL_CLASS}>{t("journal.photos")}</p>
+            <div className="flex flex-wrap gap-2">
+              {draft.photos.map((photo, idx) => (
+                <div key={photo} className="relative">
+                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-28 rounded-lg border border-gray-200 object-cover dark:border-white/10" />
+                  <IconButton
+                    icon={X}
+                    size="sm"
+                    label={t("journal.removePhoto", { n: idx + 1 })}
+                    onClick={() => removeDraftPhoto(photo)}
+                    className="absolute top-1 right-1 bg-white/90 shadow-xs hover:bg-white dark:bg-gray-900/90"
+                  />
+                </div>
+              ))}
+              {draft.photos.length < MAX_PHOTOS && (
+                <label className="flex size-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
+                  {uploading ? <Camera size={20} aria-hidden="true" className="animate-pulse" /> : <ImagePlus size={20} aria-hidden="true" />}
+                  {t("journal.addPhoto")}
+                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoSelect} />
+                </label>
+              )}
             </div>
-            {animals.length > 0 && (
-              <div>
-                <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">{t("journal.animal")}</label>
-                <select
-                  value={animalId}
-                  onChange={(e) => setAnimalId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800"
-                >
-                  <option value="">--</option>
-                  {animals.map((a) => (
-                    <option key={a.id} value={a.id}>{ANIMAL_ICONS[a.type]} {a.name || t(`livestock.types.${a.type}`)} ({a.count}×)</option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHint", { max: MAX_PHOTOS })}</p>
           </div>
-          {/* Photo upload */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              <Camera size={14} className="mr-1 inline" />
-              {t("journal.addPhotos")}
-            </label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handlePhotoSelect}
-              disabled={photos.length >= 3}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-garden-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-garden-700 hover:file:bg-garden-100 dark:text-gray-400 dark:file:bg-garden-900/30 dark:file:text-garden-400"
+
+          <fieldset className="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-white/10">
+            <legend className="px-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("journal.linkedTo")}</legend>
+            <PlantCombobox
+              label={t("harvest.plant")}
+              plants={plants}
+              beds={beds.beds}
+              optional
+              value={draft.plantId}
+              bedId={draft.bedId}
+              onChange={({ plantId, bedId }) => patch({ plantId, ...(bedId ? { bedId } : {}) })}
             />
-            {photos.length >= 3 && (
-              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">{t("journal.photoLimit")}</p>
-            )}
-            {photos.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {photos.map((photo, idx) => (
-                  <div key={idx} className="relative">
-                    <JournalPhoto photo={photo} alt={`${idx + 1}`} className="h-16 w-16 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
-                    <button aria-label={t("common.close")}
-                      type="button"
-                      onClick={() => {
-                        void deletePhotos([photo]);
-                        setPhotos((prev) => prev.filter((_, i) => i !== idx));
-                      }}
-                      className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white shadow hover:bg-red-600"
-                    >
-                      <X size={10} />
-                    </button>
-                  </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {beds.beds.length > 0 && (
+                <Select label={t("harvest.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("journal.none")} options={beds.options} />
+              )}
+              {animals.length > 0 && (
+                <Select
+                  label={t("journal.animal")}
+                  value={draft.animalId}
+                  onChange={(e) => patch({ animalId: e.target.value })}
+                  placeholder={t("journal.none")}
+                  options={animals.map((a) => ({ value: a.id, label: a.name || t(`livestock.types.${a.type}`) }))}
+                />
+              )}
+            </div>
+          </fieldset>
+
+          <div>
+            <Input label={t("journal.tags")} value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} />
+            {suggestedTags.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
+                {suggestedTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
+                    className="inline-flex min-h-8 items-center rounded-full bg-gray-100 px-2.5 text-xs font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                  >
+                    + #{tag}
+                  </button>
                 ))}
               </div>
             )}
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
           </div>
         </div>
       </Modal>
 
-      {/* Photo viewer overlay */}
-      {viewPhoto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setViewPhoto(null)}>
-          <button aria-label={t("common.close")} className="absolute right-4 top-4 rounded-full bg-white/20 p-2 text-white hover:bg-white/40" onClick={() => setViewPhoto(null)}>
-            <X size={20} />
-          </button>
-          <FullPhoto photo={viewPhoto} />
-        </div>
-      )}
+      <Modal open={viewPhoto !== null} onClose={() => setViewPhoto(null)} title={viewPhoto?.title ?? ""} size="lg">
+        {viewPhoto && <FullPhoto photo={viewPhoto.photo} alt={viewPhoto.title} />}
+      </Modal>
     </div>
   );
 }

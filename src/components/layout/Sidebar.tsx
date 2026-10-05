@@ -1,234 +1,114 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  Home, LayoutGrid, Sprout, Cloud, CalendarDays, ClipboardList, Settings, X,
-  Apple, BookOpen, Scale, Wallet, Wheat, Beaker, Bug, Droplets, UtensilsCrossed, ChevronRight, Bird, Archive, GitBranch, Egg, Heart,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
-interface NavItem {
-  to: string;
-  icon: LucideIcon;
-  labelKey: string;
-}
-
-interface NavGroup {
-  labelKey: string;
-  icon: LucideIcon;
-  color: string;
-  items: NavItem[];
-}
-
-const groups: NavGroup[] = [
-  {
-    labelKey: "nav.group.planning",
-    icon: LayoutGrid,
-    color: "text-garden-500",
-    items: [
-      { to: "/planner", icon: LayoutGrid, labelKey: "nav.planner" },
-      { to: "/plants", icon: Sprout, labelKey: "nav.plants" },
-      { to: "/companions", icon: GitBranch, labelKey: "nav.companions" },
-      { to: "/calendar", icon: CalendarDays, labelKey: "nav.calendar" },
-    ],
-  },
-  {
-    labelKey: "nav.group.fieldwork",
-    icon: ClipboardList,
-    color: "text-amber-500",
-    items: [
-      { to: "/tasks", icon: ClipboardList, labelKey: "nav.tasks" },
-      { to: "/seeds", icon: Wheat, labelKey: "nav.seeds" },
-      { to: "/soil", icon: Beaker, labelKey: "nav.soil" },
-      { to: "/pests", icon: Bug, labelKey: "nav.pests" },
-      { to: "/water-log", icon: Droplets, labelKey: "nav.waterLog" },
-    ],
-  },
-  {
-    labelKey: "nav.group.livestock",
-    icon: Bird,
-    color: "text-orange-500",
-    items: [
-      { to: "/livestock", icon: Bird, labelKey: "nav.livestock" },
-      { to: "/livestock/production", icon: Egg, labelKey: "nav.livestockProduction" },
-      { to: "/livestock/feed", icon: Wheat, labelKey: "nav.livestockFeed" },
-      { to: "/livestock/health", icon: Heart, labelKey: "nav.livestockHealth" },
-    ],
-  },
-  {
-    labelKey: "nav.group.records",
-    icon: Apple,
-    color: "text-rose-500",
-    items: [
-      { to: "/harvest", icon: Apple, labelKey: "nav.harvest" },
-      { to: "/journal", icon: BookOpen, labelKey: "nav.journal" },
-      { to: "/pantry", icon: Archive, labelKey: "nav.pantry" },
-    ],
-  },
-  {
-    labelKey: "nav.group.analysis",
-    icon: Scale,
-    color: "text-sky-500",
-    items: [
-      { to: "/foodplan", icon: UtensilsCrossed, labelKey: "nav.foodplan" },
-      { to: "/sufficiency", icon: Scale, labelKey: "nav.sufficiency" },
-      { to: "/expenses", icon: Wallet, labelKey: "nav.expenses" },
-      { to: "/weather", icon: Cloud, labelKey: "nav.weather" },
-    ],
-  },
-];
+import { Sprout, X } from "lucide-react";
+import { NAV_GROUPS, SETTINGS_ENTRY, sectionIdForPath, type NavEntry } from "./navigation";
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
 }
 
-function NavGroupSection({ group, onClose }: { group: NavGroup; onClose: () => void }) {
+const itemBase =
+  "group flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors lg:min-h-9";
+
+function NavItem({ item, active, onNavigate }: { item: NavEntry; active: boolean; onNavigate: () => void }) {
   const { t } = useTranslation();
-  const location = useLocation();
-  const isGroupActive = group.items.some((item) => location.pathname === item.to);
-  const [expanded, setExpanded] = useState(isGroupActive);
-  const GroupIcon = group.icon;
-
+  const Icon = item.icon;
   return (
-    <div className="rounded-lg">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-          isGroupActive && !expanded
-            ? "bg-garden-50/50 dark:bg-garden-900/10"
-            : "hover:bg-gray-50 dark:hover:bg-gray-800/50"
-        }`}
-      >
-        <GroupIcon size={16} className={group.color} />
-        <span className={`flex-1 text-left text-xs font-semibold uppercase tracking-wider ${
-          isGroupActive ? "text-gray-800 dark:text-gray-200" : "text-gray-500 dark:text-gray-500"
-        }`}>
-          {t(group.labelKey)}
-        </span>
-        <ChevronRight size={13} className={`text-gray-400 transition-transform dark:text-gray-600 ${expanded ? "rotate-90" : ""}`} />
-      </button>
-
-      {expanded && (
-        <div className="ml-2 mt-0.5 space-y-0.5 border-l-2 border-gray-200 pl-2 dark:border-gray-800">
-          {group.items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-garden-50 text-garden-700 dark:bg-garden-900/30 dark:text-garden-400"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-                }`
-              }
-            >
-              <item.icon size={16} />
-              {t(item.labelKey)}
-            </NavLink>
-          ))}
-        </div>
-      )}
-
-      {/* Collapsed preview: show icons of items */}
-      {!expanded && (
-        <div className="ml-8 flex gap-1 pb-1">
-          {group.items.map((item) => {
-            const isActive = location.pathname === item.to;
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={onClose}
-                title={t(item.labelKey)}
-                className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-                  isActive
-                    ? "bg-garden-100 text-garden-600 dark:bg-garden-900/40 dark:text-garden-400"
-                    : "text-gray-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
-                }`}
-              >
-                <item.icon size={16} />
-              </NavLink>
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <NavLink
+      to={item.to}
+      end={item.to === "/"}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={`${itemBase} ${
+        active
+          ? "bg-garden-50 text-garden-800 dark:bg-garden-500/15 dark:text-garden-200"
+          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-50"
+      }`}
+    >
+      <Icon
+        size={18}
+        aria-hidden="true"
+        className={active ? "text-garden-600 dark:text-garden-300" : "text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"}
+      />
+      <span className="truncate">{t(item.labelKey)}</span>
+    </NavLink>
   );
 }
 
+/**
+ * Flat, always-labelled navigation (14 entries in 4 groups). Sub-pages are
+ * tabs of their section (see SectionTabs), so nothing hides behind an icon.
+ * Desktop: static column. Below lg: a drawer above every other layer.
+ */
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const activeId = sectionIdForPath(pathname);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Drawer: Esc closes it, and focus moves into it when it opens.
+  useEffect(() => {
+    if (!open) return;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={onClose} />
+        <div aria-hidden="true" className="fixed inset-0 z-50 bg-gray-950/50 backdrop-blur-[1px] lg:hidden" onClick={onClose} />
       )}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full w-64 flex-col border-r border-gray-200 bg-white transition-transform dark:border-gray-700 dark:bg-gray-900 lg:static lg:translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full"
+        aria-label={t("shell.navigation")}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-gray-200 bg-white pt-safe transition-transform duration-200 dark:border-white/10 dark:bg-gray-900 lg:static lg:z-auto lg:w-60 lg:translate-x-0 lg:pt-0 ${
+          open ? "translate-x-0 shadow-lg" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 dark:border-gray-700">
+        <div className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
           <div className="flex items-center gap-2">
-            <Sprout className="h-7 w-7 text-garden-600" />
-            <span className="text-xl font-bold text-garden-800 dark:text-garden-400">
-              {t("app.title")}
+            <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">
+              <Sprout size={18} />
             </span>
+            <span className="text-base font-semibold tracking-tight text-gray-900 dark:text-gray-50">{t("app.title")}</span>
           </div>
-          <button onClick={onClose} aria-label="Close sidebar" className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 lg:hidden dark:hover:bg-gray-800">
-            <X size={20} />
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label={t("shell.closeNavigation")}
+            className="inline-flex size-11 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 lg:hidden dark:text-gray-400 dark:hover:bg-white/10"
+          >
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
-        <nav aria-label="Main navigation" className="flex-1 overflow-y-auto p-3">
-          {/* Dashboard */}
-          <NavLink
-            to="/"
-            end
-            onClick={onClose}
-            className={({ isActive }) =>
-              `mb-3 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-garden-50 text-garden-700 dark:bg-garden-900/30 dark:text-garden-400"
-                  : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-              }`
-            }
-          >
-            <Home size={18} />
-            {t("nav.dashboard")}
-          </NavLink>
-
-          {/* Grouped sections */}
-          <div className="space-y-1">
-            {groups.map((group) => (
-              <NavGroupSection key={group.labelKey} group={group} onClose={onClose} />
-            ))}
-          </div>
-
-          {/* Settings at bottom */}
-          <div className="mt-4 border-t border-gray-100 pt-3 dark:border-gray-800">
-            <NavLink
-              to="/settings"
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-garden-50 text-garden-700 dark:bg-garden-900/30 dark:text-garden-400"
-                    : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
-                }`
-              }
-            >
-              <Settings size={18} />
-              {t("nav.settings")}
-            </NavLink>
-          </div>
+        <nav aria-label={t("shell.mainNavigation")} className="flex-1 overflow-y-auto px-3 pb-4">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.id} className={group.labelKey ? "mt-5" : "mt-1"}>
+              {group.labelKey && (
+                <h2 className="mb-1 px-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                  {t(group.labelKey)}
+                </h2>
+              )}
+              <ul className="space-y-0.5">
+                {group.items.map((item) => (
+                  <li key={item.id}>
+                    <NavItem item={item} active={activeId === item.id} onNavigate={onClose} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
 
-        <div className="border-t border-gray-200 p-4 text-xs text-gray-400 dark:border-gray-700">
-          {t("app.subtitle")}
+        <div className="shrink-0 border-t border-gray-200 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-white/10">
+          <NavItem item={SETTINGS_ENTRY} active={activeId === "settings"} onNavigate={onClose} />
         </div>
       </aside>
     </>

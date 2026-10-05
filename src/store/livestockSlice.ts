@@ -9,11 +9,16 @@ export interface LivestockSlice {
   addAnimal: (animal: Omit<Animal, "id">) => void;
   updateAnimal: (id: string, updates: Partial<Animal>) => void;
   deleteAnimal: (id: string) => void;
+  /** Puts back an animal with its records exactly as they were (undo after delete). */
+  restoreAnimal: (snapshot: { animal: Animal; products: AnimalProduct[]; feeds: FeedEntry[]; health: HealthEvent[] }) => void;
   addProduct: (product: Omit<AnimalProduct, "id">) => void;
+  updateProduct: (id: string, updates: Partial<Omit<AnimalProduct, "id">>) => void;
   deleteProduct: (id: string) => void;
   addFeedEntry: (entry: Omit<FeedEntry, "id">) => void;
+  updateFeedEntry: (id: string, updates: Partial<Omit<FeedEntry, "id">>) => void;
   deleteFeedEntry: (id: string) => void;
   addHealthEvent: (event: Omit<HealthEvent, "id">) => void;
+  updateHealthEvent: (id: string, updates: Partial<Omit<HealthEvent, "id">>) => void;
   deleteHealthEvent: (id: string) => void;
 }
 
@@ -40,8 +45,19 @@ export const createLivestockSlice: StateCreator<LivestockSlice> = (set) => ({
       healthEvents: state.healthEvents.filter((h) => h.animalId !== id),
     })),
 
+  restoreAnimal: ({ animal, products, feeds, health }) =>
+    set((state) => ({
+      animals: state.animals.some((a) => a.id === animal.id) ? state.animals : [...state.animals, animal],
+      animalProducts: [...state.animalProducts, ...products],
+      feedEntries: [...state.feedEntries, ...feeds],
+      healthEvents: [...state.healthEvents, ...health],
+    })),
+
   addProduct: (product) =>
     set((state) => ({ animalProducts: [...state.animalProducts, { ...product, id: genId("prod") }] })),
+
+  updateProduct: (id, updates) =>
+    set((state) => ({ animalProducts: state.animalProducts.map((p) => (p.id === id ? { ...p, ...updates } : p)) })),
 
   deleteProduct: (id) =>
     set((state) => ({ animalProducts: state.animalProducts.filter((p) => p.id !== id) })),
@@ -49,11 +65,17 @@ export const createLivestockSlice: StateCreator<LivestockSlice> = (set) => ({
   addFeedEntry: (entry) =>
     set((state) => ({ feedEntries: [...state.feedEntries, { ...entry, id: genId("feed") }] })),
 
+  updateFeedEntry: (id, updates) =>
+    set((state) => ({ feedEntries: state.feedEntries.map((f) => (f.id === id ? { ...f, ...updates } : f)) })),
+
   deleteFeedEntry: (id) =>
     set((state) => ({ feedEntries: state.feedEntries.filter((f) => f.id !== id) })),
 
   addHealthEvent: (event) =>
     set((state) => ({ healthEvents: [...state.healthEvents, { ...event, id: genId("health") }] })),
+
+  updateHealthEvent: (id, updates) =>
+    set((state) => ({ healthEvents: state.healthEvents.map((h) => (h.id === id ? { ...h, ...updates } : h)) })),
 
   deleteHealthEvent: (id) =>
     set((state) => ({ healthEvents: state.healthEvents.filter((h) => h.id !== id) })),

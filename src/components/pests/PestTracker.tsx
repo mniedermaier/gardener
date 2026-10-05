@@ -10,6 +10,9 @@ import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO } from "@/lib/format";
 import type { PestEntry } from "@/types/pest";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
+import { useBeds } from "@/components/records/useBeds";
+import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -52,8 +55,8 @@ export function PestTracker() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
   const { formatDate } = useFormat();
-  const { pests, gardens, addPest, updatePest, deletePest } = useStore(
-    useShallow((s) => ({ pests: s.pests, gardens: s.gardens, addPest: s.addPest, updatePest: s.updatePest, deletePest: s.deletePest }))
+  const { pests, addPest, updatePest, deletePest } = useStore(
+    useShallow((s) => ({ pests: s.pests, addPest: s.addPest, updatePest: s.updatePest, deletePest: s.deletePest }))
   );
   const plants = usePlants();
   const plantMap = usePlantMap();
@@ -63,14 +66,10 @@ export function PestTracker() {
   // One dialog for create and edit: editingId === null means "new".
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<Draft>(() => emptyDraft(plants[0]?.id ?? ""));
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft(""));
   const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  const bedNames = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const g of gardens) for (const b of g.beds) map.set(b.id, gardens.length > 1 ? `${g.name} · ${b.name}` : b.name);
-    return map;
-  }, [gardens]);
+  const beds = useBeds();
 
   const filtered = useMemo(
     () => pests
@@ -80,12 +79,14 @@ export function PestTracker() {
   );
   const activeCount = pests.filter((p) => !p.resolved).length;
 
-  const openAdd = useCallback(() => {
+  const openAdd = useCallback((params: AddParams = {}) => {
     setEditingId(null);
-    setDraft(emptyDraft(plants[0]?.id ?? ""));
+    setDraft({ ...emptyDraft(params.plant ?? ""), bedId: params.bed && beds.byId.has(params.bed) ? params.bed : "" });
     setDialogOpen(true);
-  }, [plants]);
-  useOpenAddOnNavigate(openAdd);
+  }, [beds]);
+  const openAddPlain = useCallback(() => openAdd(), [openAdd]);
+  useOpenAddOnNavigate(openAddPlain);
+  useAddFromUrl(openAdd);
 
   const openEdit = (pest: PestEntry) => {
     setEditingId(pest.id);
@@ -138,7 +139,7 @@ export function PestTracker() {
         title={t("pests.title")}
         description={t("pests.subtitle")}
         actions={
-          <Button onClick={openAdd}>
+          <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("pests.add")}
           </Button>
@@ -151,7 +152,7 @@ export function PestTracker() {
             icon={Bug}
             title={t("pests.emptyTitle")}
             description={t("pests.emptyText")}
-            action={<Button onClick={openAdd}><Plus size={16} aria-hidden="true" />{t("pests.add")}</Button>}
+            action={<Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("pests.add")}</Button>}
           />
         </Card>
       ) : (
@@ -174,7 +175,7 @@ export function PestTracker() {
             <List label={t("pests.title")}>
               {filtered.map((pest) => {
                 const plant = plantMap.get(pest.plantId);
-                const bedName = bedNames.get(pest.bedId);
+                const bedName = beds.label(pest.bedId);
                 return (
                   <ListRow
                     key={pest.id}
@@ -260,23 +261,24 @@ export function PestTracker() {
             ]}
           />
           <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("pests.namePlaceholder")} autoFocus />
-          <div className="grid gap-4 sm:grid-cols-2">
+          <PlantCombobox
+            label={t("harvest.plant")}
+            plants={plants}
+            beds={beds.beds}
+            optional
+            value={draft.plantId}
+            bedId={draft.bedId}
+            onChange={({ plantId, bedId }) => patch({ plantId, ...(bedId ? { bedId } : {}) })}
+          />
+          {beds.beds.length > 0 && (
             <Select
-              label={t("harvest.plant")}
-              value={draft.plantId}
-              onChange={(e) => patch({ plantId: e.target.value })}
-              options={plants.map((p) => ({ value: p.id, label: getPlantName(p.id) }))}
+              label={t("harvest.bed")}
+              value={draft.bedId}
+              onChange={(e) => patch({ bedId: e.target.value })}
+              placeholder={t("journal.none")}
+              options={beds.options}
             />
-            {bedNames.size > 0 && (
-              <Select
-                label={t("harvest.bed")}
-                value={draft.bedId}
-                onChange={(e) => patch({ bedId: e.target.value })}
-                placeholder="–"
-                options={[...bedNames].map(([id, name]) => ({ value: id, label: name }))}
-              />
-            )}
-          </div>
+          )}
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("pests.severity")}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span>

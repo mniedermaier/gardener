@@ -1,22 +1,25 @@
-import { useState, useRef, useMemo } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Upload, FileSpreadsheet, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
+import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
-import { exportAllData, exportHarvestsCsv, exportExpensesCsv } from "@/lib/dataExport";
-import { importAllData, validateExportFile, clearAllData, type ImportMode, type ImportResult } from "@/lib/dataImport";
+import { useFormat } from "@/hooks/useFormat";
+import { exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExport } from "@/lib/dataExport";
+import { importAllData, validateExportFile, type ImportMode, type ImportResult } from "@/lib/dataImport";
 
+const STAT_KEYS = ["gardens", "tasks", "harvests", "journalEntries", "expenses"] as const;
+
+/** Backup status, full backup/restore and CSV exports. The destructive "delete all" lives in the settings danger zone. */
 export function DataManagement() {
   const { t } = useTranslation();
+  const { formatDate } = useFormat();
   const { lastBackupDate, harvests, expenses } = useStore(useShallow((s) => ({ lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses })));
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [importResult, setImportResult] = useState<ImportResult | null>(null);
-  const [showModeChoice, setShowModeChoice] = useState(false);
-  const [pendingFile, setPendingFile] = useState<string | null>(null);
+  const [pending, setPending] = useState<GardenerExport | null>(null);
 
   const handleExportAll = () => {
     exportAllData();
@@ -25,155 +28,104 @@ export function DataManagement() {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const content = ev.target?.result as string;
-      try {
-        const json = JSON.parse(content);
-        if (!validateExportFile(json)) {
-          toast(t("dataManagement.invalidFile"), "error");
-          return;
-        }
-        setPendingFile(content);
-        setShowModeChoice(true);
-      } catch {
-        toast(t("dataManagement.invalidFile"), "error");
-      }
-    };
-    reader.readAsText(file);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    file.text()
+      .then((content) => {
+        const json: unknown = JSON.parse(content);
+        if (!validateExportFile(json)) throw new Error("invalid");
+        setPending(json);
+      })
+      .catch(() => toast(t("dataManagement.invalidFile"), "error"));
+  };
+
+  const summary = (result: ImportResult) => {
+    const stats = result.stats as Partial<Record<(typeof STAT_KEYS)[number], number>>;
+    const parts = STAT_KEYS.filter((k) => (stats[k] ?? 0) > 0).map((k) => t(`dataManagement.counts.${k}`, { count: stats[k] }));
+    return parts.length ? t("dataManagement.importedSummary", { items: parts.join(", ") }) : t("dataManagement.importSuccess");
   };
 
   const handleImport = (mode: ImportMode) => {
-    if (!pendingFile) return;
-    const json = JSON.parse(pendingFile);
-    const result = importAllData(json, mode);
-    setImportResult(result);
-    setShowModeChoice(false);
-    setPendingFile(null);
-    if (result.success) {
-      toast(t("dataManagement.importSuccess"), "success");
-    } else {
-      toast(result.error ?? t("dataManagement.importError"), "error");
-    }
+    if (!pending) return;
+    const result = importAllData(pending, mode);
+    setPending(null);
+    if (result.success) toast(summary(result), "success");
+    else toast(t("dataManagement.importError"), "error");
   };
-
-  const handleClearAll = async () => {
-    if (await confirm(t("dataManagement.clearConfirm"))) {
-      clearAllData();
-    }
-  };
-
-  // Beim Mounten festhalten, damit der Render rein bleibt
-  const [mountedAt] = useState(() => Date.now());
-  const backupAge = useMemo(
-    () =>
-      lastBackupDate
-        ? Math.floor((mountedAt - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24))
-        : null,
-    [lastBackupDate, mountedAt],
-  );
 
   return (
-    <Card>
-      <h2 className="mb-4 text-lg font-semibold">{t("dataManagement.title")}</h2>
-
-      {/* Backup status */}
-      <div className="mb-4 rounded-lg bg-gray-50 p-3 text-sm dark:bg-gray-800">
-        {lastBackupDate ? (
-          <p className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <CheckCircle size={14} className="text-garden-500" />
-            {t("dataManagement.lastBackup")}: {new Date(lastBackupDate).toLocaleDateString()} ({backupAge} {t("dataManagement.daysAgo")})
-          </p>
-        ) : (
-          <p className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-            <AlertTriangle size={14} />
-            {t("dataManagement.noBackup")}
-          </p>
-        )}
+    <div className="space-y-5">
+      <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2.5 dark:bg-white/5">
+        {lastBackupDate
+          ? <ShieldCheck size={18} aria-hidden="true" className="shrink-0 text-positive" />
+          : <HardDrive size={18} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />}
+        <p className="text-sm text-gray-700 dark:text-gray-300">
+          {lastBackupDate
+            ? <>{t("dataManagement.lastBackup")}: <time dateTime={lastBackupDate} className="font-medium">{formatDate(lastBackupDate, "relative")}</time></>
+            : t("dataManagement.noBackup")}
+        </p>
       </div>
 
-      {/* Full backup */}
-      <div className="space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button onClick={handleExportAll} className="flex-1">
-            <Download size={16} />
-            {t("dataManagement.exportAll")}
-          </Button>
-          <Button variant="secondary" onClick={() => fileInputRef.current?.click()} className="flex-1">
-            <Upload size={16} />
-            {t("dataManagement.importBackup")}
-          </Button>
-          <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleFileSelect} />
-        </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Button onClick={handleExportAll}>
+          <Download size={16} aria-hidden="true" />
+          {t("dataManagement.exportAll")}
+        </Button>
+        <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+          <Upload size={16} aria-hidden="true" />
+          {t("dataManagement.importBackup")}
+        </Button>
+        <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleFileSelect} aria-label={t("dataManagement.importBackup")} />
+      </div>
 
-        {/* CSV exports */}
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={exportHarvestsCsv}
-            disabled={harvests.length === 0}
-            className="flex-1"
-          >
-            <FileSpreadsheet size={14} />
-            {t("dataManagement.exportHarvestsCsv")} ({harvests.length})
+      <div>
+        <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="ghost" size="sm" onClick={exportHarvestsCsv} disabled={harvests.length === 0}>
+            <FileSpreadsheet size={14} aria-hidden="true" />
+            {t("dataManagement.exportHarvestsCsv")}
+            <span className="text-gray-500 tabular-nums dark:text-gray-400">{harvests.length}</span>
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={exportExpensesCsv}
-            disabled={expenses.length === 0}
-            className="flex-1"
-          >
-            <FileSpreadsheet size={14} />
-            {t("dataManagement.exportExpensesCsv")} ({expenses.length})
-          </Button>
-        </div>
-
-        {/* Danger zone */}
-        <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
-          <Button variant="danger" size="sm" onClick={handleClearAll}>
-            <Trash2 size={14} />
-            {t("dataManagement.clearAll")}
+          <Button variant="ghost" size="sm" onClick={exportExpensesCsv} disabled={expenses.length === 0}>
+            <FileSpreadsheet size={14} aria-hidden="true" />
+            {t("dataManagement.exportExpensesCsv")}
+            <span className="text-gray-500 tabular-nums dark:text-gray-400">{expenses.length}</span>
           </Button>
         </div>
       </div>
 
-      {/* Import mode dialog */}
-      {showModeChoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowModeChoice(false)} />
-          <div className="relative mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-gray-900">
-            <h3 className="mb-2 text-lg font-semibold">{t("dataManagement.importMode")}</h3>
-            <p className="mb-4 text-sm text-gray-500">{t("dataManagement.importModeDesc")}</p>
-            <div className="space-y-2">
-              <Button className="w-full" onClick={() => handleImport("merge")}>
-                {t("dataManagement.merge")}
-              </Button>
-              <Button variant="danger" className="w-full" onClick={() => handleImport("overwrite")}>
-                {t("dataManagement.overwrite")}
-              </Button>
-              <Button variant="ghost" className="w-full" onClick={() => { setShowModeChoice(false); setPendingFile(null); }}>
-                {t("common.cancel")}
-              </Button>
-            </div>
-          </div>
+      <Modal
+        open={pending !== null}
+        onClose={() => setPending(null)}
+        title={t("dataManagement.importMode")}
+        description={t("dataManagement.importModeDesc")}
+        footer={<Button variant="ghost" onClick={() => setPending(null)}>{t("common.cancel")}</Button>}
+      >
+        <div className="grid gap-2">
+          <button
+            type="button"
+            onClick={() => handleImport("merge")}
+            className="flex min-h-14 items-start gap-3 rounded-xl border border-gray-200 p-4 text-left hover:border-garden-600 hover:bg-garden-50/50 dark:border-white/10 dark:hover:border-garden-400 dark:hover:bg-garden-500/10"
+          >
+            <GitMerge size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-700 dark:text-garden-300" />
+            <span>
+              <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t("dataManagement.mergeTitle")}</span>
+              <span className="block text-sm text-gray-600 dark:text-gray-400">{t("dataManagement.mergeDesc")}</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleImport("overwrite")}
+            className="flex min-h-14 items-start gap-3 rounded-xl border border-gray-200 p-4 text-left hover:border-danger/50 hover:bg-danger/5 dark:border-white/10"
+          >
+            <Replace size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-danger" />
+            <span>
+              <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t("dataManagement.overwriteTitle")}</span>
+              <span className="block text-sm text-gray-600 dark:text-gray-400">{t("dataManagement.overwriteDesc")}</span>
+            </span>
+          </button>
         </div>
-      )}
-
-      {/* Import result */}
-      {importResult?.success && (
-        <div className="mt-3 rounded-lg bg-garden-50 p-3 text-xs text-garden-700 dark:bg-garden-900/20 dark:text-garden-400">
-          {t("dataManagement.imported")}:
-          {importResult.stats.gardens > 0 && ` ${importResult.stats.gardens} ${t("dataManagement.statsGardens")}`}
-          {importResult.stats.tasks > 0 && `, ${importResult.stats.tasks} ${t("dataManagement.statsTasks")}`}
-          {importResult.stats.harvests > 0 && `, ${importResult.stats.harvests} ${t("dataManagement.statsHarvests")}`}
-          {importResult.stats.journalEntries > 0 && `, ${importResult.stats.journalEntries} ${t("dataManagement.statsJournal")}`}
-          {importResult.stats.expenses > 0 && `, ${importResult.stats.expenses} ${t("dataManagement.statsExpenses")}`}
-        </div>
-      )}
-    </Card>
+      </Modal>
+    </div>
   );
 }

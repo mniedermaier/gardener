@@ -1,191 +1,320 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, TrendingUp, TrendingDown, Euro } from "lucide-react";
-import { useToast } from "@/components/ui/Toast";
-import { useStore } from "@/store";
+import { useNavigate } from "react-router-dom";
+import {
+  Coins, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, Receipt, Scale, Sprout, Stethoscope, Trash2, TrendingUp, Wheat,
+  type LucideIcon,
+} from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
-import { Card } from "@/components/ui/Card";
+import { useStore } from "@/store";
+import { useAnalysisPrefs } from "@/store/analysisPrefs";
+import { useFormat } from "@/hooks/useFormat";
+import { useGardenMetrics } from "@/hooks/useGardenMetrics";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { todayISO } from "@/lib/format";
+import { DEFAULT_PRODUCT_PRICES, PRODUCT_TYPES, type Period } from "@/lib/metrics";
+import type { Expense, ExpenseCategory } from "@/types/expense";
+import type { ProductType } from "@/types/animal";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import type { ExpenseCategory } from "@/types/expense";
-import { format } from "date-fns";
+import { Select } from "@/components/ui/Select";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatCard } from "@/components/ui/StatCard";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { List, ListRow } from "@/components/ui/List";
+import { Menu } from "@/components/ui/Menu";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { useToast } from "@/components/ui/Toast";
+import { TONE_SOFT } from "@/components/ui/tone";
+import { HowCalculated, Meter } from "@/components/ui/charts";
+import { DateField } from "@/components/records/DateField";
 
-const CATEGORIES: ExpenseCategory[] = ["seeds", "soil", "tools", "fertilizer", "infrastructure", "water", "animal_feed", "veterinary", "other"];
+const CATEGORIES: ExpenseCategory[] = ["seeds", "soil", "fertilizer", "tools", "infrastructure", "water", "animal_feed", "veterinary", "other"];
 
-const CATEGORY_ICONS: Record<ExpenseCategory, string> = {
-  seeds: "\ud83c\udf31",
-  soil: "\ud83e\udea8",
-  tools: "\ud83e\uddf0",
-  fertilizer: "\ud83d\udca9",
-  infrastructure: "\ud83c\udfd7\ufe0f",
-  water: "\ud83d\udca7",
-  animal_feed: "\ud83c\udf3e",
-  veterinary: "\ud83e\ude7a",
-  other: "\ud83d\udce6",
+const CATEGORY_ICON: Record<ExpenseCategory, LucideIcon> = {
+  seeds: Sprout,
+  soil: Layers,
+  tools: Hammer,
+  fertilizer: Leaf,
+  infrastructure: Fence,
+  water: Droplet,
+  animal_feed: Wheat,
+  veterinary: Stethoscope,
+  other: Package,
 };
 
-// Approximate market prices per kg for common garden produce (EUR)
-const MARKET_PRICES: Record<string, number> = {
-  tomato: 3.5, zucchini: 2.5, carrot: 1.5, lettuce: 2.0, bean: 4.0,
-  pea: 5.0, radish: 3.0, cucumber: 2.0, pepper: 4.5, onion: 1.5,
-  garlic: 12.0, potato: 1.2, kale: 3.0, spinach: 4.0, beetroot: 2.5,
-  leek: 3.0, pumpkin: 2.0, chard: 3.0, kohlrabi: 2.5, fennel: 3.5,
-  corn: 2.0, cabbage: 1.5, broccoli: 4.0, cauliflower: 3.5, celery: 3.0,
-  turnip: 2.0, strawberry: 8.0, raspberry: 15.0, blueberry: 18.0,
-  currant: 10.0, gooseberry: 10.0, basil: 25.0, parsley: 15.0,
-  dill: 20.0, chives: 20.0, mint: 20.0, rosemary: 25.0, thyme: 30.0,
-  sunflower: 5.0,
-};
+function CategoryTile({ category }: { category: ExpenseCategory }) {
+  const Icon = CATEGORY_ICON[category];
+  return (
+    <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${TONE_SOFT.neutral}`} aria-hidden="true">
+      <Icon size={16} />
+    </span>
+  );
+}
+
+interface Draft { description: string; amount: string; category: ExpenseCategory; date: string }
+const emptyDraft = (): Draft => ({ description: "", amount: "", category: "seeds", date: todayISO() });
+const parseAmount = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
 
 export function ExpenseDashboard() {
   const { t } = useTranslation();
-  const { confirm } = useToast();
-  const { expenses, harvests, addExpense, deleteExpense } = useStore(useShallow((s) => ({ expenses: s.expenses, harvests: s.harvests, addExpense: s.addExpense, deleteExpense: s.deleteExpense })));
-  const [showAdd, setShowAdd] = useState(false);
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState<ExpenseCategory>("seeds");
-  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [gardenId] = useState("");
+  const f = useFormat();
+  const navigate = useNavigate();
+  const { toast, confirm } = useToast();
+  const { expenses, harvests, addExpense, updateExpense, deleteExpense } = useStore(
+    useShallow((s) => ({ expenses: s.expenses, harvests: s.harvests, addExpense: s.addExpense, updateExpense: s.updateExpense, deleteExpense: s.deleteExpense })),
+  );
+  const { productPrices, setProductPrice } = useAnalysisPrefs(useShallow((p) => ({ productPrices: p.productPrices, setProductPrice: p.setProductPrice })));
 
-  const totalExpenses = expenses.reduce((s, e) => s + e.amountCents, 0);
+  const year = new Date().getFullYear();
+  const [scope, setScope] = useState<"season" | "all">("season");
+  const period: Period = scope === "season" ? year : null;
+  const m = useGardenMetrics({ period });
+  const { balance } = m;
 
-  const harvestValue = useMemo(() => {
-    let total = 0;
-    for (const h of harvests) {
-      const pricePerKg = MARKET_PRICES[h.plantId] ?? 3.0;
-      const kg = (h.weightGrams ?? 0) / 1000;
-      total += kg * pricePerKg;
-    }
-    return Math.round(total * 100);
-  }, [harvests]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  const roi = totalExpenses > 0 ? Math.round(((harvestValue - totalExpenses) / totalExpenses) * 100) : 0;
+  const openAdd = useCallback(() => {
+    setEditingId(null);
+    setDraft(emptyDraft());
+    setDialogOpen(true);
+  }, []);
+  useOpenAddOnNavigate(openAdd);
 
-  const byCategory = useMemo(() => {
-    const map = new Map<ExpenseCategory, number>();
-    for (const e of expenses) {
-      map.set(e.category, (map.get(e.category) ?? 0) + e.amountCents);
-    }
-    return map;
-  }, [expenses]);
-
-  const handleAdd = () => {
-    if (!description.trim() || !amount) return;
-    addExpense({
-      gardenId,
-      date,
-      category,
-      description: description.trim(),
-      amountCents: Math.round(Number(amount) * 100),
-    });
-    setDescription("");
-    setAmount("");
-    setShowAdd(false);
+  const openEdit = (e: Expense) => {
+    setEditingId(e.id);
+    setDraft({ description: e.description, amount: String(e.amountCents / 100), category: e.category, date: e.date });
+    setDialogOpen(true);
   };
 
-  const formatCents = (cents: number) => `${(cents / 100).toFixed(2)} €`;
+  const amount = parseAmount(draft.amount);
+  const canSave = draft.description.trim() !== "" && amount > 0;
+
+  const save = () => {
+    if (!canSave) return;
+    const fields = { description: draft.description.trim(), amountCents: Math.round(amount * 100), category: draft.category, date: draft.date };
+    if (editingId) {
+      updateExpense(editingId, fields);
+      toast(t("expenses.updated"), "success");
+    } else {
+      addExpense({ ...fields, gardenId: "" });
+      toast(t("expenses.saved", { amount: f.formatCurrency(amount), description: fields.description }), "success");
+    }
+    setDialogOpen(false);
+  };
+
+  const remove = async (e: Expense) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteExpense(e.id);
+    setDialogOpen(false);
+    const { id: _id, ...rest } = e;
+    toast(t("expenses.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addExpense(rest) } });
+  };
+
+  const visible = useMemo(
+    () => expenses.filter((e) => period === null || e.date.startsWith(`${period}-`)).sort((a, b) => b.date.localeCompare(a.date)),
+    [expenses, period],
+  );
+  const groups = useMemo(() => {
+    const out: { key: string; items: Expense[]; sum: number }[] = [];
+    for (const e of visible) {
+      const key = e.date.slice(0, 7);
+      const last = out[out.length - 1];
+      if (last?.key === key) { last.items.push(e); last.sum += e.amountCents / 100; }
+      else out.push({ key, items: [e], sum: e.amountCents / 100 });
+    }
+    return out;
+  }, [visible]);
+
+  const categoryRows = useMemo(() => {
+    const rows: { key: string; label: string; icon: LucideIcon; amount: number }[] = CATEGORIES
+      .filter((c) => (balance.costs.byCategory[c] ?? 0) > 0)
+      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0 }));
+    if (balance.costs.feed > 0) rows.push({ key: "feedLog", label: t("expenses.feedLog"), icon: Wheat, amount: balance.costs.feed });
+    if (balance.costs.veterinary > 0) rows.push({ key: "vetLog", label: t("expenses.vetLog"), icon: Stethoscope, amount: balance.costs.veterinary });
+    return rows.sort((a, b) => b.amount - a.amount);
+  }, [balance.costs, t]);
+
+  const hasAnything = expenses.length > 0 || harvests.length > 0 || balance.costs.total > 0 || balance.totalValue > 0;
+  const editing = editingId ? expenses.find((e) => e.id === editingId) : undefined;
+  const addButton = (
+    <Button onClick={openAdd}>
+      <Plus size={16} aria-hidden="true" />
+      {t("expenses.add")}
+    </Button>
+  );
+  const net = balance.net;
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-bold sm:text-2xl">{t("expenses.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} />
-          {t("expenses.add")}
-        </Button>
-      </div>
+      <PageHeader title={t("expenses.title")} description={t("expenses.subtitle")} actions={hasAnything ? addButton : undefined} />
 
-      <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
-        <Card className="text-center">
-          <TrendingDown size={20} className="mx-auto mb-1 text-red-500" />
-          <p className="text-lg font-bold sm:text-2xl text-red-600">{formatCents(totalExpenses)}</p>
-          <p className="text-xs text-gray-500">{t("expenses.totalExpenses")}</p>
-        </Card>
-        <Card className="text-center">
-          <TrendingUp size={20} className="mx-auto mb-1 text-garden-500" />
-          <p className="text-lg font-bold sm:text-2xl text-garden-600">{formatCents(harvestValue)}</p>
-          <p className="text-xs text-gray-500">{t("expenses.harvestValue")}</p>
-        </Card>
-        <Card className="text-center">
-          <Euro size={20} className={`mx-auto mb-1 ${roi >= 0 ? "text-garden-500" : "text-red-500"}`} />
-          <p className={`text-lg font-bold sm:text-2xl ${roi >= 0 ? "text-garden-600" : "text-red-600"}`}>
-            {roi >= 0 ? "+" : ""}{roi}%
-          </p>
-          <p className="text-xs text-gray-500">{t("expenses.roi")}</p>
-        </Card>
-      </div>
-
-      {byCategory.size > 0 && (
-        <Card className="mb-6">
-          <h2 className="mb-3 text-sm font-semibold text-gray-600 dark:text-gray-400">{t("expenses.byCategory")}</h2>
-          <div className="space-y-2">
-            {Array.from(byCategory.entries())
-              .sort((a, b) => b[1] - a[1])
-              .map(([cat, cents]) => (
-                <div key={cat} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                  <span className="flex items-center gap-2 text-sm">
-                    <span>{CATEGORY_ICONS[cat]}</span>
-                    {t(`expenses.categories.${cat}`)}
-                  </span>
-                  <span className="text-sm font-medium">{formatCents(cents)}</span>
-                </div>
-              ))}
-          </div>
-        </Card>
-      )}
-
-      {expenses.length === 0 ? (
+      {!hasAnything ? (
         <Card>
-          <p className="text-center text-gray-500">{t("expenses.noEntries")}</p>
+          <EmptyState icon={Receipt} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest")}>{t("expenses.toHarvest")}</Button>} />
         </Card>
       ) : (
-        <div className="space-y-2">
-          {[...expenses].sort((a, b) => b.date.localeCompare(a.date)).map((e) => (
-            <div key={e.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-              <span className="text-lg">{CATEGORY_ICONS[e.category]}</span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{e.description}</p>
-                <p className="text-xs text-gray-400">{e.date}</p>
+        <div className="space-y-6">
+          <SegmentedControl
+            label={t("expenses.period")}
+            value={scope}
+            onChange={setScope}
+            options={[
+              { value: "season", label: t("expenses.season", { year }) },
+              { value: "all", label: t("expenses.allTime") },
+            ]}
+          />
+
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard
+              label={t("expenses.totalCosts")}
+              value={f.formatCurrency(balance.costs.total)}
+              icon={Coins}
+              tone="neutral"
+              hint={balance.costs.feed + balance.costs.veterinary > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.feed + balance.costs.veterinary) }) : undefined}
+            />
+            <StatCard
+              label={t("expenses.yieldValue")}
+              value={f.formatCurrency(balance.totalValue)}
+              icon={TrendingUp}
+              tone="neutral"
+              hint={t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) })}
+            />
+            <StatCard
+              label={t("expenses.net")}
+              value={f.formatCurrency(net)}
+              icon={Scale}
+              tone="neutral"
+              trend={{ label: net >= 0 ? t("expenses.surplus") : t("expenses.deficit"), direction: net > 0 ? "up" : net < 0 ? "down" : "flat", tone: net >= 0 ? "positive" : "warning" }}
+            />
+            <StatCard
+              label={t("expenses.roi")}
+              value={balance.roi === null ? "–" : f.formatPercent(balance.roi)}
+              icon={TrendingUp}
+              tone="neutral"
+              hint={balance.roi === null ? t("expenses.roiNoCosts") : t("expenses.roiHint")}
+            />
+          </div>
+
+          <HowCalculated>
+              <p>{t("expenses.howCosts")}</p>
+              <p>{t("expenses.howValue")}</p>
+              <p>{t("expenses.howRoi")}</p>
+              <div>
+                <p className="mb-2 font-medium text-gray-800 dark:text-gray-200">{t("expenses.productPrices")}</p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {PRODUCT_TYPES.map((type: ProductType) => (
+                    <Input
+                      key={type}
+                      label={t(`expenses.pricePer.${type}`)}
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      step={0.05}
+                      value={productPrices[type] ?? ""}
+                      placeholder={f.formatNumber(DEFAULT_PRODUCT_PRICES[type], { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      onChange={(e) => setProductPrice(type, e.target.value === "" ? null : Number(e.target.value))}
+                    />
+                  ))}
+                </div>
+                <p className="mt-2">{t("expenses.priceHint")}</p>
               </div>
-              <span className="text-sm font-semibold text-red-600">{formatCents(e.amountCents)}</span>
-              <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteExpense(e.id); }} className="rounded p-1 text-gray-400 hover:text-red-500">
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))}
+          </HowCalculated>
+
+          {categoryRows.length > 0 && (
+            <Card>
+              <CardHeader title={t("expenses.byCategory")} description={t("expenses.byCategoryDesc")} />
+              <ul className="space-y-3">
+                {categoryRows.map((r) => {
+                  const Icon = r.icon;
+                  return (
+                    <li key={r.key}>
+                      <div className="mb-1 flex items-center justify-between gap-2 text-sm">
+                        <span className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                          <Icon size={14} aria-hidden="true" className="text-gray-500" />
+                          {r.label}
+                        </span>
+                        <span className="tabular-nums text-gray-900 dark:text-gray-100">
+                          {f.formatCurrency(r.amount)}
+                          <span className="ml-1 text-gray-500 dark:text-gray-400">· {f.formatPercent(r.amount / balance.costs.total)}</span>
+                        </span>
+                      </div>
+                      <Meter actual={r.amount} max={categoryRows[0].amount} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          )}
+
+          <section aria-labelledby="expense-list" className="space-y-3">
+            <h2 id="expense-list" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("expenses.entries")}</h2>
+            {visible.length === 0 ? (
+              <Card>
+                <EmptyState compact icon={Receipt} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
+              </Card>
+            ) : groups.map((g) => (
+              <List key={g.key} header={`${f.formatDate(`${g.key}-01`, "monthYear")} · ${f.formatCurrency(g.sum)}`}>
+                {g.items.map((e) => (
+                  <ListRow
+                    key={e.id}
+                    leading={<CategoryTile category={e.category} />}
+                    title={e.description}
+                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")].join(" · ")}
+                    trailing={f.formatCurrency(e.amountCents / 100)}
+                    onClick={() => openEdit(e)}
+                    actions={
+                      <Menu
+                        label={t("common.moreActions")}
+                        items={[
+                          { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(e) },
+                          "separator",
+                          { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void remove(e) },
+                        ]}
+                      />
+                    }
+                  />
+                ))}
+              </List>
+            ))}
+          </section>
         </div>
       )}
 
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("expenses.add")}>
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("expenses.edit") : t("expenses.add")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void remove(editing)}>
+                <Trash2 size={16} aria-hidden="true" />
+                {t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={save} disabled={!canSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
         <div className="space-y-4">
-          <Input label={t("expenses.description")} value={description} onChange={(e) => setDescription(e.target.value)} autoFocus />
-          <Input label={t("expenses.amount")} type="number" step="0.01" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} />
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("expenses.category")}</label>
-            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setCategory(cat)}
-                  className={`flex flex-col items-center gap-0.5 rounded-lg border p-2 text-xs transition-all ${
-                    category === cat
-                      ? "border-garden-500 bg-garden-50 dark:bg-garden-900/30"
-                      : "border-gray-200 dark:border-gray-700"
-                  }`}
-                >
-                  <span>{CATEGORY_ICONS[cat]}</span>
-                  {t(`expenses.categories.${cat}`)}
-                </button>
-              ))}
-            </div>
+          <Input label={t("expenses.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} placeholder={t("expenses.descriptionPlaceholder")} autoFocus />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label={t("expenses.amount")} type="number" inputMode="decimal" step="0.01" min={0} value={draft.amount} onChange={(e) => patch({ amount: e.target.value })} />
+            <Select
+              label={t("expenses.category")}
+              value={draft.category}
+              onChange={(e) => patch({ category: e.target.value as ExpenseCategory })}
+              options={CATEGORIES.map((c) => ({ value: c, label: t(`expenses.categories.${c}`) }))}
+            />
           </div>
-          <Input label={t("harvest.date")} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
-          </div>
+          <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
         </div>
       </Modal>
     </div>

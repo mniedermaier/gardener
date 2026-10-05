@@ -238,3 +238,40 @@ four things:
 
 To show a number in the text, format it first and pass it as another variable,
 for example `{{weight}}`.
+
+## 7. Charts and metrics (`src/components/ui/charts/`, `src/lib/metrics.ts`)
+
+One small chart system instead of hand-made `div` bars. All parts are SVG,
+theme-aware, use tabular figures and ship a text alternative.
+
+| Component | Use |
+|---|---|
+| `BarChart` | Vertical (optionally stacked) bars over months/weeks: y-grid with 3–4 nice ticks, `formatTick` for units, `marker={{ index, label: t("charts.today") }}`, optional `target` line, hover **and** ←/→ keyboard tooltip, legend for ≥ 2 series, visually hidden `<table>`. |
+| `Meter` | Horizontal progress: `actual` solid, `forecast` hatched, `target` tick. Brand colour only, the number next to it says how good it is. |
+| `MonthStrip` | 12-month heatmap (one hue, 5 steps) with the value printed in each cell; outlines the current month. |
+| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. |
+| `Sparkline` | Tiny trend line for stat tiles (`label` = summary for screen readers). |
+| `Legend`, `HatchPattern` | Swatches: solid = recorded, hatched = forecast, line = target. |
+| `HowCalculated` | `<details>` "Wie berechnet?" under a metric. Every KPI that is computed gets one. |
+
+```tsx
+<BarChart
+  data={months.map((d, i) => ({ key: d.key, label: formatDate(d.date, "month"), fullLabel: formatDate(d.date, "monthYear"), values: [fresh[i], stored[i]] }))}
+  series={[{ label: t("sufficiency.fresh"), color: "brand" }, { label: t("sufficiency.stored"), color: "earth", hatched: true }]}
+  formatValue={(kg) => formatWeight(kg * 1000)} formatTick={(kg) => formatNumber(kg)}
+  marker={{ index: new Date().getMonth(), label: t("charts.today") }}
+  caption={t("…summary sentence…")} categoryLabel={t("charts.month")}
+/>
+```
+
+Rules: one unit per chart (different units → small multiples, never one
+stacked axis); series colours in fixed order `brand → earth → sky`, `muted`
+for neutral shares; forecasts are hatched so meaning is not colour-only;
+the caption summarises the finding.
+
+**Numbers:** analysis pages and the dashboard take their figures from
+`lib/metrics.ts` / `useGardenMetrics()` — never recompute totals in a
+component. Wording is fixed: **Erfasst** (recorded harvests and animal
+products in the season) vs **Prognose** (planting plan × expected yield,
+herd × typical yield). Household size and animal-product prices live in
+`store/analysisPrefs.ts`.

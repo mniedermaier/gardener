@@ -1,0 +1,122 @@
+import { createElement, memo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
+import type { LucideIcon } from "lucide-react";
+import {
+  Sun, Moon, CloudSun, Cloud, CloudDrizzle, CloudRain, CloudLightning, CloudSnow, CloudFog, Snowflake, ArrowRight, CloudOff,
+} from "lucide-react";
+import { useStore } from "@/store";
+import { useShallow } from "zustand/react/shallow";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/Button";
+import { useFormat } from "@/hooks/useFormat";
+import { useWeatherGlance } from "@/hooks/useWeatherGlance";
+import { todayISO } from "@/lib/format";
+
+const ICONS: Record<string, LucideIcon> = {
+  "01": Sun, "02": CloudSun, "03": Cloud, "04": Cloud, "09": CloudDrizzle, "10": CloudRain, "11": CloudLightning, "13": CloudSnow, "50": CloudFog,
+};
+
+function weatherIcon(code: string): LucideIcon {
+  if (code === "01n") return Moon;
+  return ICONS[code.slice(0, 2)] ?? Cloud;
+}
+
+function WeatherIcon({ code, size, className, label }: { code: string; size: number; className?: string; label?: string }) {
+  return createElement(weatherIcon(code), {
+    size, className, strokeWidth: 1.75,
+    ...(label ? { "aria-label": label, role: "img" } : { "aria-hidden": true }),
+  });
+}
+
+const capitalize = (s: string) => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s);
+
+/** Today plus three days, with a frost hint for the gardener. */
+export const WeatherCard = memo(function WeatherCard() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { formatDate, formatTemperature } = useFormat();
+  const { threshold, locationName } = useStore(useShallow((s) => ({ threshold: s.alerts.frostThresholdC, locationName: s.locationName })));
+  const glance = useWeatherGlance();
+  const [today] = useState(todayISO);
+
+  const more = (
+    <Link to="/weather" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
+      {t("dashboard.weatherMore")} <ArrowRight size={14} aria-hidden="true" />
+    </Link>
+  );
+
+  if (glance.status === "unconfigured" || glance.status === "error") {
+    const unconfigured = glance.status === "unconfigured";
+    return (
+      <Card padding="sm">
+        <EmptyState
+          compact
+          icon={unconfigured ? Cloud : CloudOff}
+          title={t(unconfigured ? "dashboard.weatherConnectTitle" : "dashboard.weatherErrorTitle")}
+          description={t(unconfigured ? "dashboard.weatherConnectText" : "dashboard.weatherErrorText")}
+          action={<Button variant="secondary" size="sm" onClick={() => navigate("/settings")}>{t("dashboard.openSettings")}</Button>}
+        />
+      </Card>
+    );
+  }
+
+  if (glance.status === "loading") {
+    return (
+      <Card padding="sm" aria-busy="true">
+        <Skeleton className="mb-4 h-5 w-24" />
+        <Skeleton className="mb-4 h-10 w-40" />
+        <div className="grid grid-cols-3 gap-2">
+          {[0, 1, 2].map((i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+        </div>
+      </Card>
+    );
+  }
+
+  const { data } = glance;
+  const upcoming = data.days.filter((d) => d.date > today).slice(0, 3);
+  const frostDays = upcoming.filter((d) => d.tempMin <= threshold);
+
+  return (
+    <Card padding="sm">
+      <CardHeader title={t("dashboard.weatherTitle")} description={locationName || undefined} actions={more} className="mb-3" />
+      <div className="flex items-center gap-3">
+        <WeatherIcon code={data.icon} size={40} className="shrink-0 text-gray-600 dark:text-gray-300" />
+        <div>
+          <p className="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums dark:text-gray-50">{formatTemperature(data.temp)}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{capitalize(data.description)}</p>
+        </div>
+      </div>
+
+      {upcoming.length > 0 && (
+        <ul className="mt-4 grid grid-cols-3 gap-2">
+          {upcoming.map((d) => {
+            const frost = d.tempMin <= threshold;
+            return (
+              <li key={d.date} className="rounded-lg bg-gray-50 px-2 py-2.5 text-center dark:bg-white/5" title={capitalize(d.description)}>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{formatDate(d.date, "weekday")}</p>
+                <WeatherIcon code={d.icon} size={20} label={d.description} className="mx-auto my-1.5 text-gray-600 dark:text-gray-300" />
+                <p className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{formatTemperature(d.tempMax)}</p>
+                <p className={`text-xs tabular-nums ${frost ? "font-medium text-danger" : "text-gray-500 dark:text-gray-400"}`}>{formatTemperature(d.tempMin)}</p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {frostDays.length > 0 && (
+        <p className="mt-3 flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
+          <Snowflake size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+          <span>
+            {t("dashboard.frostHint", {
+              days: frostDays.map((d) => formatDate(d.date, "weekday")).join(", "),
+              temp: formatTemperature(Math.min(...frostDays.map((d) => d.tempMin))),
+            })}
+          </span>
+        </p>
+      )}
+    </Card>
+  );
+});

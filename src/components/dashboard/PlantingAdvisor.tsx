@@ -1,19 +1,17 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Lightbulb } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, Sprout } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { getPlantingAdvice } from "@/lib/advisor";
-import { Card } from "@/components/ui/Card";
-
-const URGENCY_STYLES = {
-  now: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  soon: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  upcoming: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-};
+import { ListRow } from "@/components/ui/List";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/Button";
 
 const ACTION_KEYS = {
   sow_indoors: "calendar.taskTypes.sow_indoors",
@@ -21,8 +19,10 @@ const ACTION_KEYS = {
   transplant: "calendar.taskTypes.transplant",
 };
 
-export function PlantingAdvisor() {
+/** What to sow or plant out in the next four weeks (not yet in a bed). Rows only; the caller provides the card. */
+export const PlantingAdvisor = memo(function PlantingAdvisor() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plants = usePlants();
   const plantMap = usePlantMap();
@@ -35,41 +35,47 @@ export function PlantingAdvisor() {
   }, [gardens]);
 
   const advice = useMemo(
-    () => getPlantingAdvice(plants, lastFrostDate, alreadyPlanted).slice(0, 8),
-    [plants, lastFrostDate, alreadyPlanted]
+    () => getPlantingAdvice(plants, lastFrostDate, alreadyPlanted).slice(0, 6),
+    [plants, lastFrostDate, alreadyPlanted],
   );
 
-  if (advice.length === 0) return null;
+  if (advice.length === 0) {
+    return (
+      <EmptyState
+        compact
+        icon={Sprout}
+        title={t("advisor.emptyTitle")}
+        description={t("advisor.emptyText")}
+        action={
+          <Button variant="secondary" size="sm" onClick={() => navigate("/calendar")}>
+            <CalendarDays size={14} aria-hidden="true" />
+            {t("advisor.openCalendar")}
+          </Button>
+        }
+      />
+    );
+  }
 
   return (
-    <Card>
-      <h2 className="mb-3 flex items-center gap-2 font-semibold">
-        <Lightbulb size={16} className="text-amber-500" />
-        {t("advisor.title")}
-      </h2>
-      <div className="space-y-2">
-        {advice.map((a) => {
-          const plant = plantMap.get(a.plantId);
-          if (!plant) return null;
-          return (
-            <div
-              key={`${a.plantId}-${a.action}`}
-              className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800"
-            >
-              <div className="flex items-center gap-2">
-                <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />
-                <span className="text-sm font-medium">{getPlantName(a.plantId)}</span>
-                <span className="text-xs text-gray-500">{t(ACTION_KEYS[a.action])}</span>
-              </div>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${URGENCY_STYLES[a.urgency]}`}>
-                {a.urgency === "now"
-                  ? t("advisor.now")
-                  : t("advisor.inWeeks", { weeks: a.weeksUntil })}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </Card>
+    <ul className="divide-y divide-gray-100 dark:divide-white/5">
+      {advice.map((a) => {
+        const plant = plantMap.get(a.plantId);
+        if (!plant) return null;
+        return (
+          <ListRow
+            key={`${a.plantId}-${a.action}`}
+            leading={<PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />}
+            title={getPlantName(a.plantId)}
+            meta={t(ACTION_KEYS[a.action])}
+            trailing={
+              a.urgency === "now"
+                ? <Badge tone="brand">{t("advisor.now")}</Badge>
+                : <Badge tone="neutral">{t("advisor.inWeeks", { count: a.weeksUntil })}</Badge>
+            }
+            onClick={() => navigate(`/plants?plant=${encodeURIComponent(plant.id)}`)}
+          />
+        );
+      })}
+    </ul>
   );
-}
+});

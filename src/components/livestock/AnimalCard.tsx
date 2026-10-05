@@ -1,75 +1,97 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2 } from "lucide-react";
-import { Card } from "@/components/ui/Card";
-import { ANIMAL_ICONS, PRODUCT_ICONS, ANNUAL_YIELD } from "@/types/animal";
-import type { Animal, HealthEvent, HealthEventType } from "@/types/animal";
-
-const HEALTH_ICONS: Record<HealthEventType, string> = {
-  vaccination: "💉", deworming: "💊", illness: "🤒", injury: "🩹",
-  checkup: "🩺", treatment: "💊", death: "✝️", other: "📋",
-};
+import { ANNUAL_YIELD } from "@/types/animal";
+import type { Animal, HealthEvent } from "@/types/animal";
+import { useFormat } from "@/hooks/useFormat";
+import { Badge } from "@/components/ui/Badge";
+import { Menu } from "@/components/ui/Menu";
+import { ANIMAL_ICON, HEALTH_ICON, HEALTH_TONE, PRODUCT_ICON } from "./icons";
+import { IconTile, animalLabel, formatProductAmount } from "./shared";
 
 interface AnimalCardProps {
   animal: Animal;
-  productCount: number;
+  /** Recorded this season, per product, in recording units. */
+  recorded: Partial<Record<string, number>>;
   feedCost: number;
-  healthCount: number;
   lastHealth?: HealthEvent;
   onEdit: () => void;
   onDelete: () => void;
-  onClick: () => void;
+  onOpen: () => void;
 }
 
-export const AnimalCard = memo(function AnimalCard({
-  animal, productCount, feedCost, healthCount, lastHealth,
-  onEdit, onDelete, onClick,
-}: AnimalCardProps) {
+/** One herd/colony. The whole card opens the detail page; actions sit in the menu. */
+export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost, lastHealth, onEdit, onDelete, onOpen }: AnimalCardProps) {
   const { t } = useTranslation();
+  const f = useFormat();
   const yields = ANNUAL_YIELD[animal.type];
+  const HealthIcon = lastHealth ? HEALTH_ICON[lastHealth.type] : null;
 
   return (
-    <div onClick={onClick} className="cursor-pointer">
-    <Card className="transition-shadow hover:shadow-md">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">{ANIMAL_ICONS[animal.type]}</span>
-          <div>
-            <h3 className="font-semibold">{animal.name || t(`livestock.types.${animal.type}`)}</h3>
-            <p className="text-sm text-gray-500">
-              {animal.count}× {t(`livestock.types.${animal.type}`)}
-              <span className="ml-2 text-xs text-gray-400">{t("livestock.since")} {animal.acquiredDate}</span>
-            </p>
-            <div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-400">
-              {yields.map((y) => (
-                <span key={y.product}>
-                  {PRODUCT_ICONS[y.product]} ~{y.quantity * animal.count} {y.unit}/{t("livestock.year")}
-                </span>
-              ))}
-            </div>
-            <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-400">
-              <span>{t("livestock.productionEntries", { count: productCount })}</span>
-              {feedCost > 0 && <span>{t("livestock.feedTotal")}: {feedCost.toFixed(2)} €</span>}
-              {healthCount > 0 && <span>🩺 {healthCount}</span>}
-            </div>
-            {animal.notes && <p className="mt-1 text-xs italic text-gray-400">{animal.notes}</p>}
-            {lastHealth && (
-              <p className="mt-1 text-xs text-gray-400">
-                {HEALTH_ICONS[lastHealth.type]} {t(`livestock.healthTypes.${lastHealth.type}`)} · {lastHealth.date}
-              </p>
-            )}
-          </div>
+    <div className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs transition-colors hover:border-gray-300 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20">
+      <div className="flex items-start gap-3">
+        <IconTile icon={ANIMAL_ICON[animal.type]} tone="brand" size="lg" />
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+            <button type="button" onClick={onOpen} className="text-left after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-focus">
+              {animalLabel(animal, t)}
+            </button>
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t(`livestock.typeCount.${animal.type}`, { count: animal.count })}
+            {" · "}
+            {t("livestock.sinceDate", { date: f.formatDate(animal.acquiredDate, "monthYear") })}
+          </p>
         </div>
-        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <button aria-label={t("common.edit")} onClick={onEdit} className="rounded p-1 text-gray-300 hover:text-garden-500">
-            <Pencil size={14} />
-          </button>
-          <button aria-label={t("common.delete")} onClick={onDelete} className="rounded p-1 text-gray-300 hover:text-red-500">
-            <Trash2 size={14} />
-          </button>
+        <div className="relative z-10 -mr-2 -mt-1">
+          <Menu
+            label={t("common.moreActions")}
+            items={[
+              { label: t("common.edit"), icon: Pencil, onSelect: onEdit },
+              "separator",
+              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: onDelete },
+            ]}
+          />
         </div>
       </div>
-    </Card>
+
+      <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm dark:border-white/5">
+        {yields.slice(0, 2).map((y) => {
+          const Icon = PRODUCT_ICON[y.product];
+          const expected = formatProductAmount(y.product, y.quantity * animal.count, f, t);
+          return (
+            <div key={y.product}>
+              <dt className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                <Icon size={12} aria-hidden="true" />
+                {t("livestock.recordedThisYear", { product: t(`livestock.products.${y.product}`) })}
+              </dt>
+              <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
+                {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
+                <span className="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+                  {t("livestock.ofExpected", { amount: expected })}
+                </span>
+              </dd>
+            </div>
+          );
+        })}
+        {yields.length < 2 && (
+          <div>
+            <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>
+            <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatCurrency(feedCost)}</dd>
+          </div>
+        )}
+      </dl>
+
+      {(lastHealth || animal.notes) && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+          {lastHealth && HealthIcon && (
+            <Badge tone={HEALTH_TONE[lastHealth.type]} icon={HealthIcon}>
+              {t(`livestock.healthTypes.${lastHealth.type}`)} · {f.formatDate(lastHealth.date, "relative")}
+            </Badge>
+          )}
+          {animal.notes && <span className="line-clamp-1">{animal.notes}</span>}
+        </div>
+      )}
     </div>
   );
 });

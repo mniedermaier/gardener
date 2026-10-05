@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { SeasonTimeline } from "./SeasonTimeline";
 import { SuccessionPlanner } from "./SuccessionPlanner";
 
@@ -7,9 +8,11 @@ export function CalendarPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">{t("calendar.title")}</h1>
-      <SeasonTimeline />
-      <SuccessionPlanner />
+      <PageHeader title={t("calendar.title")} description={t("calendar.pageSubtitle")} />
+      <div className="space-y-6">
+        <SeasonTimeline />
+        <SuccessionPlanner />
+      </div>
     </div>
   );
 }

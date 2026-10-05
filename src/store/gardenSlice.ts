@@ -16,6 +16,10 @@ export interface GardenSlice {
   togglePath: (gardenId: string, bedId: string, cellX: number, cellY: number) => void;
   duplicateGarden: (gardenId: string) => string;
   duplicateBed: (gardenId: string, bedId: string) => void;
+  /** Undo for deleteBed: puts the bed (same id) back at its old position. */
+  restoreBed: (gardenId: string, bed: Bed, index: number) => void;
+  /** Undo for deleteGarden: puts the garden (same id) back and selects it. */
+  restoreGarden: (garden: Garden, index: number) => void;
 }
 
 let nextId = Date.now();
@@ -189,4 +193,22 @@ export const createGardenSlice: StateCreator<GardenSlice> = (set) => ({
         return { ...g, beds: [...g.beds, clone], updatedAt: new Date().toISOString() };
       }),
     })),
+
+  restoreBed: (gardenId, bed, index) =>
+    set((state) => ({
+      gardens: state.gardens.map((g) => {
+        if (g.id !== gardenId || g.beds.some((b) => b.id === bed.id)) return g;
+        const beds = [...g.beds];
+        beds.splice(Math.min(index, beds.length), 0, bed);
+        return { ...g, beds, updatedAt: new Date().toISOString() };
+      }),
+    })),
+
+  restoreGarden: (garden, index) =>
+    set((state) => {
+      if (state.gardens.some((g) => g.id === garden.id)) return state;
+      const gardens = [...state.gardens];
+      gardens.splice(Math.min(index, gardens.length), 0, garden);
+      return { gardens, activeGardenId: garden.id };
+    }),
 });

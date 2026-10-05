@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { migrateLegacyPhotos } from "@/lib/migratePhotos";
 import { useStorageHealth } from "@/hooks/useStorageHealth";
 import { AppShell } from "@/components/layout/AppShell";
@@ -110,6 +110,8 @@ export default function App() {
           <Route path="import" element={<L><ImportPage /></L>} />
           <Route path="weather" element={<L><WeatherDashboard /></L>} />
           <Route path="settings" element={<L><SettingsPage /></L>} />
+          {/* Unknown hash (old bookmark, typo): back to "Heute" instead of a blank page. */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
     </HashRouter>

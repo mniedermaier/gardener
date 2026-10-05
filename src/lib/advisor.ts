@@ -69,3 +69,80 @@ export function getPlantingAdvice(
 
   return advice;
 }
+
+// --- "Jetzt pflanzbar" for the planner palette ------------------------------
+
+export type PlantableAction = "sow_outdoors" | "transplant" | "plant_autumn" | "sow_autumn";
+
+export interface PlantableNow {
+  plantId: string;
+  action: PlantableAction;
+  /** Last day of the window (local date). */
+  until: Date;
+}
+
+/**
+ * Autumn windows the frost-relative data cannot express (months, 1-based,
+ * inclusive). `protectedTo` extends the window under glass/fleece.
+ */
+const AUTUMN_WINDOWS: Record<string, { action: PlantableAction; from: number; to: number; protectedTo?: number }> = {
+  garlic: { action: "plant_autumn", from: 9, to: 11 },
+  currant: { action: "plant_autumn", from: 10, to: 11 },
+  gooseberry: { action: "plant_autumn", from: 10, to: 11 },
+  raspberry: { action: "plant_autumn", from: 10, to: 11 },
+  blueberry: { action: "plant_autumn", from: 10, to: 11 },
+  strawberry: { action: "plant_autumn", from: 8, to: 9 },
+  spinach: { action: "sow_autumn", from: 8, to: 9, protectedTo: 11 },
+  arugula: { action: "sow_autumn", from: 8, to: 9, protectedTo: 10 },
+  radish: { action: "sow_autumn", from: 8, to: 9, protectedTo: 10 },
+  lettuce: { action: "sow_autumn", from: 8, to: 8, protectedTo: 10 },
+  pak_choi: { action: "sow_autumn", from: 8, to: 8, protectedTo: 10 },
+};
+
+const DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * Plants that can go into a bed right now: direct sowing or planting out
+ * within [date − 1 week, date + 3 weeks] of their frost-relative date, plus
+ * the autumn windows above. Indoor sowing is left out — it does not happen in
+ * a bed. `frostProtectionWeeks` (greenhouse, cold frame …) shifts spring
+ * dates earlier and extends autumn sowing.
+ */
+export function getPlantableNow(
+  plants: Plant[],
+  lastFrostDate: string,
+  opts: { now?: Date; frostProtectionWeeks?: number } = {},
+): PlantableNow[] {
+  const now = opts.now ?? new Date();
+  const protection = opts.frostProtectionWeeks ?? 0;
+  // Use this year's frost day: a stored date from an earlier season must not
+  // push every window into the past.
+  const stored = parseISO(lastFrostDate);
+  const frost = new Date(now.getFullYear(), stored.getMonth(), stored.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const month = now.getMonth() + 1;
+  const result: PlantableNow[] = [];
+
+  for (const plant of plants) {
+    let best: PlantableNow | null = null;
+    const consider = (action: PlantableAction, weeks: number | null) => {
+      if (weeks === null) return;
+      const date = addWeeks(frost, weeks - protection);
+      const start = new Date(date.getTime() - 7 * DAY);
+      const end = new Date(date.getTime() + 21 * DAY);
+      if (today >= start && today <= end && (!best || end > best.until)) best = { plantId: plant.id, action, until: end };
+    };
+    consider("sow_outdoors", plant.sowOutdoorsWeeks);
+    consider("transplant", plant.transplantWeeks);
+
+    const autumn = AUTUMN_WINDOWS[plant.id];
+    if (!best && autumn) {
+      const to = protection >= 3 && autumn.protectedTo ? autumn.protectedTo : autumn.to;
+      if (month >= autumn.from && month <= to) {
+        best = { plantId: plant.id, action: autumn.action, until: new Date(now.getFullYear(), to, 0) };
+      }
+    }
+    if (best) result.push(best);
+  }
+  return result.sort((a, b) => a.until.getTime() - b.until.getTime());
+}

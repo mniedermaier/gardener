@@ -1,259 +1,363 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, AlertTriangle, ShoppingCart, Package } from "lucide-react";
+import { FlaskConical, Package, Pencil, Plus, ShoppingCart, Sprout, Trash2, Wallet } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { needsNewStock, propagation, seedViability, type Viability } from "@/lib/seedViability";
+import type { SeedItem, SeedSource, SeedUnit } from "@/types/seed";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { Card } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Badge } from "@/components/ui/Badge";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { StatCard } from "@/components/ui/StatCard";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
-import type { SeedSource, SeedUnit } from "@/types/seed";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
+import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 
 const CURRENT_YEAR = new Date().getFullYear();
+const UNITS: SeedUnit[] = ["packets", "grams", "seeds"];
+const SOURCES: SeedSource[] = ["shop", "saved", "traded", "gifted"];
+
+type Filter = "all" | "test";
+
+interface Draft {
+  plantId: string;
+  variety: string;
+  quantity: string;
+  unit: SeedUnit;
+  year: string;
+  source: SeedSource;
+  shopName: string;
+  cost: string;
+  notes: string;
+}
+
+const emptyDraft = (plantId = ""): Draft => ({
+  plantId, variety: "", quantity: "1", unit: "packets", year: String(CURRENT_YEAR), source: "shop", shopName: "", cost: "", notes: "",
+});
+
+const num = (s: string) => Number(s.trim().replace(",", "."));
 
 export function SeedInventory() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
-  const { seeds, gardens, addSeed, deleteSeed } = useStore(
-    useShallow((s) => ({ seeds: s.seeds, gardens: s.gardens, addSeed: s.addSeed, deleteSeed: s.deleteSeed }))
+  const { formatCurrency, formatNumber, locale } = useFormat();
+  const { seeds, gardens, addSeed, updateSeed, deleteSeed } = useStore(
+    useShallow((s) => ({ seeds: s.seeds, gardens: s.gardens, addSeed: s.addSeed, updateSeed: s.updateSeed, deleteSeed: s.deleteSeed })),
   );
   const plants = usePlants();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
-  const [showAdd, setShowAdd] = useState(false);
-  const [plantId, setPlantId] = useState(plants[0]?.id ?? "");
-  const [variety, setVariety] = useState("");
-  const [quantity, setQuantity] = useState("1");
-  const [unit, setUnit] = useState<SeedUnit>("packets");
-  const [year, setYear] = useState(String(CURRENT_YEAR));
-  const [source, setSource] = useState<SeedSource>("shop");
-  const [cost, setCost] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft());
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  // Plants in garden that have no seeds
-  const missingSeeds = useMemo(() => {
-    const plantedIds = new Set<string>();
-    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) plantedIds.add(c.plantId);
-    const seedPlantIds = new Set(seeds.map((s) => s.plantId));
-    return Array.from(plantedIds).filter((id) => !seedPlantIds.has(id));
-  }, [gardens, seeds]);
+  const openAdd = useCallback((params: AddParams = {}) => {
+    setEditingId(null);
+    setSubmitted(false);
+    const plantId = params.plant && plantMap.has(params.plant) ? params.plant : "";
+    setDraft({ ...emptyDraft(plantId), ...(propagation(plantMap.get(plantId)) === "vegetative" ? { unit: "grams" as const } : {}) });
+    setDialogOpen(true);
+  }, [plantMap]);
+  const openAddPlain = useCallback(() => openAdd(), [openAdd]);
+  useOpenAddOnNavigate(openAddPlain);
+  useAddFromUrl(openAdd);
 
-  // Seeds expiring soon or expired
-  const expiringSeeds = useMemo(() => {
-    return seeds.filter((s) => {
-      const plant = plantMap.get(s.plantId);
-      if (!plant?.seedSaving) return false;
-      const expiryYear = s.yearAcquired + plant.seedSaving.seedViabilityYears;
-      return expiryYear <= CURRENT_YEAR;
+  const openEdit = (s: SeedItem) => {
+    setEditingId(s.id);
+    setSubmitted(false);
+    setDraft({
+      plantId: s.plantId, variety: s.variety ?? "", quantity: String(s.quantity), unit: s.unit, year: String(s.yearAcquired),
+      source: s.source, shopName: s.shopName ?? "", cost: s.cost != null ? s.cost.toLocaleString(locale, { useGrouping: false }) : "", notes: s.notes ?? "",
     });
-  }, [seeds, plantMap]);
-
-  const handleAdd = () => {
-    if (!plantId) return;
-    addSeed({
-      plantId,
-      variety: variety || undefined,
-      quantity: Number(quantity),
-      unit,
-      yearAcquired: Number(year),
-      source,
-      cost: cost ? Number(cost) : undefined,
-    });
-    setVariety("");
-    setQuantity("1");
-    setCost("");
-    setShowAdd(false);
-    toast(t("seeds.added"), "success");
+    setDialogOpen(true);
   };
 
+  // Annual crops in the beds without any seed or planting stock in the inventory.
+  // Perennials (rosemary, thyme, berries…) are already in the ground.
+  const missing = useMemo(() => {
+    const planted = new Set<string>();
+    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) planted.add(c.plantId);
+    const stocked = new Set(seeds.map((s) => s.plantId));
+    return [...planted]
+      .filter((id) => !stocked.has(id) && needsNewStock(plantMap.get(id)))
+      .sort((a, b) => getPlantName(a).localeCompare(getPlantName(b)));
+  }, [gardens, seeds, plantMap, getPlantName]);
+
+  const rows = useMemo(
+    () => seeds
+      .map((s) => ({ seed: s, viability: seedViability(plantMap.get(s.plantId), s.yearAcquired, CURRENT_YEAR) }))
+      .sort((a, b) => getPlantName(a.seed.plantId).localeCompare(getPlantName(b.seed.plantId)) || (a.seed.variety ?? "").localeCompare(b.seed.variety ?? "")),
+    [seeds, plantMap, getPlantName],
+  );
+  const testCount = rows.filter((r) => r.viability.status === "testRecommended").length;
+  const shown = filter === "test" ? rows.filter((r) => r.viability.status === "testRecommended") : rows;
   const totalCost = seeds.reduce((s, seed) => s + (seed.cost ?? 0), 0);
+
+  const quantityNum = num(draft.quantity);
+  const yearNum = Math.round(num(draft.year));
+  const costNum = draft.cost.trim() ? num(draft.cost) : 0;
+  const errors = {
+    plant: submitted && !draft.plantId ? t("seeds.needPlant") : undefined,
+    quantity: !Number.isFinite(quantityNum) || quantityNum < 0 ? t("seeds.invalidNumber") : undefined,
+    year: !Number.isFinite(yearNum) || yearNum < 1950 || yearNum > CURRENT_YEAR + 1 ? t("seeds.invalidYear") : undefined,
+    cost: !Number.isFinite(costNum) || costNum < 0 ? t("seeds.invalidNumber") : undefined,
+  };
+
+  const handleSave = () => {
+    setSubmitted(true);
+    if (!draft.plantId || errors.quantity || errors.year || errors.cost) return;
+    const fields = {
+      plantId: draft.plantId,
+      variety: draft.variety.trim() || undefined,
+      quantity: quantityNum,
+      unit: draft.unit,
+      yearAcquired: yearNum,
+      source: draft.source,
+      shopName: draft.source === "shop" ? draft.shopName.trim() || undefined : undefined,
+      cost: costNum || undefined,
+      notes: draft.notes.trim() || undefined,
+    };
+    if (editingId) {
+      updateSeed(editingId, fields);
+      toast(t("seeds.updated"), "success");
+    } else {
+      addSeed(fields);
+      toast(t("seeds.added"), "success");
+    }
+    setDialogOpen(false);
+  };
+
+  const handleDelete = async (seed: SeedItem) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteSeed(seed.id);
+    setDialogOpen(false);
+    const { id: _id, ...rest } = seed;
+    toast(t("seeds.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addSeed(rest) } });
+  };
+
+  const statusBadge = (v: Viability) => {
+    switch (v.status) {
+      case "notApplicable":
+        return <Badge variant="outline" icon={Sprout}>{t("seeds.plantingStock")}</Badge>;
+      case "testRecommended":
+        return <Badge tone="warning" icon={FlaskConical}>{t("seeds.testRecommended")}</Badge>;
+      case "lastYear":
+        return <Badge tone="warning" dot>{t("seeds.yearsLeft", { count: v.yearsLeft })}</Badge>;
+      default:
+        return <Badge tone="positive" dot>{t("seeds.yearsLeft", { count: v.yearsLeft })}</Badge>;
+    }
+  };
+
+  const yearsText = (count: number) => t("seeds.years", { count });
+  const editing = editingId ? seeds.find((s) => s.id === editingId) : undefined;
+  const draftPlant = draft.plantId ? plantMap.get(draft.plantId) : undefined;
+  const draftVegetative = propagation(draftPlant) === "vegetative";
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("seeds.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} />
-          {t("seeds.add")}
-        </Button>
-      </div>
+      <PageHeader
+        title={t("seeds.title")}
+        description={t("seeds.subtitle")}
+        actions={
+          <Button onClick={openAddPlain}>
+            <Plus size={16} aria-hidden="true" />
+            {t("seeds.add")}
+          </Button>
+        }
+      />
 
-      {/* Stats */}
       {seeds.length > 0 && (
-        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <Card className="text-center">
-            <Package size={18} className="mx-auto mb-1 text-garden-500" />
-            <p className="text-xl font-bold">{seeds.length}</p>
-            <p className="text-xs text-gray-500">{t("seeds.items")}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-xl font-bold text-amber-600">{expiringSeeds.length}</p>
-            <p className="text-xs text-gray-500">{t("seeds.expiring")}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-xl font-bold">{totalCost.toFixed(2)} €</p>
-            <p className="text-xs text-gray-500">{t("seeds.totalCost")}</p>
-          </Card>
+        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard label={t("seeds.items")} value={formatNumber(seeds.length)} icon={Package} />
+          <StatCard label={t("seeds.testRecommended")} value={formatNumber(testCount)} icon={FlaskConical} tone={testCount ? "warning" : "neutral"} hint={t("seeds.testHintShort")} />
+          <StatCard label={t("seeds.missingStat")} value={formatNumber(missing.length)} icon={ShoppingCart} tone="info" hint={t("seeds.missingStatHint")} />
+          <StatCard label={t("seeds.totalCost")} value={formatCurrency(totalCost)} icon={Wallet} tone="neutral" />
         </div>
       )}
 
-      {/* Expiring warning */}
-      {expiringSeeds.length > 0 && (
-        <Card className="mb-4 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/10">
-          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
-            <AlertTriangle size={14} />
-            {t("seeds.expiringTitle")}
-          </h3>
-          <div className="space-y-1">
-            {expiringSeeds.map((s) => {
-              const plant = plantMap.get(s.plantId);
+      {missing.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader title={t("seeds.shoppingList")} description={t("seeds.shoppingListHint")} />
+          <div className="flex flex-wrap gap-2">
+            {missing.map((id) => {
+              const plant = plantMap.get(id);
+              if (!plant) return null;
+              const vegetative = propagation(plant) === "vegetative";
               return (
-                <div key={s.id} className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
-                  {plant && <PlantIconDisplay plantId={s.plantId} emoji={plant.icon} size={14} />}
-                  <span>{getPlantName(s.plantId)}{s.variety ? ` (${s.variety})` : ""}</span>
-                  <span className="text-amber-500">— {t("seeds.acquiredIn")} {s.yearAcquired}</span>
-                </div>
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => openAdd({ plant: id })}
+                  aria-label={t("seeds.addFor", { name: getPlantName(id) })}
+                  className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-gray-200 bg-white py-1 pr-3 pl-1.5 text-sm font-medium text-gray-800 hover:border-garden-500 hover:bg-garden-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-garden-500/15"
+                >
+                  <PlantIconDisplay plantId={id} emoji={plant.icon} size={22} />
+                  {getPlantName(id)}
+                  {vegetative && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">· {t("seeds.plantingStock")}</span>}
+                  <Plus size={14} aria-hidden="true" className="text-gray-500" />
+                </button>
               );
             })}
           </div>
         </Card>
       )}
 
-      {/* Shopping list - plants without seeds */}
-      {missingSeeds.length > 0 && (
-        <Card className="mb-4 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/10">
-          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
-            <ShoppingCart size={14} />
-            {t("seeds.shoppingList")}
-          </h3>
-          <div className="flex flex-wrap gap-1">
-            {missingSeeds.map((id) => {
-              const plant = plantMap.get(id);
-              return plant ? (
-                <button
-                  key={id}
-                  onClick={() => { setPlantId(id); setShowAdd(true); }}
-                  className="flex items-center gap-1 rounded-full border border-blue-200 bg-white px-2 py-0.5 text-xs text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                >
-                  <PlantIconDisplay plantId={id} emoji={plant.icon} size={12} />
-                  {getPlantName(id)}
-                </button>
-              ) : null;
-            })}
-          </div>
-        </Card>
-      )}
-
-      {/* Seed list */}
       {seeds.length === 0 ? (
         <Card>
-          <p className="text-center text-gray-500">{t("seeds.empty")}</p>
+          <EmptyState
+            icon={Package}
+            title={t("seeds.emptyTitle")}
+            description={t("seeds.emptyText")}
+            action={<Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("seeds.add")}</Button>}
+          />
         </Card>
       ) : (
-        <div className="space-y-2">
-          {[...seeds].sort((a, b) => {
-            const na = getPlantName(a.plantId);
-            const nb = getPlantName(b.plantId);
-            return na.localeCompare(nb);
-          }).map((seed) => {
-            const plant = plantMap.get(seed.plantId);
-            const viabilityYears = plant?.seedSaving?.seedViabilityYears ?? 4;
-            const expiryYear = seed.yearAcquired + viabilityYears;
-            const yearsLeft = expiryYear - CURRENT_YEAR;
-            const isExpired = yearsLeft <= 0;
-
-            return (
-              <div
-                key={seed.id}
-                className={`flex items-center gap-3 rounded-lg border bg-white p-3 dark:bg-gray-900 ${
-                  isExpired ? "border-red-200 dark:border-red-900" : "border-gray-200 dark:border-gray-700"
-                }`}
-              >
-                {plant && <PlantIconDisplay plantId={seed.plantId} emoji={plant.icon} size={20} />}
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">
-                    {getPlantName(seed.plantId)}
-                    {seed.variety && <span className="ml-1 text-gray-400">({seed.variety})</span>}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span>{seed.quantity} {t(`seeds.units.${seed.unit}`)}</span>
-                    <span>·</span>
-                    <span>{t(`seeds.sources.${seed.source}`)}</span>
-                    <span>·</span>
-                    <span>{seed.yearAcquired}</span>
-                    {seed.cost && <span>· {seed.cost.toFixed(2)} €</span>}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    isExpired
-                      ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                      : yearsLeft <= 1
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                        : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                  }`}>
-                    {isExpired ? t("seeds.expired") : t("seeds.yearsLeft", { count: yearsLeft })}
-                  </span>
-                </div>
-                <button aria-label={t("common.delete")}
-                  onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteSeed(seed.id); }}
-                  className="shrink-0 rounded p-1 text-gray-300 hover:text-red-500"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        <>
+          {testCount > 0 && (
+            <SegmentedControl
+              className="mb-4"
+              label={t("seeds.filterLabel")}
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: "all", label: t("common.all"), count: rows.length },
+                { value: "test", label: t("seeds.testRecommended"), count: testCount },
+              ]}
+            />
+          )}
+          <List label={t("seeds.title")}>
+            {shown.map(({ seed, viability }) => {
+              const plant = plantMap.get(seed.plantId);
+              const name = getPlantName(seed.plantId);
+              const sourceText = seed.source === "shop" && seed.shopName ? seed.shopName : t(`seeds.sources.${seed.source}`);
+              return (
+                <ListRow
+                  key={seed.id}
+                  onClick={() => openEdit(seed)}
+                  clickLabel={seed.variety ? `${name} ${seed.variety}` : name}
+                  leading={plant ? <PlantIconDisplay plantId={seed.plantId} emoji={plant.icon} size={28} /> : <Package size={20} aria-hidden="true" className="text-gray-500" />}
+                  title={
+                    <>
+                      {name}
+                      {seed.variety && <span className="font-normal text-gray-500 dark:text-gray-400"> · {seed.variety}</span>}
+                    </>
+                  }
+                  badges={statusBadge(viability)}
+                  meta={[
+                    t(`seeds.unitCount.${seed.unit}`, { count: seed.quantity, n: formatNumber(seed.quantity) }),
+                    sourceText,
+                    t("seeds.acquired", { year: seed.yearAcquired }),
+                  ].join(" · ")}
+                  description={
+                    viability.status === "testRecommended"
+                      ? t("seeds.testExplain", { name, years: yearsText(viability.viabilityYears) })
+                      : viability.status === "notApplicable"
+                        ? t("seeds.plantingStockExplain")
+                        : seed.notes
+                  }
+                  trailing={seed.cost ? formatCurrency(seed.cost) : undefined}
+                  actions={
+                    <Menu
+                      label={t("common.moreActions")}
+                      items={[
+                        { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(seed) },
+                        "separator",
+                        { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(seed) },
+                      ]}
+                    />
+                  }
+                />
+              );
+            })}
+          </List>
+        </>
       )}
 
-      {/* Add seed modal */}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("seeds.add")}>
-        <div className="space-y-4">
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("seeds.edit") : t("seeds.add")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />
+                {t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.plant")}</label>
-            <select
-              value={plantId}
-              onChange={(e) => setPlantId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800"
-            >
-              {plants.map((p) => (
-                <option key={p.id} value={p.id}>{p.icon} {getPlantName(p.id)}</option>
-              ))}
-            </select>
+            <PlantCombobox
+              label={t("harvest.plant")}
+              plants={plants}
+              value={draft.plantId}
+              autoFocus={!draft.plantId}
+              onChange={({ plantId }) => patch({ plantId, ...(propagation(plantMap.get(plantId)) === "vegetative" && draft.unit !== "grams" ? { unit: "grams" as const } : {}) })}
+              hint={draftVegetative ? t("seeds.vegetativeHint", { name: getPlantName(draft.plantId) }) : undefined}
+            />
+            {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
-          <Input label={t("planner.variety")} value={variety} onChange={(e) => setVariety(e.target.value)} placeholder={t("planner.varietyPlaceholder")} />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("seeds.quantity")} type="number" min={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+          <Input label={t("planner.variety")} value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={t("planner.varietyPlaceholder")} />
+          <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+            <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("seeds.unit")}</label>
-              <select value={unit} onChange={(e) => setUnit(e.target.value as SeedUnit)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-                {(["packets", "grams", "seeds"] as const).map((u) => (
-                  <option key={u} value={u}>{t(`seeds.units.${u}`)}</option>
-                ))}
-              </select>
+              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300" aria-hidden="true">{t("seeds.unit")}</p>
+              <SegmentedControl
+                fullWidth
+                label={t("seeds.unit")}
+                value={draft.unit}
+                onChange={(unit) => patch({ unit })}
+                options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
+              />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("seeds.year")} type="number" min={2020} max={2030} value={year} onChange={(e) => setYear(e.target.value)} />
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("seeds.source")}</label>
-              <select value={source} onChange={(e) => setSource(e.target.value as SeedSource)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-                {(["shop", "saved", "traded", "gifted"] as const).map((s) => (
-                  <option key={s} value={s}>{t(`seeds.sources.${s}`)}</option>
-                ))}
-              </select>
-            </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label={t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
+            <Select
+              label={t("seeds.source")}
+              value={draft.source}
+              onChange={(e) => patch({ source: e.target.value as SeedSource })}
+              options={SOURCES.map((s) => ({ value: s, label: t(`seeds.sources.${s}`) }))}
+            />
           </div>
-          <Input label={`${t("expenses.amount")} (${t("common.optional", { defaultValue: "optional" })})`} type="number" step="0.01" min={0} value={cost} onChange={(e) => setCost(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {draft.source === "shop" && (
+              <Input label={t("seeds.shopName")} value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
+            )}
+            <Input
+              label={t("seeds.cost")}
+              inputMode="decimal"
+              value={draft.cost}
+              onChange={(e) => patch({ cost: e.target.value })}
+              placeholder={formatCurrency(3.5)}
+              hint={t("common.optional")}
+              error={errors.cost}
+            />
           </div>
+          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

@@ -1,306 +1,359 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, TrendingUp, AlertCircle, Apple, Beef, Citrus, Wheat, Snowflake, Archive, Bird } from "lucide-react";
-import { ANIMAL_ICONS, PRODUCT_ICONS } from "@/types/animal";
-import { useStore } from "@/store";
+import { useNavigate } from "react-router-dom";
+import { Apple, Beef, Citrus, LayoutGrid, Lightbulb, Scale, Sprout, Target, Wheat, Archive } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
-import { usePlants, usePlantMap } from "@/hooks/usePlants";
+import { useStore } from "@/store";
+import { useAnalysisPrefs } from "@/store/analysisPrefs";
+import { usePlantMap, usePlants } from "@/hooks/usePlants";
+import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useGardenMetrics } from "@/hooks/useGardenMetrics";
+import { calculateSufficiency, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
+import { annualCalorieNeed, getForecastProducts, PRODUCT_TYPES, productToKg } from "@/lib/metrics";
+import { PRODUCT_NUTRITION } from "@/types/animal";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { calculateSufficiency, type SufficiencyResult } from "@/lib/sufficiency";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatCard } from "@/components/ui/StatCard";
+import { Tabs } from "@/components/ui/Tabs";
+import { List, ListRow } from "@/components/ui/List";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/Badge";
+import { BarChart, HowCalculated, Meter, MonthStrip } from "@/components/ui/charts";
+import { PRODUCT_ICON } from "@/components/livestock/icons";
+import { IconTile, formatProductAmount } from "@/components/livestock/shared";
+import { HouseholdSizeField } from "./HouseholdSizeField";
 import { PreservationGuide } from "./PreservationGuide";
 
-const NUTRIENT_ICONS = {
-  calories: Apple,
-  protein: Beef,
-  vitaminC: Citrus,
-  fiber: Wheat,
-};
+type View = "overview" | "crops" | "animals" | "preserve";
+const NUTRIENTS = ["calories", "protein", "vitaminC", "fiber"] as const;
+const NUTRIENT_ICON = { calories: Apple, protein: Beef, vitaminC: Citrus, fiber: Wheat };
+/** Calorie-dense staples considered as levers ("+5 m² → +x %"). */
+const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "squash", "pea"];
+const LEVER_AREA_M2 = 5;
 
-const NUTRIENT_COLORS = {
-  calories: "bg-amber-500",
-  protein: "bg-red-500",
-  vitaminC: "bg-orange-500",
-  fiber: "bg-green-500",
-};
+export function SufficiencyDashboard() {
+  const { t } = useTranslation();
+  const f = useFormat();
+  const navigate = useNavigate();
+  const { gardens, gridCellSizeCm, lastFrostDate, animals } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals })),
+  );
+  const householdSize = useAnalysisPrefs((s) => s.householdSize);
+  const plants = usePlants();
+  const plantMap = usePlantMap();
+  const plantName = usePlantName();
+  const metrics = useGardenMetrics();
+  const [view, setView] = useState<View>("overview");
 
-function ProgressBar({ percent, color }: { percent: number; color: string }) {
+  // Forecast basis: herd estimates, not extrapolated logs — same as metrics.ts.
+  const result = useMemo(() => {
+    const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
+    if (!hasPlantings && animals.length === 0) return null;
+    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals, []);
+  }, [gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals]);
+
+  const months = useMemo(() => Array.from({ length: 12 }, (_, i) => new Date(2026, i, 1)), []);
+  const monthShort = months.map((d) => f.formatDate(d, "month"));
+  const monthLong = months.map((d) => new Intl.DateTimeFormat(f.locale, { month: "long" }).format(d));
+  const currentMonth = new Date().getMonth();
+  const year = new Date().getFullYear();
+  const ss = metrics.selfSufficiency;
+
+  const levers = useMemo(() => {
+    const need = annualCalorieNeed(householdSize);
+    return LEVER_CROPS.map((id) => plantMap.get(id))
+      .filter((p): p is NonNullable<typeof p> => !!p && !!p.expectedYieldKgPerM2 && !!p.caloriesPer100g)
+      .map((p) => ({ plantId: p.id, gain: (LEVER_AREA_M2 * p.expectedYieldKgPerM2! * 10 * p.caloriesPer100g!) / need }))
+      .sort((a, b) => b.gain - a.gain)
+      .slice(0, 3);
+  }, [plantMap, householdSize]);
+
+  const header = (
+    <PageHeader
+      title={t("sufficiency.title")}
+      description={t("sufficiency.subtitle")}
+      actions={<HouseholdSizeField />}
+      tabs={result ? (
+        <Tabs
+          label={t("sufficiency.views")}
+          value={view}
+          onChange={setView}
+          items={[
+            { value: "overview", label: t("sufficiency.tabs.overview") },
+            { value: "crops", label: t("sufficiency.tabs.crops"), count: result.plantYields.length },
+            { value: "animals", label: t("sufficiency.tabs.animals"), count: animals.length },
+            { value: "preserve", label: t("sufficiency.tabs.preserve") },
+          ]}
+        />
+      ) : undefined}
+    />
+  );
+
+  if (!result) {
+    return (
+      <div>
+        {header}
+        <Card>
+          <EmptyState
+            icon={Target}
+            title={t("sufficiency.emptyTitle")}
+            description={t("sufficiency.emptyText")}
+            action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
+            secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock")}>{t("sufficiency.toLivestock")}</Button>}
+          />
+        </Card>
+      </div>
+    );
+  }
+
+  const lowCount = result.lowMonths.length;
+  const gap = result.winterGap;
+  const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
+
   return (
-    <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-      <div
-        className={`h-full rounded-full transition-all ${color}`}
-        style={{ width: `${Math.min(100, percent)}%` }}
-      />
+    <div>
+      {header}
+
+      {view === "overview" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard
+              label={t("metrics.selfSufficiencyForecast")}
+              value={f.formatPercent(ss.forecastRatio)}
+              icon={Target}
+              tone="brand"
+              hint={t("metrics.caloriesFor", { count: householdSize })}
+            />
+            <StatCard
+              label={t("metrics.selfSufficiencyActual")}
+              value={f.formatPercent(ss.actualRatio)}
+              icon={Target}
+              tone="neutral"
+              hint={t("metrics.recordedSince", { year })}
+            />
+            <StatCard label={t("metrics.yieldForecast")} value={f.formatWeight(metrics.harvest.forecast.totalGrams)} icon={Sprout} tone="neutral" hint={t("metrics.plantsOnly")} />
+            <StatCard label={t("metrics.yieldActual")} value={f.formatWeight(metrics.harvest.actual.totalGrams)} icon={Scale} tone="neutral" hint={t("metrics.harvestEntries", { count: metrics.harvest.entryCount })} />
+          </div>
+          <HowCalculated>
+            <p>{t("metrics.howForecast")}</p>
+            <p>{t("metrics.howActual")}</p>
+            <p>{t("metrics.howNeed", { kcal: f.formatNumber(2000, { maximumFractionDigits: 0 }) })}</p>
+          </HowCalculated>
+
+          <Card>
+            <CardHeader title={t("sufficiency.monthlyTitle")} description={t("sufficiency.monthlyDesc", { count: householdSize })} />
+            <MonthStrip
+              values={coverage}
+              monthLabels={monthShort}
+              monthNames={monthLong}
+              formatValue={(r) => f.formatPercent(Math.min(1, r))}
+              current={currentMonth}
+              caption={t("sufficiency.monthlyCaption")}
+            />
+            <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
+              {lowCount >= 11 ? (
+                <p>{t("sufficiency.noMonthCovered", { percent: f.formatPercent(LOW_COVERAGE_PERCENT / 100) })}</p>
+              ) : gap ? (
+                <p>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{t("sufficiency.winterGap")}: </span>
+                  {t("sufficiency.winterGapDesc", {
+                    months: gap.months.map((m) => monthLong[m]).join(", "),
+                    kg: f.formatWeight(gap.storedKgNeeded * 1000),
+                    percent: f.formatPercent(LOW_COVERAGE_PERCENT / 100),
+                  })}
+                </p>
+              ) : (
+                <p>{t("sufficiency.noWinterGap", { from: monthLong[STORAGE_MONTHS[0]], to: monthLong[STORAGE_MONTHS[STORAGE_MONTHS.length - 1]] })}</p>
+              )}
+            </div>
+            <div className="mt-6">
+              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.monthlyKgTitle")}</h3>
+              <BarChart
+                data={result.monthlyFood.map((m) => ({ key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month], values: [m.freshKg, m.storedKg] }))}
+                series={[
+                  { label: t("sufficiency.fresh"), color: "brand" },
+                  { label: t("sufficiency.stored"), color: "earth", hatched: true },
+                ]}
+                formatValue={(v) => f.formatWeight(v * 1000)}
+                formatTick={(v) => f.formatNumber(v, { maximumFractionDigits: 0 })}
+                marker={{ index: currentMonth, label: t("charts.today") }}
+                caption={t("sufficiency.monthlyKgCaption")}
+                categoryLabel={t("charts.month")}
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("sufficiency.axisKg")}</p>
+            </div>
+          </Card>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader title={t("sufficiency.nutritionCoverage")} description={t("sufficiency.coverageDesc", { count: householdSize })} />
+              <ul className="space-y-4">
+                {NUTRIENTS.map((key) => {
+                  const data = result.nutrition[key];
+                  const Icon = NUTRIENT_ICON[key];
+                  const unit = key === "calories" ? "kcal" : key === "vitaminC" ? "mg" : "g";
+                  const label = t(`sufficiency.nutrients.${key}`);
+                  return (
+                    <li key={key}>
+                      <div className="mb-1 flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100">
+                          <Icon size={14} aria-hidden="true" className="text-gray-500" />
+                          {label}
+                        </span>
+                        <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(data.percent / 100)}</span>
+                      </div>
+                      <Meter forecast={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100)}`} />
+                      <p className="mt-1 text-xs tabular-nums text-gray-500 dark:text-gray-400">
+                        {t("sufficiency.ofNeed", { produced: `${f.formatNumber(data.produced, { maximumFractionDigits: 0 })} ${unit}`, needed: `${f.formatNumber(data.needed, { maximumFractionDigits: 0 })} ${unit}` })}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+
+            <Card>
+              <CardHeader title={t("sufficiency.leversTitle")} description={t("sufficiency.leversDesc", { area: f.formatArea(LEVER_AREA_M2) })} />
+              <ul className="divide-y divide-gray-100 dark:divide-white/5">
+                {levers.map((l) => {
+                  const p = plantMap.get(l.plantId)!;
+                  return (
+                    <li key={l.plantId} className="flex items-center gap-3 py-2.5">
+                      <PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />
+                      <span className="flex-1 text-sm text-gray-900 dark:text-gray-100">{t("sufficiency.leverRow", { area: f.formatArea(LEVER_AREA_M2), plant: plantName(p.id) })}</span>
+                      <Badge tone="brand" icon={Lightbulb}>{t("sufficiency.leverGain", { percent: f.formatPercent(l.gain, 1) })}</Badge>
+                    </li>
+                  );
+                })}
+              </ul>
+              {result.gaps.length > 0 && (
+                <div className="mt-4 border-t border-gray-100 pt-3 dark:border-white/5">
+                  <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("sufficiency.gaps")}</p>
+                  <ul className="space-y-1.5 text-sm">
+                    {result.gaps.map((g) => (
+                      <li key={g.nutrient} className="text-gray-700 dark:text-gray-300">
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100)}</span>
+                        {" — "}
+                        {g.suggestion.split(",").filter((id) => plantMap.has(id)).map((id) => plantName(id)).join(", ")}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {view === "crops" && (
+        result.plantYields.length === 0 ? (
+          <Card><EmptyState compact icon={Sprout} title={t("sufficiency.noCropsTitle")} description={t("sufficiency.noCrops")} action={<Button onClick={() => navigate("/planner")}>{t("sufficiency.toPlanner")}</Button>} /></Card>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t("sufficiency.cropsIntro")}</p>
+            <List label={t("sufficiency.yieldByPlant")}>
+              {[...result.plantYields].sort((a, b) => b.estimatedKg - a.estimatedKg).map((y) => {
+                const p = plantMap.get(y.plantId);
+                if (!p) return null;
+                const actualG = metrics.harvest.actual.byPlant[y.plantId] ?? 0;
+                const forecastG = metrics.harvest.forecast.byPlant[y.plantId] ?? y.estimatedKg * 1000;
+                return (
+                  <ListRow
+                    key={y.plantId}
+                    leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
+                    title={plantName(p.id)}
+                    meta={[f.formatArea(y.areaM2), t("sufficiency.kcalValue", { kcal: f.formatNumber(y.calories, { maximumFractionDigits: 0 }) }), t("metrics.actualShort", { value: f.formatWeight(actualG) })].join(" · ")}
+                    description={<Meter actual={actualG} forecast={forecastG} max={Math.max(actualG, forecastG, 1)} label={t("metrics.actualVsForecast", { actual: f.formatWeight(actualG), forecast: f.formatWeight(forecastG) })} className="mt-1.5 max-w-xs" size={6} />}
+                    trailing={<span title={t("metrics.forecast")}>{f.formatWeight(forecastG)}</span>}
+                  />
+                );
+              })}
+            </List>
+            <LegendNote />
+          </div>
+        )
+      )}
+
+      {view === "animals" && (
+        animals.length === 0 ? (
+          <Card><EmptyState compact icon={Beef} title={t("sufficiency.noAnimalsTitle")} description={t("sufficiency.noAnimals")} action={<Button onClick={() => navigate("/livestock")}>{t("sufficiency.toLivestock")}</Button>} /></Card>
+        ) : (
+          <AnimalYields />
+        )
+      )}
+
+      {view === "preserve" && (
+        <div className="space-y-6">
+          {result.storageRequirements.length > 0 && (
+            <Card padding="none">
+              <div className="p-4 pb-2 sm:px-6 sm:pt-5">
+                <CardHeader className="mb-0" title={t("sufficiency.storageTitle")} description={t("sufficiency.storageDesc")} />
+              </div>
+              <ul className="divide-y divide-gray-100 dark:divide-white/5">
+                {result.storageRequirements.map((s) => {
+                  const p = plantMap.get(s.plantId);
+                  return (
+                    <li key={s.plantId} className="flex items-center gap-3 px-4 py-3 sm:px-6">
+                      {p ? <PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} /> : <IconTile icon={Archive} />}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{plantName(s.plantId)}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {t(`preservation.methods.${s.method}`)} · {t("sufficiency.shelfLife", { count: s.shelfLifeMonths })}
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatWeight(s.quantityKg * 1000)}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          )}
+          <PreservationGuide />
+        </div>
+      )}
     </div>
   );
 }
 
-export function SufficiencyDashboard() {
-  const { t, i18n } = useTranslation();
-  const { gardens, gridCellSizeCm, lastFrostDate, animals, animalProducts } = useStore(useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, animalProducts: s.animalProducts })));
-  const plants = usePlants();
-  const plantMap = usePlantMap();
-  const [familySize, setFamilySize] = useState(2);
+function LegendNote() {
+  const { t } = useTranslation();
+  return <p className="text-xs text-gray-500 dark:text-gray-400">{t("metrics.meterLegend")}</p>;
+}
 
-  const result: SufficiencyResult | null = useMemo(() => {
-    const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
-    const hasAnimals = animals.length > 0;
-    if (!hasPlantings && !hasAnimals) return null;
-    return calculateSufficiency(gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals, animalProducts);
-  }, [gardens, plants, familySize, gridCellSizeCm, lastFrostDate, animals, animalProducts]);
-
+/** Herd products: forecast from typical yields, recorded from the production log. */
+function AnimalYields() {
+  const { t } = useTranslation();
+  const f = useFormat();
+  const metrics = useGardenMetrics();
+  const animals = useStore((s) => s.animals);
+  const forecast = useMemo(() => getForecastProducts(animals), [animals]);
+  const types = PRODUCT_TYPES.filter((ty) => forecast[ty] > 0 || metrics.animalProducts.actual[ty] > 0);
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("sufficiency.title")}</h1>
-      </div>
-
-      <Card className="mb-6">
-        <div className="flex items-center gap-4">
-          <Users size={20} className="text-garden-600" />
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium">{t("sufficiency.familySize")}</label>
-            <Input
-              type="number"
-              min={1}
-              max={20}
-              value={familySize}
-              onChange={(e) => setFamilySize(Math.max(1, Number(e.target.value)))}
-              className="w-20"
+    <div className="space-y-3">
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t("sufficiency.animalsIntro")}</p>
+      <List label={t("sufficiency.animalYields")}>
+        {types.map((ty) => {
+          const kcal = productToKg(ty, forecast[ty]) * 10 * PRODUCT_NUTRITION[ty].caloriesPer100g;
+          const actual = metrics.animalProducts.actual[ty];
+          return (
+            <ListRow
+              key={ty}
+              leading={<IconTile icon={PRODUCT_ICON[ty]} />}
+              title={t(`livestock.products.${ty}`)}
+              meta={[
+                t("metrics.actualShort", { value: formatProductAmount(ty, actual, f, t) }),
+                kcal > 0 ? t("sufficiency.kcalValue", { kcal: f.formatNumber(kcal, { maximumFractionDigits: 0 }) }) : t("sufficiency.nonFood"),
+              ].join(" · ")}
+              description={<Meter actual={actual} forecast={forecast[ty]} max={Math.max(actual, forecast[ty], 1)} size={6} className="mt-1.5 max-w-xs" label={t("metrics.actualVsForecast", { actual: formatProductAmount(ty, actual, f, t), forecast: formatProductAmount(ty, forecast[ty], f, t) })} />}
+              trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, forecast[ty], f, t) })}
             />
-          </div>
-        </div>
-      </Card>
-
-      {!result ? (
-        <Card>
-          <p className="text-center text-gray-500">{t("sufficiency.noPlantings")}</p>
-        </Card>
-      ) : (
-        <>
-          <div className="mb-6 grid grid-cols-2 gap-2 sm:gap-4">
-            <Card className="text-center">
-              <p className="text-2xl font-bold text-garden-600 sm:text-4xl">{result.totalYieldKg.toFixed(0)} kg</p>
-              <p className="text-sm text-gray-500">{t("sufficiency.estimatedYield")}</p>
-            </Card>
-            <Card className="text-center">
-              <p className="text-2xl font-bold text-garden-600 sm:text-4xl">{result.plantYields.length}</p>
-              <p className="text-sm text-gray-500">{t("sufficiency.plantTypes")}</p>
-            </Card>
-          </div>
-
-          <Card className="mb-6">
-            <h2 className="mb-4 text-lg font-semibold">{t("sufficiency.nutritionCoverage")}</h2>
-            <p className="mb-4 text-xs text-gray-500">{t("sufficiency.coverageDesc", { size: familySize })}</p>
-            <div className="space-y-4">
-              {(["calories", "protein", "vitaminC", "fiber"] as const).map((key) => {
-                const data = result.nutrition[key];
-                const Icon = NUTRIENT_ICONS[key];
-                return (
-                  <div key={key}>
-                    <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-2 font-medium">
-                        <Icon size={14} />
-                        {t(`sufficiency.nutrients.${key}`)}
-                      </span>
-                      <span className={`font-bold ${data.percent >= 50 ? "text-garden-600" : "text-amber-600"}`}>
-                        {data.percent}%
-                      </span>
-                    </div>
-                    <ProgressBar percent={data.percent} color={NUTRIENT_COLORS[key]} />
-                    <p className="mt-0.5 text-xs text-gray-400">
-                      {key === "calories"
-                        ? `${data.produced.toLocaleString()} / ${data.needed.toLocaleString()} kcal`
-                        : key === "vitaminC"
-                          ? `${data.produced.toLocaleString()} / ${data.needed.toLocaleString()} mg`
-                          : `${data.produced.toLocaleString()} / ${data.needed.toLocaleString()} g`}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-
-          {result.gaps.length > 0 && (
-            <Card className="mb-6 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/10">
-              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-amber-800 dark:text-amber-300">
-                <AlertCircle size={18} />
-                {t("sufficiency.gaps")}
-              </h2>
-              <div className="space-y-3">
-                {result.gaps.map((gap) => (
-                  <div key={gap.nutrient}>
-                    <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                      {t(`sufficiency.nutrients.${gap.nutrient}`)}: {gap.percent}% {t("sufficiency.covered")}
-                    </p>
-                    <p className="text-xs text-amber-700 dark:text-amber-400">
-                      {t("sufficiency.suggestion")}:{" "}
-                      {gap.suggestion.split(",").map((id, i, arr) => {
-                        const p = plantMap.get(id);
-                        return p ? (
-                          <span key={id} className="inline-flex items-center gap-0.5">
-                            <PlantIconDisplay plantId={id} emoji={p.icon} size={14} />
-                            {t(`plants.catalog.${id}.name`)}{i < arr.length - 1 ? ", " : ""}
-                          </span>
-                        ) : id;
-                      })}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-
-          {/* Monthly Food Calendar */}
-          <Card className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold">{t("sufficiency.monthlyTitle")}</h2>
-            <p className="mb-4 text-xs text-gray-500">{t("sufficiency.monthlyDesc", { size: familySize })}</p>
-            <div className="mb-2 text-right text-xs text-gray-400">
-              {t("sufficiency.annualCoverage")}: <span className="font-bold">{result.annualCoveragePercent}%</span>
-            </div>
-            <div className="flex items-end gap-1" style={{ height: "140px" }}>
-              {result.monthlyFood.map((m) => {
-                const monthNames = i18n.language === "de"
-                  ? ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"]
-                  : ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-                const maxKg = Math.max(...result.monthlyFood.map((f) => Math.max(f.totalKg, 1)));
-                const freshH = (m.freshKg / maxKg) * 100;
-                const storedH = (m.storedKg / maxKg) * 100;
-                const isLow = m.coveragePercent < 25;
-                return (
-                  <div key={m.month} className="flex flex-1 flex-col items-center gap-0.5">
-                    <span className={`text-[9px] font-medium ${isLow ? "text-red-500" : "text-gray-500"}`}>{m.coveragePercent}%</span>
-                    <div className="flex w-full flex-col items-center" style={{ height: "100px" }}>
-                      <div className="w-full flex flex-col justify-end" style={{ height: "100px" }}>
-                        {m.storedKg > 0 && (
-                          <div className="w-full rounded-t bg-amber-400 dark:bg-amber-600" style={{ height: `${storedH}%` }} title={`${t("sufficiency.stored")}: ${m.storedKg} kg`} />
-                        )}
-                        {m.freshKg > 0 && (
-                          <div className={`w-full ${m.storedKg > 0 ? "" : "rounded-t"} bg-garden-500`} style={{ height: `${freshH}%` }} title={`${t("sufficiency.fresh")}: ${m.freshKg} kg`} />
-                        )}
-                      </div>
-                    </div>
-                    <span className={`text-[10px] ${isLow ? "font-bold text-red-500" : "text-gray-400"}`}>{monthNames[m.month]}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-2 flex gap-4 text-xs">
-              <span className="flex items-center gap-1"><span className="h-3 w-3 rounded bg-garden-500" /> {t("sufficiency.fresh")}</span>
-              <span className="flex items-center gap-1"><span className="h-3 w-3 rounded bg-amber-400" /> {t("sufficiency.stored")}</span>
-            </div>
-          </Card>
-
-          {/* Winter Gap Warning */}
-          {result.winterGap && (
-            <Card className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/10">
-              <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold text-blue-800 dark:text-blue-300">
-                <Snowflake size={18} />
-                {t("sufficiency.winterGap")}
-              </h2>
-              <p className="mb-3 text-sm text-blue-700 dark:text-blue-400">
-                {t("sufficiency.winterGapDesc", {
-                  months: result.winterGap.months.map((m) => {
-                    const names = i18n.language === "de"
-                      ? ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]
-                      : ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                    return names[m];
-                  }).join(", "),
-                  kg: result.winterGap.storedKgNeeded,
-                })}
-              </p>
-            </Card>
-          )}
-
-          {/* Storage Requirements */}
-          {result.storageRequirements.length > 0 && (
-            <Card className="mb-6">
-              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-                <Archive size={18} />
-                {t("sufficiency.storageTitle")}
-              </h2>
-              <div className="space-y-2">
-                {result.storageRequirements.map((s, i) => {
-                  const plant = plantMap.get(s.plantId);
-                  return (
-                    <div key={i} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                      <div className="flex items-center gap-2">
-                        {plant && <PlantIconDisplay plantId={s.plantId} emoji={plant.icon} size={16} />}
-                        <span className="text-sm font-medium">{plant ? t(`plants.catalog.${s.plantId}.name`) : s.plantId}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className="font-medium">{s.quantityKg} kg</span>
-                        <span>{t(`preservation.methods.${s.method}`)}</span>
-                        <span>{s.shelfLifeMonths} {t("sufficiency.months")}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          )}
-
-          <Card>
-            <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <TrendingUp size={18} />
-              {t("sufficiency.yieldByPlant")}
-            </h2>
-            <div className="space-y-2">
-              {result.plantYields
-                .sort((a, b) => b.estimatedKg - a.estimatedKg)
-                .map((y) => {
-                  const plant = plantMap.get(y.plantId);
-                  if (!plant) return null;
-                  return (
-                    <div key={y.plantId} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                      <div className="flex items-center gap-2">
-                        <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />
-                        <span className="text-sm font-medium">{t(`plants.catalog.${y.plantId}.name`)}</span>
-                        <span className="text-xs text-gray-400">{y.areaM2.toFixed(1)} m²</span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs">
-                        <span className="font-semibold">{y.estimatedKg} kg</span>
-                        <span className="text-gray-500">{y.calories} kcal</span>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </Card>
-
-          {/* Animal Yields */}
-          {result.animalYields.length > 0 && (
-            <Card className="mt-6">
-              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-                <Bird size={18} />
-                {t("sufficiency.animalYields")}
-              </h2>
-              <div className="space-y-2">
-                {result.animalYields.map((y, i) => (
-                  <div key={i} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{ANIMAL_ICONS[y.animalType as keyof typeof ANIMAL_ICONS]}</span>
-                      <span className="text-sm font-medium">
-                        {PRODUCT_ICONS[y.productType as keyof typeof PRODUCT_ICONS]} {t(`livestock.products.${y.productType}`)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs">
-                      <span className="font-semibold">{y.quantityKg} kg</span>
-                      <span className="text-gray-500">{y.calories} kcal</span>
-                      <span className="text-gray-500">{y.proteinG}g {t("sufficiency.nutrients.protein")}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-
-          <div className="mt-6">
-            <PreservationGuide />
-          </div>
-        </>
-      )}
+          );
+        })}
+      </List>
+      <LegendNote />
     </div>
   );
 }

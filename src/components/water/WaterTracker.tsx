@@ -1,206 +1,300 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
-import { Droplets, Trash2, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CloudRain, Droplets, Pencil, Plus, Trash2 } from "lucide-react";
+import { addWeeks, endOfWeek, getISOWeek, startOfMonth, startOfWeek, subWeeks } from "date-fns";
 import { useStore } from "@/store";
-import { Card } from "@/components/ui/Card";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { toDate, toISODate, todayISO } from "@/lib/format";
+import type { WaterEntry } from "@/types/water";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { StatCard } from "@/components/ui/StatCard";
 import { useToast } from "@/components/ui/Toast";
-import { startOfWeek, startOfMonth, isWithinInterval, parseISO } from "date-fns";
+import { DateField } from "@/components/records/DateField";
+import { BarChart } from "@/components/ui/charts";
+import { useBeds } from "@/components/records/useBeds";
+import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 
 const METHODS = ["manual", "hose", "drip", "sprinkler", "rain"] as const;
+type Method = (typeof METHODS)[number];
+const CHART_WEEKS = 8;
+const QUICK_LITERS = [5, 10, 20, 50];
+
+interface Draft { bedId: string; liters: string; method: Method; duration: string; date: string; notes: string }
+
+const num = (s: string) => Number(s.trim().replace(",", "."));
+const weekStart = (d: Date) => startOfWeek(d, { weekStartsOn: 1 });
 
 export function WaterTracker() {
   const { t } = useTranslation();
-  const { toast } = useToast();
-
-  const { waterEntries, addWaterEntry, deleteWaterEntry, gardens } = useStore(
-    useShallow((s) => ({
-      waterEntries: s.waterEntries,
-      addWaterEntry: s.addWaterEntry,
-      deleteWaterEntry: s.deleteWaterEntry,
-      gardens: s.gardens,
-    })),
+  const { toast, confirm } = useToast();
+  const { formatDate, formatVolume, formatNumber, locale } = useFormat();
+  const { waterEntries, addWaterEntry, updateWaterEntry, deleteWaterEntry } = useStore(
+    useShallow((s) => ({ waterEntries: s.waterEntries, addWaterEntry: s.addWaterEntry, updateWaterEntry: s.updateWaterEntry, deleteWaterEntry: s.deleteWaterEntry })),
   );
+  const beds = useBeds();
+  const navigate = useNavigate();
 
-  const allBeds = useMemo(
-    () => gardens.flatMap((g) => g.beds.map((b) => ({ id: b.id, name: b.name, gardenId: g.id, gardenName: g.name }))),
-    [gardens],
-  );
+  // ---------------------------------------------------------------- dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [draft, setDraft] = useState<Draft>({ bedId: "", liters: "", method: "manual", duration: "", date: todayISO(), notes: "" });
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  const [selectedBedId, setSelectedBedId] = useState(allBeds[0]?.id ?? "");
-  const [liters, setLiters] = useState("");
-  const [method, setMethod] = useState<(typeof METHODS)[number]>("manual");
-  const [duration, setDuration] = useState("");
+  const lastEntry = useMemo(() => [...waterEntries].sort((a, b) => b.date.localeCompare(a.date))[0], [waterEntries]);
 
-  const now = new Date();
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-  const monthStart = startOfMonth(now);
+  const openAdd = useCallback((params: AddParams = {}) => {
+    setEditingId(null);
+    setSubmitted(false);
+    const bedId = params.bed && beds.byId.has(params.bed) ? params.bed : lastEntry && beds.byId.has(lastEntry.bedId) ? lastEntry.bedId : beds.beds[0]?.id ?? "";
+    setDraft({ bedId, liters: "", method: lastEntry && lastEntry.method !== "rain" ? lastEntry.method : "manual", duration: "", date: params.date ?? todayISO(), notes: "" });
+    setDialogOpen(true);
+  }, [beds, lastEntry]);
+  const openAddPlain = useCallback(() => openAdd(), [openAdd]);
+  useOpenAddOnNavigate(openAddPlain);
+  useAddFromUrl(openAdd);
 
-  const weekTotal = useMemo(
-    () =>
-      waterEntries
-        .filter((e) => {
-          const d = parseISO(e.date);
-          return isWithinInterval(d, { start: weekStart, end: now });
-        })
-        .reduce((sum, e) => sum + e.liters, 0),
-    [waterEntries, weekStart, now],
-  );
-
-  const monthTotal = useMemo(
-    () =>
-      waterEntries
-        .filter((e) => {
-          const d = parseISO(e.date);
-          return isWithinInterval(d, { start: monthStart, end: now });
-        })
-        .reduce((sum, e) => sum + e.liters, 0),
-    [waterEntries, monthStart, now],
-  );
-
-  const recentEntries = useMemo(
-    () => [...waterEntries].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10),
-    [waterEntries],
-  );
-
-  const handleAdd = () => {
-    const litersNum = parseFloat(liters);
-    if (!selectedBedId || isNaN(litersNum) || litersNum <= 0) return;
-
-    const bed = allBeds.find((b) => b.id === selectedBedId);
-    if (!bed) return;
-
-    addWaterEntry({
-      bedId: selectedBedId,
-      gardenId: bed.gardenId,
-      date: new Date().toISOString(),
-      liters: litersNum,
-      method,
-      duration: duration ? parseInt(duration, 10) : undefined,
+  const openEdit = (e: WaterEntry) => {
+    setEditingId(e.id);
+    setSubmitted(false);
+    setDraft({
+      bedId: e.bedId, liters: e.liters.toLocaleString(locale, { useGrouping: false }), method: e.method,
+      duration: e.duration ? String(e.duration) : "", date: toISODate(e.date) || todayISO(), notes: e.notes ?? "",
     });
-
-    setLiters("");
-    setDuration("");
-    toast(t("water.added"));
+    setDialogOpen(true);
   };
 
-  const getBedLabel = (gardenId: string, bedId: string) => {
-    const bed = allBeds.find((b) => b.id === bedId && b.gardenId === gardenId);
-    if (!bed) return bedId;
-    return `${bed.gardenName} — ${bed.name}`;
+  const litersNum = num(draft.liters);
+  const durationNum = draft.duration.trim() ? Math.round(num(draft.duration)) : 0;
+  const errors = {
+    bed: submitted && !draft.bedId ? t("water.needBed") : undefined,
+    liters: (submitted || draft.liters.trim()) && !(litersNum > 0) ? t("water.needLiters") : undefined,
+    duration: !(durationNum >= 0) ? t("water.invalidNumber") : undefined,
   };
+
+  const handleSave = () => {
+    setSubmitted(true);
+    const bed = beds.byId.get(draft.bedId);
+    if (!bed || !(litersNum > 0) || errors.duration) return;
+    const fields = {
+      bedId: bed.id, gardenId: bed.gardenId, date: draft.date, liters: litersNum, method: draft.method,
+      duration: durationNum || undefined, notes: draft.notes.trim() || undefined,
+    };
+    if (editingId) {
+      updateWaterEntry(editingId, fields);
+      toast(t("water.updated"), "success");
+    } else {
+      addWaterEntry(fields);
+      const added = useStore.getState().waterEntries.at(-1);
+      toast(t("water.saved", { bed: bed.label, amount: formatVolume(litersNum) }), "success", {
+        action: added ? { label: t("common.undo"), onClick: () => deleteWaterEntry(added.id) } : undefined,
+      });
+    }
+    setDialogOpen(false);
+  };
+
+  const handleDelete = async (e: WaterEntry) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteWaterEntry(e.id);
+    setDialogOpen(false);
+    const { id: _id, ...rest } = e;
+    toast(t("water.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addWaterEntry(rest) } });
+  };
+
+  // ---------------------------------------------------------------- aggregates
+  const data = useMemo(() => {
+    const now = new Date();
+    const thisWeek = weekStart(now);
+    const thisMonth = startOfMonth(now);
+    let week = 0, weekRain = 0, month = 0;
+    const firstChartWeek = subWeeks(thisWeek, CHART_WEEKS - 1);
+    const perWeek = new Map<number, { water: number; rain: number }>();
+    for (let i = 0; i < CHART_WEEKS; i++) perWeek.set(addWeeks(firstChartWeek, i).getTime(), { water: 0, rain: 0 });
+    const groups = new Map<number, WaterEntry[]>();
+    for (const e of waterEntries) {
+      const d = toDate(e.date);
+      if (!d) continue;
+      const ws = weekStart(d).getTime();
+      const rain = e.method === "rain";
+      if (ws === thisWeek.getTime()) { if (rain) weekRain += e.liters; else week += e.liters; }
+      if (d >= thisMonth && !rain) month += e.liters;
+      const bucket = perWeek.get(ws);
+      if (bucket) { if (rain) bucket.rain += e.liters; else bucket.water += e.liters; }
+      groups.set(ws, [...(groups.get(ws) ?? []), e]);
+    }
+    const chart = [...perWeek.entries()].map(([ws, v]) => ({ ws: new Date(ws), ...v }));
+    const avg = chart.reduce((s, w) => s + w.water, 0) / CHART_WEEKS;
+    const weeks = [...groups.entries()]
+      .sort((a, b) => b[0] - a[0])
+      .map(([ws, entries]) => [new Date(ws), entries.sort((a, b) => b.date.localeCompare(a.date))] as const);
+    return { week, weekRain, month, avg, chart, weeks };
+  }, [waterEntries]);
+
+  const [weeksShown, setWeeksShown] = useState(4);
+  const editing = editingId ? waterEntries.find((e) => e.id === editingId) : undefined;
+  const weekRange = (ws: Date) => `${formatDate(ws)} – ${formatDate(endOfWeek(ws, { weekStartsOn: 1 }))}`;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Droplets className="h-7 w-7 text-sky-500" />
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{t("water.title")}</h1>
-      </div>
-
-      {/* Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t("water.thisWeek")}</p>
-          <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{weekTotal.toFixed(1)} {t("water.liters")}</p>
-        </Card>
-        <Card>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t("water.thisMonth")}</p>
-          <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{monthTotal.toFixed(1)} {t("water.liters")}</p>
-        </Card>
-      </div>
-
-      {/* Quick-add form */}
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold text-gray-700 dark:text-gray-200">{t("water.add")}</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("planner.bed")}
-            </label>
-            <select
-              value={selectedBedId}
-              onChange={(e) => setSelectedBedId(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 sm:py-2 sm:text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-            >
-              {allBeds.map((b) => (
-                <option key={`${b.gardenId}-${b.id}`} value={b.id}>
-                  {b.gardenName} — {b.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Input
-            label={t("water.liters")}
-            type="number"
-            min="0"
-            step="0.1"
-            value={liters}
-            onChange={(e) => setLiters(e.target.value)}
-            placeholder="10"
-          />
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("water.method")}
-            </label>
-            <select
-              value={method}
-              onChange={(e) => setMethod(e.target.value as (typeof METHODS)[number])}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 sm:py-2 sm:text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-            >
-              {METHODS.map((m) => (
-                <option key={m} value={m}>{t(`water.methods.${m}`)}</option>
-              ))}
-            </select>
-          </div>
-          <Input
-            label={`${t("water.duration")} (${t("water.minutes")})`}
-            type="number"
-            min="0"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            placeholder="15"
-          />
-        </div>
-        <div className="mt-4">
-          <Button onClick={handleAdd} disabled={!selectedBedId || !liters}>
-            <Plus size={16} />
+    <div>
+      <PageHeader
+        title={t("water.title")}
+        description={t("water.subtitle")}
+        actions={
+          <Button onClick={openAddPlain} disabled={beds.beds.length === 0}>
+            <Plus size={16} aria-hidden="true" />
             {t("water.add")}
           </Button>
-        </div>
-      </Card>
+        }
+      />
 
-      {/* Recent entries */}
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold text-gray-700 dark:text-gray-200">{t("water.title")}</h2>
-        {recentEntries.length === 0 ? (
-          <p className="text-sm text-gray-400">{t("water.noEntries")}</p>
-        ) : (
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {recentEntries.map((entry) => (
-              <div key={entry.id} className="flex items-center justify-between py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                    {getBedLabel(entry.gardenId, entry.bedId)}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {new Date(entry.date).toLocaleDateString()} — {entry.liters} {t("water.liters")} — {t(`water.methods.${entry.method}`)}
-                    {entry.duration ? ` — ${entry.duration} ${t("water.minutes")}` : ""}
-                  </p>
-                </div>
-                <button aria-label={t("common.delete")}
-                  onClick={() => deleteWaterEntry(entry.id)}
-                  className="ml-2 rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
-                  title={t("common.delete")}
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))}
+      {waterEntries.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={Droplets}
+            title={t("water.emptyTitle")}
+            description={beds.beds.length ? t("water.emptyText") : t("water.emptyNoBeds")}
+            action={beds.beds.length
+              ? <Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("water.add")}</Button>
+              : <Button onClick={() => navigate("/planner")}>{t("importPage.toPlanner")}</Button>}
+          />
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard label={t("water.thisWeek")} value={formatVolume(data.week)} icon={Droplets} tone="info" hint={data.weekRain ? t("water.plusRain", { amount: formatVolume(data.weekRain) }) : undefined} />
+            <StatCard label={t("water.thisMonth")} value={formatVolume(data.month)} />
+            <StatCard label={t("water.avgPerWeek")} value={formatVolume(data.avg)} hint={t("water.lastWeeks", { count: CHART_WEEKS })} />
+            <StatCard label={t("water.entriesStat")} value={formatNumber(waterEntries.length)} />
           </div>
-        )}
-      </Card>
+
+          <Card>
+            <CardHeader title={t("water.perWeek")} description={t("water.perWeekHint", { count: CHART_WEEKS })} />
+            <BarChart
+              caption={t("water.perWeek")}
+              categoryLabel={t("water.week")}
+              series={[
+                { label: t("water.irrigation"), color: "sky" },
+                { label: t("water.methods.rain"), color: "muted" },
+              ]}
+              data={data.chart.map((w) => ({
+                key: String(w.ws.getTime()),
+                label: t("water.weekShort", { week: getISOWeek(w.ws) }),
+                fullLabel: `${t("water.weekShort", { week: getISOWeek(w.ws) })} · ${weekRange(w.ws)}`,
+                values: [w.water, w.rain],
+              }))}
+              formatValue={formatVolume}
+            />
+          </Card>
+
+          <section className="space-y-4" aria-label={t("water.log")}>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("water.log")}</h2>
+            {data.weeks.slice(0, weeksShown).map(([ws, entries]) => {
+              const total = entries.filter((e) => e.method !== "rain").reduce((s, e) => s + e.liters, 0);
+              return (
+                <List
+                  key={ws.getTime()}
+                  header={
+                    <span className="flex items-center justify-between gap-2">
+                      <span>{t("water.weekShort", { week: getISOWeek(ws) })} · {weekRange(ws)}</span>
+                      <span className="font-medium tabular-nums">{formatVolume(total)}</span>
+                    </span>
+                  }
+                >
+                  {entries.map((e) => {
+                    const rain = e.method === "rain";
+                    const Icon = rain ? CloudRain : Droplets;
+                    return (
+                      <ListRow
+                        key={e.id}
+                        onClick={() => openEdit(e)}
+                        leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-info/10 text-info"><Icon size={16} aria-hidden="true" /></span>}
+                        title={beds.label(e.bedId) ?? t("water.unknownBed")}
+                        meta={
+                          <>
+                            {t(`water.methods.${e.method}`)}
+                            {e.duration ? ` · ${t("water.minutesCount", { count: e.duration })}` : ""}
+                            {" · "}
+                            <time dateTime={toISODate(e.date)}>{formatDate(e.date, "relative")}</time>
+                          </>
+                        }
+                        description={e.notes}
+                        trailing={formatVolume(e.liters)}
+                        actions={
+                          <Menu
+                            label={t("common.moreActions")}
+                            items={[
+                              { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(e) },
+                              "separator",
+                              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(e) },
+                            ]}
+                          />
+                        }
+                      />
+                    );
+                  })}
+                </List>
+              );
+            })}
+            {data.weeks.length > weeksShown && (
+              <Button variant="secondary" onClick={() => setWeeksShown((n) => n + 4)}>{t("water.showOlder")}</Button>
+            )}
+          </section>
+        </div>
+      )}
+
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("water.edit") : t("water.add")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />{t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <Select label={t("planner.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} options={beds.options} error={errors.bed} />
+          <div>
+            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} placeholder="10" error={errors.liters} autoFocus />
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {QUICK_LITERS.map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => patch({ liters: String(l) })}
+                  className="inline-flex min-h-9 items-center rounded-full bg-gray-100 px-3 text-sm font-medium text-gray-700 hover:bg-gray-200 sm:min-h-8 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                >
+                  {formatVolume(l)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
+            <Input label={t("water.durationLabel")} inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder="15" hint={t("common.optional")} error={errors.duration} />
+          </div>
+          <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
+          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+        </div>
+      </Modal>
     </div>
   );
 }

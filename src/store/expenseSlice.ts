@@ -4,6 +4,7 @@ import type { Expense } from "@/types/expense";
 export interface ExpenseSlice {
   expenses: Expense[];
   addExpense: (expense: Omit<Expense, "id">) => void;
+  updateExpense: (id: string, updates: Partial<Omit<Expense, "id">>) => void;
   deleteExpense: (id: string) => void;
 }
 
@@ -16,6 +17,11 @@ export const createExpenseSlice: StateCreator<ExpenseSlice> = (set) => ({
   addExpense: (expense) =>
     set((state) => ({
       expenses: [...state.expenses, { ...expense, id: genId() }],
+    })),
+
+  updateExpense: (id, updates) =>
+    set((state) => ({
+      expenses: state.expenses.map((e) => (e.id === id ? { ...e, ...updates } : e)),
     })),
 
   deleteExpense: (id) =>

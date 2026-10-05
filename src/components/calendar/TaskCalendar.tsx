@@ -1,121 +1,192 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { Plus, Check, Calendar, Download, Trash2, Filter } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Plus, CalendarDays, Download, Trash2, Pencil, Repeat, CircleCheck, RotateCcw, ListChecks,
+  House, Sprout, Shovel, Droplets, Apple, Leaf, Search, CookingPot, TestTube, ClipboardList,
+} from "lucide-react";
+import { addDays, addWeeks, differenceInCalendarDays, endOfWeek, parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { usePlantMap } from "@/hooks/usePlants";
+import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate, type AddPrefill } from "@/hooks/useOpenAddOnNavigate";
+import { toISODate, todayISO } from "@/lib/format";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Badge } from "@/components/ui/Badge";
+import { IconButton } from "@/components/ui/IconButton";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import type { Task, TaskType } from "@/types/task";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import { downloadIcal } from "@/lib/ical";
-import { format, isAfter, isBefore, startOfWeek, endOfWeek, addWeeks, parseISO } from "date-fns";
 
-const taskTypeColors: Record<TaskType, string> = {
-  sow_indoors: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  sow_outdoors: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  transplant: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  water: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
-  harvest: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  fertilize: "bg-earth-100 text-earth-700 dark:bg-earth-700/30 dark:text-earth-300",
-  scout: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  preserve: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
-  soil_test: "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-400",
-  custom: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
+const TASK_TYPES: TaskType[] = ["sow_indoors", "sow_outdoors", "transplant", "water", "harvest", "fertilize", "scout", "preserve", "soil_test", "custom"];
+
+export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
+  sow_indoors: House,
+  sow_outdoors: Sprout,
+  transplant: Shovel,
+  water: Droplets,
+  harvest: Apple,
+  fertilize: Leaf,
+  scout: Search,
+  preserve: CookingPot,
+  soil_test: TestTube,
+  custom: ClipboardList,
 };
 
-const taskTypes: TaskType[] = ["sow_indoors", "sow_outdoors", "transplant", "water", "harvest", "fertilize", "scout", "preserve", "soil_test", "custom"];
+type StatusFilter = "open" | "done" | "all";
+type Group = "overdue" | "today" | "tomorrow" | "thisWeek" | "later" | "done";
+const GROUP_ORDER: Group[] = ["overdue", "today", "tomorrow", "thisWeek", "later", "done"];
+type Recurrence = "none" | "daily" | "weekly" | "biweekly";
 
-type ViewFilter = "active" | "overdue" | "thisWeek" | "upcoming" | "completed" | "all";
-type TypeFilter = "all" | TaskType;
+interface Draft {
+  title: string;
+  type: TaskType;
+  dueDate: string;
+  gardenId: string;
+  bedId: string;
+  plantId: string;
+  recurring: Recurrence;
+  description: string;
+}
+
+function groupOf(task: Task, today: Date, weekEnd: Date): Group {
+  if (task.completedDate) return "done";
+  const diff = differenceInCalendarDays(parseISO(task.dueDate), today);
+  if (diff < 0) return "overdue";
+  if (diff === 0) return "today";
+  if (diff === 1) return "tomorrow";
+  if (parseISO(task.dueDate) <= weekEnd) return "thisWeek";
+  return "later";
+}
+
+function nextDue(task: Task): string | null {
+  if (!task.recurring) return null;
+  const due = parseISO(task.dueDate);
+  const step = task.recurring.interval === "daily" ? addDays(due, 1) : addWeeks(due, task.recurring.interval === "weekly" ? 1 : 2);
+  // Never schedule into the past: a daily task done late continues from today.
+  const today = startOfDay(new Date());
+  const next = step < today ? addDays(today, task.recurring.interval === "daily" ? 1 : 0) : step;
+  if (task.recurring.until && next > parseISO(task.recurring.until)) return null;
+  return toISODate(next);
+}
 
 export function TaskCalendar() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
-  const { tasks, gardens, lastFrostDate, addTask, completeTask, deleteTask, generateTasks } = useStore(
+  const { formatDate } = useFormat();
+  const { tasks, gardens, lastFrostDate, addTask, updateTask, deleteTask, generateTasks } = useStore(
     useShallow((s) => ({
       tasks: s.tasks, gardens: s.gardens, lastFrostDate: s.lastFrostDate,
-      addTask: s.addTask, completeTask: s.completeTask, deleteTask: s.deleteTask, generateTasks: s.generateTasks,
+      addTask: s.addTask, updateTask: s.updateTask, deleteTask: s.deleteTask, generateTasks: s.generateTasks,
     }))
   );
+  const plants = usePlants();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
-  const [showAddTask, setShowAddTask] = useState(false);
-  const openAdd = useCallback(() => setShowAddTask(true), []);
+
+  const [status, setStatus] = useState<StatusFilter>("open");
+  const [typeFilter, setTypeFilter] = useState<"all" | TaskType>("all");
+
+  const emptyDraft = useCallback((prefill?: AddPrefill): Draft => {
+    const gardenId = prefill?.gardenId ?? gardens.find((g) => g.beds.some((b) => b.id === prefill?.bedId))?.id ?? gardens[0]?.id ?? "";
+    return {
+      title: "", type: "custom", dueDate: todayISO(), gardenId,
+      bedId: prefill?.bedId ?? "", plantId: prefill?.plantId ?? "", recurring: "none", description: "",
+    };
+  }, [gardens]);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft());
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
+
+  const openAdd = useCallback((prefill?: AddPrefill) => {
+    setEditingId(null);
+    setDraft(emptyDraft(prefill));
+    setDialogOpen(true);
+  }, [emptyDraft]);
   useOpenAddOnNavigate(openAdd);
-  const [newTitle, setNewTitle] = useState("");
-  const [newType, setNewType] = useState<TaskType>("custom");
-  const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [viewFilter, setViewFilter] = useState<ViewFilter>("active");
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
-  const [showFilters, setShowFilters] = useState(false);
 
-  const now = new Date();
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
-  const counts = useMemo(() => {
-    const overdue = tasks.filter((t) => !t.completedDate && isBefore(parseISO(t.dueDate), weekStart)).length;
-    const thisWeek = tasks.filter((t) => !t.completedDate && !isBefore(parseISO(t.dueDate), weekStart) && !isAfter(parseISO(t.dueDate), weekEnd)).length;
-    const upcoming = tasks.filter((t) => !t.completedDate && isAfter(parseISO(t.dueDate), weekEnd)).length;
-    const completed = tasks.filter((t) => t.completedDate).length;
-    const active = tasks.filter((t) => !t.completedDate).length;
-    return { overdue, thisWeek, upcoming, completed, active, all: tasks.length };
-  }, [tasks, weekStart, weekEnd]);
-
-  const filtered = useMemo(() => {
-    let list = [...tasks];
-
-    // View filter
-    if (viewFilter === "active") list = list.filter((t) => !t.completedDate);
-    else if (viewFilter === "overdue") list = list.filter((t) => !t.completedDate && isBefore(parseISO(t.dueDate), weekStart));
-    else if (viewFilter === "thisWeek") list = list.filter((t) => !t.completedDate && !isBefore(parseISO(t.dueDate), weekStart) && !isAfter(parseISO(t.dueDate), weekEnd));
-    else if (viewFilter === "upcoming") list = list.filter((t) => !t.completedDate && isAfter(parseISO(t.dueDate), weekEnd));
-    else if (viewFilter === "completed") list = list.filter((t) => t.completedDate);
-
-    // Type filter
-    if (typeFilter !== "all") list = list.filter((t) => t.type === typeFilter);
-
-    // Sort: overdue first, then by date
-    list.sort((a, b) => {
-      if (a.completedDate && !b.completedDate) return 1;
-      if (!a.completedDate && b.completedDate) return -1;
-      return a.dueDate.localeCompare(b.dueDate);
+  const openEdit = (task: Task) => {
+    setEditingId(task.id);
+    setDraft({
+      title: task.title, type: task.type, dueDate: task.dueDate.slice(0, 10), gardenId: task.gardenId,
+      bedId: task.bedId ?? "", plantId: task.plantId ?? "", recurring: task.recurring?.interval ?? "none",
+      description: task.description ?? "",
     });
+    setDialogOpen(true);
+  };
 
-    return list;
-  }, [tasks, viewFilter, typeFilter, weekStart, weekEnd]);
+  // Bed names (prefixed with the garden when there are several gardens).
+  const bedNames = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const g of gardens) for (const b of g.beds) map.set(b.id, gardens.length > 1 ? `${g.name} · ${b.name}` : b.name);
+    return map;
+  }, [gardens]);
+
+  const todayKey = todayISO();
+
+  const typed = useMemo(
+    () => (typeFilter === "all" ? tasks : tasks.filter((x) => x.type === typeFilter)),
+    [tasks, typeFilter],
+  );
+  const openCount = typed.filter((x) => !x.completedDate).length;
+  const doneCount = typed.length - openCount;
+  const overdueCount = tasks.filter((x) => !x.completedDate && x.dueDate.slice(0, 10) < todayKey).length;
+  const totalOpen = tasks.filter((x) => !x.completedDate).length;
+
+  const groups = useMemo(() => {
+    const today = startOfDay(parseISO(todayKey));
+    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
+    const visible = typed.filter((x) => status === "all" || (status === "open" ? !x.completedDate : !!x.completedDate));
+    const byGroup = new Map<Group, Task[]>();
+    for (const task of visible) {
+      const g = groupOf(task, today, weekEnd);
+      if (!byGroup.has(g)) byGroup.set(g, []);
+      byGroup.get(g)!.push(task);
+    }
+    for (const [g, list] of byGroup) {
+      list.sort((a, b) => g === "done"
+        ? (b.completedDate ?? "").localeCompare(a.completedDate ?? "")
+        : a.dueDate.localeCompare(b.dueDate) || a.title.localeCompare(b.title));
+    }
+    return GROUP_ORDER.filter((g) => byGroup.has(g)).map((g) => ({ group: g, tasks: byGroup.get(g)! }));
+  }, [typed, status, todayKey]);
+
+  const hasPlantedBeds = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
 
   const handleGenerateTasks = () => {
     let count = 0;
+    const frostDate = parseISO(lastFrostDate);
     for (const garden of gardens) {
       const plantings: Array<{ plantId: string; bedId: string; type: TaskType; title: string; dueDate: string }> = [];
-      const frostDate = parseISO(lastFrostDate);
-
       for (const bed of garden.beds) {
-        const protection = getFrostProtectionWeeks(bed);
-        const effectiveFrostDate = addWeeks(frostDate, -protection);
-        const envLabel = protection > 0 ? ` (${t(`planner.environmentTypes.${bed.environmentType ?? "outdoor_bed"}`)})` : "";
-        const uniquePlants = new Set(bed.cells.map((c) => c.plantId));
-        for (const plantId of uniquePlants) {
+        const effectiveFrostDate = addWeeks(frostDate, -getFrostProtectionWeeks(bed));
+        for (const plantId of new Set(bed.cells.map((c) => c.plantId))) {
           const plant = plantMap.get(plantId);
           if (!plant) continue;
-          const name = getPlantName(plantId) + envLabel;
-
-          if (plant.sowIndoorsWeeks !== null) {
-            plantings.push({ plantId, bedId: bed.id, type: "sow_indoors", title: `${t("calendar.taskTypes.sow_indoors")}: ${name}`, dueDate: format(addWeeks(effectiveFrostDate, plant.sowIndoorsWeeks), "yyyy-MM-dd") });
-          }
-          if (plant.sowOutdoorsWeeks !== null) {
-            plantings.push({ plantId, bedId: bed.id, type: "sow_outdoors", title: `${t("calendar.taskTypes.sow_outdoors")}: ${name}`, dueDate: format(addWeeks(effectiveFrostDate, plant.sowOutdoorsWeeks), "yyyy-MM-dd") });
-          }
-          if (plant.transplantWeeks !== null) {
-            plantings.push({ plantId, bedId: bed.id, type: "transplant", title: `${t("calendar.taskTypes.transplant")}: ${name}`, dueDate: format(addWeeks(effectiveFrostDate, plant.transplantWeeks), "yyyy-MM-dd") });
-          }
+          const name = getPlantName(plantId);
+          const add = (type: TaskType, weeks: number | null) => {
+            if (weeks === null) return;
+            plantings.push({ plantId, bedId: bed.id, type, title: t("calendar.generatedTitle", { action: t(`calendar.taskTypes.${type}`), plant: name }), dueDate: toISODate(addWeeks(effectiveFrostDate, weeks)) });
+          };
+          add("sow_indoors", plant.sowIndoorsWeeks);
+          add("sow_outdoors", plant.sowOutdoorsWeeks);
+          add("transplant", plant.transplantWeeks);
         }
       }
       if (plantings.length > 0) {
@@ -126,198 +197,303 @@ export function TaskCalendar() {
     toast(t("calendar.generated", { count }), "success");
   };
 
-  const handleAddTask = () => {
-    if (!newTitle.trim()) return;
-    addTask({ gardenId: gardens[0]?.id ?? "", type: newType, title: newTitle.trim(), dueDate: newDate });
-    setNewTitle("");
-    setShowAddTask(false);
+  const handleSave = () => {
+    if (!draft.title.trim() || !draft.dueDate) return;
+    const fields = {
+      title: draft.title.trim(),
+      type: draft.type,
+      dueDate: draft.dueDate,
+      gardenId: draft.gardenId || gardens[0]?.id || "",
+      bedId: draft.bedId || undefined,
+      plantId: draft.plantId || undefined,
+      description: draft.description.trim() || undefined,
+      recurring: draft.recurring === "none" ? undefined : { interval: draft.recurring },
+    };
+    if (editingId) {
+      updateTask(editingId, fields);
+      toast(t("calendar.taskUpdated"), "success");
+    } else {
+      addTask(fields);
+      toast(t("calendar.taskAdded"), "success");
+    }
+    setDialogOpen(false);
+  };
+
+  const handleComplete = (task: Task) => {
+    const next = nextDue(task);
+    if (next) {
+      // Recurring: roll forward to the next date instead of closing the task.
+      updateTask(task.id, { dueDate: next });
+      toast(t("calendar.nextOccurrence", { date: formatDate(next, "relative") }), "success", {
+        action: { label: t("common.undo"), onClick: () => updateTask(task.id, { dueDate: task.dueDate }) },
+      });
+      return;
+    }
+    updateTask(task.id, { completedDate: todayISO() });
+    toast(t("calendar.taskDone"), "success", {
+      action: { label: t("common.undo"), onClick: () => updateTask(task.id, { completedDate: undefined }) },
+    });
+  };
+
+  const restore = (task: Task) => {
+    const { id: _id, ...rest } = task;
+    addTask(rest);
+  };
+
+  const handleDelete = async (task: Task) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deleteTask(task.id);
+    setDialogOpen(false);
+    toast(t("calendar.taskDeleted"), "success", { action: { label: t("common.undo"), onClick: () => restore(task) } });
   };
 
   const handleDeleteCompleted = async () => {
-    const completedTasks = tasks.filter((t) => t.completedDate);
-    if (completedTasks.length === 0) return;
-    if (await confirm(t("calendar.deleteCompletedConfirm", { count: completedTasks.length }))) {
-      for (const task of completedTasks) deleteTask(task.id);
-      toast(t("calendar.deletedCompleted", { count: completedTasks.length }), "success");
-    }
+    const completed = tasks.filter((x) => x.completedDate);
+    if (completed.length === 0) return;
+    if (!(await confirm(t("calendar.deleteCompletedConfirm", { count: completed.length }), { confirmLabel: t("common.delete") }))) return;
+    for (const task of completed) deleteTask(task.id);
+    toast(t("calendar.deletedCompleted", { count: completed.length }), "success", {
+      action: { label: t("common.undo"), onClick: () => completed.forEach(restore) },
+    });
   };
 
-  const isOverdue = (task: Task) => !task.completedDate && isBefore(parseISO(task.dueDate), weekStart);
-  const isThisWeek = (task: Task) => !task.completedDate && !isBefore(parseISO(task.dueDate), weekStart) && !isAfter(parseISO(task.dueDate), weekEnd);
+  const editing = editingId ? tasks.find((x) => x.id === editingId) : undefined;
+
+  const groupLabel = (g: Group, n: number) => `${t(`calendar.groups.${g}`)} · ${n}`;
+
+  const bedOptions = useMemo(() => {
+    const garden = gardens.find((g) => g.id === draft.gardenId) ?? gardens[0];
+    return (garden?.beds ?? []).map((b) => ({ value: b.id, label: b.name }));
+  }, [gardens, draft.gardenId]);
+
+  const description = tasks.length === 0
+    ? t("calendar.subtitle")
+    : [t("calendar.openCount", { count: totalOpen }), overdueCount > 0 ? t("calendar.overdueCount", { count: overdueCount }) : null].filter(Boolean).join(" · ");
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("nav.tasks")}</h1>
-        <div className="flex gap-2">
-          {tasks.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => downloadIcal(tasks)} title="iCal">
-              <Download size={16} />
+      <PageHeader
+        title={t("nav.tasks")}
+        description={description}
+        actions={
+          <>
+            {hasPlantedBeds && (
+              <span className="hidden sm:contents">
+                <Button variant="secondary" onClick={handleGenerateTasks} title={t("calendar.generateHint")}>
+                <CalendarDays size={16} aria-hidden="true" />
+                {t("calendar.generate")}
+              </Button>
+              </span>
+            )}
+            <Button onClick={() => openAdd()}>
+              <Plus size={16} aria-hidden="true" />
+              {t("calendar.addTask")}
             </Button>
-          )}
-          {gardens.some((g) => g.beds.some((b) => b.cells.length > 0)) && (
-            <Button variant="secondary" size="sm" onClick={handleGenerateTasks}>
-              <Calendar size={16} />
-              {t("calendar.generate")}
-            </Button>
-          )}
-          <Button size="sm" onClick={() => setShowAddTask(true)}>
-            <Plus size={16} />
-            {t("calendar.addTask")}
-          </Button>
-        </div>
-      </div>
+            {(tasks.length > 0 || hasPlantedBeds) && (
+              <Menu
+                label={t("common.moreActions")}
+                items={[
+                  ...(hasPlantedBeds ? [{ label: t("calendar.generate"), icon: CalendarDays, onSelect: handleGenerateTasks }] : []),
+                  ...(tasks.length > 0 ? [{ label: t("calendar.exportIcal"), icon: Download, onSelect: () => downloadIcal(tasks) }] : []),
+                  ...(tasks.some((x) => x.completedDate)
+                    ? ["separator" as const, { label: t("calendar.deleteCompleted"), icon: Trash2, danger: true, onSelect: () => void handleDeleteCompleted() }]
+                    : []),
+                ]}
+              />
+            )}
+          </>
+        }
+      />
 
-      {/* Stats row */}
-      {tasks.length > 0 && (
-        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
-          {([
-            { key: "active" as ViewFilter, count: counts.active, color: "text-garden-600", label: t("calendar.active") },
-            { key: "overdue" as ViewFilter, count: counts.overdue, color: "text-red-600", label: t("calendar.overdue") },
-            { key: "thisWeek" as ViewFilter, count: counts.thisWeek, color: "text-blue-600", label: t("calendar.thisWeek") },
-            { key: "upcoming" as ViewFilter, count: counts.upcoming, color: "text-gray-600", label: t("calendar.upcoming") },
-            { key: "completed" as ViewFilter, count: counts.completed, color: "text-green-600", label: t("calendar.completed") },
-          ]).map((s) => (
-            <button
-              key={s.key}
-              onClick={() => setViewFilter(s.key)}
-              className={`rounded-lg border p-2 text-center transition-colors ${
-                viewFilter === s.key
-                  ? "border-garden-400 bg-garden-50 dark:border-garden-600 dark:bg-garden-900/20"
-                  : "border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-              }`}
-            >
-              <p className={`text-lg font-bold ${s.color}`}>{s.count}</p>
-              <p className="text-xs text-gray-500">{s.label}</p>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Type filter */}
-      {tasks.length > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-1">
-          <button aria-label={t("common.filter")} onClick={() => setShowFilters(!showFilters)} className="mr-1 text-gray-400 hover:text-gray-600">
-            <Filter size={14} />
-          </button>
-          {(showFilters || typeFilter !== "all") && (
-            <>
-              <button
-                onClick={() => setTypeFilter("all")}
-                className={`min-h-8 rounded-full px-2.5 py-1 text-xs font-medium ${typeFilter === "all" ? "bg-garden-100 text-garden-700 dark:bg-garden-900/40" : "bg-gray-100 text-gray-500 dark:bg-gray-800"}`}
-              >
-                {t("plants.allCategories")}
-              </button>
-              {taskTypes.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setTypeFilter(typeFilter === type ? "all" : type)}
-                  className={`min-h-8 rounded-full px-2.5 py-1 text-xs font-medium ${typeFilter === type ? taskTypeColors[type] : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}
-                >
-                  {t(`calendar.taskTypes.${type}`)}
-                </button>
-              ))}
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Task list */}
-      {filtered.length === 0 ? (
+      {tasks.length === 0 ? (
         <Card>
-          <p className="text-center text-gray-500">
-            {tasks.length === 0 ? t("calendar.noTasks") : t("common.noResults")}
-          </p>
+          <EmptyState
+            icon={ListChecks}
+            title={t("calendar.emptyTitle")}
+            description={t("calendar.emptyText")}
+            action={<Button onClick={() => openAdd()}><Plus size={16} aria-hidden="true" />{t("calendar.addTask")}</Button>}
+            secondaryAction={hasPlantedBeds ? (
+              <Button variant="secondary" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
+            ) : undefined}
+          />
         </Card>
       ) : (
-        <div className="space-y-1.5">
-          {filtered.map((task) => {
-            const plant = task.plantId ? plantMap.get(task.plantId) : undefined;
-            const overdue = isOverdue(task);
-            const thisWeek = isThisWeek(task);
-            return (
-              <div
-                key={task.id}
-                className={`flex items-center gap-3 rounded-lg border bg-white p-3 transition-colors dark:bg-gray-900 ${
-                  task.completedDate
-                    ? "border-gray-100 opacity-50 dark:border-gray-800"
-                    : overdue
-                      ? "border-red-200 dark:border-red-900"
-                      : thisWeek
-                        ? "border-blue-200 dark:border-blue-900"
-                        : "border-gray-200 dark:border-gray-700"
-                }`}
-              >
-                <button
-                  onClick={() => !task.completedDate && completeTask(task.id)}
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                    task.completedDate
-                      ? "border-green-500 bg-green-500 text-white"
-                      : "border-gray-300 hover:border-garden-500"
-                  }`}
-                >
-                  {task.completedDate && <Check size={12} />}
-                </button>
+        <>
+          <div className="mb-4 flex flex-wrap items-end gap-3">
+            <SegmentedControl
+              label={t("calendar.statusFilter")}
+              value={status}
+              onChange={setStatus}
+              options={[
+                { value: "open", label: t("calendar.open"), count: openCount },
+                { value: "done", label: t("calendar.completed"), count: doneCount },
+                { value: "all", label: t("common.all"), count: typed.length },
+              ]}
+            />
+            <Select
+              aria-label={t("calendar.typeFilter")}
+              wrapperClassName="w-full sm:w-52"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value as "all" | TaskType)}
+              options={[{ value: "all", label: t("calendar.allTypes") }, ...TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))]}
+            />
+          </div>
 
-                {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={16} />}
-
-                <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-medium ${task.completedDate ? "line-through text-gray-400" : ""}`}>{task.title}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span className={overdue ? "font-medium text-red-500" : ""}>{task.dueDate}</span>
-                    {overdue && <span className="text-red-500">{t("calendar.overdue")}</span>}
-                  </div>
-                </div>
-
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${taskTypeColors[task.type]}`}>
-                  {t(`calendar.taskTypes.${task.type}`)}
-                </span>
-
-                <button aria-label={t("common.delete")}
-                  onClick={async () => { if (await confirm(t("common.confirmDelete"))) deleteTask(task.id); }}
-                  className="shrink-0 rounded p-1 text-gray-300 hover:text-red-500"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Clear completed */}
-      {counts.completed > 0 && viewFilter !== "completed" && (
-        <div className="mt-3 text-right">
-          <button onClick={handleDeleteCompleted} className="text-xs text-gray-400 hover:text-red-500">
-            {t("calendar.deleteCompleted")} ({counts.completed})
-          </button>
-        </div>
-      )}
-
-      <Modal open={showAddTask} onClose={() => setShowAddTask(false)} title={t("calendar.addTask")}>
-        <div className="space-y-4">
-          <Input label={t("calendar.taskTitle")} value={newTitle} onChange={(e) => setNewTitle(e.target.value)} autoFocus />
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.taskType")}</label>
-            <div className="flex flex-wrap gap-2">
-              {taskTypes.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setNewType(type)}
-                  className={`min-h-10 rounded-full px-3 py-1.5 text-xs font-medium transition-colors touch-manipulation ${
-                    newType === type ? taskTypeColors[type] + " ring-2 ring-offset-1 ring-garden-500" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                  }`}
-                >
-                  {t(`calendar.taskTypes.${type}`)}
-                </button>
+          {groups.length === 0 ? (
+            <Card>
+              <EmptyState
+                compact
+                icon={CircleCheck}
+                title={status === "open" ? t("calendar.allDoneTitle") : t("calendar.emptyFilter")}
+                description={status === "open" ? t("calendar.allDoneText") : t("calendar.emptyFilterText")}
+                action={<Button variant="secondary" onClick={() => openAdd()}><Plus size={16} aria-hidden="true" />{t("calendar.addTask")}</Button>}
+              />
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {groups.map(({ group, tasks: list }) => (
+                <List key={group} header={<span className={group === "overdue" ? "text-danger" : undefined}>{groupLabel(group, list.length)}</span>}>
+                  {list.map((task) => {
+                    const plant = task.plantId ? plantMap.get(task.plantId) : undefined;
+                    const TypeIcon = TASK_TYPE_ICONS[task.type] ?? ClipboardList;
+                    const done = !!task.completedDate;
+                    const due = task.dueDate.slice(0, 10);
+                    const meta = [
+                      task.type === "custom" ? null : t(`calendar.taskTypes.${task.type}`),
+                      task.bedId ? bedNames.get(task.bedId) : null,
+                      plant && !task.title.includes(getPlantName(plant.id)) ? getPlantName(plant.id) : null,
+                      done
+                        ? t("calendar.doneOn", { date: formatDate(task.completedDate!, "relative") })
+                        : group === "overdue" ? null : formatDate(due, group === "later" ? "short" : "relative"),
+                    ].filter(Boolean).join(" · ");
+                    return (
+                      <ListRow
+                        key={task.id}
+                        muted={done}
+                        onClick={() => openEdit(task)}
+                        leading={
+                          plant ? (
+                            <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
+                          ) : (
+                            <span className="inline-flex size-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
+                              <TypeIcon size={16} />
+                            </span>
+                          )
+                        }
+                        title={<span className={done ? "line-through" : undefined}>{task.title}</span>}
+                        clickLabel={task.title}
+                        badges={
+                          <>
+                            {group === "overdue" && (
+                              <Badge tone="danger" dot>{t("calendar.overdueSince", { date: formatDate(due, "relative") })}</Badge>
+                            )}
+                            {task.recurring && (
+                              <Badge icon={Repeat} title={t("calendar.recurrence")}>{t(`calendar.recurring.${task.recurring.interval}`)}</Badge>
+                            )}
+                          </>
+                        }
+                        meta={meta}
+                        description={task.description}
+                        actions={
+                          <>
+                            {done ? (
+                              <IconButton icon={RotateCcw} label={t("calendar.reopen")} onClick={() => updateTask(task.id, { completedDate: undefined })} />
+                            ) : (
+                              <IconButton icon={CircleCheck} tone="brand" label={t("calendar.markDone")} onClick={() => handleComplete(task)} />
+                            )}
+                            <Menu
+                              label={t("common.moreActions")}
+                              items={[
+                                { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(task) },
+                                "separator",
+                                { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(task) },
+                              ]}
+                            />
+                          </>
+                        }
+                      />
+                    );
+                  })}
+                </List>
               ))}
             </div>
+          )}
+        </>
+      )}
+
+      {/* Add and edit share one dialog */}
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("calendar.editTask") : t("calendar.addTask")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />
+                {t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave} disabled={!draft.title.trim() || !draft.dueDate}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <Input
+            label={t("calendar.taskTitle")}
+            value={draft.title}
+            onChange={(e) => patch({ title: e.target.value })}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
+            placeholder={t("calendar.titlePlaceholder")}
+            autoFocus
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              label={t("calendar.taskType")}
+              value={draft.type}
+              onChange={(e) => patch({ type: e.target.value as TaskType })}
+              options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
+            />
+            <Input label={t("calendar.taskDate")} type="date" value={draft.dueDate} onChange={(e) => patch({ dueDate: e.target.value })} />
           </div>
-          <Input label={t("calendar.taskDate")} type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAddTask(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAddTask}>{t("common.add")}</Button>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {gardens.length > 1 && (
+              <Select
+                label={t("calendar.garden")}
+                value={draft.gardenId}
+                onChange={(e) => patch({ gardenId: e.target.value, bedId: "" })}
+                options={gardens.map((g) => ({ value: g.id, label: g.name }))}
+              />
+            )}
+            {bedOptions.length > 0 && (
+              <Select
+                label={t("harvest.bed")}
+                value={draft.bedId}
+                onChange={(e) => patch({ bedId: e.target.value })}
+                placeholder="–"
+                options={bedOptions}
+              />
+            )}
+            <Select
+              label={t("harvest.plant")}
+              value={draft.plantId}
+              onChange={(e) => patch({ plantId: e.target.value })}
+              placeholder="–"
+              options={plants.map((p) => ({ value: p.id, label: getPlantName(p.id) }))}
+            />
           </div>
+          <div>
+            <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.recurrence")}</p>
+            <SegmentedControl
+              fullWidth
+              label={t("calendar.recurrence")}
+              value={draft.recurring}
+              onChange={(recurring) => patch({ recurring })}
+              options={(["none", "daily", "weekly", "biweekly"] as const).map((r) => ({ value: r, label: t(`calendar.recurring.${r}`) }))}
+            />
+          </div>
+          <Textarea label={t("calendar.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>

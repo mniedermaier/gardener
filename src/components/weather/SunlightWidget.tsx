@@ -1,97 +1,73 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Sunrise, Sunset, Clock } from "lucide-react";
-import { useStore } from "@/store";
+import { Clock, Sun, Sunrise, Sunset, type LucideIcon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
-import { Card } from "@/components/ui/Card";
+import { useStore } from "@/store";
+import { useFormat } from "@/hooks/useFormat";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { BarChart } from "@/components/ui/charts";
 import { getDaylightInfo, getMonthlyDaylight } from "@/lib/sunlight";
 
-const MONTH_LABELS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const MONTH_LABELS_DE = ["Jan", "Feb", "M\u00e4r", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+function Fact({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+  return (
+    <div>
+      <dt className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+        <Icon size={12} aria-hidden="true" />
+        {label}
+      </dt>
+      <dd className="text-lg font-semibold tabular-nums text-gray-900 dark:text-gray-100">{value}</dd>
+    </div>
+  );
+}
 
+/** Today's sun times and daylight hours per month (with a today marker). */
 export function SunlightWidget() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const f = useFormat();
   const { locationLat, locationLon } = useStore(useShallow((s) => ({ locationLat: s.locationLat, locationLon: s.locationLon })));
-  const months = i18n.language === "de" ? MONTH_LABELS_DE : MONTH_LABELS_EN;
-  const [selectedDate] = useState(new Date());
+  const now = useMemo(() => new Date(), []);
 
-  const today = useMemo(() => {
-    if (locationLat === null || locationLon === null) return null;
-    return getDaylightInfo(selectedDate, locationLat, locationLon);
-  }, [locationLat, locationLon, selectedDate]);
+  const today = useMemo(() => (locationLat === null || locationLon === null ? null : getDaylightInfo(now, locationLat, locationLon)), [locationLat, locationLon, now]);
+  const yearly = useMemo(() => (locationLat === null || locationLon === null ? null : getMonthlyDaylight(locationLat, locationLon, now.getFullYear())), [locationLat, locationLon, now]);
 
-  const yearlyData = useMemo(() => {
-    if (locationLat === null || locationLon === null) return null;
-    return getMonthlyDaylight(locationLat, locationLon, selectedDate.getFullYear());
-  }, [locationLat, locationLon, selectedDate]);
+  if (!today || !yearly) return null;
 
-  if (!today || !yearlyData) return null;
-
-  const maxDaylight = Math.max(...yearlyData.map((d) => d.daylightHours));
-  const currentMonth = selectedDate.getMonth();
+  const hours = (h: number) => t("sunlight.hoursValue", { hours: f.formatNumber(h, { maximumFractionDigits: 1 }) });
+  const longest = yearly.reduce((a, b) => (b.daylightHours > a.daylightHours ? b : a));
+  const shortest = yearly.reduce((a, b) => (b.daylightHours < a.daylightHours ? b : a));
+  /** getMonthlyDaylight numbers months 1–12. */
+  const monthDate = (m: number) => new Date(now.getFullYear(), m - 1, 1);
 
   return (
     <Card className="mt-6">
-      <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-        <Sun size={18} className="text-amber-500" />
-        {t("sunlight.title")}
-      </h2>
-
-      <div className="mb-6 grid gap-4 sm:grid-cols-4">
-        <div className="flex items-center gap-2">
-          <Sunrise size={18} className="text-orange-400" />
-          <div>
-            <p className="text-lg font-bold">{today.sunrise}</p>
-            <p className="text-xs text-gray-500">{t("sunlight.sunrise")}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Sunset size={18} className="text-orange-500" />
-          <div>
-            <p className="text-lg font-bold">{today.sunset}</p>
-            <p className="text-xs text-gray-500">{t("sunlight.sunset")}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Clock size={18} className="text-amber-500" />
-          <div>
-            <p className="text-lg font-bold">{today.daylightHours}h</p>
-            <p className="text-xs text-gray-500">{t("sunlight.daylight")}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Sun size={18} className="text-amber-400" />
-          <div>
-            <p className="text-lg font-bold">{today.maxAltitudeDeg}°</p>
-            <p className="text-xs text-gray-500">{t("sunlight.maxAltitude")}</p>
-          </div>
-        </div>
-      </div>
-
-      <h3 className="mb-2 text-sm font-semibold text-gray-600 dark:text-gray-400">
-        {t("sunlight.yearlyDaylight")}
-      </h3>
-      <div className="flex items-end gap-1" style={{ height: "120px" }}>
-        {yearlyData.map((d, i) => {
-          const heightPercent = (d.daylightHours / maxDaylight) * 100;
-          const isCurrent = i === currentMonth;
-          return (
-            <div key={i} className="flex flex-1 flex-col items-center gap-1">
-              <span className="text-[9px] font-medium text-gray-500">{d.daylightHours.toFixed(0)}h</span>
-              <div
-                className={`w-full rounded-t transition-all ${
-                  isCurrent ? "bg-amber-400" : "bg-amber-200 dark:bg-amber-700"
-                }`}
-                style={{ height: `${heightPercent}%` }}
-                title={`${months[i]}: ${d.daylightHours}h, max ${d.maxAltitude}°`}
-              />
-              <span className={`text-[10px] ${isCurrent ? "font-bold text-amber-600" : "text-gray-400"}`}>
-                {months[i]}
-              </span>
-            </div>
-          );
+      <CardHeader title={t("sunlight.title")} description={t("sunlight.desc")} />
+      <dl className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <Fact icon={Sunrise} label={t("sunlight.sunrise")} value={today.sunrise} />
+        <Fact icon={Sunset} label={t("sunlight.sunset")} value={today.sunset} />
+        <Fact icon={Clock} label={t("sunlight.daylight")} value={hours(today.daylightHours)} />
+        <Fact icon={Sun} label={t("sunlight.maxAltitude")} value={`${f.formatNumber(today.maxAltitudeDeg, { maximumFractionDigits: 0 })}°`} />
+      </dl>
+      <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sunlight.yearlyDaylight")}</h3>
+      <BarChart
+        data={yearly.map((d) => ({
+          key: String(d.month),
+          label: f.formatDate(monthDate(d.month), "month"),
+          fullLabel: f.formatDate(monthDate(d.month), "monthYear"),
+          values: [d.daylightHours],
+        }))}
+        series={[{ label: t("sunlight.daylight"), color: "earth" }]}
+        formatValue={hours}
+        formatTick={(v) => t("sunlight.hoursShort", { hours: f.formatNumber(v, { maximumFractionDigits: 0 }) })}
+        marker={{ index: now.getMonth(), label: t("charts.today") }}
+        caption={t("sunlight.caption", {
+          longest: f.formatDate(monthDate(longest.month), "monthYear"),
+          longestHours: hours(longest.daylightHours),
+          shortest: f.formatDate(monthDate(shortest.month), "monthYear"),
+          shortestHours: hours(shortest.daylightHours),
         })}
-      </div>
+        categoryLabel={t("charts.month")}
+        height={170}
+      />
     </Card>
   );
 }

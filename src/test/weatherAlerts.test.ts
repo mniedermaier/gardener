@@ -127,3 +127,24 @@ describe("getAllAlerts", () => {
     expect(alerts.length).toBeGreaterThanOrEqual(2);
   });
 });
+
+describe("groupAlerts", () => {
+  it("merges frost nights into one group, drops the weekly digest and sorts by severity", async () => {
+    const { groupAlerts, detectFrostAlerts } = await import("@/lib/weatherAlerts");
+    const days = [
+      { date: "2026-10-06", tempMin: 2, tempMax: 10, description: "", icon: "01d", precipitation: 0 },
+      { date: "2026-10-05", tempMin: -1, tempMax: 9, description: "", icon: "01d", precipitation: 0 },
+      { date: "2026-10-07", tempMin: -6, tempMax: 8, description: "", icon: "01d", precipitation: 0 },
+    ];
+    const frost = detectFrostAlerts(days, 2);
+    const groups = groupAlerts([
+      { id: "weekly-summary", type: "weekly", severity: "warning", titleKey: "", descriptionKey: "" },
+      { id: "watering-rain", type: "watering", severity: "info", titleKey: "", descriptionKey: "" },
+      ...frost,
+    ]);
+    expect(groups.map((g) => g.type)).toEqual(["frost", "watering"]);
+    expect(groups[0].alerts).toHaveLength(3);
+    expect(groups[0].severity).toBe("danger");
+    expect(groups[0].alerts.map((a) => a.date)).toEqual(["2026-10-05", "2026-10-06", "2026-10-07"]);
+  });
+});

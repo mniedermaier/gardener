@@ -1,28 +1,29 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface UndoAction {
   label: string;
   undo: () => void;
 }
 
+/**
+ * Small per-component undo stack (max 20). The stack lives in a ref so the
+ * undo side effect runs exactly once — calling it inside a state updater ran
+ * it twice under StrictMode.
+ */
 export function useUndo() {
-  const [stack, setStack] = useState<UndoAction[]>([]);
+  const stack = useRef<UndoAction[]>([]);
+  const [size, setSize] = useState(0);
 
   const pushUndo = useCallback((action: UndoAction) => {
-    setStack((prev) => [...prev.slice(-19), action]); // keep max 20
+    stack.current = [...stack.current.slice(-19), action];
+    setSize(stack.current.length);
   }, []);
 
   const undo = useCallback(() => {
-    setStack((prev) => {
-      if (prev.length === 0) return prev;
-      const last = prev[prev.length - 1];
-      last.undo();
-      return prev.slice(0, -1);
-    });
+    const last = stack.current.pop();
+    setSize(stack.current.length);
+    last?.undo();
   }, []);
 
-  const canUndo = stack.length > 0;
-  const lastLabel = stack.length > 0 ? stack[stack.length - 1].label : "";
-
-  return { pushUndo, undo, canUndo, lastLabel };
+  return { pushUndo, undo, canUndo: size > 0 };
 }

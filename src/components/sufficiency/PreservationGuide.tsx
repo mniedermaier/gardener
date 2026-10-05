@@ -1,102 +1,111 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useStore } from "@/store";
+import { useNavigate } from "react-router-dom";
+import { CookingPot, FlaskConical, Snowflake, Sun, Warehouse, Archive, type LucideIcon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
+import { useStore } from "@/store";
 import { usePlantMap } from "@/hooks/usePlants";
+import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { Card } from "@/components/ui/Card";
-import type { PreservationMethod } from "@/types/plant";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import type { Plant, PreservationMethod, SeedSavingInfo } from "@/types/plant";
+import type { Tone } from "@/components/ui/tone";
+import { propagation } from "@/lib/seedViability";
 
-const METHOD_ICONS: Record<PreservationMethod, string> = {
-  canning: "\ud83c\udf6f",
-  freezing: "\u2744\ufe0f",
-  fermenting: "\ud83e\uddc5",
-  drying: "\u2600\ufe0f",
-  root_cellar: "\ud83c\udfe0",
+const METHOD_ICON: Record<PreservationMethod, LucideIcon> = {
+  canning: CookingPot,
+  freezing: Snowflake,
+  fermenting: FlaskConical,
+  drying: Sun,
+  root_cellar: Warehouse,
 };
+
+const DIFFICULTY_TONE: Record<SeedSavingInfo["difficulty"], Tone> = { easy: "brand", moderate: "neutral", advanced: "warning" };
+
+/** Wording for vegetatively propagated crops (see lib/seedViability). */
+const VEGETATIVE_KIND: Record<string, "tubers" | "cloves"> = { potato: "tubers", garlic: "cloves" };
+const vegetativeKind = (p: Plant) => (propagation(p) === "vegetative" ? VEGETATIVE_KIND[p.id] ?? "other" : null);
 
 export function PreservationGuide() {
   const { t } = useTranslation();
+  const f = useFormat();
+  const navigate = useNavigate();
   const { gardens } = useStore(useShallow((s) => ({ gardens: s.gardens })));
   const plantMap = usePlantMap();
+  const plantName = usePlantName();
 
-  const plantedPlants = useMemo(() => {
+  const planted = useMemo(() => {
     const ids = new Set<string>();
     for (const g of gardens) for (const b of g.beds) for (const c of b.cells) ids.add(c.plantId);
-    return Array.from(ids).map((id) => plantMap.get(id)).filter(Boolean).filter((p) => p!.preservationMethods && p!.preservationMethods.length > 0);
+    return [...ids].map((id) => plantMap.get(id)).filter((p): p is Plant => !!p);
   }, [gardens, plantMap]);
 
-  const seedSavingPlants = useMemo(() => {
-    const ids = new Set<string>();
-    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) ids.add(c.plantId);
-    return Array.from(ids).map((id) => plantMap.get(id)).filter(Boolean).filter((p) => p!.seedSaving);
-  }, [gardens, plantMap]);
+  const preservable = planted.filter((p) => (p.preservationMethods ?? []).length > 0);
+  const seedPlants = planted.filter((p) => p.seedSaving || propagation(p) === "vegetative");
 
-  if (plantedPlants.length === 0 && seedSavingPlants.length === 0) {
+  if (preservable.length === 0 && seedPlants.length === 0) {
     return (
       <Card>
-        <p className="text-center text-gray-500">{t("sufficiency.noPlantings")}</p>
+        <EmptyState compact icon={Archive} title={t("preservation.emptyTitle")} description={t("preservation.emptyText")} action={<Button onClick={() => navigate("/planner")}>{t("sufficiency.toPlanner")}</Button>} />
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {plantedPlants.length > 0 && (
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("preservation.title")}</h2>
-          <p className="mb-4 text-xs text-gray-500">{t("preservation.desc")}</p>
-          <div className="space-y-2">
-            {plantedPlants.map((plant) => (
-              <div key={plant!.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                <div className="flex items-center gap-2">
-                  <PlantIconDisplay plantId={plant!.id} emoji={plant!.icon} size={20} />
-                  <span className="text-sm font-medium">{t(`plants.catalog.${plant!.id}.name`)}</span>
-                </div>
-                <div className="flex gap-2">
-                  {plant!.preservationMethods!.map((method) => (
-                    <span
-                      key={method}
-                      className="rounded-full bg-gray-200 px-2 py-0.5 text-xs dark:bg-gray-700"
-                      title={t(`preservation.methods.${method}`)}
-                    >
-                      {METHOD_ICONS[method]} {t(`preservation.methods.${method}`)}
-                    </span>
+    <div className="grid gap-6 lg:grid-cols-2">
+      {preservable.length > 0 && (
+        <Card padding="none">
+          <div className="px-4 pt-4 sm:px-6 sm:pt-5"><CardHeader title={t("preservation.title")} description={t("preservation.desc")} /></div>
+          <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
+            {preservable.map((p) => (
+              <li key={p.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:px-6">
+                <PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />
+                <span className="min-w-24 flex-1 text-sm font-medium text-gray-900 dark:text-gray-100">{plantName(p.id)}</span>
+                <span className="flex flex-wrap gap-1.5">
+                  {p.preservationMethods!.map((m) => (
+                    <Badge key={m} variant="outline" icon={METHOD_ICON[m]}>{t(`preservation.methods.${m}`)}</Badge>
                   ))}
-                </div>
-              </div>
+                </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </Card>
       )}
 
-      {seedSavingPlants.length > 0 && (
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">{t("preservation.seedSaving")}</h2>
-          <div className="space-y-2">
-            {seedSavingPlants.map((plant) => {
-              const ss = plant!.seedSaving!;
+      {seedPlants.length > 0 && (
+        <Card padding="none">
+          <div className="px-4 pt-4 sm:px-6 sm:pt-5"><CardHeader title={t("preservation.seedSaving")} description={t("preservation.seedSavingDesc")} /></div>
+          <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
+            {seedPlants.map((p) => {
+              const veg = vegetativeKind(p);
+              const ss = p.seedSaving;
               return (
-                <div key={plant!.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800">
-                  <div className="flex items-center gap-2">
-                    <PlantIconDisplay plantId={plant!.id} emoji={plant!.icon} size={20} />
-                    <span className="text-sm font-medium">{t(`plants.catalog.${plant!.id}.name`)}</span>
+                <li key={p.id} className="flex items-center gap-3 px-4 py-3 sm:px-6">
+                  <PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{plantName(p.id)}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {veg
+                        ? t(`preservation.vegetative.${veg}`)
+                        : [
+                            t("preservation.viability", { count: ss!.seedViabilityYears }),
+                            ss!.isolationDistanceM ? t("preservation.isolation", { distance: `${f.formatNumber(ss!.isolationDistanceM, { maximumFractionDigits: 0 })} m` }) : null,
+                          ].filter(Boolean).join(" · ")}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span className={`rounded-full px-2 py-0.5 ${
-                      ss.difficulty === "easy" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
-                      ss.difficulty === "moderate" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
-                      "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                    }`}>
-                      {t(`preservation.difficulty.${ss.difficulty}`)}
-                    </span>
-                    {ss.isolationDistanceM && <span>{ss.isolationDistanceM}m</span>}
-                    <span>{ss.seedViabilityYears} {t("preservation.years")}</span>
-                  </div>
-                </div>
+                  {veg ? (
+                    <Badge variant="outline">{t("preservation.vegetativeBadge")}</Badge>
+                  ) : (
+                    <Badge tone={DIFFICULTY_TONE[ss!.difficulty]}>{t(`preservation.difficulty.${ss!.difficulty}`)}</Badge>
+                  )}
+                </li>
               );
             })}
-          </div>
+          </ul>
         </Card>
       )}
     </div>
