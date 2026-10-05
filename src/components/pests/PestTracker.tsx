@@ -1,23 +1,57 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Bug, Check } from "lucide-react";
+import { Plus, Bug, Check, Leaf, Pencil, RotateCcw, Trash2, Microscope } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useFormat } from "@/hooks/useFormat";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { todayISO } from "@/lib/format";
+import type { PestEntry } from "@/types/pest";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { Badge } from "@/components/ui/Badge";
+import { IconButton } from "@/components/ui/IconButton";
+import { Menu } from "@/components/ui/Menu";
+import { List, ListRow } from "@/components/ui/List";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
-import { format } from "date-fns";
+import type { Tone } from "@/components/ui/tone";
 
-const SEVERITY_COLORS = ["", "bg-green-100 text-green-700", "bg-lime-100 text-lime-700", "bg-amber-100 text-amber-700", "bg-orange-100 text-orange-700", "bg-red-100 text-red-700"];
+type Severity = PestEntry["severity"];
+type Filter = "active" | "resolved" | "all";
+
+const SEVERITY_TONE: Record<Severity, Tone> = { 1: "neutral", 2: "neutral", 3: "warning", 4: "danger", 5: "danger" };
+const SEVERITIES: Severity[] = [1, 2, 3, 4, 5];
+
+interface Draft {
+  type: PestEntry["type"];
+  name: string;
+  plantId: string;
+  bedId: string;
+  severity: Severity;
+  description: string;
+  treatment: string;
+  organic: boolean;
+}
+
+const emptyDraft = (plantId: string): Draft => ({
+  type: "pest", name: "", plantId, bedId: "", severity: 3, description: "", treatment: "", organic: true,
+});
 
 export function PestTracker() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
+  const { formatDate } = useFormat();
   const { pests, gardens, addPest, updatePest, deletePest } = useStore(
     useShallow((s) => ({ pests: s.pests, gardens: s.gardens, addPest: s.addPest, updatePest: s.updatePest, deletePest: s.deletePest }))
   );
@@ -25,177 +59,239 @@ export function PestTracker() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
-  const [showAdd, setShowAdd] = useState(false);
-  const [filter, setFilter] = useState<"active" | "resolved" | "all">("active");
-  const [plantId, setPlantId] = useState(plants[0]?.id ?? "");
-  const [bedId, setBedId] = useState("");
-  const [type, setType] = useState<"pest" | "disease">("pest");
-  const [name, setName] = useState("");
-  const [severity, setSeverity] = useState(3);
-  const [description, setDescription] = useState("");
-  const [organic, setOrganic] = useState(true);
+  const [filter, setFilter] = useState<Filter>("active");
+  // One dialog for create and edit: editingId === null means "new".
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft(plants[0]?.id ?? ""));
+  const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
-  const allBeds = gardens.flatMap((g) => g.beds.map((b) => ({ id: b.id, name: b.name, gardenName: g.name })));
+  const bedNames = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const g of gardens) for (const b of g.beds) map.set(b.id, gardens.length > 1 ? `${g.name} · ${b.name}` : b.name);
+    return map;
+  }, [gardens]);
 
-  const filtered = pests
-    .filter((p) => filter === "all" || (filter === "active" ? !p.resolved : p.resolved))
-    .sort((a, b) => b.date.localeCompare(a.date));
-
+  const filtered = useMemo(
+    () => pests
+      .filter((p) => filter === "all" || (filter === "active" ? !p.resolved : p.resolved))
+      .sort((a, b) => b.date.localeCompare(a.date)),
+    [pests, filter],
+  );
   const activeCount = pests.filter((p) => !p.resolved).length;
-  const resolvedCount = pests.filter((p) => p.resolved).length;
 
-  const handleAdd = () => {
-    if (!name.trim()) return;
-    addPest({
-      plantId, bedId, type, name: name.trim(), severity: severity as 1|2|3|4|5,
-      description: description || undefined, organic, resolved: false, date: format(new Date(), "yyyy-MM-dd"),
+  const openAdd = useCallback(() => {
+    setEditingId(null);
+    setDraft(emptyDraft(plants[0]?.id ?? ""));
+    setDialogOpen(true);
+  }, [plants]);
+  useOpenAddOnNavigate(openAdd);
+
+  const openEdit = (pest: PestEntry) => {
+    setEditingId(pest.id);
+    setDraft({
+      type: pest.type, name: pest.name, plantId: pest.plantId, bedId: pest.bedId, severity: pest.severity,
+      description: pest.description ?? "", treatment: pest.treatment ?? "", organic: pest.organic,
     });
-    setName("");
-    setDescription("");
-    setShowAdd(false);
-    toast(t("pests.added"), "success");
+    setDialogOpen(true);
   };
 
-  const handleResolve = (id: string) => {
-    updatePest(id, { resolved: true, resolvedDate: format(new Date(), "yyyy-MM-dd") });
-    toast(t("pests.resolved"), "success");
-  };
-
-  const handleAddTreatment = (id: string) => {
-    const treatment = prompt(t("pests.treatmentPrompt"));
-    if (treatment) {
-      updatePest(id, { treatment, treatmentDate: format(new Date(), "yyyy-MM-dd") });
+  const handleSave = () => {
+    if (!draft.name.trim()) return;
+    const fields = {
+      type: draft.type, name: draft.name.trim(), plantId: draft.plantId, bedId: draft.bedId, severity: draft.severity,
+      description: draft.description.trim() || undefined, organic: draft.organic,
+      treatment: draft.treatment.trim() || undefined,
+    };
+    if (editingId) {
+      const before = pests.find((p) => p.id === editingId);
+      const treatmentChanged = (before?.treatment ?? "") !== (fields.treatment ?? "");
+      updatePest(editingId, { ...fields, ...(treatmentChanged && fields.treatment ? { treatmentDate: todayISO() } : {}) });
+      toast(t("pests.updated"), "success");
+    } else {
+      addPest({ ...fields, resolved: false, date: todayISO(), ...(fields.treatment ? { treatmentDate: todayISO() } : {}) });
+      toast(t("pests.added"), "success");
     }
+    setDialogOpen(false);
   };
+
+  const handleResolve = (pest: PestEntry) => {
+    updatePest(pest.id, { resolved: true, resolvedDate: todayISO() });
+    toast(t("pests.resolved"), "success", {
+      action: { label: t("common.undo"), onClick: () => updatePest(pest.id, { resolved: false, resolvedDate: undefined }) },
+    });
+  };
+
+  const handleDelete = async (pest: PestEntry) => {
+    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    deletePest(pest.id);
+    setDialogOpen(false);
+    const { id: _id, ...rest } = pest;
+    toast(t("pests.deleted"), "success", { action: { label: t("common.undo"), onClick: () => addPest(rest) } });
+  };
+
+  const editing = editingId ? pests.find((p) => p.id === editingId) : undefined;
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("pests.title")}</h1>
-        <Button size="sm" onClick={() => setShowAdd(true)}>
-          <Plus size={16} />
-          {t("pests.add")}
-        </Button>
-      </div>
+      <PageHeader
+        title={t("pests.title")}
+        description={t("pests.subtitle")}
+        actions={
+          <Button onClick={openAdd}>
+            <Plus size={16} aria-hidden="true" />
+            {t("pests.add")}
+          </Button>
+        }
+      />
 
-      {/* Stats */}
-      <div className="mb-4 flex gap-2">
-        {([
-          { key: "active" as const, count: activeCount, label: t("pests.active"), color: "text-red-600" },
-          { key: "resolved" as const, count: resolvedCount, label: t("pests.resolvedLabel"), color: "text-green-600" },
-          { key: "all" as const, count: pests.length, label: t("plants.allCategories"), color: "text-gray-600" },
-        ]).map((s) => (
-          <button
-            key={s.key}
-            onClick={() => setFilter(s.key)}
-            className={`rounded-lg border px-3 py-2 text-center ${filter === s.key ? "border-garden-400 bg-garden-50 dark:border-garden-600 dark:bg-garden-900/20" : "border-gray-200 dark:border-gray-700"}`}
-          >
-            <p className={`text-lg font-bold ${s.color}`}>{s.count}</p>
-            <p className="text-[10px] text-gray-500">{s.label}</p>
-          </button>
-        ))}
-      </div>
-
-      {/* Pest list */}
-      {filtered.length === 0 ? (
-        <Card><p className="text-center text-gray-500">{t("pests.empty")}</p></Card>
+      {pests.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={Bug}
+            title={t("pests.emptyTitle")}
+            description={t("pests.emptyText")}
+            action={<Button onClick={openAdd}><Plus size={16} aria-hidden="true" />{t("pests.add")}</Button>}
+          />
+        </Card>
       ) : (
-        <div className="space-y-2">
-          {filtered.map((pest) => {
-            const plant = plantMap.get(pest.plantId);
-            return (
-              <Card key={pest.id} className={pest.resolved ? "opacity-60" : ""}>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="mb-1 flex items-center gap-2">
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${pest.type === "pest" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"}`}>
-                        {t(`pests.types.${pest.type}`)}
-                      </span>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${SEVERITY_COLORS[pest.severity]} dark:opacity-80`}>
-                        {pest.severity}/5
-                      </span>
-                      {pest.organic && <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] text-green-600 dark:bg-green-900/20">{t("pests.organic")}</span>}
-                      {pest.resolved && <Check size={14} className="text-green-500" />}
-                    </div>
-                    <p className="text-sm font-semibold">{pest.name}</p>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
-                      {plant && (
-                        <span className="flex items-center gap-1">
-                          <PlantIconDisplay plantId={pest.plantId} emoji={plant.icon} size={12} />
-                          {getPlantName(pest.plantId)}
-                        </span>
-                      )}
-                      <span>{pest.date}</span>
-                    </div>
-                    {pest.description && <p className="mt-1 text-xs text-gray-500">{pest.description}</p>}
-                    {pest.treatment && (
-                      <p className="mt-1 rounded bg-blue-50 px-2 py-1 text-xs text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                        {t("pests.treatment")}: {pest.treatment} ({pest.treatmentDate})
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex shrink-0 gap-1">
-                    {!pest.resolved && (
+        <>
+          <SegmentedControl
+            className="mb-4"
+            label={t("pests.filterLabel")}
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "active", label: t("pests.active"), count: activeCount },
+              { value: "resolved", label: t("pests.resolvedLabel"), count: pests.length - activeCount },
+              { value: "all", label: t("common.all"), count: pests.length },
+            ]}
+          />
+
+          {filtered.length === 0 ? (
+            <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("pests.emptyFilter")}</p></Card>
+          ) : (
+            <List label={t("pests.title")}>
+              {filtered.map((pest) => {
+                const plant = plantMap.get(pest.plantId);
+                const bedName = bedNames.get(pest.bedId);
+                return (
+                  <ListRow
+                    key={pest.id}
+                    muted={pest.resolved}
+                    onClick={() => openEdit(pest)}
+                    leading={plant ? <PlantIconDisplay plantId={pest.plantId} emoji={plant.icon} size={28} /> : <Bug size={20} aria-hidden="true" className="text-gray-500" />}
+                    title={pest.name}
+                    badges={
                       <>
-                        <button onClick={() => handleAddTreatment(pest.id)} className="rounded p-1 text-blue-400 hover:text-blue-600" title={t("pests.addTreatment")}>
-                          <Bug size={14} />
-                        </button>
-                        <button aria-label={t("common.confirm")} onClick={() => handleResolve(pest.id)} className="rounded p-1 text-green-400 hover:text-green-600" title={t("pests.resolve")}>
-                          <Check size={14} />
-                        </button>
+                        <Badge tone={SEVERITY_TONE[pest.severity]} dot>{t(`pests.severityLevel.${pest.severity}`)}</Badge>
+                        <Badge variant="outline" icon={pest.type === "pest" ? Bug : Microscope}>{t(`pests.types.${pest.type}`)}</Badge>
+                        {pest.organic && <Badge tone="brand" icon={Leaf}>{t("pests.organic")}</Badge>}
+                        {pest.resolved && <Badge tone="positive" icon={Check}>{t("pests.resolvedLabel")}</Badge>}
                       </>
-                    )}
-                    <button aria-label={t("common.delete")} onClick={async () => { if (await confirm(t("common.confirmDelete"))) deletePest(pest.id); }} className="rounded p-1 text-gray-300 hover:text-red-500">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                    }
+                    meta={[plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")].filter(Boolean).join(" · ")}
+                    description={
+                      pest.treatment || pest.description ? (
+                        <>
+                          {pest.description && <span className="block">{pest.description}</span>}
+                          {pest.treatment && (
+                            <span className="block">
+                              <span className="font-medium">{t("pests.treatment")}:</span> {pest.treatment}
+                              {pest.treatmentDate && <span className="text-gray-500 dark:text-gray-400"> · {formatDate(pest.treatmentDate)}</span>}
+                            </span>
+                          )}
+                        </>
+                      ) : undefined
+                    }
+                    actions={
+                      <>
+                        {!pest.resolved && (
+                          <IconButton icon={Check} tone="brand" label={t("pests.resolve")} onClick={() => handleResolve(pest)} />
+                        )}
+                        <Menu
+                          label={t("common.moreActions")}
+                          items={[
+                            { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(pest) },
+                            ...(pest.resolved
+                              ? [{ label: t("pests.reopen"), icon: RotateCcw, onSelect: () => updatePest(pest.id, { resolved: false, resolvedDate: undefined }) }]
+                              : []),
+                            "separator" as const,
+                            { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(pest) },
+                          ]}
+                        />
+                      </>
+                    }
+                  />
+                );
+              })}
+            </List>
+          )}
+        </>
       )}
 
-      {/* Add pest modal */}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("pests.add")}>
+      {/* Add and edit share one dialog */}
+      <Modal
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editingId ? t("pests.edit") : t("pests.add")}
+        footer={
+          <>
+            {editing && (
+              <Button variant="danger-ghost" className="mr-auto" onClick={() => void handleDelete(editing)}>
+                <Trash2 size={16} aria-hidden="true" />
+                {t("common.delete")}
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleSave} disabled={!draft.name.trim()}>{editingId ? t("common.save") : t("common.add")}</Button>
+          </>
+        }
+      >
         <div className="space-y-4">
-          <div className="flex gap-2">
-            {(["pest", "disease"] as const).map((t_) => (
-              <button key={t_} onClick={() => setType(t_)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium ${type === t_ ? "border-garden-500 bg-garden-50 dark:bg-garden-900/30" : "border-gray-200 dark:border-gray-700"}`}>
-                {t(`pests.types.${t_}`)}
-              </button>
-            ))}
+          <SegmentedControl
+            fullWidth
+            label={t("pests.types.pest") + " / " + t("pests.types.disease")}
+            value={draft.type}
+            onChange={(type) => patch({ type })}
+            options={[
+              { value: "pest", label: t("pests.types.pest"), icon: Bug },
+              { value: "disease", label: t("pests.types.disease"), icon: Microscope },
+            ]}
+          />
+          <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("pests.namePlaceholder")} autoFocus />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              label={t("harvest.plant")}
+              value={draft.plantId}
+              onChange={(e) => patch({ plantId: e.target.value })}
+              options={plants.map((p) => ({ value: p.id, label: getPlantName(p.id) }))}
+            />
+            {bedNames.size > 0 && (
+              <Select
+                label={t("harvest.bed")}
+                value={draft.bedId}
+                onChange={(e) => patch({ bedId: e.target.value })}
+                placeholder="–"
+                options={[...bedNames].map(([id, name]) => ({ value: id, label: name }))}
+              />
+            )}
           </div>
-          <Input label={t("pests.name")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("pests.namePlaceholder")} autoFocus />
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.plant")}</label>
-            <select value={plantId} onChange={(e) => setPlantId(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-              {plants.map((p) => <option key={p.id} value={p.id}>{p.icon} {getPlantName(p.id)}</option>)}
-            </select>
+            <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("pests.severity")}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span>
+            </p>
+            <SegmentedControl
+              fullWidth
+              label={t("pests.severity")}
+              value={String(draft.severity)}
+              onChange={(v) => patch({ severity: Number(v) as Severity })}
+              options={SEVERITIES.map((s) => ({ value: String(s), label: String(s) }))}
+            />
           </div>
-          {allBeds.length > 0 && (
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("harvest.bed")}</label>
-              <select value={bedId} onChange={(e) => setBedId(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800">
-                <option value="">--</option>
-                {allBeds.map((b) => <option key={b.id} value={b.id}>{b.gardenName} / {b.name}</option>)}
-              </select>
-            </div>
-          )}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("pests.severity")} ({severity}/5)</label>
-            <input type="range" min={1} max={5} value={severity} onChange={(e) => setSeverity(Number(e.target.value))} className="w-full" />
-          </div>
-          <Input label={t("pests.description")} value={description} onChange={(e) => setDescription(e.target.value)} />
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={organic} onChange={(e) => setOrganic(e.target.checked)} className="rounded border-gray-300" />
-            <span className="text-sm text-gray-700 dark:text-gray-300">{t("pests.organicOnly")}</span>
-          </label>
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowAdd(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleAdd}>{t("common.add")}</Button>
-          </div>
+          <Textarea label={t("pests.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
+          <Textarea label={t("pests.treatment")} hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} />
+          <Checkbox label={t("pests.organicOnly")} checked={draft.organic} onChange={(e) => patch({ organic: e.target.checked })} />
         </div>
       </Modal>
     </div>

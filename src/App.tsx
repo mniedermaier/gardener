@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { useStore } from "@/store";
+import { PageSkeleton } from "@/components/ui/Skeleton";
 
 // Retry wrapper: if a chunk fails to load (stale cache after deploy), clear cache and reload
 function lazyRetry<T extends Record<string, unknown>>(
@@ -60,7 +61,7 @@ const CompanionMatrix = lazy(() => lazyRetry(() => import("@/components/plants/C
 const SettingsPage = lazy(() => lazyRetry(() => import("@/components/settings/SettingsPage")).then((m) => ({ default: m.SettingsPage })));
 
 function PageLoader() {
-  return <div className="flex h-32 items-center justify-center text-gray-400">...</div>;
+  return <PageSkeleton />;
 }
 
 function L({ children }: { children: React.ReactNode }) {

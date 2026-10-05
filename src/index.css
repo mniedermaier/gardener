@@ -3,19 +3,42 @@
 /* Class-based dark mode (v4 defaults to media query) */
 @variant dark (&:where(.dark, .dark *));
 
-/* Custom theme tokens (migrated from tailwind.config.ts) */
+/*
+ * Design tokens — see docs/DESIGN_SYSTEM.md.
+ *
+ * The gray scale is overridden on purpose: every existing `gray-*` class
+ * becomes a warm stone/earth neutral, and the dark end carries a faint moss
+ * tint, so all pages pick up the new identity without a migration.
+ */
 @theme {
-  --color-garden-50: #f0fdf0;
-  --color-garden-100: #dcfce7;
-  --color-garden-200: #bbf7d0;
-  --color-garden-300: #86efac;
-  --color-garden-400: #4ade80;
-  --color-garden-500: #22c55e;
-  --color-garden-600: #16a34a;
-  --color-garden-700: #15803d;
-  --color-garden-800: #166534;
-  --color-garden-900: #14532d;
+  /* Warm neutrals (stone/earth, dark end slightly moss-tinted) */
+  --color-gray-50: #f9f8f5;
+  --color-gray-100: #f2f1ec;
+  --color-gray-200: #e6e4dd;
+  --color-gray-300: #d4d1c8;
+  --color-gray-400: #a6a297;
+  --color-gray-500: #737063; /* 4.9:1 on white — minimum for meta text */
+  --color-gray-600: #57554b;
+  --color-gray-700: #403f37;
+  --color-gray-800: #292b25;
+  --color-gray-900: #1b1d19;
+  --color-gray-950: #0f110e;
 
+  /* Brand: deep sage / forest green. 600 is the primary action colour. */
+  --color-garden-50: #f1f7f1;
+  --color-garden-100: #ddeedd;
+  --color-garden-200: #bcdcbf;
+  --color-garden-300: #8fc296;
+  --color-garden-400: #62a46c;
+  --color-garden-500: #3f874b;
+  --color-garden-600: #2f6b3a;
+  --color-garden-700: #285a31;
+  --color-garden-800: #22492a;
+  --color-garden-900: #1b3b22;
+  --color-garden-950: #0f2214;
+
+  /* Accent: earth */
+  --color-earth-50: #fbf7f0;
   --color-earth-100: #fef3c7;
   --color-earth-200: #e8d5b7;
   --color-earth-300: #d4a574;
@@ -24,11 +47,109 @@
   --color-earth-600: #7a5230;
   --color-earth-700: #5c3a1e;
 
-  --font-sans: "Inter", "system-ui", sans-serif;
+  /*
+   * Semantic tones. One colour per tone; it is readable as text on white and
+   * as a tint (`bg-danger/10`). The dark theme swaps in lighter values below,
+   * so `bg-danger/15 text-danger` works in both themes without `dark:`.
+   */
+  --color-positive: #2c7339;
+  --color-warning: #9a5b0b;
+  --color-danger: #b42318;
+  --color-info: #23649b;
+  --color-focus: #2f6b3a;
+
+  /* Type: Inter is self-hosted via @fontsource (see main.tsx). */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Typography scale (5 steps). Meta=text-xs, Body=text-sm, Title=text-base,
+     Section=text-xl, Page=text-page. Nothing below 11px (text-overline). */
+  --text-page: 1.75rem;
+  --text-page--line-height: 2.125rem;
+  --text-page--letter-spacing: -0.015em;
+  --text-page--font-weight: 600;
+  --text-overline: 0.6875rem;
+  --text-overline--line-height: 1rem;
+  --text-overline--letter-spacing: 0.06em;
+
+  --shadow-xs: 0 1px 2px 0 rgb(28 25 18 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(28 25 18 / 0.07), 0 1px 2px -1px rgb(28 25 18 / 0.06);
 }
 
-body {
-  @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+/* Dark theme values for the semantic tones */
+.dark {
+  --color-positive: #7cc489;
+  --color-warning: #eab45a;
+  --color-danger: #f2897e;
+  --color-info: #80b8e6;
+  --color-focus: #7cc489;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    accent-color: var(--color-garden-600);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-tap-highlight-color: transparent;
+  }
+  :root.dark {
+    color-scheme: dark;
+    accent-color: var(--color-garden-400);
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
+  }
+
+  /* One visible focus ring for keyboard users everywhere; mouse clicks stay clean. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline-offset: 0;
+  }
+
+  /* Base form controls: native controls follow the brand and the theme. */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--color-garden-600);
+  }
+  .dark input[type="checkbox"],
+  .dark input[type="radio"] {
+    accent-color: var(--color-garden-400);
+  }
+  input[type="range"] {
+    accent-color: var(--color-garden-600);
+  }
+  ::placeholder {
+    color: var(--color-gray-400);
+  }
+  .dark ::placeholder {
+    color: var(--color-gray-500);
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+
+  /* Numbers line up in tables, stats and lists. */
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 /* Scrollbars - only on scrollable containers, not all elements */
@@ -37,14 +158,14 @@ aside,
 [class*="overflow-y-auto"],
 [class*="overflow-x-auto"] {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--color-gray-300) transparent;
 }
 
 .dark main,
 .dark aside,
 .dark [class*="overflow-y-auto"],
 .dark [class*="overflow-x-auto"] {
-  scrollbar-color: #4b5563 #1f2937;
+  scrollbar-color: var(--color-gray-700) var(--color-gray-900);
 }
 
 main::-webkit-scrollbar,
@@ -59,7 +180,7 @@ main::-webkit-scrollbar-thumb,
 aside::-webkit-scrollbar-thumb,
 [class*="overflow-y-auto"]::-webkit-scrollbar-thumb,
 [class*="overflow-x-auto"]::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--color-gray-300);
   border-radius: 3px;
 }
 
@@ -67,7 +188,7 @@ aside::-webkit-scrollbar-thumb,
 .dark aside::-webkit-scrollbar-thumb,
 .dark [class*="overflow-y-auto"]::-webkit-scrollbar-thumb,
 .dark [class*="overflow-x-auto"]::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: var(--color-gray-700);
   border-radius: 3px;
 }
 

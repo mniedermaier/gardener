@@ -1,18 +1,33 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { X, CheckCircle, AlertTriangle, Info } from "lucide-react";
 
-type ToastType = "success" | "warning" | "error" | "info";
+export type ToastType = "success" | "warning" | "error" | "info";
+
+export interface ToastOptions {
+  /** Inline action, typically "Rückgängig": toast(msg, "success", { action: { label: t("common.undo"), onClick: restore } }) */
+  action?: { label: string; onClick: () => void };
+  /** ms until the toast disappears. Default 3000, with an action 6000. */
+  duration?: number;
+}
+
+export interface ConfirmOptions {
+  /** Label of the confirming button. Default: common.confirm */
+  confirmLabel?: string;
+  /** Destructive confirmation (red button). Default true. */
+  danger?: boolean;
+}
 
 interface Toast {
   id: number;
   message: string;
   type: ToastType;
+  action?: ToastOptions["action"];
 }
 
 interface ToastContextValue {
-  toast: (message: string, type?: ToastType) => void;
-  confirm: (message: string) => Promise<boolean>;
+  toast: (message: string, type?: ToastType, options?: ToastOptions) => void;
+  confirm: (message: string, options?: ConfirmOptions) => Promise<boolean>;
 }
 
 const ToastContext = createContext<ToastContextValue>({
@@ -31,11 +46,11 @@ const ICONS = {
   info: Info,
 };
 
-const STYLES = {
-  success: "border-green-300 bg-green-50 text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300",
-  warning: "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  error: "border-red-300 bg-red-50 text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-300",
-  info: "border-sky-300 bg-sky-50 text-sky-800 dark:border-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+const ICON_TONE = {
+  success: "text-positive",
+  warning: "text-warning",
+  error: "text-danger",
+  info: "text-info",
 };
 
 let nextId = 0;
@@ -45,20 +60,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   // useTranslation hier nicht suspendieren.
   const { t: translate } = useTranslation(undefined, { useSuspense: false });
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
   const [confirmState, setConfirmState] = useState<{
     message: string;
+    options: ConfirmOptions;
     resolve: (value: boolean) => void;
   } | null>(null);
 
-  const addToast = useCallback((message: string, type: ToastType = "success") => {
-    const id = nextId++;
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
+  const dismiss = useCallback((id: number) => {
+    clearTimeout(timers.current.get(id));
+    timers.current.delete(id);
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const confirmFn = useCallback((message: string): Promise<boolean> => {
+  const addToast = useCallback((message: string, type: ToastType = "success", options: ToastOptions = {}) => {
+    const id = nextId++;
+    setToasts((prev) => [...prev, { id, message, type, action: options.action }]);
+    const duration = options.duration ?? (options.action ? 6000 : 3000);
+    timers.current.set(id, setTimeout(() => dismiss(id), duration));
+  }, [dismiss]);
+
+  const confirmFn = useCallback((message: string, options: ConfirmOptions = {}): Promise<boolean> => {
     return new Promise((resolve) => {
-      setConfirmState({ message, resolve });
+      setConfirmState({ message, options, resolve });
     });
   }, []);
 
@@ -67,24 +91,43 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setConfirmState(null);
   };
 
+  const danger = confirmState?.options.danger ?? true;
+
   return (
     <ToastContext.Provider value={{ toast: addToast, confirm: confirmFn }}>
       {children}
 
-      {/* Toast stack */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" aria-live="polite">
+      {/* Toast stack — above the bottom nav on mobile, bottom right on desktop */}
+      <div className="pointer-events-none fixed inset-x-4 bottom-safe-nav z-[60] flex flex-col items-stretch gap-2 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-96" aria-live="polite">
         {toasts.map((t) => {
           const Icon = ICONS[t.type];
           return (
             <div
               key={t.id}
-              role="alert"
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm shadow-lg animate-in slide-in-from-right ${STYLES[t.type]}`}
+              role={t.type === "error" ? "alert" : "status"}
+              className="pointer-events-auto flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-lg dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"
             >
-              <Icon size={16} />
+              <Icon size={18} aria-hidden="true" className={`shrink-0 ${ICON_TONE[t.type]}`} />
               <span className="flex-1">{t.message}</span>
-              <button aria-label={translate("common.close")} onClick={() => setToasts((prev) => prev.filter((tt) => tt.id !== t.id))}>
-                <X size={14} />
+              {t.action && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    t.action?.onClick();
+                    dismiss(t.id);
+                  }}
+                  className="-my-1 min-h-9 shrink-0 rounded-lg px-2 font-semibold text-garden-700 hover:bg-garden-50 dark:text-garden-300 dark:hover:bg-white/10"
+                >
+                  {t.action.label}
+                </button>
+              )}
+              <button
+                type="button"
+                aria-label={translate("common.close")}
+                onClick={() => dismiss(t.id)}
+                className="-mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10"
+              >
+                <X size={14} aria-hidden="true" />
               </button>
             </div>
           );
@@ -93,22 +136,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
       {/* Confirm dialog */}
       {confirmState && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => handleConfirm(false)} />
-          <div className="relative mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-gray-900">
-            <p className="mb-4 text-sm">{confirmState.message}</p>
+          <div role="alertdialog" aria-modal="true" aria-label={confirmState.message} className="relative mx-4 w-full max-w-sm rounded-xl border border-transparent bg-white p-6 shadow-xl dark:border-white/10 dark:bg-gray-900">
+            <p className="mb-5 text-sm text-gray-800 dark:text-gray-200">{confirmState.message}</p>
             <div className="flex justify-end gap-2">
               <button
+                type="button"
                 onClick={() => handleConfirm(false)}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                className="min-h-10 rounded-lg px-4 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
               >
                 {translate("common.cancel")}
               </button>
               <button
+                type="button"
+                autoFocus
                 onClick={() => handleConfirm(true)}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                className={`min-h-10 rounded-lg px-4 text-sm font-medium ${danger ? "bg-danger text-white hover:brightness-110 dark:text-gray-950" : "bg-garden-600 text-white hover:bg-garden-700"}`}
               >
-                {translate("common.confirm")}
+                {confirmState.options.confirmLabel ?? translate("common.confirm")}
               </button>
             </div>
           </div>

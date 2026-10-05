@@ -196,7 +196,7 @@ export function SeedInventory() {
                         ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                         : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                   }`}>
-                    {isExpired ? t("seeds.expired") : `${yearsLeft} ${t("seeds.yearsLeft")}`}
+                    {isExpired ? t("seeds.expired") : t("seeds.yearsLeft", { count: yearsLeft })}
                   </span>
                 </div>
                 <button aria-label={t("common.delete")}

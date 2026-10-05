@@ -1,14 +1,43 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
-interface CardProps {
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
+  className?: string;
+  /** Inner padding. "none" for cards that hold a List or a full-bleed chart. */
+  padding?: "none" | "sm" | "md";
+}
+
+const PADDING = { none: "", sm: "p-4", md: "p-4 sm:p-6" };
+
+/** A surface. Border instead of heavy shadow; in dark mode a visible white/10 edge. */
+export function Card({ children, className = "", padding = "md", ...props }: CardProps) {
+  return (
+    <div
+      className={`rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900 ${PADDING[padding]} ${className}`}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+interface CardHeaderProps {
+  title: ReactNode;
+  description?: ReactNode;
+  /** Right-aligned slot, e.g. a "Alle anzeigen" link or an IconButton. */
+  actions?: ReactNode;
   className?: string;
 }
 
-export function Card({ children, className = "" }: CardProps) {
+/** Title row inside a Card: Title level (16 px semibold). */
+export function CardHeader({ title, description, actions, className = "" }: CardHeaderProps) {
   return (
-    <div className={`rounded-xl border border-gray-200/80 bg-white p-6 shadow dark:border-gray-700 dark:bg-gray-900 ${className}`}>
-      {children}
+    <div className={`mb-4 flex items-start justify-between gap-3 ${className}`}>
+      <div className="min-w-0">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
+        {description && <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
+      </div>
+      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
 }

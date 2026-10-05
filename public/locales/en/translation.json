@@ -51,7 +51,8 @@
     "gardenOverview": "Your Gardens",
     "quickStats": "Quick Stats",
     "viewAll": "View all",
-    "overdueCount": "{{count}} overdue tasks!",
+    "overdueCount_one": "{{count}} task overdue",
+    "overdueCount_other": "{{count}} tasks overdue",
     "noTasks": "No upcoming tasks this week.",
     "noHarvests": "No harvests logged yet.",
     "noGardens": "No gardens created yet.",
@@ -98,7 +99,8 @@
     "dragPlant": "Drag or click to place plants",
     "gridInfo": "Grid: {{cells}} cells ({{size}} cm each)",
     "autoFill": "Smart plant suggestions",
-    "autoFillDone": "Placed {{count}} plants!",
+    "autoFillDone_one": "Placed {{count}} plant",
+    "autoFillDone_other": "Placed {{count}} plants",
     "clearBed": "Clear all",
     "path": "Path",
     "pathMode": "Draw Paths",
@@ -433,11 +435,14 @@
     "taskType": "Type",
     "taskDate": "Date",
     "generate": "Generate",
-    "generated": "Generated {{count}} tasks",
+    "generated_one": "Generated {{count}} task",
+    "generated_other": "Generated {{count}} tasks",
     "active": "Active",
     "deleteCompleted": "Clear completed",
-    "deleteCompletedConfirm": "Delete {{count}} completed tasks?",
-    "deletedCompleted": "Deleted {{count}} completed tasks",
+    "deleteCompletedConfirm_one": "Delete {{count}} completed task?",
+    "deleteCompletedConfirm_other": "Delete {{count}} completed tasks?",
+    "deletedCompleted_one": "Deleted {{count}} completed task",
+    "deletedCompleted_other": "Deleted {{count}} completed tasks",
     "taskTypes": {
       "sow_indoors": "Sow Indoors",
       "sow_outdoors": "Sow Outdoors",
@@ -522,7 +527,8 @@
     "wateringNotNeeded": "No watering needed",
     "wateringHotDry": "Hot and dry days ahead ({{temp}}°C avg). Water deeply in the morning.",
     "wateringRainExpected": "Rain expected in the next days. Hold off on watering.",
-    "wateringHighNeedPlants": "{{count}} high-water plants need attention. No rain in forecast.",
+    "wateringHighNeedPlants_one": "{{count}} high-water plant needs attention. No rain in forecast.",
+    "wateringHighNeedPlants_other": "{{count}} high-water plants need attention. No rain in forecast.",
     "weeklySummaryTitle": "Weekly Garden Outlook",
     "weeklySummaryNeutral": "Moderate conditions ahead. Temps {{minTemp}}–{{maxTemp}}°C, {{rainyDays}} rainy days.",
     "weeklySummaryFrost": "Frost risk this week! Min {{minTemp}}°C. Protect tender plants and delay transplanting.",
@@ -545,7 +551,8 @@
     "entries": "entries",
     "totalWeight": "Total weight",
     "avgQuality": "Avg. quality",
-    "stars": "{{count}} stars",
+    "stars_one": "{{count}} star",
+    "stars_other": "{{count}} stars",
     "garden": "Garden"
   },
   "journal": {
@@ -591,7 +598,8 @@
     "markConsumed": "Mark as consumed",
     "expiredBadge": "Expired",
     "expiringSoonBadge": "{{days}} days left",
-    "expiredWarning": "{{count}} items have expired! Please check and consume or discard.",
+    "expiredWarning_one": "{{count}} item has expired. Please check it and use or discard it.",
+    "expiredWarning_other": "{{count}} items have expired. Please check them and use or discard them.",
     "allMethods": "All methods",
     "shelfLife": "Shelf life",
     "yield": "Yield",
@@ -633,8 +641,10 @@
     "archiveConfirm": "Archive the current season and start fresh? All beds will be cleared but your harvest data and journal remain.",
     "archives": "Past Seasons",
     "noArchives": "No archived seasons yet.",
-    "beds": "{{count}} beds",
-    "plants": "{{count}} plants"
+    "beds_one": "{{count}} bed",
+    "beds_other": "{{count}} beds",
+    "plants_one": "{{count}} plant",
+    "plants_other": "{{count}} plants"
   },
   "foodplan": {
     "title": "Annual Food Plan",
@@ -678,10 +688,10 @@
     "animalYields": "Animal Yields"
   },
   "pests": {
-    "title": "Pest & Disease Tracker",
+    "title": "Pests & diseases",
     "add": "Report Problem",
-    "added": "Problem reported!",
-    "resolved": "Marked as resolved!",
+    "added": "Problem recorded",
+    "resolved": "Marked as resolved",
     "active": "Active",
     "resolvedLabel": "Resolved",
     "empty": "No pest or disease problems recorded. That's great!",
@@ -698,7 +708,24 @@
     "types": {
       "pest": "Pest",
       "disease": "Disease"
-    }
+    },
+    "subtitle": "Record problems, treat them and spot patterns across seasons.",
+    "updated": "Changes saved",
+    "deleted": "Entry deleted",
+    "edit": "Edit problem",
+    "reopen": "Reopen",
+    "filterLabel": "Status filter",
+    "emptyTitle": "No problems recorded",
+    "emptyText": "Record pests and diseases as they appear, so you can see what works and what comes back every year.",
+    "emptyFilter": "There are no entries in this view.",
+    "severityLevel": {
+      "1": "Very low",
+      "2": "Low",
+      "3": "Moderate",
+      "4": "High",
+      "5": "Severe"
+    },
+    "treatmentHint": "What did you do? Saved with today's date."
   },
   "livestock": {
     "title": "Livestock Management",
@@ -731,7 +758,8 @@
     "feedTotal": "Feed cost",
     "unit": "Unit",
     "liters": "Liters",
-    "productionEntries": "{{count}} entries",
+    "productionEntries_one": "{{count}} entry",
+    "productionEntries_other": "{{count}} entries",
     "healthTab": "Health",
     "addHealth": "Health Entry",
     "healthAdded": "Health entry logged!",
@@ -823,7 +851,8 @@
     "year": "Year acquired",
     "source": "Source",
     "expired": "Expired",
-    "yearsLeft": "years left",
+    "yearsLeft_one": "{{count}} year left",
+    "yearsLeft_other": "{{count}} years left",
     "units": {
       "packets": "packets",
       "grams": "grams",
@@ -1011,7 +1040,10 @@
     "copy": "Copy",
     "settings": "Settings",
     "confirm": "Confirm",
-    "favorite": "Favourite"
+    "favorite": "Favourite",
+    "undo": "Undo",
+    "moreActions": "More actions",
+    "all": "All"
   },
   "companions": {
     "title": "Companion Planting Matrix",

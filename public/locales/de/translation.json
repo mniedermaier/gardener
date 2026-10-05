@@ -51,7 +51,8 @@
     "gardenOverview": "Deine Gärten",
     "quickStats": "Schnellübersicht",
     "viewAll": "Alle anzeigen",
-    "overdueCount": "{{count}} überfällige Aufgaben!",
+    "overdueCount_one": "{{count}} Aufgabe überfällig",
+    "overdueCount_other": "{{count}} Aufgaben überfällig",
     "noTasks": "Keine Aufgaben diese Woche.",
     "noHarvests": "Noch keine Ernten erfasst.",
     "noGardens": "Noch keine Gärten angelegt.",
@@ -98,7 +99,8 @@
     "dragPlant": "Ziehen oder klicken um Pflanzen zu platzieren",
     "gridInfo": "Raster: {{cells}} Felder (je {{size}} cm)",
     "autoFill": "Smarte Pflanzvorschläge",
-    "autoFillDone": "{{count}} Pflanzen platziert!",
+    "autoFillDone_one": "{{count}} Pflanze platziert",
+    "autoFillDone_other": "{{count}} Pflanzen platziert",
     "clearBed": "Alle entfernen",
     "path": "Weg",
     "pathMode": "Wege zeichnen",
@@ -433,11 +435,14 @@
     "taskType": "Typ",
     "taskDate": "Datum",
     "generate": "Generieren",
-    "generated": "{{count}} Aufgaben generiert",
+    "generated_one": "{{count}} Aufgabe generiert",
+    "generated_other": "{{count}} Aufgaben generiert",
     "active": "Aktiv",
     "deleteCompleted": "Erledigte löschen",
-    "deleteCompletedConfirm": "{{count}} erledigte Aufgaben löschen?",
-    "deletedCompleted": "{{count}} erledigte Aufgaben gelöscht",
+    "deleteCompletedConfirm_one": "{{count}} erledigte Aufgabe löschen?",
+    "deleteCompletedConfirm_other": "{{count}} erledigte Aufgaben löschen?",
+    "deletedCompleted_one": "{{count}} erledigte Aufgabe gelöscht",
+    "deletedCompleted_other": "{{count}} erledigte Aufgaben gelöscht",
     "taskTypes": {
       "sow_indoors": "Vorziehen",
       "sow_outdoors": "Direktsaat",
@@ -522,7 +527,8 @@
     "wateringNotNeeded": "Kein Gießen nötig",
     "wateringHotDry": "Heiße und trockene Tage voraus ({{temp}}°C Durchschnitt). Morgens gründlich gießen.",
     "wateringRainExpected": "Regen erwartet in den nächsten Tagen. Mit dem Gießen warten.",
-    "wateringHighNeedPlants": "{{count}} Pflanzen mit hohem Wasserbedarf brauchen Aufmerksamkeit. Kein Regen vorhergesagt.",
+    "wateringHighNeedPlants_one": "{{count}} Pflanze mit hohem Wasserbedarf braucht Aufmerksamkeit. Kein Regen vorhergesagt.",
+    "wateringHighNeedPlants_other": "{{count}} Pflanzen mit hohem Wasserbedarf brauchen Aufmerksamkeit. Kein Regen vorhergesagt.",
     "weeklySummaryTitle": "Wochenausblick für den Garten",
     "weeklySummaryNeutral": "Moderate Bedingungen voraus. Temperaturen {{minTemp}}–{{maxTemp}}°C, {{rainyDays}} Regentage.",
     "weeklySummaryFrost": "Frostgefahr diese Woche! Min {{minTemp}}°C. Empfindliche Pflanzen schützen und Umpflanzen verschieben.",
@@ -545,7 +551,8 @@
     "entries": "Einträge",
     "totalWeight": "Gesamtgewicht",
     "avgQuality": "Durchschn. Qualität",
-    "stars": "{{count}} Sterne",
+    "stars_one": "{{count}} Stern",
+    "stars_other": "{{count}} Sterne",
     "garden": "Garten"
   },
   "journal": {
@@ -591,7 +598,8 @@
     "markConsumed": "Als verbraucht markieren",
     "expiredBadge": "Abgelaufen",
     "expiringSoonBadge": "Noch {{days}} Tage",
-    "expiredWarning": "{{count}} Vorräte sind abgelaufen! Bitte prüfen und verbrauchen oder entsorgen.",
+    "expiredWarning_one": "{{count}} Vorrat ist abgelaufen. Bitte prüfen und verbrauchen oder entsorgen.",
+    "expiredWarning_other": "{{count}} Vorräte sind abgelaufen. Bitte prüfen und verbrauchen oder entsorgen.",
     "allMethods": "Alle Methoden",
     "shelfLife": "Haltbarkeit",
     "yield": "Ausbeute",
@@ -633,8 +641,10 @@
     "archiveConfirm": "Aktuelle Saison archivieren und neu starten? Alle Beete werden geleert, aber Erntedaten und Tagebuch bleiben erhalten.",
     "archives": "Vergangene Saisons",
     "noArchives": "Noch keine archivierten Saisons.",
-    "beds": "{{count}} Beete",
-    "plants": "{{count}} Pflanzen"
+    "beds_one": "{{count}} Beet",
+    "beds_other": "{{count}} Beete",
+    "plants_one": "{{count}} Pflanze",
+    "plants_other": "{{count}} Pflanzen"
   },
   "foodplan": {
     "title": "Jährlicher Ernährungsplan",
@@ -678,10 +688,10 @@
     "animalYields": "Tierische Erträge"
   },
   "pests": {
-    "title": "Schädlings- & Krankheits-Tracker",
+    "title": "Schädlinge & Krankheiten",
     "add": "Problem melden",
-    "added": "Problem erfasst!",
-    "resolved": "Als gelöst markiert!",
+    "added": "Problem erfasst",
+    "resolved": "Als gelöst markiert",
     "active": "Aktiv",
     "resolvedLabel": "Gelöst",
     "empty": "Keine Schädlings- oder Krankheitsprobleme erfasst. Das ist großartig!",
@@ -698,7 +708,24 @@
     "types": {
       "pest": "Schädling",
       "disease": "Krankheit"
-    }
+    },
+    "subtitle": "Probleme erfassen, behandeln und über die Saisons Muster erkennen.",
+    "updated": "Änderungen gespeichert",
+    "deleted": "Eintrag gelöscht",
+    "edit": "Problem bearbeiten",
+    "reopen": "Wieder öffnen",
+    "filterLabel": "Status-Filter",
+    "emptyTitle": "Keine Probleme erfasst",
+    "emptyText": "Erfasse Schädlinge und Krankheiten, sobald sie auftreten – so siehst du, was wirkt und was jedes Jahr wiederkommt.",
+    "emptyFilter": "In dieser Ansicht gibt es keine Einträge.",
+    "severityLevel": {
+      "1": "Sehr gering",
+      "2": "Gering",
+      "3": "Mittel",
+      "4": "Stark",
+      "5": "Sehr stark"
+    },
+    "treatmentHint": "Was hast du unternommen? Wird mit Datum gespeichert."
   },
   "livestock": {
     "title": "Tierhaltung",
@@ -731,7 +758,8 @@
     "feedTotal": "Futterkosten",
     "unit": "Einheit",
     "liters": "Liter",
-    "productionEntries": "{{count}} Einträge",
+    "productionEntries_one": "{{count}} Eintrag",
+    "productionEntries_other": "{{count}} Einträge",
     "healthTab": "Gesundheit",
     "addHealth": "Gesundheitseintrag",
     "healthAdded": "Gesundheitseintrag erfasst!",
@@ -823,7 +851,8 @@
     "year": "Erwerbsjahr",
     "source": "Quelle",
     "expired": "Abgelaufen",
-    "yearsLeft": "Jahre übrig",
+    "yearsLeft_one": "noch {{count}} Jahr",
+    "yearsLeft_other": "noch {{count}} Jahre",
     "units": {
       "packets": "Päckchen",
       "grams": "Gramm",
@@ -1011,7 +1040,10 @@
     "copy": "Kopieren",
     "settings": "Einstellungen",
     "confirm": "Bestätigen",
-    "favorite": "Favorit"
+    "favorite": "Favorit",
+    "undo": "Rückgängig",
+    "moreActions": "Weitere Aktionen",
+    "all": "Alle"
   },
   "companions": {
     "title": "Pflanzpartner-Matrix",

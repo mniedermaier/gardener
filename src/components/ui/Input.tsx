@@ -1,10 +1,17 @@
-import { useId, type InputHTMLAttributes } from "react";
+import { useId, type InputHTMLAttributes, type ReactNode } from "react";
+import { CONTROL_CLASS, Field, describedBy } from "./Field";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  /** Helper text below the field, linked via aria-describedby. */
+  hint?: ReactNode;
+  /** Error text; also sets aria-invalid. */
+  error?: ReactNode;
+  /** Class for the wrapper (label + field), e.g. grid placement or width. */
+  wrapperClassName?: string;
 }
 
-export function Input({ label, className = "", id, type, ...props }: InputProps) {
+export function Input({ label, hint, error, wrapperClassName, className = "", id, "aria-describedby": ariaDescribedBy, type, ...props }: InputProps) {
   // No caller passes an id, so without a generated one every label pointed at
   // nothing and screen readers announced the fields unlabelled.
   const generatedId = useId();
@@ -16,19 +23,16 @@ export function Input({ label, className = "", id, type, ...props }: InputProps)
     : props.inputMode;
 
   return (
-    <div>
-      {label && (
-        <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-          {label}
-        </label>
-      )}
+    <Field id={inputId} label={label} hint={hint} error={error} className={wrapperClassName}>
       <input
         id={inputId}
         type={type}
         inputMode={inputMode}
-        className={`block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm transition-colors placeholder:text-gray-400 focus:border-garden-500 focus:outline-none focus:ring-1 focus:ring-garden-500 sm:py-2 sm:text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 ${className}`}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(inputId, hint, error, ariaDescribedBy)}
+        className={`${CONTROL_CLASS} ${className}`}
         {...props}
       />
-    </div>
+    </Field>
   );
 }

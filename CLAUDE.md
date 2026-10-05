@@ -155,6 +155,8 @@ backend/           Express + SQLite (Docker only)
 
 ## Conventions
 
+- UI work follows `docs/DESIGN_SYSTEM.md` (tokens, type scale, primitives,
+  `useFormat()` for numbers/dates, plurals via `count`)
 - Named exports (not default) for all components
 - UI primitives in `src/components/ui/`
 - Tailwind custom colors: `garden-*` (greens), `earth-*` (browns), `sky-*` (blues)

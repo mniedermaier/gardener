@@ -11,6 +11,8 @@ function getStoredLocale(): string {
   }
 }
 
+// Plurals: i18next (v21+) resolves key_one/key_other via Intl.PluralRules
+// (es/fr also need key_many). Pass the count option; see docs/DESIGN_SYSTEM.md.
 i18n
   .use(HttpBackend)
   .use(initReactI18next)
