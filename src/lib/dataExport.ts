@@ -1,4 +1,5 @@
 import { useStore } from "@/store";
+import { useAnalysisPrefs } from "@/store/analysisPrefs";
 import type { Garden, SeasonArchive } from "@/types/garden";
 import type { Task } from "@/types/task";
 import type { HarvestEntry } from "@/types/harvest";
@@ -7,7 +8,7 @@ import type { Expense } from "@/types/expense";
 import type { Plant } from "@/types/plant";
 import type { AlertConfig } from "@/store/settingsSlice";
 import type { WeatherHistoryEntry } from "@/store/weatherSlice";
-import type { Animal, AnimalProduct, FeedEntry, HealthEvent } from "@/types/animal";
+import type { Animal, AnimalProduct, FeedEntry, HealthEvent, ProductType } from "@/types/animal";
 import type { SeedItem } from "@/types/seed";
 import type { SoilTest, Amendment } from "@/types/soil";
 import type { PestEntry } from "@/types/pest";
@@ -47,11 +48,17 @@ export interface GardenerExport {
       alerts: AlertConfig;
     };
     weatherHistory: WeatherHistoryEntry[];
+    /** Analysis preferences (separate persist store). Missing in backups made before it existed. */
+    analysisPrefs?: {
+      householdSize: number;
+      productPrices: Partial<Record<ProductType, number>>;
+    };
   };
 }
 
 export function buildExportData(): GardenerExport {
   const state = useStore.getState();
+  const prefs = useAnalysisPrefs.getState();
   return {
     version: 1,
     exportedAt: new Date().toISOString(),
@@ -85,6 +92,7 @@ export function buildExportData(): GardenerExport {
         alerts: state.alerts,
       },
       weatherHistory: state.weatherHistory,
+      analysisPrefs: { householdSize: prefs.householdSize, productPrices: { ...prefs.productPrices } },
     },
   };
 }

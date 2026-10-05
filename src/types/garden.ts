@@ -74,17 +74,6 @@ export interface SeasonArchive {
   archivedAt: string;
 }
 
-export const ENVIRONMENT_ICONS: Record<EnvironmentType, string> = {
-  outdoor_bed: "\ud83c\udf31",
-  raised_bed: "\ud83e\uddf1",
-  greenhouse: "\ud83c\udfe1",
-  cold_frame: "\u2744\ufe0f",
-  polytunnel: "\ud83c\udf08",
-  container: "\ud83e\udeb4",
-  windowsill: "\ud83e\uddf4",
-  vertical: "\u2b06\ufe0f",
-};
-
 export const ENVIRONMENT_FROST_PROTECTION: Record<EnvironmentType, number> = {
   outdoor_bed: 0,
   raised_bed: 1,

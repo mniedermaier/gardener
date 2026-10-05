@@ -76,20 +76,22 @@ export const BedEditor = memo(function BedEditor(props: Props) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-gray-100 px-3 py-3 sm:px-4 dark:border-white/5">
+      <div className="flex items-center gap-x-2 border-b border-gray-100 px-3 py-3 sm:gap-x-3 sm:px-4 dark:border-white/5">
         <IconButton icon={ArrowLeft} label={t("planner.allBeds")} onClick={onBack} className="-ml-1" />
-        <EnvironmentChip type={envType} />
-        <div className="min-w-0 flex-1">
+        {/* Mobile: the bed type is in the meta line; the chip would push the zoom controls into a second row. */}
+        <span className="hidden sm:contents"><EnvironmentChip type={envType} /></span>
+        {/* w-0: the title must not widen the card to its full text width. */}
+        <div className="w-0 min-w-0 flex-1">
           <h2 className="truncate text-lg font-semibold text-gray-900 dark:text-gray-100">{bed.name}</h2>
           <p className="truncate text-xs text-gray-500 dark:text-gray-400">
             {[size, t(`planner.environmentTypes.${envType}`), t("season.plants", { count: bed.cells.length })].join(" · ")}
           </p>
         </div>
-        {frostWeeks > 0 && <Badge tone="info" icon={ShieldCheck} className="hidden sm:inline-flex">{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge>}
-        <div className="flex items-center gap-0.5">
-          <IconButton icon={ZoomOut} label={t("planner.zoomOut")} onClick={() => onZoom(Math.max(0.6, +(zoom - 0.2).toFixed(1)))} disabled={zoom <= 0.6} />
+        {frostWeeks > 0 && <span className="hidden sm:contents"><Badge tone="info" icon={ShieldCheck}>{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge></span>}
+        <div className="-mr-1 flex shrink-0 items-center sm:mr-0 sm:gap-0.5">
+          <IconButton icon={ZoomOut} label={t("planner.zoomOut")} onClick={() => onZoom(Math.max(0.6, Math.round((zoom - 0.2) * 10) / 10))} disabled={zoom <= 0.6} />
           <span className="hidden w-11 text-center text-xs text-gray-500 tabular-nums sm:inline dark:text-gray-400">{formatPercent(zoom, 0)}</span>
-          <IconButton icon={ZoomIn} label={t("planner.zoomIn")} onClick={() => onZoom(Math.min(1.6, +(zoom + 0.2).toFixed(1)))} disabled={zoom >= 1.6} />
+          <IconButton icon={ZoomIn} label={t("planner.zoomIn")} onClick={() => onZoom(Math.min(1.6, Math.round((zoom + 0.2) * 10) / 10))} disabled={zoom >= 1.6} />
           <Menu
             label={t("planner.bedActions", { name: bed.name })}
             items={[

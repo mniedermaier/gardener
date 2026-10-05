@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { AppWindow, ArrowUpFromLine, Fence, Flower2, Snowflake, Sprout, Tent, Warehouse } from "lucide-react";
 import type { EnvironmentType } from "@/types/garden";
 
-/** Lucide icon per bed type — the UI never shows the emoji from ENVIRONMENT_ICONS. */
+/** Lucide icon per bed type. */
 export const ENVIRONMENT_LUCIDE: Record<EnvironmentType, LucideIcon> = {
   outdoor_bed: Sprout,
   raised_bed: Fence,

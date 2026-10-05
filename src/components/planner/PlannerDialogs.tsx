@@ -34,8 +34,8 @@ export function bedToDraft(bed: Bed | undefined, gridCellSizeCm: number): BedDra
   const m = gridCellSizeCm / 100;
   return {
     name: bed?.name ?? "",
-    widthM: bed ? +(bed.width * m).toFixed(2) : 1.8,
-    heightM: bed ? +(bed.height * m).toFixed(2) : 1.2,
+    widthM: bed ? Math.round(bed.width * m * 100) / 100 : 1.8,
+    heightM: bed ? Math.round(bed.height * m * 100) / 100 : 1.2,
     environmentType: bed?.environmentType ?? "outdoor_bed",
     greenhouseConfig: bed?.greenhouseConfig ?? DEFAULT_GH,
     coldFrameConfig: bed?.coldFrameConfig ?? { frostProtectionWeeks: 3 },

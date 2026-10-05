@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays } from "lucide-react";
 import { subDays } from "date-fns";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { Input } from "@/components/ui/Input";
-import { LABEL_CLASS } from "@/components/ui/Field";
+import { SegmentedControl } from "./SegmentedControl";
+import { DatePicker } from "./DatePicker";
+import { LABEL_CLASS } from "./Field";
 import { useFormat } from "@/hooks/useFormat";
 import { toISODate, todayISO } from "@/lib/format";
 
@@ -21,12 +21,11 @@ interface DateFieldProps {
 
 /**
  * Date input for records: the two most common answers as one tap
- * ("Heute" / "Gestern"), any other date via the native picker. The chosen
- * date is echoed in the app language, because native date inputs follow the
- * browser locale ("10/05/2026") rather than the app language.
+ * ("Heute" / "Gestern"), any other date via `DatePicker` (native calendar,
+ * displayed in the app language).
  */
 export function DateField({ label, value, onChange, allowFuture = false }: DateFieldProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { formatDate } = useFormat();
   const today = todayISO();
   const yesterday = toISODate(subDays(new Date(), 1));
@@ -55,15 +54,12 @@ export function DateField({ label, value, onChange, allowFuture = false }: DateF
         ]}
       />
       {choice === "custom" ? (
-        <Input
+        <DatePicker
           wrapperClassName="mt-2"
           aria-label={label}
-          type="date"
-          lang={i18n.resolvedLanguage ?? i18n.language}
           max={allowFuture ? undefined : today}
           value={value}
           onChange={(e) => e.target.value && onChange(e.target.value)}
-          hint={formatDate(value, "long")}
         />
       ) : (
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{formatDate(value, "long")}</p>

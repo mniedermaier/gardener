@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { getFrostProtectionWeeks, ENVIRONMENT_ICONS, type Bed } from "@/types/garden";
+import { getFrostProtectionWeeks, type Bed } from "@/types/garden";
+import { ENVIRONMENT_LUCIDE } from "@/components/planner/environment";
 
 function makeBed(overrides: Partial<Bed> = {}): Bed {
   return {
@@ -22,7 +23,7 @@ describe("Environment types", () => {
       "polytunnel", "container", "windowsill", "vertical",
     ] as const;
     for (const t of types) {
-      expect(ENVIRONMENT_ICONS[t]).toBeTruthy();
+      expect(ENVIRONMENT_LUCIDE[t]).toBeTruthy();
     }
   });
 

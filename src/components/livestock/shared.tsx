@@ -14,11 +14,12 @@ import {
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
-import { DateField } from "@/components/records/DateField";
+import { DateField } from "@/components/ui/DateField";
 import { ANIMAL_ICON, HEALTH_ICON, PRODUCT_ICON } from "./icons";
 import { TONE_SOFT, type Tone } from "@/components/ui/tone";
 import type { LucideIcon } from "lucide-react";
@@ -447,7 +448,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
         <Input label={t("livestock.animalName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
         <div className="grid grid-cols-2 gap-3">
           <Input label={t("livestock.count")} type="number" inputMode="numeric" min={animal ? 0 : 1} step={1} value={count} onChange={(e) => setCount(e.target.value)} />
-          <Input label={t("livestock.acquired")} type="date" value={acquired} onChange={(e) => setAcquired(e.target.value)} />
+          <DatePicker label={t("livestock.acquired")} value={acquired} onChange={(e) => setAcquired(e.target.value)} />
         </div>
         <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder={t("livestock.notesPlaceholder")} />
       </div>

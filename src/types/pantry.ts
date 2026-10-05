@@ -37,15 +37,6 @@ export const PRESERVATION_YIELD: Record<PreservationMethod, number> = {
   root_cellar: 0.95,
 };
 
-/** Icons per method */
-export const METHOD_ICONS: Record<PreservationMethod, string> = {
-  canning: "🫙",
-  freezing: "🧊",
-  fermenting: "🫧",
-  drying: "☀️",
-  root_cellar: "🏚️",
-};
-
 /** Preservation tips per method (translation keys) */
 export const METHOD_TIPS_KEY = "pantry.tips";
 

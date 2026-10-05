@@ -1,4 +1,6 @@
 import { useStore } from "@/store";
+import { clampHouseholdSize, useAnalysisPrefs } from "@/store/analysisPrefs";
+import type { ProductType } from "@/types/animal";
 import type { GardenerExport } from "./dataExport";
 
 export type ImportMode = "overwrite" | "merge";
@@ -24,14 +26,49 @@ export interface ImportResult {
     pests: number;
     waterEntries: number;
     pantryItems: number;
+    /** 1 when analysis preferences (household size, prices) were applied. */
+    analysisPrefs: number;
   };
 }
 
 const EMPTY_STATS: ImportResult["stats"] = {
   gardens: 0, tasks: 0, harvests: 0, journalEntries: 0, expenses: 0,
   customPlants: 0, seasonArchives: 0, animals: 0, animalProducts: 0,
-  feedEntries: 0, healthEvents: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0, waterEntries: 0, pantryItems: 0,
+  feedEntries: 0, healthEvents: 0, seeds: 0, soilTests: 0, amendments: 0, pests: 0, waterEntries: 0, pantryItems: 0, analysisPrefs: 0,
 };
+
+type PrefsData = NonNullable<GardenerExport["data"]["analysisPrefs"]>;
+
+/** Keeps only valid, non-negative price overrides from an untrusted backup. */
+function cleanPrices(prices: unknown): Partial<Record<ProductType, number>> {
+  const out: Partial<Record<ProductType, number>> = {};
+  if (!prices || typeof prices !== "object") return out;
+  for (const [k, v] of Object.entries(prices as Record<string, unknown>)) {
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0) out[k as ProductType] = v;
+  }
+  return out;
+}
+
+/** Overwrite: the backup's preferences replace the current ones. */
+function importPrefsOverwrite(prefs: PrefsData | undefined): number {
+  if (!prefs || typeof prefs !== "object") return 0;
+  useAnalysisPrefs.setState({
+    householdSize: clampHouseholdSize(Number(prefs.householdSize)),
+    productPrices: cleanPrices(prefs.productPrices),
+  });
+  return 1;
+}
+
+/** Merge: keep the current household size and prices, add price overrides that are not set yet. */
+function importPrefsMerge(prefs: PrefsData | undefined): number {
+  if (!prefs || typeof prefs !== "object") return 0;
+  const current = useAnalysisPrefs.getState().productPrices;
+  const incoming = cleanPrices(prefs.productPrices);
+  const added = Object.keys(incoming).filter((k) => current[k as ProductType] === undefined);
+  if (added.length === 0) return 0;
+  useAnalysisPrefs.setState({ productPrices: { ...incoming, ...current } });
+  return 1;
+}
 
 export function validateExportFile(json: unknown): json is GardenerExport {
   if (!json || typeof json !== "object") return false;
@@ -124,6 +161,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
       pests: data.pests?.length ?? 0,
       waterEntries: data.waterEntries?.length ?? 0,
       pantryItems: data.pantryItems?.length ?? 0,
+      analysisPrefs: importPrefsOverwrite(data.analysisPrefs),
     },
   };
 }
@@ -215,6 +253,7 @@ function importMerge(
       pests: mergedPests.length - current.pests.length,
       waterEntries: mergedWaterEntries.length - current.waterEntries.length,
       pantryItems: mergedPantryItems.length - current.pantryItems.length,
+      analysisPrefs: importPrefsMerge(data.analysisPrefs),
     },
   };
 }

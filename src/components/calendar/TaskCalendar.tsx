@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
@@ -455,7 +456,7 @@ export function TaskCalendar() {
               onChange={(e) => patch({ type: e.target.value as TaskType })}
               options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
             />
-            <Input label={t("calendar.taskDate")} type="date" value={draft.dueDate} onChange={(e) => patch({ dueDate: e.target.value })} />
+            <DatePicker label={t("calendar.taskDate")} value={draft.dueDate} onChange={(e) => patch({ dueDate: e.target.value })} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {gardens.length > 1 && (

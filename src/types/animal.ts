@@ -43,29 +43,6 @@ export interface FeedEntry {
   notes?: string;
 }
 
-export const ANIMAL_ICONS: Record<AnimalType, string> = {
-  chicken: "\ud83d\udc14",
-  duck: "\ud83e\udd86",
-  rabbit: "\ud83d\udc30",
-  bee: "\ud83d\udc1d",
-  goat: "🐐",
-  sheep: "🐑",
-  quail: "🐦",
-};
-
-/**
- * Legacy emoji maps. The UI uses Lucide icons from
- * `components/livestock/icons.ts`; these stay only for older call sites.
- */
-export const PRODUCT_ICONS: Record<ProductType, string> = {
-  eggs: "\ud83e\udd5a",
-  honey: "\ud83c\udf6f",
-  meat: "\ud83e\udd69",
-  wax: "\ud83d\udd6f\ufe0f",
-  milk: "🥛",
-  wool: "🧶",
-};
-
 // Nutrition per 100g of product
 export const PRODUCT_NUTRITION: Record<ProductType, { caloriesPer100g: number; proteinPer100g: number }> = {
   eggs: { caloriesPer100g: 155, proteinPer100g: 13 },

@@ -9,6 +9,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import { useFormat } from "@/hooks/useFormat";
@@ -223,10 +224,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
           {step === "frost" && (
             <>
               <StepHeader icon={Snowflake} title={t("onboarding.frostTitle")} description={t("onboarding.frostDesc")} />
-              <Input
+              <DatePicker
                 label={t("settings.lastFrostDate")}
-                type="date"
-                lang={i18n.resolvedLanguage}
                 value={shownFrost}
                 onChange={(e) => {
                   setFrostTouched(true);

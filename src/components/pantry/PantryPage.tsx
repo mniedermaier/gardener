@@ -31,7 +31,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Tabs } from "@/components/ui/Tabs";
 import { LABEL_CLASS } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
-import { DateField } from "@/components/records/DateField";
+import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 

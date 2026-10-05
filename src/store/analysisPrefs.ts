@@ -6,7 +6,8 @@ import type { ProductType } from "@/types/animal";
 /**
  * Small preference store for the analysis pages (self-sufficiency, food plan,
  * costs). Kept apart from the main store on purpose: these are view settings,
- * not garden records, so they are not part of backups and need no migration.
+ * not garden records, and need no migration. They are still part of backups
+ * (`analysisPrefs` in lib/dataExport.ts, optional for older files).
  *
  * - householdSize: one value shared by Selbstversorgung, Ernährungsplan and
  *   the dashboard metrics (before, each page had its own field).

@@ -10,6 +10,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -166,10 +167,8 @@ export function SettingsPage() {
             />
             <div className="grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 dark:border-white/10">
               <div>
-                <Input
+                <DatePicker
                   label={t("settings.lastFrostDate")}
-                  type="date"
-                  lang={i18n.resolvedLanguage}
                   value={store.lastFrostDate}
                   onChange={(e) => e.target.value && store.setLastFrostDate(e.target.value)}
                   hint={frostEstimate ? t("settings.frostEstimate", { date: formatDate(frostEstimate, "short") }) : t("settings.frostHint")}

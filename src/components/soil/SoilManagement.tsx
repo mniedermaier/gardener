@@ -23,7 +23,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Tabs } from "@/components/ui/Tabs";
 import { useToast } from "@/components/ui/Toast";
 import type { Tone } from "@/components/ui/tone";
-import { DateField } from "@/components/records/DateField";
+import { DateField } from "@/components/ui/DateField";
 import { useBeds } from "@/components/records/useBeds";
 
 const AMENDMENT_TYPES: AmendmentType[] = ["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"];

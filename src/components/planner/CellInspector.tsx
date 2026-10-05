@@ -10,6 +10,7 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Textarea } from "@/components/ui/Textarea";
 import { PlantInfoPanel } from "./PlantInfoPanel";
 
@@ -110,9 +111,8 @@ export const CellInspector = memo(function CellInspector({
           onChange={(e) => onUpdate({ variety: e.target.value || undefined })}
           placeholder={t("planner.varietyPlaceholder")}
         />
-        <Input
+        <DatePicker
           label={t("planner.plantedDate")}
-          type="date"
           value={cell.plantedDate ?? ""}
           onChange={(e) => onUpdate({ plantedDate: e.target.value || undefined })}
         />

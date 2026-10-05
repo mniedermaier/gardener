@@ -24,7 +24,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { StatCard } from "@/components/ui/StatCard";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
-import { DateField } from "@/components/records/DateField";
+import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { BarChart } from "@/components/ui/charts";
 import { QualityInput, QualityStars, type Quality } from "@/components/records/Quality";

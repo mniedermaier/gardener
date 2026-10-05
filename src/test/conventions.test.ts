@@ -1,9 +1,8 @@
 /**
  * Ratchet for design-system conventions (docs/DESIGN_SYSTEM.md).
  *
- * Existing code still has violations, so this does not demand zero — it fails
- * when a count goes *up*. When you migrate a page and a count drops, lower
- * the baseline here in the same change so it cannot creep back.
+ * All counts are at zero now; the baselines stay here so a new occurrence
+ * fails the build with a pointer to the right primitive or helper.
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
@@ -34,11 +33,11 @@ function count(pattern: RegExp, { skipPrimitives = false } = {}) {
 }
 
 const RULES: Array<{ name: string; pattern: RegExp; max: number; fix: string; skipPrimitives?: boolean }> = [
-  { name: "toFixed() in components", pattern: /\.toFixed\(/g, max: 37, fix: "use useFormat() / lib/format.ts" },
-  { name: "font size below 11px", pattern: /text-\[(?:[0-9]|10)(?:\.\d+)?px\]/g, max: 23, fix: "smallest size is text-xs (12px) or text-overline (11px)" },
-  { name: "raw <select>", pattern: /<select\b/g, max: 35, fix: "use ui/Select", skipPrimitives: true },
-  { name: "raw <textarea>", pattern: /<textarea\b/g, max: 5, fix: "use ui/Textarea", skipPrimitives: true },
-  { name: "window.prompt/alert", pattern: /\b(?:window\.)?(?:prompt|alert)\(/g, max: 2, fix: "use Modal or toast" },
+  { name: "toFixed() in components", pattern: /\.toFixed\(/g, max: 0, fix: "use useFormat() / lib/format.ts" },
+  { name: "font size below 11px", pattern: /text-\[(?:[0-9]|10)(?:\.\d+)?px\]/g, max: 0, fix: "smallest size is text-xs (12px) or text-overline (11px)" },
+  { name: "raw <select>", pattern: /<select\b/g, max: 0, fix: "use ui/Select", skipPrimitives: true },
+  { name: "raw <textarea>", pattern: /<textarea\b/g, max: 0, fix: "use ui/Textarea", skipPrimitives: true },
+  { name: "window.prompt/alert", pattern: /\b(?:window\.)?(?:prompt|alert)\(/g, max: 0, fix: "use Modal or toast" },
 ];
 
 describe("design-system ratchet", () => {

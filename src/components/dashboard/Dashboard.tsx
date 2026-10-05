@@ -1,7 +1,7 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { Apple, ArrowRight, Sprout, Wallet, Egg, Plus, Star } from "lucide-react";
+import { Apple, ArrowRight, Sprout, Scale, Egg, Plus, Star, Target } from "lucide-react";
 import { getISOWeek } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -10,6 +10,7 @@ import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useHarvestReady } from "@/hooks/useHarvestReady";
+import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -17,6 +18,9 @@ import { StatCard } from "@/components/ui/StatCard";
 import { List, ListRow } from "@/components/ui/List";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
+import { Meter } from "@/components/ui/charts";
+import { TONE_SOFT } from "@/components/ui/tone";
+import { ANNUAL_YIELD } from "@/types/animal";
 import { PlantingAdvisor } from "./PlantingAdvisor";
 import { HarvestReady } from "./HarvestReady";
 import { TodayTasks } from "./TodayTasks";
@@ -25,6 +29,9 @@ import { GettingStarted, useGettingStartedSteps } from "./GettingStarted";
 import { BackupHint } from "./BackupHint";
 
 type NowTab = "harvest" | "sow";
+
+const TILE = "h-full rounded-xl border border-gray-200 bg-white shadow-xs transition-colors hover:border-gray-300 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20";
+const TILE_LINK = "h-full transition-colors hover:border-gray-300 dark:hover:border-white/20";
 
 const WIDE = "(min-width: 1024px)";
 const subscribeWide = (cb: () => void) => {
@@ -43,9 +50,9 @@ const useWide = () => useSyncExternalStore(subscribeWide, () => window.matchMedi
 export function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { formatWeight, formatCurrency, formatNumber, formatDate, locale } = useFormat();
-  const { gardens, harvests, expenses, animals, animalProducts } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, harvests: s.harvests, expenses: s.expenses, animals: s.animals, animalProducts: s.animalProducts })),
+  const { formatWeight, formatCurrency, formatNumber, formatPercent, formatDate, locale } = useFormat();
+  const { gardens, harvests, expenses, animals } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, harvests: s.harvests, expenses: s.expenses, animals: s.animals })),
   );
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
@@ -63,10 +70,12 @@ export function Dashboard() {
   const uniquePlantIds = new Set<string>();
   for (const g of gardens) for (const b of g.beds) for (const c of b.cells) uniquePlantIds.add(c.plantId);
 
-  const totalHarvestGrams = harvests.reduce((s, h) => s + (h.weightGrams ?? 0), 0);
-  const totalExpenseEur = expenses.reduce((s, e) => s + e.amountCents, 0) / 100;
+  // Season figures come from lib/metrics.ts so they match the analysis pages.
+  const m = useGardenMetrics();
+  const harvestActual = m.harvest.actual.totalGrams;
+  const harvestForecast = m.harvest.forecast.totalGrams;
   const totalAnimals = animals.reduce((s, a) => s + a.count, 0);
-  const totalEggs = animalProducts.filter((p) => p.type === "eggs").reduce((s, p) => s + p.quantity, 0);
+  const layers = animals.filter((a) => ANNUAL_YIELD[a.type]?.some((y) => y.product === "eggs")).reduce((s, a) => s + a.count, 0);
 
   const recentHarvests = useMemo(
     () => [...harvests].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4),
@@ -77,7 +86,7 @@ export function Dashboard() {
     date: new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(now),
     week: getISOWeek(now),
   });
-  const hasSeason = harvests.length > 0 || expenses.length > 0 || totalAnimals > 0;
+  const hasSeason = harvests.length > 0 || expenses.length > 0 || totalAnimals > 0 || totalPlantings > 0;
   const firstGarden = gardens.length === 1 ? gardens[0].name : null;
 
   const addHarvest = () => navigate("/harvest", { state: { openAdd: true } satisfies OpenAddState });
@@ -136,42 +145,70 @@ export function Dashboard() {
             <section>
               <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.seasonTitle")}</h2>
               <div className="grid grid-cols-2 gap-3">
-                <Link to="/harvest" className="rounded-xl">
-                  <StatCard
-                    label={t("dashboard.harvested")}
-                    value={formatWeight(totalHarvestGrams)}
-                    icon={Apple}
-                    hint={t("dashboard.harvestEntries", { count: harvests.length })}
-                    className="h-full transition-colors hover:border-gray-300 dark:hover:border-white/20"
-                  />
+                <Link to="/harvest" className="col-span-2 rounded-xl">
+                  <div className={`${TILE} p-4`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{t("metrics.yieldActual")}</p>
+                      <span className={`-mt-1 -mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${TONE_SOFT.brand}`} aria-hidden="true">
+                        <Apple size={16} />
+                      </span>
+                    </div>
+                    <p className="mt-1 text-2xl font-semibold tracking-tight text-gray-900 tabular-nums dark:text-gray-50">{formatWeight(harvestActual)}</p>
+                    {harvestForecast > 0 && (
+                      <Meter
+                        actual={harvestActual}
+                        forecast={harvestForecast}
+                        max={Math.max(harvestActual, harvestForecast)}
+                        label={t("metrics.actualVsForecast", { actual: formatWeight(harvestActual), forecast: formatWeight(harvestForecast) })}
+                        className="mt-3"
+                      />
+                    )}
+                    <p className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                      <span>{t("metrics.harvestEntries", { count: m.harvest.entryCount })}</span>
+                      {harvestForecast > 0 && <span className="tabular-nums">{t("dashboard.forecastValue", { value: formatWeight(harvestForecast) })}</span>}
+                    </p>
+                  </div>
                 </Link>
-                <Link to="/planner" className="rounded-xl">
+                <Link to="/sufficiency" className="rounded-xl">
                   <StatCard
-                    label={t("dashboard.plantings")}
-                    value={formatNumber(totalPlantings)}
-                    icon={Sprout}
-                    hint={t("dashboard.typesInBeds", { types: formatNumber(uniquePlantIds.size), count: totalBeds })}
-                    className="h-full transition-colors hover:border-gray-300 dark:hover:border-white/20"
+                    label={t("metrics.selfSufficiencyForecast")}
+                    value={formatPercent(m.selfSufficiency.forecastRatio)}
+                    icon={Target}
+                    tone="neutral"
+                    hint={t("metrics.actualShort", { value: formatPercent(m.selfSufficiency.actualRatio) })}
+                    className={TILE_LINK}
                   />
                 </Link>
                 <Link to="/expenses" className="rounded-xl">
                   <StatCard
-                    label={t("dashboard.totalExpenses")}
-                    value={formatCurrency(totalExpenseEur, { maximumFractionDigits: 0 })}
-                    icon={Wallet}
+                    label={t("expenses.net")}
+                    value={formatCurrency(m.balance.net)}
+                    icon={Scale}
                     tone="neutral"
-                    className="h-full transition-colors hover:border-gray-300 dark:hover:border-white/20"
+                    hint={m.balance.roi === null ? t("expenses.roiNoCosts") : t("dashboard.roiValue", { value: formatPercent(m.balance.roi) })}
+                    className={TILE_LINK}
                   />
                 </Link>
-                {totalAnimals > 0 && (
-                  <Link to="/livestock" className="rounded-xl">
+                {layers > 0 ? (
+                  <Link to="/livestock" className="col-span-2 rounded-xl">
                     <StatCard
                       label={t("dashboard.totalEggs")}
-                      value={formatNumber(totalEggs)}
+                      value={formatNumber(m.animalProducts.actual.eggs, { maximumFractionDigits: 0 })}
                       icon={Egg}
                       tone="neutral"
-                      hint={t("dashboard.animalsCount", { count: totalAnimals })}
-                      className="h-full transition-colors hover:border-gray-300 dark:hover:border-white/20"
+                      hint={t("dashboard.animalsCount", { count: layers })}
+                      className={TILE_LINK}
+                    />
+                  </Link>
+                ) : (
+                  <Link to="/planner" className="col-span-2 rounded-xl">
+                    <StatCard
+                      label={t("dashboard.plantings")}
+                      value={formatNumber(totalPlantings)}
+                      icon={Sprout}
+                      tone="neutral"
+                      hint={t("dashboard.typesInBeds", { types: formatNumber(uniquePlantIds.size), count: totalBeds })}
+                      className={TILE_LINK}
                     />
                   </Link>
                 )}

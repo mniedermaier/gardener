@@ -21,7 +21,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StatCard } from "@/components/ui/StatCard";
 import { useToast } from "@/components/ui/Toast";
-import { DateField } from "@/components/records/DateField";
+import { DateField } from "@/components/ui/DateField";
 import { BarChart } from "@/components/ui/charts";
 import { useBeds } from "@/components/records/useBeds";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";

@@ -29,7 +29,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
 import { HowCalculated, Meter } from "@/components/ui/charts";
-import { DateField } from "@/components/records/DateField";
+import { DateField } from "@/components/ui/DateField";
 
 const CATEGORIES: ExpenseCategory[] = ["seeds", "soil", "fertilizer", "tools", "infrastructure", "water", "animal_feed", "veterinary", "other"];
 

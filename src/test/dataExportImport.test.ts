@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { buildExportData, type GardenerExport } from "@/lib/dataExport";
-import { validateExportFile } from "@/lib/dataImport";
+import { importAllData, validateExportFile } from "@/lib/dataImport";
+import { useAnalysisPrefs } from "@/store/analysisPrefs";
 
 function makeExport(overrides: Partial<GardenerExport["data"]> = {}): GardenerExport {
   return {
@@ -36,6 +37,7 @@ function makeExport(overrides: Partial<GardenerExport["data"]> = {}): GardenerEx
         alerts: { frostAlertEnabled: true, frostThresholdC: 2, wateringReminders: true, greenhouseAlerts: true, weeklyDigest: true },
       },
       weatherHistory: [],
+      analysisPrefs: { householdSize: 2, productPrices: {} },
       ...overrides,
     },
   };
@@ -64,6 +66,40 @@ describe("Data export", () => {
     expect(data.data).toHaveProperty("seasonArchives");
     expect(data.data).toHaveProperty("weatherHistory");
     expect(data.data).toHaveProperty("settings");
+    expect(data.data).toHaveProperty("analysisPrefs");
+  });
+});
+
+describe("Analysis preferences in backups", () => {
+  beforeEach(() => useAnalysisPrefs.setState({ householdSize: 2, productPrices: {} }));
+
+  it("exports household size and price overrides", () => {
+    useAnalysisPrefs.setState({ householdSize: 4, productPrices: { eggs: 0.5 } });
+    expect(buildExportData().data.analysisPrefs).toEqual({ householdSize: 4, productPrices: { eggs: 0.5 } });
+  });
+
+  it("overwrite import replaces them", () => {
+    const result = importAllData(makeExport({ analysisPrefs: { householdSize: 5, productPrices: { honey: 9 } } }), "overwrite");
+    expect(result.stats.analysisPrefs).toBe(1);
+    expect(useAnalysisPrefs.getState().householdSize).toBe(5);
+    expect(useAnalysisPrefs.getState().productPrices).toEqual({ honey: 9 });
+  });
+
+  it("merge import keeps current values and adds missing prices", () => {
+    useAnalysisPrefs.setState({ householdSize: 3, productPrices: { eggs: 0.4 } });
+    importAllData(makeExport({ analysisPrefs: { householdSize: 6, productPrices: { eggs: 1, honey: 9 } } }), "merge");
+    expect(useAnalysisPrefs.getState().householdSize).toBe(3);
+    expect(useAnalysisPrefs.getState().productPrices).toEqual({ eggs: 0.4, honey: 9 });
+  });
+
+  it("old backups without the field still import and leave prefs untouched", () => {
+    useAnalysisPrefs.setState({ householdSize: 3, productPrices: { eggs: 0.4 } });
+    const old = makeExport();
+    delete old.data.analysisPrefs;
+    const result = importAllData(old, "overwrite");
+    expect(result.success).toBe(true);
+    expect(result.stats.analysisPrefs).toBe(0);
+    expect(useAnalysisPrefs.getState().householdSize).toBe(3);
   });
 });
 
