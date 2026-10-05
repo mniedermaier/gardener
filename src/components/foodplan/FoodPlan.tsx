@@ -8,7 +8,7 @@ import { useAnalysisPrefs } from "@/store/analysisPrefs";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { getCropPlan, getForecastProducts, PRODUCT_TYPES } from "@/lib/metrics";
+import { ANNUAL_CONSUMPTION_KG_PER_PERSON, EGG_WEIGHT_KG, getCropPlan, getForecastProducts, PRODUCT_TYPES } from "@/lib/metrics";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -68,6 +68,7 @@ export function FoodPlan() {
             <p>{t("foodplan.howTargets")}</p>
             <p>{t("foodplan.howCoverage")}</p>
             <p>{t("metrics.howActual")}</p>
+            <p>{t("foodplan.howVsCalories")}</p>
           </HowCalculated>
 
           {deficits.length > 0 && (
@@ -139,17 +140,29 @@ export function FoodPlan() {
 
           {animals.length > 0 && (
             <section aria-labelledby="animal-products" className="space-y-3">
-              <h2 id="animal-products" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.animalProducts")}</h2>
+              <div>
+                <h2 id="animal-products" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.animalProducts")}</h2>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("foodplan.animalIntro", { count: householdSize })}</p>
+              </div>
               <List label={t("foodplan.animalProducts")}>
-                {PRODUCT_TYPES.filter((ty) => animalForecast[ty] > 0).map((ty) => (
-                  <ListRow
-                    key={ty}
-                    leading={<IconTile icon={PRODUCT_ICON[ty]} />}
-                    title={t(`livestock.products.${ty}`)}
-                    meta={t("foodplan.animalMeta")}
-                    trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, animalForecast[ty], f, t) })}
-                  />
-                ))}
+                {PRODUCT_TYPES.filter((ty) => animalForecast[ty] > 0).map((ty) => {
+                  const perPerson = ANNUAL_CONSUMPTION_KG_PER_PERSON[ty];
+                  // Typical household consumption in the recording unit (eggs as hen's eggs).
+                  const need = perPerson === undefined ? null : (perPerson / (ty === "eggs" ? EGG_WEIGHT_KG : 1)) * householdSize;
+                  const surplus = need === null ? 0 : Math.max(0, animalForecast[ty] - need);
+                  return (
+                    <ListRow
+                      key={ty}
+                      leading={<IconTile icon={PRODUCT_ICON[ty]} />}
+                      title={t(`livestock.products.${ty}`)}
+                      badges={need !== null && surplus > 0 ? <Badge tone="neutral">{t("foodplan.surplusBadge")}</Badge> : undefined}
+                      meta={need === null
+                        ? t("sufficiency.nonFood")
+                        : [t("foodplan.animalNeed", { amount: formatProductAmount(ty, need, f, t) }), surplus > 0 ? t("foodplan.animalSurplus", { amount: formatProductAmount(ty, surplus, f, t) }) : null].filter(Boolean).join(" · ")}
+                      trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, animalForecast[ty], f, t) })}
+                    />
+                  );
+                })}
               </List>
             </section>
           )}

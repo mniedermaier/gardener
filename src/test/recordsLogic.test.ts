@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { phAdvice, targetPh, DEFAULT_PH } from "@/lib/soil";
+import { assessPh, bedPhTarget, phAdvice, targetPh, DEFAULT_PH } from "@/lib/soil";
 import { needsNewStock, propagation, seedViability } from "@/lib/seedViability";
 import plants from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
@@ -21,6 +21,45 @@ describe("soil pH advice", () => {
     expect(phAdvice(6.5, DEFAULT_PH)).toBe("optimal");
     // Blueberries want acid soil: 5.0 is fine, no lime.
     expect(phAdvice(5.0, targetPh(["blueberry"]))).toBe("optimal");
+  });
+});
+
+describe("crop-specific lime rules", () => {
+  const potatoField = ["potato", "pumpkin", "bean", "corn"]; // demo "Kartoffelacker"
+
+  it("never recommends lime for a potato bed at pH 5.6 (scab)", () => {
+    const a = assessPh(5.6, potatoField);
+    expect(a.advice).toBe("limeVeto");
+    expect(a.limeAverse).toEqual(["potato"]);
+    expect(a.target).toEqual({ min: 5.0, max: 6.0 });
+  });
+
+  it("a pure potato bed at 5.6 is simply optimal", () => {
+    expect(assessPh(5.6, ["potato"]).advice).toBe("optimal");
+    expect(bedPhTarget(["potato"])).toEqual({ min: 5.0, max: 6.0 });
+  });
+
+  it("warns about scab risk when the potato bed is alkaline", () => {
+    expect(assessPh(6.8, ["potato"]).advice).toBe("averseHigh");
+  });
+
+  it("only a little lime when even potatoes find it too acid", () => {
+    expect(assessPh(4.2, ["potato"]).advice).toBe("limeLight");
+  });
+
+  it("blueberries far above their range need acidifying, not 'slightly basic'", () => {
+    expect(assessPh(6.5, ["blueberry"]).advice).toBe("acidify");
+    expect(assessPh(5.0, ["blueberry"]).advice).toBe("optimal");
+  });
+
+  it("flags brassicas so lime advice can mention clubroot", () => {
+    const a = assessPh(6.0, ["cabbage", "kale"]);
+    expect(a.advice).toBe("limeLight");
+    expect(a.limeLoving).toEqual(["cabbage", "kale"]);
+  });
+
+  it("leaves beds without lime-averse crops on the shared target", () => {
+    expect(assessPh(7.1, ["tomato", "pepper", "cucumber"]).advice).toBe("noLime");
   });
 });
 

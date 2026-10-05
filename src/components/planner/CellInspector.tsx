@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Apple, Bug, ChevronDown, NotebookPen, Plus, Trash2, X, TriangleAlert } from "lucide-react";
+import { Apple, Bug, ChevronDown, ChevronUp, NotebookPen, Plus, Trash2, X, TriangleAlert } from "lucide-react";
 import type { Bed, CellPlanting } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
@@ -27,6 +27,9 @@ interface Props {
   onUpdate: (updates: Partial<CellPlanting>) => void;
   /** In the mobile sheet the sheet header already names the plant. */
   hideHeader?: boolean;
+  /** Mobile peek: only the actions, plus a button that expands the sheet. */
+  compact?: boolean;
+  onExpand?: () => void;
 }
 
 /**
@@ -35,7 +38,7 @@ interface Props {
  * journal note (deep links into those pages, pre-filled), plant more of it.
  */
 export const CellInspector = memo(function CellInspector({
-  gardenId, bed, cell, plant, frostProtectionWeeks, conflictPartners, onClose, onPlantMore, onRemove, onUpdate, hideHeader = false,
+  gardenId, bed, cell, plant, frostProtectionWeeks, conflictPartners, onClose, onPlantMore, onRemove, onUpdate, hideHeader = false, compact = false, onExpand,
 }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -51,7 +54,7 @@ export const CellInspector = memo(function CellInspector({
   };
 
   return (
-    <section aria-label={t("planner.inspectorLabel", { name })} className="space-y-4">
+    <section aria-label={t("planner.inspectorLabel", { name })} className={compact ? "space-y-3" : "space-y-4"}>
       {!hideHeader && <div className="flex items-start gap-3">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: plant.color + "22" }}>
           <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
@@ -69,11 +72,11 @@ export const CellInspector = memo(function CellInspector({
       </div>}
 
       {conflictPartners.length > 0 && (
-        <div role="note" className="flex gap-2 rounded-lg bg-danger/10 p-3 text-sm text-danger dark:bg-danger/15">
+        <div role="note" className="flex gap-2 rounded-lg bg-warning/10 p-3 text-sm text-warning dark:bg-warning/15">
           <TriangleAlert size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
           <div>
             <p className="font-medium">{t("planner.conflictWith", { plants: conflictPartners.map(getPlantName).join(", ") })}</p>
-            <p className="mt-0.5 text-gray-700 dark:text-gray-300">{t("planner.conflictWhy")}</p>
+            {!compact && <p className="mt-0.5 text-gray-700 dark:text-gray-300">{t("planner.conflictWhy")}</p>}
           </div>
         </div>
       )}
@@ -104,6 +107,16 @@ export const CellInspector = memo(function CellInspector({
         ))}
       </div>
 
+      {compact ? (
+        <button
+          type="button"
+          onClick={onExpand}
+          className="flex min-h-11 w-full items-center justify-between rounded-lg px-1 text-sm font-medium text-garden-700 dark:text-garden-300"
+        >
+          {t("planner.sheetMore")}
+          <ChevronUp size={18} aria-hidden="true" />
+        </button>
+      ) : <>
       <div className="space-y-3">
         <Input
           label={t("planner.variety")}
@@ -135,6 +148,7 @@ export const CellInspector = memo(function CellInspector({
           {t("planner.removePlant")}
         </Button>
       </div>
+      </>}
     </section>
   );
 });

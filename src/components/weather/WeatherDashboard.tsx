@@ -10,8 +10,10 @@ import { useStore } from "@/store";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { todayISO } from "@/lib/format";
+import { toDate, todayISO } from "@/lib/format";
+import { differenceInCalendarDays } from "date-fns";
 import { getAllAlerts, groupAlerts, type AlertGroup, type WeatherAlert } from "@/lib/weatherAlerts";
+import { fetchWeather as fetchWeather_, getWeatherProvider, isWeatherConfigured, WeatherAuthError } from "@/lib/weather";
 import type { Plant } from "@/types/plant";
 import type { WeatherData } from "@/types/weather";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -50,6 +52,18 @@ function weatherIcon(code: string): LucideIcon {
 
 type FetchError = "auth" | "network";
 
+/** Same day names as the forecast list: "Heute", "Morgen", then "Mi." … */
+function dayLabel(date: string, f: ReturnType<typeof useFormat>): string {
+  const diff = differenceInCalendarDays(toDate(date) ?? new Date(), new Date());
+  return diff >= 0 && diff < 2 ? f.formatDate(date, "relative") : f.formatDate(date, "weekday");
+}
+
+/** "Mittwoch, 7. Okt." — the day inside an alert sentence. */
+function dayPhrase(date: string, locale: string): string {
+  const d = toDate(date);
+  return d ? new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "short" }).format(d) : date;
+}
+
 /** Frost-sensitive crops = planted crops normally set out only after the last frost. */
 function frostSensitive(plants: Plant[]): Plant[] {
   return plants.filter((p) => p.transplantWeeks !== null && p.transplantWeeks >= 0 && p.harvestDaysMax < 365);
@@ -63,8 +77,8 @@ function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: stri
   const fmtParams = (p?: Record<string, string | number>) => {
     if (!p) return p;
     const out: Record<string, string | number> = { ...p };
-    if (typeof p.date === "string") out.date = f.formatDate(p.date, "short");
-    for (const k of ["temp", "max", "min"] as const) if (typeof p[k] === "number") out[k] = f.formatTemperature(p[k] as number);
+    if (typeof p.date === "string") out.date = dayPhrase(p.date, f.locale);
+    for (const k of ["temp", "max", "min", "outside", "buffer"] as const) if (typeof p[k] === "number") out[k] = f.formatTemperature(p[k] as number);
     return out;
   };
 
@@ -78,7 +92,7 @@ function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: stri
         <span className="flex flex-wrap gap-1.5">
           {group.alerts.map((a) => (
             <Badge key={a.id} variant="outline" tone={a.severity === "danger" ? "danger" : "warning"}>
-              {f.formatDate(a.date ?? "", "weekday")} {f.formatTemperature(Number(a.titleParams?.temp ?? 0))}
+              {dayLabel(a.date ?? "", f)} {f.formatTemperature(Number(a.titleParams?.temp ?? 0))}
             </Badge>
           ))}
         </span>
@@ -110,7 +124,7 @@ function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: stri
 }
 
 export function WeatherDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
   const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, gardens: s.gardens, addWeatherHistory: s.addWeatherHistory })));
@@ -137,73 +151,22 @@ export function WeatherDashboard() {
   const weekly = allAlerts.find((a) => a.type === "weekly");
   const sensitive = useMemo(() => frostSensitive(plantedPlants).map((p) => plantName(p.id)), [plantedPlants, plantName]);
 
+  const provider = getWeatherProvider(weatherApiKey);
   const fetchWeather = useCallback(async () => {
-    if (!weatherApiKey || locationLat === null || locationLon === null) return;
+    if (!isWeatherConfigured(locationLat, locationLon)) return;
     setLoading(true);
     setError(null);
     try {
-      const [currentRes, forecastRes] = await Promise.all([
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${locationLat}&lon=${locationLon}&appid=${weatherApiKey}&units=metric`),
-        fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${locationLat}&lon=${locationLon}&appid=${weatherApiKey}&units=metric`),
-      ]);
-      if (currentRes.status === 401 || forecastRes.status === 401) {
-        setError("auth");
-        return;
-      }
-      if (!currentRes.ok || !forecastRes.ok) throw new Error("API error");
-
-      const current = await currentRes.json();
-      const forecast = await forecastRes.json();
-
-      const dailyMap = new Map<string, { temps: number[]; descriptions: string[]; icons: string[]; precip: number[] }>();
-      for (const item of forecast.list) {
-        const date = item.dt_txt.split(" ")[0];
-        if (!dailyMap.has(date)) dailyMap.set(date, { temps: [], descriptions: [], icons: [], precip: [] });
-        const d = dailyMap.get(date)!;
-        d.temps.push(item.main.temp);
-        d.descriptions.push(item.weather[0].description);
-        d.icons.push(item.weather[0].icon);
-        d.precip.push(item.pop * 100);
-      }
-
-      const forecastItems = Array.from(dailyMap.entries()).slice(0, 5).map(([date, d]) => ({
-        date,
-        tempMin: Math.round(Math.min(...d.temps)),
-        tempMax: Math.round(Math.max(...d.temps)),
-        description: d.descriptions[Math.floor(d.descriptions.length / 2)],
-        icon: d.icons[Math.floor(d.icons.length / 2)],
-        precipitation: Math.round(Math.max(...d.precip)),
-      }));
-
-      addWeatherHistory({
-        date: todayISO(),
-        tempMin: Math.round(current.main.temp_min),
-        tempMax: Math.round(current.main.temp_max),
-        precipitation: current.rain?.["1h"] ?? 0,
-        humidity: current.main.humidity,
-      });
-
-      const weatherData: WeatherData = {
-        current: {
-          temp: Math.round(current.main.temp),
-          feelsLike: Math.round(current.main.feels_like),
-          humidity: current.main.humidity,
-          description: current.weather[0].description,
-          icon: current.weather[0].icon,
-          windSpeed: Math.round(current.wind.speed * 3.6),
-        },
-        forecast: forecastItems,
-        locationName: locationName || current.name,
-        fetchedAt: new Date().toISOString(),
-      };
-      setWeather(weatherData);
-      try { sessionStorage.setItem("gardener-weather", JSON.stringify(weatherData)); } catch { /* private mode */ }
-    } catch {
-      setError("network");
+      const result = await fetchWeather_({ lat: locationLat!, lon: locationLon!, apiKey: weatherApiKey, locale: i18n.language, locationName, t });
+      addWeatherHistory(result.today);
+      setWeather(result.data);
+      try { sessionStorage.setItem("gardener-weather", JSON.stringify(result.data)); } catch { /* private mode */ }
+    } catch (e) {
+      setError(e instanceof WeatherAuthError ? "auth" : "network");
     } finally {
       setLoading(false);
     }
-  }, [weatherApiKey, locationLat, locationLon, locationName, addWeatherHistory]);
+  }, [weatherApiKey, locationLat, locationLon, locationName, addWeatherHistory, t, i18n.language]);
 
   useEffect(() => { void fetchWeather(); }, [fetchWeather]);
 
@@ -214,16 +177,21 @@ export function WeatherDashboard() {
     </Button>
   );
 
-  if (!weatherApiKey || locationLat === null || locationLon === null) {
+  if (!isWeatherConfigured(locationLat, locationLon)) {
     return (
       <div>
         <PageHeader title={t("weather.title")} description={t("weather.subtitle")} />
         <Card>
           <EmptyState
-            icon={CloudSun}
-            title={t("weather.connectTitle")}
-            description={!weatherApiKey ? t("weather.noApiKey") : t("weather.noLocation")}
-            action={toSettings}
+            icon={MapPin}
+            title={t("weather.locationTitle")}
+            description={t("weather.locationText")}
+            action={
+              <Button onClick={() => navigate("/settings")}>
+                <MapPin size={16} aria-hidden="true" />
+                {t("weather.setLocation")}
+              </Button>
+            }
           />
         </Card>
         <SunlightWidget />
@@ -298,7 +266,7 @@ export function WeatherDashboard() {
               {createElement(weatherIcon(weather.current.icon), { size: 48, strokeWidth: 1.5, "aria-hidden": true, className: "text-gray-700 dark:text-gray-300" })}
               <div>
                 <p className="text-4xl font-semibold tracking-tight tabular-nums text-gray-900 dark:text-gray-50">{f.formatTemperature(weather.current.temp)}</p>
-                <p className="text-sm capitalize text-gray-600 dark:text-gray-300">{weather.current.description}</p>
+                <p className="text-sm text-gray-600 first-letter:uppercase dark:text-gray-300">{weather.current.description}</p>
               </div>
             </div>
             <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-sm dark:border-white/5">
@@ -322,16 +290,16 @@ export function WeatherDashboard() {
               <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })} />
             </div>
             <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
-              {days.map((day, i) => {
+              {days.map((day) => {
                 const frost = day.tempMin <= alertConfig.frostThresholdC;
                 return (
                   <li key={day.date} className="grid grid-cols-[4.5rem_1.5rem_1fr] items-center gap-x-3 gap-y-1 px-4 py-3 sm:grid-cols-[5.5rem_1.5rem_minmax(0,1fr)_3rem_minmax(6rem,10rem)_3rem] sm:px-6">
                     <time dateTime={day.date} className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {i < 2 ? f.formatDate(day.date, "relative") : f.formatDate(day.date, "weekday")}
+                      {dayLabel(day.date, f)}
                       <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(day.date, "short")}</span>
                     </time>
                     {createElement(weatherIcon(day.icon), { size: 20, "aria-hidden": true, className: "text-gray-600 dark:text-gray-300" })}
-                    <span className="min-w-0 text-sm capitalize text-gray-700 dark:text-gray-300">
+                    <span className="min-w-0 text-sm text-gray-700 first-letter:uppercase dark:text-gray-300">
                       {day.description}
                       <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs normal-case text-gray-500 dark:text-gray-400">
                         <Umbrella size={12} aria-hidden="true" />
@@ -356,6 +324,17 @@ export function WeatherDashboard() {
                 );
               })}
             </ul>
+            <p className="border-t border-gray-100 px-4 py-2.5 text-xs text-gray-500 sm:px-6 dark:border-white/5 dark:text-gray-400">
+              {provider === "open-meteo" ? (
+                <>
+                  {t("weather.sourceLabel")}{" "}
+                  <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">Open-Meteo.com</a>
+                  {" "}(CC BY 4.0)
+                </>
+              ) : (
+                <>{t("weather.sourceLabel")} OpenWeatherMap</>
+              )}
+            </p>
           </Card>
         </div>
       )}

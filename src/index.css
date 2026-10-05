@@ -17,7 +17,7 @@
   --color-gray-200: #e6e4dd;
   --color-gray-300: #d4d1c8;
   --color-gray-400: #a6a297;
-  --color-gray-500: #737063; /* 4.9:1 on white — minimum for meta text */
+  --color-gray-500: #6b6859; /* meta text: ≥ 4.9:1 on white, gray-50 and gray-100 */
   --color-gray-600: #57554b;
   --color-gray-700: #403f37;
   --color-gray-800: #292b25;
@@ -77,6 +77,12 @@
 
 /* Dark theme values for the semantic tones */
 .dark {
+  /*
+   * Meta text in dark mode is `dark:text-gray-400`; a plain `text-gray-500`
+   * (or `dark:text-gray-500`) would only reach ~3.4:1 on the dark surfaces.
+   * Lifting 500 here keeps every meta/placeholder text ≥ 4.5:1 on gray-900/950.
+   */
+  --color-gray-500: #949084;
   --color-positive: #7cc489;
   --color-warning: #eab45a;
   --color-danger: #f2897e;
@@ -125,16 +131,25 @@
   input[type="range"] {
     accent-color: var(--color-garden-600);
   }
+  /* Placeholders are readable text too: ≥ 4.5:1 in both themes. */
   ::placeholder {
-    color: var(--color-gray-400);
+    color: var(--color-gray-500);
+    opacity: 1;
   }
   .dark ::placeholder {
-    color: var(--color-gray-500);
+    color: var(--color-gray-400);
   }
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: 0.6;
+  }
+
+  /* A visually hidden table still sizes itself to its content (width:1px
+     is ignored by table layout) and widens the page on phones. Wrap tables
+     in a div.sr-only; this rule is the safety net if one is not wrapped. */
+  table.sr-only {
+    display: block;
   }
 
   /* Numbers line up in tables, stats and lists. */

@@ -87,7 +87,7 @@ export function DatePicker({
             className,
           )}
         >
-          <span className={cn("truncate", !value && "text-gray-400")}>{value ? formatDate(value, "long") : (placeholder ?? "–")}</span>
+          <span className={cn("truncate", !value && "text-gray-500 dark:text-gray-400")}>{value ? formatDate(value, "long") : (placeholder ?? "–")}</span>
           <CalendarDays size={16} className="shrink-0 text-gray-500 dark:text-gray-400" />
         </div>
       </div>

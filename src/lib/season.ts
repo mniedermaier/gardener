@@ -1,0 +1,163 @@
+import { addDays, addWeeks, isAfter, isBefore, startOfDay } from "date-fns";
+import type { Plant } from "@/types/plant";
+import type { EnvironmentType, Garden } from "@/types/garden";
+import { getFrostProtectionWeeks } from "@/types/garden";
+import { toDate } from "@/lib/format";
+
+/**
+ * One source of truth for a crop's season: the phase windows (Kalender,
+ * Pflanzendetail), "what is harvestable now" (Dashboard) and which crops suit
+ * which bed type (Palette "Jetzt"). Everything is relative to the user's last
+ * spring frost; protected beds (greenhouse, cold frame …) shift spring dates
+ * earlier AND keep the season open longer in autumn.
+ */
+
+export type Phase = "sowIndoors" | "sowOutdoors" | "transplant" | "harvest";
+export const PHASES: Phase[] = ["sowIndoors", "sowOutdoors", "transplant", "harvest"];
+
+export interface PhaseWindow {
+  phase: Phase;
+  start: Date;
+  end: Date;
+}
+
+/** Window lengths in weeks (shared by every view). */
+const PHASE_WEEKS = { sowIndoors: 3, sowOutdoors: 4, transplant: 3 } as const;
+
+/** Typical gap between last spring and first autumn frost in Central Europe (~5 months). */
+export const FROST_FREE_DAYS = 150;
+
+/** The frost day of the stored date, moved into `now`'s year (a stale year must not shift every window). */
+export function seasonFrost(lastFrostDate: string, now: Date = new Date()): Date {
+  const stored = toDate(lastFrostDate) ?? new Date(now.getFullYear(), 4, 15);
+  return new Date(now.getFullYear(), stored.getMonth(), stored.getDate());
+}
+
+/** Estimated first autumn frost for a last spring frost. */
+export function estimateFirstFrost(lastFrost: Date): Date {
+  return addDays(lastFrost, FROST_FREE_DAYS);
+}
+
+/** Crops that keep bearing until the autumn frost once they have started. */
+const CONTINUOUS = new Set([
+  "tomato", "pepper", "eggplant", "cucumber", "zucchini", "chard", "kale", "leek",
+  "basil", "parsley", "chives", "mint", "thyme", "rosemary", "pumpkin", "squash", "celery", "endive",
+]);
+
+/** Perennials and shrubs: they stay for years, so no crop rotation and no greenhouse space. */
+const PERENNIAL = new Set(["raspberry", "blueberry", "currant", "gooseberry", "asparagus", "rosemary", "thyme", "chives", "mint", "strawberry"]);
+const WOODY = new Set(["raspberry", "blueberry", "currant", "gooseberry", "rosemary"]);
+
+export function isContinuousCropper(plant: Plant): boolean {
+  return CONTINUOUS.has(plant.id);
+}
+
+export function isPerennial(plant: Plant): boolean {
+  return PERENNIAL.has(plant.id) || plant.harvestDaysMax >= 365;
+}
+
+export function isWoody(plant: Plant): boolean {
+  return WOODY.has(plant.id) || (plant.category === "berry" && plant.harvestDaysMax >= 365);
+}
+
+const PROTECTED: EnvironmentType[] = ["greenhouse", "polytunnel", "cold_frame"];
+
+/**
+ * Does the crop belong in this kind of bed? Protected structures are for
+ * annual crops (no shrubs, nothing that blocks the space for 9 months like
+ * garlic); windowsills take herbs and small leafy crops; containers nothing
+ * that sprawls over 60 cm; raised and vertical beds no shrubs.
+ */
+export function suitsEnvironment(plant: Plant, env: EnvironmentType = "outdoor_bed"): boolean {
+  if (PROTECTED.includes(env)) return !isPerennial(plant) && plant.harvestDaysMax < 200;
+  if (env === "windowsill") return !isWoody(plant) && (plant.category === "herb" || plant.spacingCm <= 20);
+  if (env === "container") return plant.spacingCm <= 60;
+  // Raised and vertical beds are vegetable beds: shrubs belong in the ground.
+  if (env === "raised_bed" || env === "vertical") return !isWoody(plant);
+  return true;
+}
+
+/**
+ * Phase windows for one crop in one season. `frost` is the (this year's) last
+ * frost; `frostProtectionWeeks` shifts spring earlier and extends the harvest
+ * of continuous croppers past the autumn frost by the same amount.
+ */
+export function getPhaseWindows(plant: Plant, frost: Date, opts: { frostProtectionWeeks?: number } = {}): PhaseWindow[] {
+  const protection = opts.frostProtectionWeeks ?? 0;
+  const effective = addWeeks(frost, -protection);
+  const at = (weeks: number | null) => (weeks === null ? null : addWeeks(effective, weeks));
+  const windows: PhaseWindow[] = [];
+  const indoors = at(plant.sowIndoorsWeeks);
+  const outdoors = at(plant.sowOutdoorsWeeks);
+  const transplant = at(plant.transplantWeeks);
+  if (indoors) windows.push({ phase: "sowIndoors", start: indoors, end: addWeeks(indoors, PHASE_WEEKS.sowIndoors) });
+  if (outdoors) windows.push({ phase: "sowOutdoors", start: outdoors, end: addWeeks(outdoors, PHASE_WEEKS.sowOutdoors) });
+  if (transplant) windows.push({ phase: "transplant", start: transplant, end: addWeeks(transplant, PHASE_WEEKS.transplant) });
+  // Harvest counts from planting out (or direct sowing). Long-lived crops get no window.
+  const base = transplant ?? outdoors;
+  if (base && plant.harvestDaysMax < 200) {
+    const start = addDays(base, plant.harvestDaysMin);
+    let end = addDays(addWeeks(base, transplant ? PHASE_WEEKS.transplant : PHASE_WEEKS.sowOutdoors), plant.harvestDaysMax);
+    if (isContinuousCropper(plant)) {
+      const autumn = addWeeks(estimateFirstFrost(frost), protection);
+      if (isAfter(autumn, end)) end = autumn;
+    }
+    windows.push({ phase: "harvest", start, end });
+  }
+  return windows;
+}
+
+// --- Harvest ready -------------------------------------------------------------
+
+export interface HarvestReadyItem {
+  key: string;
+  plantId: string;
+  bedId: string;
+  gardenId: string;
+  bedName: string;
+  cells: number;
+  /** Past the expected window: harvest soon or it gets woody. */
+  late: boolean;
+}
+
+/**
+ * Plantings whose harvest window (planting date + days to maturity) is open
+ * on `now`, grouped per bed and crop. Continuous croppers stay open until the
+ * autumn frost, shifted by the bed's frost protection. Only cells with a
+ * planting date count.
+ */
+export function getHarvestReady(
+  gardens: Garden[],
+  plantMap: Map<string, Plant>,
+  now: Date,
+  lastFrostDate: string,
+): HarvestReadyItem[] {
+  const day = startOfDay(now);
+  const autumnFrost = estimateFirstFrost(seasonFrost(lastFrostDate, now));
+  const byKey = new Map<string, HarvestReadyItem>();
+  for (const g of gardens) {
+    for (const b of g.beds) {
+      const protection = getFrostProtectionWeeks(b);
+      for (const c of b.cells) {
+        const planted = c.plantedDate ? toDate(c.plantedDate) : null;
+        const plant = plantMap.get(c.plantId);
+        if (!planted || !plant || plant.harvestDaysMax >= 365) continue;
+        const from = addDays(planted, plant.harvestDaysMin);
+        let to = addDays(planted, plant.harvestDaysMax);
+        let grace = 21;
+        if (isContinuousCropper(plant)) {
+          const seasonEnd = addWeeks(autumnFrost, protection);
+          if (isAfter(seasonEnd, to)) { to = seasonEnd; grace = 0; }
+        }
+        // Window open, and at most three weeks past its end.
+        if (isBefore(day, from) || isAfter(day, addDays(to, grace))) continue;
+        const key = `${b.id}:${c.plantId}`;
+        const entry = byKey.get(key) ?? { key, plantId: c.plantId, bedId: b.id, gardenId: g.id, bedName: b.name, cells: 0, late: false };
+        entry.cells += 1;
+        entry.late = entry.late || isAfter(day, to);
+        byKey.set(key, entry);
+      }
+    }
+  }
+  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || b.cells - a.cells);
+}

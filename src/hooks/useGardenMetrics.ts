@@ -35,7 +35,9 @@ export interface GardenMetrics {
  *   const m = useGardenMetrics();                 // current season (calendar year)
  *   formatWeight(m.harvest.actual.totalGrams)     // "Erfasst"
  *   formatWeight(m.harvest.forecast.totalGrams)   // "Prognose"
- *   formatPercent(m.selfSufficiency.forecastRatio)
+ *   formatPercent(m.selfSufficiency.forecastRatio)     // "Jahresprognose"
+ *   formatPercent(m.selfSufficiency.actualRatio)       // "bisher erfasst"
+ *   formatPercent(m.selfSufficiency.forecastToDateRatio ?? 0) // "erwartet bis heute"
  *   formatCurrency(m.balance.net)
  */
 export function useGardenMetrics(opts: { period?: Period } = {}): GardenMetrics {
@@ -50,6 +52,7 @@ export function useGardenMetrics(opts: { period?: Period } = {}): GardenMetrics 
       feedEntries: st.feedEntries,
       healthEvents: st.healthEvents,
       gridCellSizeCm: st.gridCellSizeCm,
+      lastFrostDate: st.lastFrostDate,
     })),
   );
   const { householdSize, productPrices } = useAnalysisPrefs(
@@ -77,6 +80,7 @@ export function useGardenMetrics(opts: { period?: Period } = {}): GardenMetrics 
         gridCellSizeCm: s.gridCellSizeCm,
         householdSize,
         period,
+        lastFrostDate: s.lastFrostDate,
       }),
       balance: getBalance({
         harvests: s.harvests,

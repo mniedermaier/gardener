@@ -1,7 +1,7 @@
 import { memo, useMemo, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { useDroppable } from "@dnd-kit/core";
-import { Check, X, NotebookText, Footprints } from "lucide-react";
+import { Check, TriangleAlert, NotebookText, Footprints } from "lucide-react";
 import type { Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import type { CellConflict, CellSide } from "@/lib/placementValidation";
@@ -11,10 +11,10 @@ import { cn } from "@/lib/cn";
 export type GridMode = "inspect" | "place" | "path";
 
 const EDGE: Record<CellSide, string> = {
-  top: "inset 0 3px 0 0 var(--color-danger)",
-  right: "inset -3px 0 0 0 var(--color-danger)",
-  bottom: "inset 0 -3px 0 0 var(--color-danger)",
-  left: "inset 3px 0 0 0 var(--color-danger)",
+  top: "inset 0 3px 0 0 var(--color-warning)",
+  right: "inset -3px 0 0 0 var(--color-warning)",
+  bottom: "inset 0 -3px 0 0 var(--color-warning)",
+  left: "inset 3px 0 0 0 var(--color-warning)",
 };
 
 function conflictShadow(conflict?: CellConflict): string | undefined {
@@ -80,7 +80,7 @@ const PlannerCell = memo(function PlannerCell({
       className={cn(
         "relative flex items-center justify-center rounded-md transition-colors focus-visible:z-10",
         isPath && "bg-gray-200 dark:bg-white/10",
-        empty && mode === "place" && hint === "bad" && "cursor-not-allowed bg-danger/10",
+        empty && mode === "place" && hint === "bad" && "cursor-copy bg-warning/10 hover:bg-warning/20",
         empty && mode === "place" && hint === "good" && "cursor-copy bg-positive/15 hover:bg-positive/25",
         empty && mode === "place" && !hint && "cursor-copy bg-white/80 hover:bg-garden-100 dark:bg-white/[0.07] dark:hover:bg-garden-500/20",
         empty && mode === "path" && "cursor-pointer bg-white/60 hover:bg-gray-200 dark:bg-white/[0.05] dark:hover:bg-white/10",
@@ -96,10 +96,10 @@ const PlannerCell = memo(function PlannerCell({
       {isPath && <PathMark size={Math.round(iconSize * 0.95)} />}
       {plant && !isPath && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={iconSize} />}
       {empty && mode === "place" && hint === "good" && <Check size={14} aria-hidden="true" className="text-positive" />}
-      {empty && mode === "place" && hint === "bad" && <X size={14} aria-hidden="true" className="text-danger" />}
+      {empty && mode === "place" && hint === "bad" && <TriangleAlert size={13} aria-hidden="true" className="text-warning" />}
       {plant && conflict && (
-        <span aria-hidden="true" className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-danger text-white shadow-xs dark:text-gray-950">
-          <X size={10} strokeWidth={3} />
+        <span aria-hidden="true" className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-warning text-white shadow-xs dark:text-gray-950">
+          <TriangleAlert size={10} strokeWidth={2.5} />
         </span>
       )}
       {plant && hasNotes && (

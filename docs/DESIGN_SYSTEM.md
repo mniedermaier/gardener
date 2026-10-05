@@ -34,6 +34,23 @@ covered here, copy the pattern from the reference page
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation
     marks and uses active phrasing ("3 Aufgaben überfällig").
 
+12. **Naming:** the page `h1` is the sidebar label, and a section tab is named
+    like the `h1` of its page ("Planer", not "Gartenplaner"; "Ernte", not
+    "Ernteprotokoll"). The first tab of a section repeats the section name.
+13. **One verb per concept** (all four locales):
+
+    | Concept | de | en | es | fr |
+    |---|---|---|---|---|
+    | record something that happened (harvest, watering, feed, product, soil test, expense, health event, preserves) | erfassen | Log … | Registrar … | Noter … |
+    | add a thing you keep (bed, task, animal, plant, seeds, photo) | hinzufügen | Add … | Añadir … | Ajouter … |
+    | report a problem (pests, diseases) | melden | Report … | Registrar … | Signaler … |
+    | save a dialog | Speichern | Save | Guardar | Enregistrer |
+
+    English uses sentence case ("Add task", not "Add Task"). French addresses
+    the user with *vous*, German and Spanish with *du*/*tú*. Negative numbers
+    and temperatures use the minus sign "−" (the formatters do this), ranges the
+    en dash without spaces ("60–85 Tage"), asides the spaced en dash (" – ").
+
 `src/test/conventions.test.ts` is a ratchet: the counts of `toFixed(`, text
 below 11 px, raw `<select>`/`<textarea>` and `prompt/alert` may only go down.
 When you migrate a page, **lower the baseline numbers** in that file.
@@ -76,7 +93,11 @@ style.
 
 - Stat values use `text-2xl font-semibold tabular-nums` (`StatCard`). Use `font-bold` sparingly.
 - `text-overline` (11 px, tracking) is only for uppercase group labels. Never use `text-[10px]` or smaller.
-- Secondary text: `text-gray-500 dark:text-gray-400`. Do not use `gray-400` for readable text.
+- Secondary text: `text-gray-500 dark:text-gray-400`. Do not use `gray-400` for readable text
+  in light mode (2.5:1). Contrast is guaranteed at token level: `gray-500` is
+  ≥ 4.9:1 on white, `gray-50` and `gray-100`; in `.dark` the token is lifted so a
+  stray `text-gray-500` still reaches ≥ 4.5:1 on `gray-900/950`. Placeholders
+  use the same meta colours. Counters are information, not decoration: meta colour.
 
 ## 4. Primitives (`src/components/ui/`)
 
@@ -156,7 +177,14 @@ It behaves as a radio group with arrow keys.
   {tab === "overview" ? <Overview /> : <Crops />}         // optional: renders as the tabpanel
 </Tabs>
 ```
-Use tabs for sub-views of one page. They support ←/→/Home/End.
+Use tabs for sub-views of one page. They support ←/→/Home/End. On phones the
+row scrolls horizontally, fades at the edge that hides more tabs and keeps the
+active tab in view (`useScrollFade`).
+
+**Two navigation levels never look alike.** Section tabs (`layout/SectionTabs`,
+pages that are their own routes, e.g. Tiere · Produktion · Futter) are pills in
+the shell bar above the page. A page's own view switch is the underlined `Tabs`
+row under its `h1`. Never put a pill row inside a page.
 
 ```tsx
 <Menu label={t("common.moreActions")} align="end" items={[
@@ -189,7 +217,11 @@ if (await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") 
 ```
 
 Helpers: `cn(...)` in `src/lib/cn.ts`. Tone class maps (`TONE_SOFT`,
-`TONE_TEXT`, …) are in `ui/tone.ts`. `CONTROL_CLASS` and `Field` in
+`TONE_TEXT`, …) are in `ui/tone.ts`. Crop phases (Vorziehen, Direktsaat, Auspflanzen,
+Ernte) use `PhaseBadge`/`PhaseSwatch`/`PhaseLegend`/`phaseFill` from `ui/phase.tsx`
+(earth → green → earth, icon + hatching for "Vorziehen"); the windows come from
+`lib/season.ts`. Plant-family colours are the muted set in `data/plantFamilies.ts`.
+Task rows everywhere use `calendar/TaskRow` with `groupTasksByDue()` (`lib/tasks.ts`). `CONTROL_CLASS` and `Field` in
 `ui/Field.tsx` are for the rare custom control.
 
 ## 5. Formatting (`src/lib/format.ts`, `src/hooks/useFormat.ts`)
@@ -210,7 +242,7 @@ const { formatDate, formatNumber, formatWeight, formatCurrency, formatVolume,
 | `formatCurrency(euros, { currency, maximumFractionDigits })` | **euros** | `473,10 €` | `€473.10` |
 | `formatVolume(liters)` | litres | `10 l` | `10 l` |
 | `formatArea(m2)` | m² | `13,5 m²` | |
-| `formatTemperature(c)` | °C | `-1 °C` | |
+| `formatTemperature(c)` | °C | `−1 °C` (U+2212, `−0` becomes `0 °C`) | |
 | `formatPercent(ratio, digits?)` | **ratio** 0–1 | `25 %` | `25%` |
 
 Outside React, call the same functions directly; they use the current i18n
@@ -249,7 +281,7 @@ theme-aware, use tabular figures and ship a text alternative.
 | `BarChart` | Vertical (optionally stacked) bars over months/weeks: y-grid with 3–4 nice ticks, `formatTick` for units, `marker={{ index, label: t("charts.today") }}`, optional `target` line, hover **and** ←/→ keyboard tooltip, legend for ≥ 2 series, visually hidden `<table>`. |
 | `Meter` | Horizontal progress: `actual` solid, `forecast` hatched, `target` tick. Brand colour only, the number next to it says how good it is. |
 | `MonthStrip` | 12-month heatmap (one hue, 5 steps) with the value printed in each cell; outlines the current month. |
-| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. |
+| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are `earth`; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. |
 | `Sparkline` | Tiny trend line for stat tiles (`label` = summary for screen readers). |
 | `Legend`, `HatchPattern` | Swatches: solid = recorded, hatched = forecast, line = target. |
 | `HowCalculated` | `<details>` "Wie berechnet?" under a metric. Every KPI that is computed gets one. |

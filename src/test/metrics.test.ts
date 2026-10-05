@@ -90,7 +90,7 @@ describe("animal products", () => {
   it("forecasts herd output from typical yields", () => {
     const animals: Animal[] = [{ id: "a", type: "chicken", count: 4, acquiredDate: "2026-01-01" }, { id: "b", type: "bee", count: 2, acquiredDate: "2026-01-01" }];
     const f = getForecastProducts(animals);
-    expect(f.eggs).toBe(1000);
+    expect(f.eggs).toBe(880); // 4 hens × 220
     expect(f.honey).toBe(40);
     expect(f.wax).toBe(1);
   });
@@ -126,7 +126,10 @@ describe("money", () => {
     expect(c.feed).toBe(15);
     expect(c.veterinary).toBe(8);
     expect(c.total).toBeCloseTo(55.5);
-    expect(c.byCategory).toEqual({ seeds: 12.5, animal_feed: 20 });
+    // One breakdown: the feed log is part of animal_feed, vet log of veterinary.
+    expect(c.expenseByCategory).toEqual({ seeds: 12.5, animal_feed: 20 });
+    expect(c.byCategory).toEqual({ seeds: 12.5, animal_feed: 35, veterinary: 8 });
+    expect(c.animals).toBe(43);
   });
 
   it("counts a bill entered both as expense and in the livestock log only once", () => {
@@ -171,7 +174,9 @@ describe("self-sufficiency", () => {
     const without = getSelfSufficiency({ ...base, animals: [] });
     const withHens = getSelfSufficiency({ ...base, animals: [{ id: "a", type: "chicken", count: 5, acquiredDate: "2026-01-01" }] });
     expect(without.forecastKcal).toBe(0);
-    expect(withHens.forecastKcal).toBeCloseTo(5 * 250 * 0.06 * 10 * 155);
+    // 5 hens lay 1 100 eggs, but one person eats ~240: only those count.
+    expect(withHens.forecastKcal).toBeCloseTo(240 * 0.06 * 10 * 155);
+    expect(withHens.forecastSurplusKg.eggs).toBeCloseTo((1100 - 240) * 0.06);
   });
 
   it("caps the ratio at 100 %", () => {

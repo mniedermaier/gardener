@@ -62,21 +62,26 @@ export const plantFamilyMap: Record<string, PlantFamily> = {
   endive: "asteraceae",
 };
 
+/**
+ * Muted categorical palette (mid lightness, low chroma) that reads on white
+ * and on the dark surface alike. Neighbours in the rotation order get clearly
+ * different hues; meaning is always repeated in text next to the swatch.
+ */
 export const familyColors: Record<PlantFamily, string> = {
-  solanaceae: "#ef4444",
-  cucurbitaceae: "#22c55e",
-  fabaceae: "#8b5cf6",
-  brassicaceae: "#06b6d4",
-  apiaceae: "#f97316",
-  amaryllidaceae: "#d97706",
-  asteraceae: "#84cc16",
-  chenopodiaceae: "#be185d",
-  poaceae: "#eab308",
-  lamiaceae: "#10b981",
-  rosaceae: "#ec4899",
-  ericaceae: "#6366f1",
-  grossulariaceae: "#14b8a6",
-  other: "#9ca3af",
+  solanaceae: "#c0675c",
+  cucurbitaceae: "#c9a54e",
+  fabaceae: "#8f7fb8",
+  brassicaceae: "#5c8fab",
+  apiaceae: "#d38b5d",
+  amaryllidaceae: "#98a65f",
+  asteraceae: "#5fa384",
+  chenopodiaceae: "#a95f80",
+  poaceae: "#b3a387",
+  lamiaceae: "#6f9c9c",
+  rosaceae: "#d0919b",
+  ericaceae: "#6c7fb5",
+  grossulariaceae: "#8b6a8f",
+  other: "#a6a297",
 };
 
 export const familyNameKeys: Record<PlantFamily, { de: string; en: string }> = {

@@ -64,7 +64,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
             {o.label}
             {o.count !== undefined && " "}
             {o.count !== undefined && (
-              <span className={`tabular-nums ${selected ? "text-gray-500 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}>{o.count}</span>
+              <span className={`tabular-nums ${selected ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"}`}>{o.count}</span>
             )}
           </button>
         );

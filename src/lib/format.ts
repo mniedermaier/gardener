@@ -16,16 +16,33 @@ export function intlLocale(lang?: string): string {
 }
 
 export type DateInput = Date | string | number;
+
+/**
+ * Typographic minus: Intl prints a hyphen-minus ("-6 °C"), which Inter sets
+ * short and with a visible gap in tabular figures. Every number formatter
+ * returns U+2212 instead ("−6 °C", "−181,51 €"). Rounding to zero never shows
+ * a sign ("−0 °C" → "0 °C").
+ */
+const MINUS = "\u2212";
+function withMinus(text: string): string {
+  return text.replace(/-/g, MINUS);
+}
+/** Values that round to 0 must not keep their sign. */
+function noNegativeZero(value: number, maximumFractionDigits: number): number {
+  const f = 10 ** maximumFractionDigits;
+  return Math.round(value * f) === 0 ? 0 : value;
+}
 /**
  * - short:     "3. Okt." (current year) / "3. Okt. 2025" — lists, compact
  * - numeric:   "03.10.2026"                              — tables, exports
  * - long:      "Samstag, 3. Oktober 2026"                — headers, details
- * - relative:  "heute", "gestern", "vor 3 Tagen", "in 2 Tagen"; beyond ±6 days falls back to short
+ * - relative:  "Heute", "Gestern", "Vor 3 Tagen", "In 2 Tagen"; beyond ±6 days falls back to short
+ * - relativeInline: the same in the middle of a sentence ("zuletzt vor 3 Tagen")
  * - monthYear: "Oktober 2026"                            — group headers
  * - month:     "Okt."                                    — chart axes
  * - weekday:   "Sa."                                     — weather strips
  */
-export type DateStyle = "short" | "numeric" | "long" | "relative" | "monthYear" | "month" | "weekday";
+export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday";
 
 export interface FormatOptions {
   locale?: string;
@@ -55,11 +72,13 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
   const now = opts.now ?? new Date();
 
   switch (style) {
-    case "relative": {
+    case "relative":
+    case "relativeInline": {
       const diff = differenceInCalendarDays(startOfDay(d), startOfDay(now));
       if (Math.abs(diff) <= 6) {
         const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-        return capitalizeFirst(rtf.format(diff, "day"), locale);
+        const text = rtf.format(diff, "day");
+        return style === "relative" ? capitalizeFirst(text, locale) : text;
       }
       return formatDate(d, "short", { ...opts, now });
     }
@@ -96,10 +115,11 @@ export interface NumberOptions extends FormatOptions {
 export function formatNumber(value: number, opts: NumberOptions = {}): string {
   if (!Number.isFinite(value)) return "–";
   const { maximumFractionDigits = 1, minimumFractionDigits = 0 } = opts;
-  return new Intl.NumberFormat(intlLocale(opts.locale), {
-    maximumFractionDigits: Math.max(maximumFractionDigits, minimumFractionDigits),
+  const max = Math.max(maximumFractionDigits, minimumFractionDigits);
+  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), {
+    maximumFractionDigits: max,
     minimumFractionDigits,
-  }).format(value);
+  }).format(noNegativeZero(value, max)));
 }
 
 /**
@@ -112,32 +132,32 @@ export function formatWeight(grams: number, opts: FormatOptions & { unit?: "g" |
   const locale = intlLocale(opts.locale);
   const useKg = opts.unit === "kg" || (opts.unit !== "g" && Math.abs(grams) >= 1000);
   if (!useKg) {
-    return new Intl.NumberFormat(locale, { style: "unit", unit: "gram", maximumFractionDigits: 0 }).format(grams);
+    return withMinus(new Intl.NumberFormat(locale, { style: "unit", unit: "gram", maximumFractionDigits: 0 }).format(noNegativeZero(grams, 0)));
   }
   const kg = grams / 1000;
-  return new Intl.NumberFormat(locale, {
+  return withMinus(new Intl.NumberFormat(locale, {
     style: "unit",
     unit: "kilogram",
     maximumFractionDigits: Math.abs(kg) >= 100 ? 0 : 1,
-  }).format(kg);
+  }).format(kg));
 }
 
 /** Amount in **euros** (not cents): 473.1 → "473,10 €" (de) / "€473.10" (en). */
 export function formatCurrency(amount: number, opts: FormatOptions & { currency?: string; maximumFractionDigits?: number } = {}): string {
   if (!Number.isFinite(amount)) return "–";
   const max = opts.maximumFractionDigits ?? 2;
-  return new Intl.NumberFormat(intlLocale(opts.locale), {
+  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), {
     style: "currency",
     currency: opts.currency ?? "EUR",
     maximumFractionDigits: max,
     minimumFractionDigits: Math.min(2, max),
-  }).format(amount);
+  }).format(noNegativeZero(amount, max)));
 }
 
 /** Volume in **litres**: 10 → "10 l"; up to one decimal. */
 export function formatVolume(liters: number, opts: FormatOptions = {}): string {
   if (!Number.isFinite(liters)) return "–";
-  return new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "liter", maximumFractionDigits: 1 }).format(liters);
+  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "liter", maximumFractionDigits: 1 }).format(noNegativeZero(liters, 1)));
 }
 
 /** Area in m²: 13.5 → "13,5 m²". */
@@ -146,10 +166,10 @@ export function formatArea(squareMeters: number, opts: FormatOptions = {}): stri
   return `${formatNumber(squareMeters, { ...opts, maximumFractionDigits: 1 })} m²`;
 }
 
-/** Temperature in °C: -1.4 → "-1 °C". */
+/** Temperature in °C: -1.4 → "−1 °C" (true minus sign), -0.3 → "0 °C". */
 export function formatTemperature(celsius: number, opts: FormatOptions = {}): string {
   if (!Number.isFinite(celsius)) return "–";
-  return new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "celsius", maximumFractionDigits: 0 }).format(celsius);
+  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "celsius", maximumFractionDigits: 0 }).format(noNegativeZero(celsius, 0)));
 }
 
 /**
@@ -158,7 +178,8 @@ export function formatTemperature(celsius: number, opts: FormatOptions = {}): st
  */
 export function formatPercent(ratio: number, opts: FormatOptions & { maximumFractionDigits?: number } = {}): string {
   if (!Number.isFinite(ratio)) return "–";
-  return new Intl.NumberFormat(intlLocale(opts.locale), { style: "percent", maximumFractionDigits: opts.maximumFractionDigits ?? 0 }).format(ratio);
+  const max = opts.maximumFractionDigits ?? 0;
+  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "percent", maximumFractionDigits: max }).format(noNegativeZero(ratio, max + 2)));
 }
 
 /** All formatters bound to one language — what useFormat() returns. */

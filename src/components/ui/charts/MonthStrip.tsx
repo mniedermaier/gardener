@@ -47,17 +47,19 @@ export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthN
           </li>
         ))}
       </ol>
-      <table className="sr-only">
-        <caption>{caption}</caption>
-        <tbody>
-          {values.map((v, i) => (
-            <tr key={i}>
-              <th scope="row">{(monthNames ?? monthLabels)[i]}</th>
-              <td>{formatValue(v)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="sr-only">
+        <table>
+          <caption>{caption}</caption>
+          <tbody>
+            {values.map((v, i) => (
+              <tr key={i}>
+                <th scope="row">{(monthNames ?? monthLabels)[i]}</th>
+                <td>{formatValue(v)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 });

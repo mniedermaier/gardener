@@ -10,14 +10,16 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { calculateSufficiency, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
-import { annualCalorieNeed, getForecastProducts, PRODUCT_TYPES, productToKg } from "@/lib/metrics";
+import { annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
+import type { ProductType } from "@/types/animal";
 import { PRODUCT_NUTRITION } from "@/types/animal";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
-import { Tabs } from "@/components/ui/Tabs";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Select } from "@/components/ui/Select";
 import { List, ListRow } from "@/components/ui/List";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
@@ -52,7 +54,7 @@ export function SufficiencyDashboard() {
   const result = useMemo(() => {
     const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
     if (!hasPlantings && animals.length === 0) return null;
-    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals, []);
+    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals);
   }, [gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals]);
 
   const months = useMemo(() => Array.from({ length: 12 }, (_, i) => new Date(2026, i, 1)), []);
@@ -71,24 +73,19 @@ export function SufficiencyDashboard() {
       .slice(0, 3);
   }, [plantMap, householdSize]);
 
+  const viewOptions: { value: View; label: string; count?: number }[] = [
+    { value: "overview", label: t("sufficiency.tabs.overview") },
+    { value: "crops", label: t("sufficiency.tabs.crops"), count: result?.plantYields.length },
+    { value: "animals", label: t("sufficiency.tabs.animals"), count: animals.length },
+    { value: "preserve", label: t("sufficiency.tabs.preserve") },
+  ];
+
   const header = (
     <PageHeader
       title={t("sufficiency.title")}
       description={t("sufficiency.subtitle")}
       actions={<HouseholdSizeField />}
-      tabs={result ? (
-        <Tabs
-          label={t("sufficiency.views")}
-          value={view}
-          onChange={setView}
-          items={[
-            { value: "overview", label: t("sufficiency.tabs.overview") },
-            { value: "crops", label: t("sufficiency.tabs.crops"), count: result.plantYields.length },
-            { value: "animals", label: t("sufficiency.tabs.animals"), count: animals.length },
-            { value: "preserve", label: t("sufficiency.tabs.preserve") },
-          ]}
-        />
-      ) : undefined}
+      tabs={result ? <ViewSwitch value={view} onChange={setView} options={viewOptions} label={t("sufficiency.views")} /> : undefined}
     />
   );
 
@@ -132,16 +129,21 @@ export function SufficiencyDashboard() {
               value={f.formatPercent(ss.actualRatio)}
               icon={Target}
               tone="neutral"
-              hint={t("metrics.recordedSince", { year })}
+              hint={ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: f.formatPercent(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year })}
             />
             <StatCard label={t("metrics.yieldForecast")} value={f.formatWeight(metrics.harvest.forecast.totalGrams)} icon={Sprout} tone="neutral" hint={t("metrics.plantsOnly")} />
             <StatCard label={t("metrics.yieldActual")} value={f.formatWeight(metrics.harvest.actual.totalGrams)} icon={Scale} tone="neutral" hint={t("metrics.harvestEntries", { count: metrics.harvest.entryCount })} />
           </div>
           <HowCalculated>
+            <p>{t("metrics.howNeed", { kcal: f.formatNumber(DAILY_KCAL_PER_PERSON, { maximumFractionDigits: 0 }) })}</p>
             <p>{t("metrics.howForecast")}</p>
+            <p>{t("metrics.howCap")}</p>
             <p>{t("metrics.howActual")}</p>
-            <p>{t("metrics.howNeed", { kcal: f.formatNumber(2000, { maximumFractionDigits: 0 }) })}</p>
+            <p>{t("metrics.howToDate")}</p>
+            <p>{t("metrics.howVsFoodPlan")}</p>
           </HowCalculated>
+
+          <Composition />
 
           <Card>
             <CardHeader title={t("sufficiency.monthlyTitle")} description={t("sufficiency.monthlyDesc", { count: householdSize })} />
@@ -323,20 +325,80 @@ function LegendNote() {
   return <p className="text-xs text-gray-500 dark:text-gray-400">{t("metrics.meterLegend")}</p>;
 }
 
+/** Second-level view switch: a segmented control, a native select on phones (never cut off). */
+function ViewSwitch<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; count?: number }[]; label: string }) {
+  return (
+    <>
+      <Select
+        wrapperClassName="sm:hidden"
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        options={options.map((o) => ({ value: o.value, label: o.count !== undefined ? `${o.label} (${o.count})` : o.label }))}
+      />
+      <div className="hidden sm:block">
+        <SegmentedControl label={label} value={value} onChange={onChange} options={options} />
+      </div>
+    </>
+  );
+}
+
+/** Edible kg → amount in the product's recording unit (eggs as hen's eggs). */
+const kgToUnits = (type: ProductType, kg: number) => (type === "eggs" ? kg / EGG_WEIGHT_KG : kg);
+
+function surplusItems(surplus: ProductKg, f: ReturnType<typeof useFormat>, t: ReturnType<typeof useTranslation>["t"]): string[] {
+  return PRODUCT_TYPES.filter((ty) => surplus[ty] > 0.05).map((ty) => (ty === "eggs" ? formatProductAmount(ty, kgToUnits(ty, surplus[ty]), f, t) : `${formatProductAmount(ty, surplus[ty], f, t)} ${t(`livestock.products.${ty}`)}`));
+}
+
+/** Where the calorie forecast comes from: garden vs. animal products, plus the uncounted surplus. */
+function Composition() {
+  const { t } = useTranslation();
+  const f = useFormat();
+  const { selfSufficiency: ss } = useGardenMetrics();
+  if (ss.forecastKcal <= 0) return null;
+  const garden = ss.forecastPlantKcal / ss.needKcal;
+  const animals = ss.forecastAnimalKcal / ss.needKcal;
+  const scale = Math.max(garden + animals, 0.0001);
+  const surplus = surplusItems(ss.forecastSurplusKg, f, t);
+  return (
+    <Card>
+      <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-white/10" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, 1), animals: f.formatPercent(animals, 1) })}>
+        <span className="h-full bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />
+        <span className="h-full bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />
+      </div>
+      <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-garden-600 dark:bg-garden-400" />{t("metrics.fromGarden")}</dt>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(garden, 1)}</dd>
+        </div>
+        <div>
+          <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-earth-400 dark:bg-earth-300" />{t("metrics.fromAnimals")}</dt>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, 1)}</dd>
+        </div>
+      </dl>
+      {surplus.length > 0 && <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { items: surplus.join(", ") })}</p>}
+    </Card>
+  );
+}
+
 /** Herd products: forecast from typical yields, recorded from the production log. */
 function AnimalYields() {
   const { t } = useTranslation();
   const f = useFormat();
   const metrics = useGardenMetrics();
   const animals = useStore((s) => s.animals);
+  const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const forecast = useMemo(() => getForecastProducts(animals), [animals]);
+  const capped = useMemo(() => capToConsumption(getForecastProductKg(animals), householdSize), [animals, householdSize]);
   const types = PRODUCT_TYPES.filter((ty) => forecast[ty] > 0 || metrics.animalProducts.actual[ty] > 0);
   return (
     <div className="space-y-3">
       <p className="text-sm text-gray-500 dark:text-gray-400">{t("sufficiency.animalsIntro")}</p>
       <List label={t("sufficiency.animalYields")}>
         {types.map((ty) => {
-          const kcal = productToKg(ty, forecast[ty]) * 10 * PRODUCT_NUTRITION[ty].caloriesPer100g;
+          const kcal = capped.counted[ty] * 10 * PRODUCT_NUTRITION[ty].caloriesPer100g;
+          const surplus = capped.surplus[ty];
           const actual = metrics.animalProducts.actual[ty];
           return (
             <ListRow
@@ -345,8 +407,9 @@ function AnimalYields() {
               title={t(`livestock.products.${ty}`)}
               meta={[
                 t("metrics.actualShort", { value: formatProductAmount(ty, actual, f, t) }),
-                kcal > 0 ? t("sufficiency.kcalValue", { kcal: f.formatNumber(kcal, { maximumFractionDigits: 0 }) }) : t("sufficiency.nonFood"),
-              ].join(" · ")}
+                kcal > 0 ? t("sufficiency.kcalCounted", { kcal: f.formatNumber(kcal, { maximumFractionDigits: 0 }) }) : t("sufficiency.nonFood"),
+                surplus > 0.05 ? t("sufficiency.surplus", { amount: formatProductAmount(ty, kgToUnits(ty, surplus), f, t) }) : null,
+              ].filter(Boolean).join(" · ")}
               description={<Meter actual={actual} forecast={forecast[ty]} max={Math.max(actual, forecast[ty], 1)} size={6} className="mt-1.5 max-w-xs" label={t("metrics.actualVsForecast", { actual: formatProductAmount(ty, actual, f, t), forecast: formatProductAmount(ty, forecast[ty], f, t) })} />}
               trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, forecast[ty], f, t) })}
             />
@@ -354,6 +417,7 @@ function AnimalYields() {
         })}
       </List>
       <LegendNote />
+      <p className="text-xs text-gray-500 dark:text-gray-400">{t("metrics.howCap")}</p>
     </div>
   );
 }

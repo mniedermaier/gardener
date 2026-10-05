@@ -2,7 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type Keyboard
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import { Search, CornerDownLeft, Download, Moon, Sun, LayoutGrid, Bird, BookOpen, ClipboardList, FileText } from "lucide-react";
+import { Search, CornerDownLeft, Download, Moon, Sun, LayoutGrid, Apple, Bird, BookOpen, ClipboardList, FileText } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants } from "@/hooks/usePlants";
@@ -96,8 +96,18 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       setActive(0);
       onClose();
     };
+    // A click on the backdrop lands on the <dialog> itself and closes it.
+    const handleBackdrop = (e: MouseEvent) => {
+      if (e.target !== dialog) return;
+      const r = dialog.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
+    };
     dialog.addEventListener("close", handleClose);
-    return () => dialog.removeEventListener("close", handleClose);
+    dialog.addEventListener("click", handleBackdrop);
+    return () => {
+      dialog.removeEventListener("close", handleClose);
+      dialog.removeEventListener("click", handleBackdrop);
+    };
   }, [onClose]);
 
   useEffect(() => {
@@ -168,6 +178,24 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           leading: <PlantIconDisplay plantId={p.id} emoji={p.icon} size={20} />,
           run: () => go(`/plants?plant=${encodeURIComponent(p.id)}`),
         });
+        // The two best plant hits also offer "log a harvest" and the beds they grow in.
+        if (out.filter((c) => c.id.startsWith("plant:")).length <= 2) {
+          out.push({
+            id: `harvest:${p.id}`, group: "plants", label: t("shell.command.logHarvestFor", { name }), icon: Apple,
+            run: () => go(`/harvest?plant=${encodeURIComponent(p.id)}`),
+          });
+          for (const g of gardens) {
+            for (const b of g.beds) {
+              const count = b.cells.filter((c) => c.plantId === p.id).length;
+              if (!count || !cap("beds")) continue;
+              out.push({
+                id: `bedplant:${b.id}:${p.id}`, group: "beds", label: t("shell.command.plantInBed", { plant: name, bed: b.name }),
+                hint: t("shell.command.cellCount", { count }), icon: LayoutGrid,
+                run: () => { setActiveGarden(g.id); go(`/planner?bed=${encodeURIComponent(b.id)}`); },
+              });
+            }
+          }
+        }
       }
     }
     for (const g of gardens) {
@@ -176,7 +204,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         if (normalize(b.name).includes(q)) {
           out.push({
             id: `bed:${b.id}`, group: "beds", label: b.name, hint: g.name, icon: LayoutGrid,
-            run: () => { setActiveGarden(g.id); go("/planner"); },
+            run: () => { setActiveGarden(g.id); go(`/planner?bed=${encodeURIComponent(b.id)}`); },
           });
         }
       }
@@ -191,13 +219,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     for (const task of tasks) {
       if (!cap("tasks")) break;
       if (!task.completedDate && normalize(task.title).includes(q)) {
-        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: formatDate(task.dueDate, "relative"), icon: ClipboardList, run: () => go("/tasks") });
+        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: formatDate(task.dueDate, "relative"), icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
       }
     }
     for (const j of journalEntries) {
       if (!cap("journal")) break;
       if (normalize(j.title).includes(q) || normalize(j.text).includes(q)) {
-        out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint: formatDate(j.date, "short"), icon: BookOpen, run: () => go("/journal") });
+        out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint: formatDate(j.date, "short"), icon: BookOpen, run: () => go(`/journal?entry=${encodeURIComponent(j.id)}`) });
       }
     }
     return out;
@@ -236,8 +264,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     <dialog
       ref={dialogRef}
       aria-label={t("shell.command.title")}
-      onClick={(e) => { if (e.target === e.currentTarget) close(); }}
-      className="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden bg-white p-0 text-gray-900 backdrop:bg-gray-950/50 sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:max-w-xl sm:rounded-xl sm:shadow-lg dark:bg-gray-900 dark:text-gray-100 dark:ring-1 dark:ring-white/10"
+      className="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden bg-white p-0 text-gray-900 backdrop:bg-gray-950/50 sm:bottom-auto sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:max-w-xl sm:rounded-xl sm:shadow-lg dark:bg-gray-900 dark:text-gray-100 dark:ring-1 dark:ring-white/10"
     >
       <div className="flex h-full max-h-[inherit] flex-col pt-safe sm:pt-0">
         <div className="flex items-center gap-3 border-b border-gray-200 px-4 dark:border-white/10">
@@ -267,7 +294,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           <kbd className="hidden shrink-0 rounded border border-gray-200 px-1.5 py-0.5 text-xs text-gray-500 sm:inline dark:border-white/15 dark:text-gray-400">Esc</kbd>
         </div>
 
-        <div ref={listRef} id={`${baseId}-list`} role="listbox" aria-label={t("shell.command.results")} className="flex-1 overflow-y-auto p-2">
+        <div ref={listRef} id={`${baseId}-list`} role="listbox" aria-label={t("shell.command.results")} className="min-h-0 flex-1 overflow-y-auto p-2 sm:flex-initial">
           {results.length === 0 && (
             <p className="px-3 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
               {query.trim().length >= 2 && query !== debounced ? t("common.loading") : t("search.noResults")}

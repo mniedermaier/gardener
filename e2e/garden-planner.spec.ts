@@ -105,7 +105,7 @@ test("can navigate to plant database and search", async ({ page }) => {
   await page.getByRole("link", { name: /^Plants$/ }).first().click();
 
   // Wait for plant list to load
-  await expect(page.getByRole("heading", { name: /Plant Database/i })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Plants", exact: true })).toBeVisible();
 
   // Search
   await page.getByPlaceholder("Search plants...").fill("basil");

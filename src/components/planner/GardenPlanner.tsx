@@ -83,6 +83,12 @@ export function GardenPlanner() {
   // The open bed lives in the URL (?bed=…) so the back button returns to the overview.
   const bedParam = searchParams.get("bed");
   const openBed = activeGarden?.beds.find((b) => b.id === bedParam) ?? null;
+  // A deep link (?bed=…) into another garden switches to that garden.
+  useEffect(() => {
+    if (!bedParam || openBed) return;
+    const owner = gardens.find((g) => g.beds.some((b) => b.id === bedParam));
+    if (owner) setActiveGarden(owner.id);
+  }, [bedParam, openBed, gardens, setActiveGarden]);
 
   // --- Modes: inspect (default) · place (a palette plant is chosen) · path ---
   const [initialPlant] = useState<Plant | null>(() => {
@@ -98,6 +104,8 @@ export function GardenPlanner() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
+  // Mobile sheet height: "peek" keeps the bed visible (actions only), "full" shows everything.
+  const [sheetFull, setSheetFull] = useState(false);
 
   const [bedDialog, setBedDialog] = useState<BedDialogState>({ open: false });
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
@@ -192,8 +200,8 @@ export function GardenPlanner() {
     [openBed, placingPlant, plantMap],
   );
   const plantableNow = useMemo(
-    () => getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks }),
-    [plants, lastFrostDate, frostWeeks],
+    () => getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks, environmentType: openBed?.environmentType }),
+    [plants, lastFrostDate, frostWeeks, openBed?.environmentType],
   );
   const bedFitIds = useMemo(
     () => (openBed ? getRecommendedPlants(openBed, plants, { gridCellSizeCm, lastFrostDate }).map((r) => r.plant.id) : []),
@@ -224,26 +232,46 @@ export function GardenPlanner() {
     const gid = activeGardenId;
     const previous = bed.cells.find((c) => c.cellX === x && c.cellY === y);
     setCell(gid, bed.id, { cellX: x, cellY: y, plantId, plantedDate: toISODate() });
-    pushUndo({
-      label: "place",
-      undo: () => (previous ? useStore.getState().setCell(gid, bed.id, previous) : useStore.getState().removeCell(gid, bed.id, x, y)),
-    });
-    setFeedback(result.issues.length > 0 ? t(result.issues[0].messageKey, resolveParams(result.issues[0].messageParams)) : null);
+    const revert = () => (previous ? useStore.getState().setCell(gid, bed.id, previous) : useStore.getState().removeCell(gid, bed.id, x, y));
+    pushUndo({ label: "place", undo: revert });
+    // Unfavourable neighbours: placed anyway, with a hint and a one-tap undo.
+    const neighbour = result.issues.find((i) => i.type === "antagonist" && i.messageKey === "validation.antagonistDirect");
+    if (neighbour) {
+      toast(t(neighbour.messageKey, resolveParams(neighbour.messageParams)), "warning", { action: { label: t("common.undo"), onClick: revert } });
+      setFeedback(null);
+    } else {
+      setFeedback(result.issues.length > 0 ? t(result.issues[0].messageKey, resolveParams(result.issues[0].messageParams)) : null);
+    }
     return true;
-  }, [activeGardenId, plantMap, gridCellSizeCm, setCell, pushUndo, t, resolveParams, setFeedback]);
+  }, [activeGardenId, plantMap, gridCellSizeCm, setCell, pushUndo, t, resolveParams, setFeedback, toast]);
 
-  /** Mobile: bring a cell into the upper part of the screen, above the sheet. */
+  /**
+   * Mobile: keep the selected cell visible between the top bar and the sheet.
+   * Runs after the sheet has rendered, so its real height is known.
+   */
+  const [revealKey, setRevealKey] = useState<string | null>(null);
   const revealCell = useCallback((x: number, y: number) => {
     if (window.innerWidth >= 768) return;
-    requestAnimationFrame(() => {
+    setSheetFull(false);
+    setRevealKey(`${x}-${y}-${Date.now()}`);
+  }, [setSheetFull, setRevealKey]);
+  useEffect(() => {
+    if (!revealKey) return;
+    const [x, y] = revealKey.split("-");
+    const frame = requestAnimationFrame(() => {
       const el = document.querySelector<HTMLElement>(`[data-x="${x}"][data-y="${y}"]`);
       const main = el?.closest("main");
-      if (!el || !main) return;
-      const top = el.getBoundingClientRect().top;
-      const target = window.innerHeight * 0.22;
-      if (top > window.innerHeight * 0.45 || top < 64) main.scrollBy({ top: top - target, behavior: "smooth" });
+      const sheet = document.querySelector<HTMLElement>("[data-planner-sheet]");
+      if (!el || !main || !sheet) return;
+      const cell = el.getBoundingClientRect();
+      const top = main.getBoundingClientRect().top + 8;
+      const bottom = sheet.getBoundingClientRect().top - 12;
+      if (cell.top >= top && cell.bottom <= bottom) return;
+      // Centre the cell in the visible strip above the sheet.
+      main.scrollBy({ top: cell.top + cell.height / 2 - (top + bottom) / 2, behavior: "smooth" });
     });
-  }, []);
+    return () => cancelAnimationFrame(frame);
+  }, [revealKey]);
 
   /** Mobile: after picking a plant, show the bed (the sheet collapses). */
   const revealGrid = useCallback(() => {
@@ -285,6 +313,7 @@ export function GardenPlanner() {
       setInspectKey(null);
       setFeedback(t("planner.pickPlantFirst"));
       setSheetOpen(true);
+      setSheetFull(true);
     }
   };
   // Stable callback for the memoised cells; always calls the latest handler.
@@ -561,6 +590,8 @@ export function GardenPlanner() {
         onRemove={handleRemoveCell}
         onUpdate={(updates) => updateCell(activeGardenId, openBed.id, inspectedCell.cellX, inspectedCell.cellY, updates)}
         hideHeader={variant === "sheet"}
+        compact={variant === "sheet" && !sheetFull}
+        onExpand={() => { setSheetFull(true); if (inspectKey) setRevealKey(`${inspectKey}-${Date.now()}`); }}
       />
     ) : (
       <>
@@ -582,6 +613,8 @@ export function GardenPlanner() {
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div>
+        {/* Mobile bed view: the top bar already names the page; every pixel goes to the bed. */}
+        <div className={openBed ? "max-md:hidden" : undefined}>
         <PageHeader
           title={t("planner.title")}
           description={headerDescription}
@@ -608,6 +641,7 @@ export function GardenPlanner() {
             ) : undefined
           }
         />
+        </div>
         <input ref={fileInputRef} type="file" accept=".json,application/json" className="hidden" onChange={handleImport} aria-hidden="true" tabIndex={-1} />
 
         {!activeGarden ? (
@@ -657,18 +691,32 @@ export function GardenPlanner() {
               </aside>
             </div>
 
-            {/* Mobile: palette / inspector in a bottom sheet (≤ 50 % height); the spacer keeps the bed scrollable above it */}
-            <div className="h-[52dvh] md:hidden" aria-hidden="true" />
+            {/* Mobile: palette / inspector in a bottom sheet. Inspecting opens it as a
+                peek (actions only, ~30 % height) so the bed and the selected cell stay
+                visible; "Details" pulls it up. The spacer lets the last rows scroll above it. */}
+            <div className={sheetOpen && (sheetFull || !inspectedCell) ? "h-[72dvh] md:hidden" : "h-[40dvh] md:hidden"} aria-hidden="true" />
             <section
+              data-planner-sheet
               aria-label={inspectedCell ? t("planner.inspectorLabel", { name: inspectedPlant ? getPlantName(inspectedPlant.id) : "" }) : t("planner.paletteTitle")}
               className="fixed inset-x-0 bottom-safe-nav z-30 rounded-t-2xl border-t border-gray-200 bg-white shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] sm:bottom-0 md:hidden dark:border-white/10 dark:bg-gray-900"
             >
+              {sheetOpen && inspectedCell && (
+                <button
+                  type="button"
+                  onClick={() => { setSheetFull((f) => !f); if (inspectKey) setRevealKey(`${inspectKey}-${Date.now()}`); }}
+                  aria-label={sheetFull ? t("planner.sheetLess") : t("planner.sheetMore")}
+                  aria-expanded={sheetFull}
+                  className="flex h-4 w-full items-start justify-center pt-1.5"
+                >
+                  <span aria-hidden="true" className="h-1 w-10 rounded-full bg-gray-300 dark:bg-white/20" />
+                </button>
+              )}
               <div className="flex items-center gap-1 pr-2">
                 <button
                   type="button"
-                  onClick={() => setSheetOpen((o) => !o)}
+                  onClick={() => { setSheetOpen((o) => !o); setSheetFull(!inspectedCell); }}
                   aria-expanded={sheetOpen}
-                  className="flex min-h-14 min-w-0 flex-1 items-center gap-3 pl-4 text-left"
+                  className={`flex min-w-0 flex-1 items-center gap-3 pl-4 text-left ${sheetOpen && inspectedCell ? "min-h-12" : "min-h-14"}`}
                 >
                   {placingPlant ? (
                     <PlantIconDisplay plantId={placingPlant.id} emoji={placingPlant.icon} size={24} />
@@ -691,10 +739,10 @@ export function GardenPlanner() {
                   </span>
                   {sheetOpen ? <ChevronDown size={20} aria-hidden="true" className="shrink-0 text-gray-500" /> : <ChevronUp size={20} aria-hidden="true" className="shrink-0 text-gray-500" />}
                 </button>
-                {inspectedCell && <IconButton icon={X} label={t("common.close")} onClick={() => setInspectKey(null)} />}
+                {inspectedCell && <IconButton icon={X} label={t("common.close")} onClick={() => { setInspectKey(null); setSheetOpen(false); }} />}
               </div>
               {sheetOpen && (
-                <div className="max-h-[42dvh] overflow-y-auto overscroll-contain border-t border-gray-100 px-4 pt-3 pb-4 dark:border-white/5">
+                <div className={`${sheetFull || !inspectedCell ? "max-h-[62dvh]" : "max-h-[34dvh]"} overflow-y-auto overscroll-contain border-t border-gray-100 px-4 pt-3 pb-4 dark:border-white/5`}>
                   {paletteOrInspector("sheet")}
                 </div>
               )}

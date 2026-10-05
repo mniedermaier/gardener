@@ -1,19 +1,14 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import type { LucideIcon } from "lucide-react";
-import {
-  Plus, CalendarDays, Download, Trash2, Pencil, Repeat, CircleCheck, RotateCcw, ListChecks,
-  House, Sprout, Shovel, Droplets, Apple, Leaf, Search, CookingPot, TestTube, ClipboardList,
-} from "lucide-react";
-import { addDays, addWeeks, differenceInCalendarDays, endOfWeek, parseISO, startOfDay } from "date-fns";
+import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks } from "lucide-react";
+import { addWeeks, parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
-import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate, type AddPrefill } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 import { toISODate, todayISO } from "@/lib/format";
-import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -21,10 +16,8 @@ import { Input } from "@/components/ui/Input";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { Badge } from "@/components/ui/Badge";
-import { IconButton } from "@/components/ui/IconButton";
 import { Menu } from "@/components/ui/Menu";
-import { List, ListRow } from "@/components/ui/List";
+import { List } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -32,25 +25,13 @@ import { useToast } from "@/components/ui/Toast";
 import type { Task, TaskType } from "@/types/task";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import { downloadIcal } from "@/lib/ical";
+import { groupTasksByDue, type TaskGroup } from "@/lib/tasks";
+import { useTaskActions } from "@/hooks/useTaskActions";
+import { TaskRow } from "./TaskRow";
 
 const TASK_TYPES: TaskType[] = ["sow_indoors", "sow_outdoors", "transplant", "water", "harvest", "fertilize", "scout", "preserve", "soil_test", "custom"];
 
-export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
-  sow_indoors: House,
-  sow_outdoors: Sprout,
-  transplant: Shovel,
-  water: Droplets,
-  harvest: Apple,
-  fertilize: Leaf,
-  scout: Search,
-  preserve: CookingPot,
-  soil_test: TestTube,
-  custom: ClipboardList,
-};
-
 type StatusFilter = "open" | "done" | "all";
-type Group = "overdue" | "today" | "tomorrow" | "thisWeek" | "later" | "done";
-const GROUP_ORDER: Group[] = ["overdue", "today", "tomorrow", "thisWeek", "later", "done"];
 type Recurrence = "none" | "daily" | "weekly" | "biweekly";
 
 interface Draft {
@@ -64,31 +45,9 @@ interface Draft {
   description: string;
 }
 
-function groupOf(task: Task, today: Date, weekEnd: Date): Group {
-  if (task.completedDate) return "done";
-  const diff = differenceInCalendarDays(parseISO(task.dueDate), today);
-  if (diff < 0) return "overdue";
-  if (diff === 0) return "today";
-  if (diff === 1) return "tomorrow";
-  if (parseISO(task.dueDate) <= weekEnd) return "thisWeek";
-  return "later";
-}
-
-function nextDue(task: Task): string | null {
-  if (!task.recurring) return null;
-  const due = parseISO(task.dueDate);
-  const step = task.recurring.interval === "daily" ? addDays(due, 1) : addWeeks(due, task.recurring.interval === "weekly" ? 1 : 2);
-  // Never schedule into the past: a daily task done late continues from today.
-  const today = startOfDay(new Date());
-  const next = step < today ? addDays(today, task.recurring.interval === "daily" ? 1 : 0) : step;
-  if (task.recurring.until && next > parseISO(task.recurring.until)) return null;
-  return toISODate(next);
-}
-
 export function TaskCalendar() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
-  const { formatDate } = useFormat();
   const { tasks, gardens, lastFrostDate, addTask, updateTask, deleteTask, generateTasks } = useStore(
     useShallow((s) => ({
       tasks: s.tasks, gardens: s.gardens, lastFrostDate: s.lastFrostDate,
@@ -132,6 +91,13 @@ export function TaskCalendar() {
     setDialogOpen(true);
   };
 
+  // Deep link from the command palette: #/tasks?task=<id> opens the edit dialog.
+  useOpenFromParam("task", (id) => {
+    const task = tasks.find((x) => x.id === id);
+    if (!task) return false;
+    openEdit(task);
+  });
+
   // Bed names (prefixed with the garden when there are several gardens).
   const bedNames = useMemo(() => {
     const map = new Map<string, string>();
@@ -151,21 +117,8 @@ export function TaskCalendar() {
   const totalOpen = tasks.filter((x) => !x.completedDate).length;
 
   const groups = useMemo(() => {
-    const today = startOfDay(parseISO(todayKey));
-    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
     const visible = typed.filter((x) => status === "all" || (status === "open" ? !x.completedDate : !!x.completedDate));
-    const byGroup = new Map<Group, Task[]>();
-    for (const task of visible) {
-      const g = groupOf(task, today, weekEnd);
-      if (!byGroup.has(g)) byGroup.set(g, []);
-      byGroup.get(g)!.push(task);
-    }
-    for (const [g, list] of byGroup) {
-      list.sort((a, b) => g === "done"
-        ? (b.completedDate ?? "").localeCompare(a.completedDate ?? "")
-        : a.dueDate.localeCompare(b.dueDate) || a.title.localeCompare(b.title));
-    }
-    return GROUP_ORDER.filter((g) => byGroup.has(g)).map((g) => ({ group: g, tasks: byGroup.get(g)! }));
+    return groupTasksByDue(visible, startOfDay(parseISO(todayKey)));
   }, [typed, status, todayKey]);
 
   const hasPlantedBeds = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
@@ -220,21 +173,7 @@ export function TaskCalendar() {
     setDialogOpen(false);
   };
 
-  const handleComplete = (task: Task) => {
-    const next = nextDue(task);
-    if (next) {
-      // Recurring: roll forward to the next date instead of closing the task.
-      updateTask(task.id, { dueDate: next });
-      toast(t("calendar.nextOccurrence", { date: formatDate(next, "relative") }), "success", {
-        action: { label: t("common.undo"), onClick: () => updateTask(task.id, { dueDate: task.dueDate }) },
-      });
-      return;
-    }
-    updateTask(task.id, { completedDate: todayISO() });
-    toast(t("calendar.taskDone"), "success", {
-      action: { label: t("common.undo"), onClick: () => updateTask(task.id, { completedDate: undefined }) },
-    });
-  };
+  const { complete: handleComplete, reopen } = useTaskActions();
 
   const restore = (task: Task) => {
     const { id: _id, ...rest } = task;
@@ -260,7 +199,7 @@ export function TaskCalendar() {
 
   const editing = editingId ? tasks.find((x) => x.id === editingId) : undefined;
 
-  const groupLabel = (g: Group, n: number) => `${t(`calendar.groups.${g}`)} · ${n}`;
+  const groupLabel = (g: TaskGroup, n: number) => `${t(`calendar.groups.${g}`)} · ${n}`;
 
   const bedOptions = useMemo(() => {
     const garden = gardens.find((g) => g.id === draft.gardenId) ?? gardens[0];
@@ -354,67 +293,28 @@ export function TaskCalendar() {
             <div className="space-y-4">
               {groups.map(({ group, tasks: list }) => (
                 <List key={group} header={<span className={group === "overdue" ? "text-danger" : undefined}>{groupLabel(group, list.length)}</span>}>
-                  {list.map((task) => {
-                    const plant = task.plantId ? plantMap.get(task.plantId) : undefined;
-                    const TypeIcon = TASK_TYPE_ICONS[task.type] ?? ClipboardList;
-                    const done = !!task.completedDate;
-                    const due = task.dueDate.slice(0, 10);
-                    const meta = [
-                      task.type === "custom" ? null : t(`calendar.taskTypes.${task.type}`),
-                      task.bedId ? bedNames.get(task.bedId) : null,
-                      plant && !task.title.includes(getPlantName(plant.id)) ? getPlantName(plant.id) : null,
-                      done
-                        ? t("calendar.doneOn", { date: formatDate(task.completedDate!, "relative") })
-                        : group === "overdue" ? null : formatDate(due, group === "later" ? "short" : "relative"),
-                    ].filter(Boolean).join(" · ");
-                    return (
-                      <ListRow
-                        key={task.id}
-                        muted={done}
-                        onClick={() => openEdit(task)}
-                        leading={
-                          plant ? (
-                            <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />
-                          ) : (
-                            <span className="inline-flex size-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
-                              <TypeIcon size={16} />
-                            </span>
-                          )
-                        }
-                        title={<span className={done ? "line-through" : undefined}>{task.title}</span>}
-                        clickLabel={task.title}
-                        badges={
-                          <>
-                            {group === "overdue" && (
-                              <Badge tone="danger" dot>{t("calendar.overdueSince", { date: formatDate(due, "relative") })}</Badge>
-                            )}
-                            {task.recurring && (
-                              <Badge icon={Repeat} title={t("calendar.recurrence")}>{t(`calendar.recurring.${task.recurring.interval}`)}</Badge>
-                            )}
-                          </>
-                        }
-                        meta={meta}
-                        description={task.description}
-                        actions={
-                          <>
-                            {done ? (
-                              <IconButton icon={RotateCcw} label={t("calendar.reopen")} onClick={() => updateTask(task.id, { completedDate: undefined })} />
-                            ) : (
-                              <IconButton icon={CircleCheck} tone="brand" label={t("calendar.markDone")} onClick={() => handleComplete(task)} />
-                            )}
-                            <Menu
-                              label={t("common.moreActions")}
-                              items={[
-                                { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(task) },
-                                "separator",
-                                { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(task) },
-                              ]}
-                            />
-                          </>
-                        }
-                      />
-                    );
-                  })}
+                  {list.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      group={group}
+                      plant={task.plantId ? plantMap.get(task.plantId) : undefined}
+                      bedName={task.bedId ? bedNames.get(task.bedId) : undefined}
+                      onComplete={handleComplete}
+                      onReopen={reopen}
+                      onOpen={openEdit}
+                      actions={
+                        <Menu
+                          label={t("common.moreActions")}
+                          items={[
+                            { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(task) },
+                            "separator",
+                            { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(task) },
+                          ]}
+                        />
+                      }
+                    />
+                  ))}
                 </List>
               ))}
             </div>

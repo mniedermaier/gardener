@@ -94,10 +94,10 @@ describe("Sufficiency calculator", () => {
     ];
     const result = calculateSufficiency([], [tomato, bean], 2, 30, "2026-05-15", animals);
     expect(result.animalYields.length).toBeGreaterThan(0);
-    // 5 chickens * 250 eggs * 0.06 kg/egg = 75 kg
+    // 5 hens × 220 eggs × 60 g = 66 kg, but only 2 × 240 eggs (28.8 kg) are eaten
     const eggYield = result.animalYields.find((y) => y.productType === "eggs");
     expect(eggYield).toBeDefined();
-    expect(eggYield!.quantityKg).toBe(75);
+    expect(eggYield!.quantityKg).toBe(28.8);
     expect(eggYield!.calories).toBeGreaterThan(0);
     expect(eggYield!.proteinG).toBeGreaterThan(0);
     expect(result.totalYieldKg).toBeGreaterThan(0);

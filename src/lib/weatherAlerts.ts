@@ -1,5 +1,5 @@
 import type { WeatherForecastItem } from "@/types/weather";
-import type { Bed } from "@/types/garden";
+import type { Bed, GreenhouseConfig } from "@/types/garden";
 import type { Plant, WaterNeed } from "@/types/plant";
 import type { AlertConfig } from "@/store/settingsSlice";
 
@@ -38,41 +38,76 @@ export function detectFrostAlerts(
   return alerts;
 }
 
+/**
+ * How much warmer an **unheated** greenhouse stays than outside at the
+ * coldest point of the night (°C). Deliberately conservative: on clear,
+ * windless nights a single-skin house loses its heat almost completely
+ * (glass and foil ≈ +1 °C); twin-wall polycarbonate insulates better (≈ +2 °C).
+ * Shown as an assumption under "Wie berechnet?".
+ */
+export const GREENHOUSE_NIGHT_BUFFER_C: Record<GreenhouseConfig["material"], number> = {
+  glass: 1,
+  polycarbonate: 2,
+  plastic: 1,
+};
+
+/**
+ * On a sunny day a closed greenhouse gets far warmer than the air outside.
+ * Warn when the outside maximum comes within this many degrees of the
+ * configured maximum (manual vents need opening in time, automatic vents
+ * cope with more).
+ */
+export const GREENHOUSE_HEAT_MARGIN_C: Record<GreenhouseConfig["ventilation"], number> = { manual: 10, automatic: 5 };
+
+/** Night margin above the configured minimum at which a cold warning starts. */
+const COLD_MARGIN_C = 3;
+
 export function detectGreenhouseAlerts(
   forecast: WeatherForecastItem[],
   beds: Bed[],
 ): WeatherAlert[] {
   const alerts: WeatherAlert[] = [];
   const greenhouses = beds.filter((b) => b.environmentType === "greenhouse" && b.greenhouseConfig);
+  if (forecast.length === 0) return alerts;
 
   for (const gh of greenhouses) {
     const config = gh.greenhouseConfig!;
-    for (const day of forecast) {
-      if (day.tempMax > config.maxTempC - 5) {
+
+    // Heat: name the hottest day, not the first warm one.
+    const margin = GREENHOUSE_HEAT_MARGIN_C[config.ventilation] ?? 10;
+    const hottest = forecast.reduce((a, b) => (b.tempMax > a.tempMax ? b : a));
+    const hotDays = forecast.filter((d) => d.tempMax >= config.maxTempC - margin);
+    if (hotDays.length > 0) {
+      alerts.push({
+        id: `gh-hot-${gh.id}`,
+        type: "greenhouse_hot",
+        severity: hottest.tempMax >= config.maxTempC - margin / 2 ? "danger" : "warning",
+        titleKey: "alerts.greenhouseHotTitle",
+        descriptionKey: "alerts.greenhouseHotDesc",
+        titleParams: { name: gh.name },
+        descriptionParams: { name: gh.name, temp: hottest.tempMax, max: config.maxTempC, date: hottest.date, count: hotDays.length },
+        date: hottest.date,
+      });
+    }
+
+    // Cold (unheated only): estimate the inside minimum from the outside
+    // minimum plus a conservative buffer and report the *coldest* night.
+    if (!config.heated) {
+      const buffer = GREENHOUSE_NIGHT_BUFFER_C[config.material] ?? 1;
+      const coldest = forecast.reduce((a, b) => (b.tempMin < a.tempMin ? b : a));
+      const inside = coldest.tempMin + buffer;
+      const coldNights = forecast.filter((d) => d.tempMin + buffer < config.minTempC + COLD_MARGIN_C);
+      if (coldNights.length > 0) {
         alerts.push({
-          id: `gh-hot-${gh.id}-${day.date}`,
-          type: "greenhouse_hot",
-          severity: day.tempMax > config.maxTempC ? "danger" : "warning",
-          titleKey: "alerts.greenhouseHotTitle",
-          descriptionKey: "alerts.greenhouseHotDesc",
-          titleParams: { name: gh.name },
-          descriptionParams: { name: gh.name, temp: day.tempMax, max: config.maxTempC, date: day.date },
-          date: day.date,
-        });
-        break; // one alert per greenhouse
-      }
-      if (!config.heated && day.tempMin < config.minTempC + 3) {
-        alerts.push({
-          id: `gh-cold-${gh.id}-${day.date}`,
+          id: `gh-cold-${gh.id}`,
           type: "greenhouse_cold",
-          severity: day.tempMin < config.minTempC ? "danger" : "warning",
+          severity: inside <= 0 || inside < config.minTempC ? "danger" : "warning",
           titleKey: "alerts.greenhouseColdTitle",
-          descriptionKey: "alerts.greenhouseColdDesc",
+          descriptionKey: inside <= 0 ? "alerts.greenhouseFrostDesc" : "alerts.greenhouseColdDesc",
           titleParams: { name: gh.name },
-          descriptionParams: { name: gh.name, temp: day.tempMin, min: config.minTempC, date: day.date },
-          date: day.date,
+          descriptionParams: { name: gh.name, temp: inside, outside: coldest.tempMin, min: config.minTempC, date: coldest.date, count: coldNights.length, buffer },
+          date: coldest.date,
         });
-        break;
       }
     }
   }

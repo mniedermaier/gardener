@@ -50,9 +50,10 @@ export function validatePlacement(
     if (distX <= 3 && distY <= 3) {
       if (plant.antagonists.includes(cell.plantId) || neighbor.antagonists.includes(plantId)) {
         antagonistCount++;
+        // Bad neighbours are advice, not a ban: placing stays possible.
         if (distX <= 1 && distY <= 1) {
           issues.push({
-            severity: "error",
+            severity: "warning",
             type: "antagonist",
             messageKey: "validation.antagonistDirect",
             messageParams: { plant: plantId, neighbor: cell.plantId },

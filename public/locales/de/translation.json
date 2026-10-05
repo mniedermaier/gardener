@@ -87,17 +87,17 @@
       "analysis": "Auswertung"
     },
     "tabs": {
-      "overview": "Übersicht",
+      "overview": "Heute",
       "weather": "Wetter",
-      "catalog": "Katalog",
+      "catalog": "Pflanzen",
       "companions": "Pflanzpartner",
-      "season": "Saisonplan",
+      "season": "Kalender",
       "tasks": "Aufgaben",
       "animals": "Tiere",
       "production": "Produktion",
       "feed": "Futter",
       "health": "Gesundheit",
-      "balance": "Bilanz",
+      "balance": "Selbstversorgung",
       "foodplan": "Ernährungsplan"
     },
     "command": {
@@ -118,13 +118,18 @@
         "animals": "Tiere",
         "tasks": "Aufgaben",
         "journal": "Tagebuch"
-      }
+      },
+      "logHarvestFor": "Ernte erfassen: {{name}}",
+      "plantInBed": "{{plant}} in {{bed}}",
+      "cellCount_one": "{{count}} Feld",
+      "cellCount_other": "{{count}} Felder"
     },
     "sync": {
       "syncing": "Wird synchronisiert …",
       "connected": "Mit dem Server verbunden",
       "offline": "Server nicht erreichbar – Änderungen bleiben lokal"
-    }
+    },
+    "skipToContent": "Zum Inhalt springen"
   },
   "dashboard": {
     "title": "Heute",
@@ -162,10 +167,10 @@
     "openPlanner": "Zum Planer",
     "weatherTitle": "Wetter",
     "weatherMore": "Vorhersage",
-    "weatherConnectTitle": "Wetter verbinden",
-    "weatherConnectText": "Mit Standort und API-Schlüssel siehst du hier Wetter und Frostwarnungen.",
+    "weatherConnectTitle": "Standort festlegen",
+    "weatherConnectText": "Mit deinem Standort siehst du hier Wetter und Frostwarnungen – ohne Anmeldung oder Schlüssel.",
     "weatherErrorTitle": "Wetter nicht verfügbar",
-    "weatherErrorText": "Prüfe den API-Schlüssel oder die Internetverbindung.",
+    "weatherErrorText": "Die Wetterdaten sind gerade nicht erreichbar. Prüfe die Internetverbindung.",
     "openSettings": "Zu den Einstellungen",
     "frostHint": "Frost möglich ({{days}}, bis {{temp}}). Empfindliche Kulturen abdecken.",
     "seasonTitle": "Saison bisher",
@@ -185,14 +190,14 @@
       "dismiss": "Erste Schritte ausblenden",
       "done": "erledigt",
       "location": "Standort festlegen",
-      "locationHint": "Für Sonnenstand, Wetter und Frosttermin",
+      "locationHint": "Für Wetter, Frostwarnungen, Sonnenstand und Frosttermin",
       "bed": "Erstes Beet anlegen",
       "bedHint": "Größe und Art festlegen: Hochbeet, Gewächshaus, Kübel …",
       "plant": "Erste Pflanze setzen",
       "plantHint": "Aus der Palette ins Raster ziehen",
       "tasks": "Aufgaben erzeugen",
       "tasksHint": "Aussaat- und Pflanztermine aus deinem Plan",
-      "weather": "Wetter verbinden",
+      "weather": "Standort festlegen",
       "weatherHint": "Frost- und Gießhinweise für deinen Garten"
     },
     "backup": {
@@ -251,7 +256,7 @@
     "noResults": "Keine Treffer"
   },
   "planner": {
-    "title": "Gartenplaner",
+    "title": "Planer",
     "newGarden": "Neuer Garten",
     "newBed": "Neues Beet",
     "deleteBed": "Beet löschen",
@@ -274,7 +279,7 @@
     "varietyPlaceholder": "z.B. San Marzano, Ochsenherz...",
     "plantedDate": "Pflanzdatum",
     "confirmDeleteGarden": "Diesen Garten mit allen Beeten löschen?",
-    "placeMode": "Platziere: {{plant}} - auf Felder klicken, ESC zum Abbrechen",
+    "placeMode": "Platziere {{plant}}: auf Felder klicken, Esc zum Abbrechen",
     "share": "Gartenplan teilen",
     "shareCopied": "Teilen-Link kopiert",
     "print": "Drucken",
@@ -383,7 +388,7 @@
     "zoomIn": "Vergrößern",
     "zoomOut": "Verkleinern",
     "placing": "{{plant}} setzen",
-    "placingHint": "Tippe auf freie Felder. ✓ guter Nachbar, ✕ Konflikt.",
+    "placingHint": "Tippe auf freie Felder. ✓ guter Nachbar, ⚠ ungünstiger Nachbar.",
     "done": "Fertig",
     "inspectHint": "Tippe auf eine Pflanze, um sie anzusehen. Zum Setzen erst eine Pflanze auswählen.",
     "pickPlantFirst": "Wähle zuerst eine Pflanze aus, um dieses Feld zu bepflanzen.",
@@ -392,15 +397,15 @@
     "cellPosition": "Reihe {{row}}, Feld {{col}}",
     "emptyCell": "Leeres Feld, {{position}}",
     "gridLabel": "Raster {{name}}, {{cols}} × {{rows}} Felder",
-    "conflictWith": "Konflikt mit {{plants}}",
-    "conflictWhy": "Schlechte Nachbarn hemmen sich im Wachstum oder teilen Schädlinge und Krankheiten. Setze eine Pflanze um oder lass ein Feld Abstand.",
-    "conflictsTitle_one": "{{count}} Konflikt im Beet",
-    "conflictsTitle_other": "{{count}} Konflikte im Beet",
+    "conflictWith": "Ungünstig neben {{plants}}",
+    "conflictWhy": "Ungünstige Nachbarn hemmen sich im Wachstum oder teilen Schädlinge. Setzen bleibt möglich – besser ein Feld Abstand lassen.",
+    "conflictsTitle_one": "{{count}} ungünstige Nachbarschaft im Beet",
+    "conflictsTitle_other": "{{count}} ungünstige Nachbarschaften im Beet",
     "spots_one": "{{count}} Stelle",
     "spots_other": "{{count}} Stellen",
     "legendGood": "Guter Nachbar daneben",
-    "legendBad": "Konflikt – hier nicht möglich",
-    "legendConflict": "Rote Kante = schlechte Nachbarn",
+    "legendBad": "Ungünstiger Nachbar – Setzen möglich",
+    "legendConflict": "Farbige Kante mit ⚠ = ungünstige Nachbarn",
     "paletteTitle": "Pflanze wählen",
     "sheetPickHint": "Antippen, dann Felder im Beet tippen",
     "sheetChangePlant": "Andere Pflanze wählen",
@@ -416,7 +421,7 @@
     "removePlant": "Entfernen",
     "plantRemoved": "{{name}} entfernt",
     "thisSeason": "Termine diese Saison",
-    "harvestAfter": "Ernte nach",
+    "harvestAfter": "Erntereif nach",
     "daysRange": "{{min}}–{{max}} Tagen",
     "spacing": "{{value}} cm Abstand",
     "bedNamePlaceholder": "z. B. Hochbeet Süd",
@@ -443,6 +448,10 @@
         "medium": "Mittelzehrer",
         "light": "Schwachzehrer",
         "improver": "Bodenverbesserer"
+      },
+      "fixed": {
+        "container": "Kübel: Erde jährlich erneuern statt Fruchtfolge",
+        "perennial": "Dauerkultur – keine Fruchtfolge"
       }
     },
     "families": {
@@ -460,10 +469,12 @@
       "ericaceae": "Heidekrautgewächse",
       "grossulariaceae": "Stachelbeergewächse",
       "other": "Sonstige"
-    }
+    },
+    "sheetMore": "Details, Sorte & Notizen",
+    "sheetLess": "Weniger anzeigen"
   },
   "plants": {
-    "title": "Pflanzendatenbank",
+    "title": "Pflanzen",
     "search": "Pflanzen suchen...",
     "addCustom": "Eigene Pflanze hinzufügen",
     "customName": "Pflanzenname",
@@ -672,7 +683,7 @@
       },
       "asparagus": {
         "name": "Spargel",
-        "description": "Mehrjähriges Gemüse. Braucht 2-3 Jahre zum Etablieren, trägt dann über 15 Jahre."
+        "description": "Mehrjähriges Gemüse. Braucht 2–3 Jahre zum Etablieren, trägt dann über 15 Jahre."
       },
       "pak_choi": {
         "name": "Pak Choi",
@@ -695,7 +706,7 @@
     "inGarden": "Im Garten",
     "backToList": "Zurück zur Pflanzenliste",
     "placeInPlanner": "Im Planer platzieren",
-    "addSeeds": "Saatgut erfassen",
+    "addSeeds": "Saatgut hinzufügen",
     "logHarvest": "Ernte erfassen",
     "editCustom": "Eigene Pflanze bearbeiten",
     "saved": "{{name}} gespeichert",
@@ -714,7 +725,7 @@
       "window": "{{from}} – {{to}}",
       "lastFrost": "Letzter Frost: {{date}}",
       "rowSpacing": "Reihenabstand {{value}} cm",
-      "harvestAfter": "Ernte nach",
+      "harvestAfter": "Erntereif nach",
       "yield": "Ertrag",
       "yieldUnit": "kg/m²",
       "calories": "{{value}} kcal je 100 g",
@@ -734,45 +745,78 @@
       "yourHarvests": "Deine Ernten",
       "harvestEntries_one": "{{count}} Ernte",
       "harvestEntries_other": "{{count}} Ernten",
-      "lastHarvest": "Letzte Ernte: {{date}}",
+      "lastHarvest": "zuletzt geerntet {{date}}",
       "noHarvests": "Noch keine Ernte erfasst.",
       "seedStock": "Saatgut-Vorrat",
       "noSeeds": "Kein Saatgut im Vorrat.",
       "storage": "Haltbarmachen & Saatgut",
       "viability_one": "{{count}} Jahr keimfähig",
       "viability_other": "{{count}} Jahre keimfähig",
-      "isolation": "Isolationsabstand {{distance}} m"
+      "isolation": "Isolationsabstand {{distance}} m",
+      "harvestDaysUnit": "Tagen"
     }
   },
   "weather": {
     "title": "Wetter",
     "current": "Aktuelles Wetter",
     "forecast": "Nächste Tage",
-    "noApiKey": "Hinterlege in den Einstellungen einen OpenWeatherMap-Schlüssel und deinen Standort. Dann warnt Gardener vor Frost und Hitze.",
-    "noLocation": "Setze in den Einstellungen deinen Standort, damit Vorhersage und Sonnenzeiten stimmen.",
     "temp": "Temperatur",
     "humidity": "Luftfeuchtigkeit",
     "wind": "Wind",
     "feelsLike": "Gefühlt",
     "precipitation": "Niederschlag",
     "subtitle": "Vorhersage und Hinweise für deinen Garten.",
-    "connectTitle": "Wetter verbinden",
     "toSettings": "Zu den Einstellungen",
     "refresh": "Wetter aktualisieren",
     "retry": "Erneut versuchen",
     "errorTitle": "Wetter konnte nicht geladen werden",
-    "errorAuth": "Der API-Schlüssel wurde abgelehnt. Prüfe ihn in den Einstellungen.",
+    "errorAuth": "OpenWeatherMap hat den API-Schlüssel abgelehnt. Prüfe ihn in den Einstellungen oder lösche ihn – dann nutzt Gardener Open-Meteo, ganz ohne Schlüssel.",
     "errorNetwork": "Keine Verbindung zum Wetterdienst. Prüfe die Internetverbindung und versuch es erneut.",
     "alertsLabel": "Wetterhinweise",
     "moreAlerts_one": "{{count}} weiterer Hinweis",
     "moreAlerts_other": "{{count}} weitere Hinweise",
     "updatedAt": "Stand {{time}} Uhr",
     "windValue": "{{speed}} km/h",
-    "forecastDesc": "Tiefst- und Höchstwert; der Strich markiert die Frostschwelle {{threshold}}.",
+    "forecastDesc": "Tiefst- und Höchstwert; der Strich markiert die Frostschwelle {{threshold}}. „Frost“ heißt 0 °C oder kälter, „Frostgefahr“ bis {{threshold}} (Bodenfrost möglich).",
     "rainChance": "Regen {{percent}}",
     "rangeLabel": "{{min}} bis {{max}}",
     "frost": "Frost",
-    "frostRisk": "Frostgefahr"
+    "frostRisk": "Frostgefahr",
+    "locationTitle": "Standort festlegen",
+    "locationText": "Gardener holt die Vorhersage kostenlos von Open-Meteo, ein API-Schlüssel ist nicht nötig. Lege nur deinen Ort fest, dann warnt Gardener vor Frost und Hitze und zeigt die Sonnenzeiten.",
+    "setLocation": "Standort festlegen",
+    "sourceLabel": "Wetterdaten:",
+    "wmo": {
+      "0": "Klar",
+      "1": "Überwiegend klar",
+      "2": "Teilweise bewölkt",
+      "3": "Bedeckt",
+      "45": "Nebel",
+      "48": "Nebel mit Reif",
+      "51": "Leichter Nieselregen",
+      "53": "Nieselregen",
+      "55": "Starker Nieselregen",
+      "56": "Leichter gefrierender Nieselregen",
+      "57": "Gefrierender Nieselregen",
+      "61": "Leichter Regen",
+      "63": "Regen",
+      "65": "Starker Regen",
+      "66": "Leichter gefrierender Regen",
+      "67": "Gefrierender Regen",
+      "71": "Leichter Schneefall",
+      "73": "Schneefall",
+      "75": "Starker Schneefall",
+      "77": "Schneegriesel",
+      "80": "Leichte Regenschauer",
+      "81": "Regenschauer",
+      "82": "Heftige Regenschauer",
+      "85": "Schneeschauer",
+      "86": "Starke Schneeschauer",
+      "95": "Gewitter",
+      "96": "Gewitter mit Hagel",
+      "99": "Schweres Gewitter mit Hagel",
+      "unknown": "Keine Angabe"
+    }
   },
   "calendar": {
     "subtitle": "Was im Garten ansteht – nach Fälligkeit sortiert.",
@@ -798,7 +842,8 @@
       "tomorrow": "Morgen",
       "thisWeek": "Diese Woche",
       "later": "Später",
-      "done": "Erledigt"
+      "done": "Erledigt",
+      "next7": "Nächste 7 Tage"
     },
     "overdueSince": "{{date}} fällig",
     "recurrence": "Wiederholen",
@@ -814,7 +859,7 @@
     "taskAdded": "Aufgabe angelegt",
     "taskUpdated": "Aufgabe gespeichert",
     "taskDeleted": "Aufgabe gelöscht",
-    "nextOccurrence": "Erledigt – nächster Termin: {{date}}",
+    "nextOccurrence": "Erledigt: {{title}} – nächster Termin {{date}}",
     "doneOn": "erledigt: {{date}}",
     "editTask": "Aufgabe bearbeiten",
     "titlePlaceholder": "z. B. Tomaten ausgeizen",
@@ -869,7 +914,10 @@
       "preserve": "Konservieren",
       "soil_test": "Bodentest",
       "custom": "Eigene"
-    }
+    },
+    "nothingNextPlanted_one": "Für deine bepflanzten Kulturen beginnt nichts Neues. {{count}} Kultur kannst du jetzt säen oder pflanzen (siehe unten).",
+    "nothingNextPlanted_other": "Für deine bepflanzten Kulturen beginnt nichts Neues. {{count}} Kulturen kannst du jetzt säen oder pflanzen (siehe unten).",
+    "reopenNamed": "„{{title}}“ wieder öffnen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -881,7 +929,7 @@
       "system": "System"
     },
     "weather": "Wetter",
-    "apiKey": "API-Schlüssel",
+    "apiKey": "OpenWeatherMap-API-Schlüssel (optional)",
     "location": "Standort",
     "latitude": "Breitengrad",
     "longitude": "Längengrad",
@@ -900,7 +948,7 @@
       "frostThreshold": "Schwellwert (°C)",
       "frostDesc": "Wenn die Vorhersage unter den Schwellwert fällt",
       "wateringDesc": "Bei Hitze und ohne Regen",
-      "greenhouseDesc": "Überhitzung und Lüften",
+      "greenhouseDesc": "Überhitzung, Lüften und kalte Nächte im Gewächshaus",
       "weeklyDesc": "Kurzfassung der kommenden Tage im Wetter"
     },
     "backendUrl": "Backend-URL",
@@ -917,8 +965,8 @@
     "frostEstimate": "Schätzung für deinen Standort: {{date}}",
     "useEstimate": "Schätzung übernehmen",
     "gridHint": "Kantenlänge eines Planer-Felds",
-    "weatherDesc": "Vorhersage, Frost- und Gießhinweise über OpenWeatherMap",
-    "apiKeyHint": "Kostenlos erhältlich bei",
+    "weatherDesc": "Vorhersage, Frost- und Gießhinweise – ohne Anmeldung, nur mit deinem Standort",
+    "apiKeyHint": "Nur nötig, wenn du OpenWeatherMap statt Open-Meteo nutzen möchtest. Kostenlos erhältlich bei",
     "alertsDesc": "Welche Warnungen auf Heute und im Wetter erscheinen",
     "backendDesc": "Nur mit eigenem Server (Docker)",
     "dataDesc": "Sichern, wiederherstellen und exportieren",
@@ -930,7 +978,13 @@
       "action": "Alle Daten löschen",
       "actionDesc": "Entfernt Gärten, Ernten, Tiere und Einstellungen von diesem Gerät. Lade vorher ein Backup herunter.",
       "confirm": "Wirklich alle Daten auf diesem Gerät löschen? Ohne Backup sind sie verloren."
-    }
+    },
+    "weatherReady": "Vorhersage für {{place}} ist aktiv",
+    "weatherYourLocation": "deinen Standort",
+    "weatherNeedsLocation": "Lege oben einen Standort fest, dann lädt Gardener die Vorhersage",
+    "weatherSource": "Wetterdaten:",
+    "weatherAdvanced": "Erweitert: eigenen OpenWeatherMap-Schlüssel verwenden",
+    "weatherProviderActive": "Aktiver Anbieter: {{provider}}. Mit Schlüssel nutzt Gardener OpenWeatherMap, ohne Schlüssel Open-Meteo."
   },
   "dataManagement": {
     "title": "Daten & Backup",
@@ -969,9 +1023,9 @@
     "frostTitle": "Frostwarnung: {{temp}}",
     "frostDesc": "Temperaturen fallen am {{date}} auf {{temp}}. Empfindliche Pflanzen schützen.",
     "greenhouseHotTitle": "{{name}}: Überhitzungsgefahr",
-    "greenhouseHotDesc": "{{name}} könnte am {{date}} {{temp}} erreichen (Maximum {{max}}). Für Lüftung sorgen.",
+    "greenhouseHotDesc": "Am {{date}} draußen bis {{temp}}. Bei Sonne heizt sich das geschlossene Haus weit über {{max}} auf: morgens lüften, bei Bedarf schattieren.",
     "greenhouseColdTitle": "{{name}}: Kältewarnung",
-    "greenhouseColdDesc": "{{name}} könnte am {{date}} auf {{temp}} fallen (Minimum {{min}}). Heizung oder Vlies erwägen.",
+    "greenhouseColdDesc": "Kältester Tag: {{date}}, draußen {{outside}}. Im unbeheizten Haus sind dann etwa {{temp}} zu erwarten (Minimum {{min}}). Vlies über die Pflanzen legen. Annahme: Das Haus hält nachts rund {{buffer}} mehr als draußen.",
     "wateringNeeded": "Gießen empfohlen",
     "wateringNotNeeded": "Kein Gießen nötig",
     "wateringHotDry": "Heiße, trockene Tage voraus (im Schnitt {{temp}}). Morgens gründlich gießen.",
@@ -989,14 +1043,15 @@
       "warning": "Achtung",
       "info": "Hinweis"
     },
-    "frostGroupTitle_one": "Frost in {{count}} Nacht, bis {{temp}}",
-    "frostGroupTitle_other": "Frost in {{count}} Nächten, bis {{temp}}",
+    "frostGroupTitle_one": "Frostgefahr in {{count}} Nacht, bis {{temp}}",
+    "frostGroupTitle_other": "Frostgefahr in {{count}} Nächten, bis {{temp}}",
     "frostAffected_one": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
     "frostAffected_other": "Betroffen sind {{count}} Kulturen, z. B. {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
-    "frostAdvice": "Empfindliche Pflanzen mit Vlies abdecken und mit dem Auspflanzen warten."
+    "frostAdvice": "Empfindliche Pflanzen mit Vlies abdecken und mit dem Auspflanzen warten.",
+    "greenhouseFrostDesc": "Kältester Tag: {{date}}, draußen {{outside}}. Auch im unbeheizten Haus droht dann Frost (etwa {{temp}}). Empfindliche Pflanzen doppelt mit Vlies abdecken oder frostfrei heizen. Annahme: rund {{buffer}} wärmer als draußen."
   },
   "harvest": {
-    "title": "Ernteprotokoll",
+    "title": "Ernte",
     "add": "Ernte erfassen",
     "plant": "Pflanze",
     "bed": "Beet",
@@ -1055,7 +1110,7 @@
     "log": "Protokoll"
   },
   "journal": {
-    "title": "Gartentagebuch",
+    "title": "Tagebuch",
     "add": "Neuer Eintrag",
     "entryTitle": "Titel",
     "text": "Was ist heute im Garten passiert?",
@@ -1091,8 +1146,8 @@
     "suggestedTags": "Vorschläge:"
   },
   "pantry": {
-    "title": "Vorratskammer",
-    "add": "Vorrat hinzufügen",
+    "title": "Vorrat",
+    "add": "Vorrat erfassen",
     "added": "Vorrat gespeichert",
     "totalStored": "Eingelagert",
     "totalUnits": "Einheiten",
@@ -1128,8 +1183,8 @@
     "tip2": "Eingekochtes kühl, dunkel und trocken lagern. Direkte Sonneneinstrahlung vermeiden.",
     "tip3": "Gefrorenes Gemüse vorher blanchieren für bessere Farbe, Textur und Nährstofferhalt.",
     "tip4": "Fermentiertes regelmäßig prüfen — Schimmel an der Oberfläche sofort entfernen.",
-    "tip5": "Erdkeller-Lagerung braucht 1-4°C und hohe Luftfeuchtigkeit. Kartoffeln dunkel lagern.",
-    "tip6": "Nach dem Prinzip 'First In, First Out' verbrauchen — älteste Vorräte zuerst verwenden.",
+    "tip5": "Erdkeller-Lagerung braucht 1–4 °C und hohe Luftfeuchtigkeit. Kartoffeln dunkel lagern.",
+    "tip6": "Nach dem Prinzip „First in, first out“ verbrauchen – älteste Vorräte zuerst.",
     "methodInfo": {
       "canning": {
         "shelf": "24 Monate haltbar",
@@ -1149,7 +1204,7 @@
       },
       "root_cellar": {
         "shelf": "6 Monate haltbar",
-        "desc": "Kühle, feuchte Lagerung für Wurzelgemüse, Kartoffeln, Äpfel, Kohl. 1-4°C optimal."
+        "desc": "Kühle, feuchte Lagerung für Wurzelgemüse, Kartoffeln, Äpfel, Kohl. 1–4 °C optimal."
       }
     },
     "subtitle": "Eingemachtes, Eingefrorenes und Eingelagertes – mit Haltbarkeit im Blick.",
@@ -1204,8 +1259,8 @@
     "needMore": "-{{kg}} kg (brauche +{{m2}} m²)",
     "cropPlan": "Anbauplan",
     "animalProducts": "Tierische Produkte",
-    "coverageForecast": "Abgedeckt (Prognose)",
-    "coverageActual": "Abgedeckt (erfasst)",
+    "coverageForecast": "Mengenziel · Prognose",
+    "coverageActual": "Mengenziel · bisher geerntet",
     "ofTarget": "von {{kg}} Jahresziel",
     "actualKg": "{{kg}} der Plan-Kulturen erfasst",
     "areaNeeded": "{{area}} wären nötig",
@@ -1219,13 +1274,18 @@
     "notPlanted": "Nicht gepflanzt",
     "rowMeta": "Erfasst {{actual}} · Prognose {{forecast}} · Ziel {{target}} · {{area}} von {{needed}}",
     "meterLabel": "{{plant}}: erfasst {{actual}}, Prognose {{forecast}}, Ziel {{target}}",
-    "animalMeta": "Typischer Jahresertrag deiner Tiere",
     "emptyTitle": "Plane deinen Jahresbedarf",
     "emptyText": "Dein Haushalt braucht rund {{kg}} Gemüse und Obst im Jahr. Bepflanze Beete, dann zeigt der Plan, was noch fehlt.",
     "howTargets": "Jahresziel: durchschnittlicher Verbrauch pro Person in Mitteleuropa (z. B. 30 kg Kartoffeln, 15 kg Tomaten) × Haushaltsgröße.",
-    "howCoverage": "Abgedeckt: Summe je Kultur von min(Menge, Ziel) geteilt durch die Summe aller Ziele. Ein Überschuss bei Kartoffeln gleicht also keine fehlenden Tomaten aus.",
+    "howCoverage": "Mengenziel: Summe je Kultur von min(Menge, Ziel) geteilt durch die Summe aller Ziele. Ein Überschuss bei Kartoffeln gleicht also keine fehlenden Tomaten aus.",
     "pctActual": "{{percent}} erfasst",
-    "pctForecast": "{{percent}} Prognose"
+    "pctForecast": "{{percent}} Prognose",
+    "howVsCalories": "Das ist kein Kalorienwert: Die Selbstversorgung auf der Seite „Selbstversorgung“ rechnet in Kalorien und schließt Tierprodukte ein. Beide Zahlen weichen deshalb voneinander ab.",
+    "animalIntro_one": "Typischer Jahresertrag deiner Tiere und der übliche Verbrauch von {{count}} Person.",
+    "animalIntro_other": "Typischer Jahresertrag deiner Tiere und der übliche Verbrauch von {{count}} Personen.",
+    "animalNeed": "Verbrauch {{amount}}",
+    "animalSurplus": "Überschuss {{amount}}",
+    "surplusBadge": "Überschuss"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1288,17 +1348,19 @@
     "kcalValue": "{{kcal}} kcal",
     "noCropsTitle": "Noch keine Kulturen",
     "noCrops": "Bepflanze ein Beet im Planer, dann erscheint hier der erwartete Ertrag je Kultur.",
-    "animalsIntro": "Typischer Jahresertrag deiner Tiere, darunter die erfasste Produktion dieses Jahres.",
+    "animalsIntro": "Typischer Jahresertrag deiner Tiere, darunter die erfasste Produktion dieses Jahres. Angerechnet wird höchstens der übliche Verbrauch deines Haushalts.",
     "noAnimalsTitle": "Keine Tiere angelegt",
     "noAnimals": "Lege Hühner, Bienen oder andere Tiere an, um ihre Erträge einzurechnen.",
     "nonFood": "kein Lebensmittel",
     "perYear": "{{amount}} pro Jahr",
     "storageDesc": "Überschüsse, die du für den Winter haltbar machen kannst (Prognose).",
     "shelfLife_one": "{{count}} Monat haltbar",
-    "shelfLife_other": "{{count}} Monate haltbar"
+    "shelfLife_other": "{{count}} Monate haltbar",
+    "kcalCounted": "{{kcal}} kcal angerechnet",
+    "surplus": "Überschuss {{amount}}"
   },
   "pests": {
-    "title": "Schädlinge & Krankheiten",
+    "title": "Schädlinge",
     "add": "Problem melden",
     "added": "Problem erfasst",
     "resolved": "Als gelöst markiert",
@@ -1337,7 +1399,7 @@
     "treatmentHint": "Was hast du unternommen? Wird mit Datum gespeichert."
   },
   "livestock": {
-    "title": "Tierhaltung",
+    "title": "Tiere",
     "addAnimal": "Tier hinzufügen",
     "addProduct": "Produktion erfassen",
     "added": "{{name}} angelegt",
@@ -1361,14 +1423,13 @@
     "feedType": "Futterart",
     "feedTypePlaceholder": "z.B. Körnerfutter, Heu, Zuckersirup...",
     "feedCost": "Kosten (€)",
-    "feedCostMonth": "Futterkosten/Monat",
     "feedTotal": "Futterkosten gesamt",
     "unit": "Einheit",
     "liters": "Liter",
     "productionEntries_one": "{{count}} Eintrag",
     "productionEntries_other": "{{count}} Einträge",
     "healthTab": "Gesundheit",
-    "addHealth": "Gesundheitseintrag",
+    "addHealth": "Gesundheitseintrag erfassen",
     "healthAdded": "Gesundheitseintrag erfasst",
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
@@ -1395,17 +1456,17 @@
       "subtitle": "Eier, Honig und andere Erträge deiner Tiere."
     },
     "feed": {
-      "title": "Futterverwaltung",
-      "thisMonth": "Kosten diesen Monat",
-      "lastMonth": "Kosten letzten Monat",
+      "title": "Futter",
       "totalCost": "Gesamtkosten",
       "totalKg": "Futter gesamt",
       "perAnimal": "Kosten pro Tier",
       "subtitle": "Futtermengen und -kosten pro Tier.",
-      "vsLastMonth": "im Vergleich zum Vormonat"
+      "perMonth": "Ø pro Monat",
+      "perMonthHint_one": "über {{count}} Monat",
+      "perMonthHint_other": "über {{count}} Monate"
     },
     "health": {
-      "title": "Gesundheitsübersicht",
+      "title": "Gesundheit",
       "totalEvents": "Einträge gesamt",
       "totalCost": "Tierarztkosten",
       "losses": "Verluste",
@@ -1506,7 +1567,6 @@
     },
     "chartCaption": "{{product}} der letzten {{months}} Monate, zusammen {{total}}",
     "recordedThisYear": "{{product}} dieses Jahr",
-    "ofExpected": "von ~{{amount}}/Jahr",
     "productType": "Produkt",
     "units": {
       "pieces": "Stück",
@@ -1548,10 +1608,17 @@
     "noFeedTitle": "Noch kein Futter erfasst",
     "noHealthTitle": "Keine Gesundheitseinträge",
     "noJournalTitle": "Keine Tagebucheinträge",
-    "toJournal": "Zum Tagebuch"
+    "toJournal": "Zum Tagebuch",
+    "feedCost30": "Futterkosten · 30 Tage",
+    "feedPerMonthHint": "Ø {{amount}} pro Monat",
+    "productionTotal": "Produktion gesamt",
+    "weekShort": "KW {{week}}",
+    "showEntries": "Einträge anzeigen",
+    "hideEntries": "Einträge ausblenden",
+    "ofExpectedToDate": "von ~{{amount}} erwartet"
   },
   "seeds": {
-    "title": "Saatgut-Inventar",
+    "title": "Saatgut",
     "add": "Saatgut hinzufügen",
     "added": "Saatgut gespeichert",
     "items": "Saatgut-Posten",
@@ -1593,7 +1660,7 @@
     "missingStat": "Fehlt für Beete",
     "missingStatHint": "Gepflanzt, aber nicht vorrätig",
     "shoppingListHint": "Einjährige Kulturen in deinen Beeten ohne Saat- oder Pflanzgut im Vorrat. Mehrjährige wie Rosmarin oder Beeren sind nicht dabei.",
-    "addFor": "{{name}} erfassen",
+    "addFor": "{{name}} hinzufügen",
     "emptyTitle": "Noch kein Saatgut erfasst",
     "emptyText": "Trage deine Samentüten ein. Dann siehst du, was für die Beete fehlt und wann ältere Samen eine Keimprobe brauchen.",
     "filterLabel": "Saatgut filtern",
@@ -1614,7 +1681,7 @@
     "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben"
   },
   "soil": {
-    "title": "Boden-Management",
+    "title": "Boden",
     "addTest": "Bodentest erfassen",
     "addAmendment": "Düngung erfassen",
     "tests": "Bodentests",
@@ -1626,11 +1693,6 @@
     "amendmentType": "Typ",
     "material": "Material",
     "materialPlaceholder": "z.B. Pferdemist, Gartenkompost...",
-    "phTooAcid": "Sehr sauer - Kalk ausbringen um pH zu erhöhen",
-    "phSlightlyAcid": "Leicht sauer - die meisten Pflanzen bevorzugen 6.0-7.0",
-    "phOptimal": "Optimaler pH-Bereich für die meisten Gemüsesorten",
-    "phSlightlyAlkaline": "Leicht alkalisch - bei Bedarf Schwefel ausbringen",
-    "phTooAlkaline": "Zu alkalisch - Schwefel oder Torf ausbringen um pH zu senken",
     "types": {
       "compost": "Kompost",
       "manure": "Mist",
@@ -1658,14 +1720,20 @@
       "limeLight": "Leicht sauer",
       "optimal": "Im Zielbereich",
       "noLime": "Leicht basisch",
-      "sulfur": "Zu basisch"
+      "sulfur": "Zu basisch",
+      "limeVeto": "Kein Kalk",
+      "averseHigh": "Etwas zu hoch",
+      "acidify": "Zu basisch"
     },
     "phAdvice": {
       "limeStrong": "Deutlich unter dem Zielbereich (pH {{range}}). Kohlensauren Kalk oder Algenkalk ausbringen, am besten im Herbst, und nach einem Jahr neu messen.",
       "limeLight": "Etwas unter dem Zielbereich (pH {{range}}). Eine kleine Gabe Algenkalk genügt – nicht überkalken.",
-      "optimal": "Im Zielbereich der Kulturen (pH {{range}}). Weder Kalk noch Schwefel nötig – regelmäßig Kompost geben.",
-      "noLime": "Etwas über dem Zielbereich (pH {{range}}). Nicht kalken; Kompost und Laub- oder Rindenmulch senken den pH langsam. Schwefel ist nicht nötig.",
-      "sulfur": "Deutlich über dem Zielbereich (pH {{range}}). Elementaren Schwefel in kleinen Gaben einarbeiten, keinen Kalk und keine Holzasche ausbringen."
+      "optimal": "Im Zielbereich der Kulturen (pH {{range}}). Weder Kalk noch Schwefel nötig – maßvoll Kompost geben (2–3 l pro m² und Jahr).",
+      "noLime": "Etwas über dem Zielbereich (pH {{range}}). Nicht kalken und keine Holzasche. Laub- oder Rindenkompost und Nadelstreu senken den pH langsam; normaler Gartenkompost ist eher neutral bis basisch, also sparsam einsetzen. Schwefel ist nicht nötig.",
+      "sulfur": "Deutlich über dem Zielbereich (pH {{range}}). Elementaren Schwefel in kleinen Gaben einarbeiten, keinen Kalk und keine Holzasche ausbringen.",
+      "limeVeto": "Nicht kalken: Für {{crops}} passt pH {{ph}} (Ziel {{range}}). {{reason}} Die übrigen Kulturen im Beet kommen damit zurecht; Kalk erst nach der Ernte für die Folgekultur.",
+      "averseHigh": "Für {{crops}} etwas zu hoch (Ziel {{range}}). {{reason}} Nicht kalken, keine Holzasche; Laub- oder Rindenkompost senkt den pH langsam.",
+      "acidify": "Für {{crops}} viel zu hoch (Ziel {{range}}). Beet oder Pflanzloch mit saurem Substrat füllen (Rhododendronerde, Rindenhumus) oder mit elementarem Schwefel langsam absenken. Mit Regenwasser gießen, Leitungswasser ist oft kalkhaltig."
     },
     "nutrients": {
       "nitrogen": "Stickstoff (N)",
@@ -1690,7 +1758,32 @@
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "quantityKg": "Menge (kg)",
     "cost": "Kosten",
-    "unknownBed": "Gelöschtes Beet"
+    "unknownBed": "Gelöschtes Beet",
+    "limeReason": {
+      "potato": "Kalk fördert Kartoffelschorf.",
+      "blueberry": "Heidelbeeren brauchen sauren Boden und vertragen keinen Kalk.",
+      "strawberry": "Erdbeeren mögen leicht sauren Boden.",
+      "raspberry": "Himbeeren reagieren auf Kalk mit gelben Blättern (Chlorose)."
+    },
+    "brassicaNote": "Für Kohl lohnt es sich doppelt: ein pH um 7 beugt Kohlhernie vor.",
+    "nutrientAdvice": {
+      "nitrogen": {
+        "low": "Stickstoff niedrig: vor Starkzehrern Kompost oder Hornspäne (50–100 g/m²) geben, im Herbst Leguminosen als Gründüngung säen.",
+        "high": "Stickstoff hoch: vorerst nicht mit Stickstoff düngen, Schwachzehrer oder Gründüngung säen – zu viel Stickstoff macht Blattgemüse nitratreich."
+      },
+      "phosphorus": {
+        "low": "Phosphor niedrig: gut verrotteter Mist oder Kompost einarbeiten.",
+        "high": "Phosphor hoch, in Hausgärten häufig: keinen Mist, wenig Kompost und keine phosphathaltigen Volldünger; Stickstoff bei Bedarf gezielt mit Hornspänen ergänzen."
+      },
+      "potassium": {
+        "low": "Kalium niedrig: Beinwelljauche, Patentkali oder etwas Holzasche (nicht bei hohem pH).",
+        "high": "Kalium hoch: keine kaliumhaltigen Dünger und keine Holzasche."
+      },
+      "organicMatter": {
+        "low": "Humus niedrig: mulchen, Gründüngung säen und jährlich 2–3 l Kompost pro m² geben.",
+        "high": "Humus sehr hoch: Kompostgaben für einige Jahre reduzieren."
+      }
+    }
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -1726,15 +1819,15 @@
     "balanced": "Ausgewogener Mix",
     "balancedDesc": "Vielfältige Auswahl an Gemüse, Kräutern und mehr",
     "calories": "Maximale Kalorien",
-    "caloriesDesc": "Kartoffel, Mais, Bohnen - höchste Kalorienausbeute pro m²",
+    "caloriesDesc": "Kartoffel, Mais, Bohnen – höchste Kalorienausbeute pro m²",
     "selfsufficient": "Selbstversorgung",
     "selfsufficientDesc": "Alle Nährstoffe abdecken: Kalorien, Protein, Vitamine, Ballaststoffe + haltbar",
     "yield": "Maximaler Ertrag",
-    "yieldDesc": "Tomate, Zucchini, Gurke - meiste kg pro m²",
+    "yieldDesc": "Tomate, Zucchini, Gurke – meiste kg pro m²",
     "beginner": "Anfängerfreundlich",
     "beginnerDesc": "Pflegeleicht, Direktsaat, schnelle Ergebnisse",
     "quickharvest": "Schnelle Ernte",
-    "quickharvestDesc": "Radieschen, Salat, Spinat - Ernte in Wochen statt Monaten"
+    "quickharvestDesc": "Radieschen, Salat, Spinat – Ernte in Wochen statt Monaten"
   },
   "direction": {
     "rows_ew": "O↔W Reihen",
@@ -1762,21 +1855,21 @@
     "types": "Arten",
     "plants": "Pflanzen",
     "compatibility": "Verträglichkeit",
-    "conflicts": "Konflikte",
+    "conflicts": "ungünstige Nachbarn",
     "occupancy": "Belegung",
     "species": "Arten",
     "forecast": "Ertrag (Prognose)",
     "neighbours": "Nachbarn",
     "goodPairs_one": "{{count}} gutes Paar",
     "goodPairs_other": "{{count}} gute Paare",
-    "conflictPairs_one": "{{count}} Konflikt",
-    "conflictPairs_other": "{{count}} Konflikte"
+    "conflictPairs_one": "{{count}} ungünstiger Nachbar",
+    "conflictPairs_other": "{{count}} ungünstige Nachbarn"
   },
   "validation": {
-    "antagonistDirect": "{{plant}} und {{neighbor}} vertragen sich nicht – nicht direkt nebeneinander setzen.",
+    "antagonistDirect": "{{plant}} neben {{neighbor}} – ungünstige Nachbarn. Besser ein Feld Abstand lassen.",
     "antagonistNear": "{{neighbor}} steht nah an {{plant}} – keine idealen Nachbarn.",
     "tooClose": "Zu eng gesetzt: braucht {{spacing}} cm Abstand, hier nur {{actual}} cm.",
-    "tooMuchSun": "Diese Pflanze bevorzugt Schatten - hier evtl. zu viel Sonne",
+    "tooMuchSun": "Diese Pflanze bevorzugt Schatten – hier evtl. zu viel Sonne",
     "containerTooSmall": "Dieser Container könnte zu klein für diese Pflanze sein"
   },
   "advisor": {
@@ -1786,11 +1879,20 @@
     "inWeeks_other": "In {{count}} Wochen",
     "emptyTitle": "Gerade keine Aussaat fällig",
     "emptyText": "In den nächsten vier Wochen steht keine Aussaat an. Der Saisonplan zeigt, was danach kommt.",
-    "openCalendar": "Saisonplan öffnen"
+    "openCalendar": "Saisonplan öffnen",
+    "actions": {
+      "sow_indoors": "Vorziehen",
+      "sow_outdoors": "Direktsaat",
+      "transplant": "Auspflanzen",
+      "plant_autumn": "Pflanzen",
+      "sow_autumn": "Herbstsaat"
+    },
+    "showMore_one": "{{count}} weitere anzeigen",
+    "showMore_other": "{{count}} weitere anzeigen"
   },
   "expenses": {
-    "title": "Kosten & Ertrag",
-    "add": "Ausgabe hinzufügen",
+    "title": "Kosten",
+    "add": "Ausgabe erfassen",
     "description": "Beschreibung",
     "amount": "Betrag (€)",
     "category": "Kategorie",
@@ -1820,7 +1922,7 @@
     "season": "Saison {{year}}",
     "allTime": "Gesamt",
     "totalCosts": "Kosten",
-    "inclAnimals": "davon {{amount}} aus der Tierhaltung",
+    "inclAnimals": "davon {{amount}} Tierhaltung",
     "yieldValue": "Wert der Erträge",
     "valueSplit": "Ernte {{harvest}} · Tiere {{animals}}",
     "net": "Bilanz",
@@ -1828,7 +1930,7 @@
     "deficit": "Fehlbetrag",
     "roiHint": "Bilanz im Verhältnis zu den Kosten",
     "roiNoCosts": "Noch keine Kosten erfasst",
-    "howCosts": "Kosten: Ausgaben dieser Seite plus Futter- und Tierarztkosten aus der Tierhaltung. Steht dieselbe Rechnung (gleiches Datum, gleicher Betrag) an beiden Stellen, zählt sie nur einmal.",
+    "howCosts": "Kosten: Ausgaben dieser Seite plus Futter- und Tierarztkosten aus dem Bereich Tiere. Futterbuchungen zählen zur Kategorie Tierfutter, Tierarztkosten zur Kategorie Tierarzt.",
     "howValue": "Wert: erfasste Ernte (kg × typischer Marktpreis der Kultur, 1,20–30 €/kg, sonst 3 €/kg) plus erfasste Tierprodukte × Preis pro Einheit.",
     "howRoi": "Rendite = (Wert − Kosten) ÷ Kosten.",
     "productPrices": "Preise für Tierprodukte",
@@ -1842,13 +1944,16 @@
       "wax": "Wachs (€/kg)"
     },
     "byCategoryDesc": "Anteil an den gesamten Kosten im gewählten Zeitraum.",
-    "feedLog": "Futter (Tierhaltung)",
-    "vetLog": "Tierarzt (Tierhaltung)",
     "entries": "Ausgaben",
     "noEntriesTitle": "Keine Ausgaben in diesem Zeitraum",
     "emptyTitle": "Was kostet dein Garten, was bringt er?",
     "emptyText": "Erfasse Ausgaben und Ernten, dann rechnet Gardener die Bilanz mit Marktpreisen aus.",
-    "toHarvest": "Ernte erfassen"
+    "toHarvest": "Ernte erfassen",
+    "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futterbuch und Gesundheitsakte. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
+    "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
+    "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
+    "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
+    "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte"
   },
   "succession": {
     "pick": "Kultur hinzufügen",
@@ -1937,7 +2042,7 @@
     "all": "Alle"
   },
   "companions": {
-    "title": "Pflanzpartner-Matrix",
+    "title": "Pflanzpartner",
     "search": "Pflanze suchen...",
     "matrixView": "Matrix",
     "listView": "Liste",
@@ -2017,13 +2122,13 @@
   },
   "quickAdd": {
     "title": "Schnell erfassen",
-    "harvest": "Ernte eintragen",
-    "task": "Aufgabe anlegen",
-    "journal": "Tagebucheintrag",
+    "harvest": "Ernte erfassen",
+    "task": "Aufgabe hinzufügen",
+    "journal": "Tagebucheintrag schreiben",
     "harvestHint": "Was, wie viel, aus welchem Beet",
     "taskHint": "Erinnerung mit Fälligkeit",
     "journalHint": "Beobachtung, Notiz oder Foto",
-    "pest": "Schädling melden",
+    "pest": "Problem melden",
     "pestHint": "Befall oder Krankheit festhalten"
   },
   "records": {
@@ -2065,8 +2170,8 @@
     "forecast": "Prognose",
     "actualShort": "erfasst {{value}}",
     "actualVsForecast": "Erfasst {{actual}} von {{forecast}} Prognose",
-    "selfSufficiencyForecast": "Selbstversorgung (Prognose)",
-    "selfSufficiencyActual": "Selbstversorgung (erfasst)",
+    "selfSufficiencyForecast": "Selbstversorgung · Jahresprognose",
+    "selfSufficiencyActual": "Selbstversorgung · bisher erfasst",
     "caloriesFor_one": "Kalorienbedarf für {{count}} Person",
     "caloriesFor_other": "Kalorienbedarf für {{count}} Personen",
     "recordedSince": "Ernten und Tierprodukte seit 1. Januar {{year}}",
@@ -2075,10 +2180,21 @@
     "plantsOnly": "aus der aktuellen Beetbelegung",
     "harvestEntries_one": "{{count}} Ernteeintrag diese Saison",
     "harvestEntries_other": "{{count}} Ernteeinträge diese Saison",
-    "howForecast": "Prognose: bepflanzte Fläche × erwarteter Ertrag pro m² der Kultur, dazu der typische Jahresertrag deiner Tiere (z. B. 250 Eier pro Huhn). Sie gilt für eine ganze Saison.",
-    "howActual": "Erfasst: Summe deiner Ernteeinträge und Tierprodukte seit 1. Januar. Einträge ohne Gewicht zählen nicht mit.",
-    "howNeed": "Bedarf: {{kcal}} kcal pro Person und Tag. Der Selbstversorgungsgrad ist der Anteil dieses Jahresbedarfs, den Garten und Tiere liefern (höchstens 100 %).",
+    "howForecast": "Jahresprognose: bepflanzte Fläche × erwarteter Ertrag pro m² der Kultur, dazu der typische Jahresertrag deiner Tiere (z. B. 220 Eier pro Huhn, 20 kg Honig pro Volk).",
+    "howActual": "Bisher erfasst: deine Ernteeinträge und Tierprodukte seit 1. Januar, nach derselben Regel. Einträge ohne Gewicht zählen nicht mit.",
+    "howNeed": "Selbstversorgung = Anteil des Kalorienbedarfs deines Haushalts ({{kcal}} kcal pro Person und Tag), den Garten und Tiere im Jahr decken (höchstens 100 %).",
     "meterLegend": "Voller Balken = erfasst, schraffiert = Prognose.",
-    "pricesEditable": "Die Preise pro Ei, kg oder Liter kannst du unter Kosten anpassen."
+    "pricesEditable": "Die Preise pro Ei, kg oder Liter kannst du unter Kosten anpassen.",
+    "expectedToDate": "erwartet bis heute: {{value}}",
+    "actualVsToDateShort": "erfasst {{actual}} · erwartet bis heute {{expected}}",
+    "howCap": "Tierprodukte zählen nur bis zum üblichen Verbrauch (pro Person und Jahr etwa 240 Eier, 1 kg Honig, 52 kg Fleisch, 300 l Milch). Honig ist kalorienreich, aber kein Grundnahrungsmittel: Zwei Völker liefern rund 40 kg, ein Haushalt isst davon 1–2 kg. Was darüber liegt, ist Überschuss zum Tauschen oder Verkaufen und macht dich nicht satter. Gemüse und Obst zählen voll.",
+    "howToDate": "Erwartet bis heute: der Teil der Jahresprognose, der bis heute hereinkommen sollte – je Kultur ihr Erntefenster ab dem letzten Frost, Honig Mai bis August, Eier gleichmäßig übers Jahr. Liegt „bisher erfasst“ deutlich darunter, fehlen meist Einträge.",
+    "howVsFoodPlan": "Der Ernährungsplan misst etwas anderes: Kilogramm gegen ein Mengenziel für 20 Gemüse- und Obstkulturen, ohne Tierprodukte. Sein „Mengenziel“ weicht deshalb von diesem Kalorienwert ab.",
+    "compositionTitle": "Woraus die Prognose besteht",
+    "compositionDesc": "Anteil am Kalorienbedarf des Jahres, nach Herkunft.",
+    "compositionLabel": "Garten {{garden}}, Tierprodukte {{animals}} des Jahresbedarfs",
+    "fromGarden": "Garten",
+    "fromAnimals": "Tierprodukte",
+    "surplusNote": "Nicht eingerechnet, weil über dem üblichen Verbrauch: {{items}}."
   }
 }

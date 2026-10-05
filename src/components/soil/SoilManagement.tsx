@@ -7,7 +7,8 @@ import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { useFormat } from "@/hooks/useFormat";
 import { todayISO } from "@/lib/format";
-import { NUTRIENT_RANGE, nutrientLevel, phAdvice, targetPh, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
+import { assessPh, bedPhTarget, NUTRIENT_RANGE, nutrientLevel, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
+import { usePlantName } from "@/hooks/usePlantName";
 import type { Amendment, AmendmentType, SoilTest } from "@/types/soil";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -30,7 +31,9 @@ const AMENDMENT_TYPES: AmendmentType[] = ["compost", "manure", "lime", "sulfur",
 const AMENDMENT_ICONS: Record<AmendmentType, LucideIcon> = {
   compost: Recycle, manure: Tractor, lime: Mountain, sulfur: FlaskConical, fertilizer: Sprout, mulch: Leaf, other: Package,
 };
-const ADVICE_TONE: Record<PhAdvice, Tone> = { limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "info", sulfur: "warning" };
+const ADVICE_TONE: Record<PhAdvice, Tone> = {
+  limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "info", sulfur: "warning", limeVeto: "info", averseHigh: "warning", acidify: "danger",
+};
 const NUTRIENTS: Nutrient[] = ["nitrogen", "phosphorus", "potassium", "organicMatter"];
 
 const num = (s: string) => Number(s.trim().replace(",", "."));
@@ -69,7 +72,8 @@ export function SoilManagement() {
   const beds = useBeds();
   const [tab, setTab] = useState<"tests" | "amendments">("tests");
 
-  const bedTarget = useCallback((bedId: string): PhRange => targetPh(beds.byId.get(bedId)?.plantIds ?? []), [beds]);
+  const bedTarget = useCallback((bedId: string): PhRange => bedPhTarget(beds.byId.get(bedId)?.plantIds ?? []), [beds]);
+  const plantName = usePlantName();
   const local = (n: number) => n.toLocaleString(locale, { useGrouping: false, maximumFractionDigits: 2 });
 
   // ---------------------------------------------------------------- test dialog
@@ -217,8 +221,16 @@ export function SoilManagement() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {sortedTests.map((s) => {
-              const target = bedTarget(s.bedId);
-              const advice = phAdvice(s.ph, target);
+              const assessment = assessPh(s.ph, beds.byId.get(s.bedId)?.plantIds ?? []);
+              const { advice, target } = assessment;
+              const averseNames = assessment.limeAverse.map((id) => plantName(id)).join(", ");
+              const reasons = assessment.limeAverse.map((id) => t(`soil.limeReason.${id}`, { defaultValue: "" })).filter(Boolean).join(" ");
+              const nutrientHints = NUTRIENTS.flatMap((n) => {
+                const v = n === "nitrogen" ? s.nitrogen : n === "phosphorus" ? s.phosphorus : n === "potassium" ? s.potassium : s.organicMatter;
+                if (v === undefined || (n !== "organicMatter" && v === 0)) return [];
+                const level = nutrientLevel(n, v);
+                return level === "optimal" ? [] : [t(`soil.nutrientAdvice.${n}.${level}`)];
+              });
               return (
                 <article key={s.id} className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
                   <div className="flex items-start justify-between gap-3">
@@ -260,7 +272,10 @@ export function SoilManagement() {
 
                   <p className="mt-3 flex gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
                     <Lightbulb size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
-                    <span>{t(`soil.phAdvice.${advice}`, { range: rangeText(target) })}</span>
+                    <span>
+                      {t(`soil.phAdvice.${advice}`, { range: rangeText(target), crops: averseNames, ph: formatNumber(s.ph), reason: reasons })}
+                      {(advice === "limeStrong" || advice === "limeLight") && assessment.limeLoving.length > 0 && <> {t("soil.brassicaNote")}</>}
+                    </span>
                   </p>
 
                   <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3">
@@ -286,6 +301,11 @@ export function SoilManagement() {
                       );
                     })}
                   </dl>
+                  {nutrientHints.length > 0 && (
+                    <ul className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                      {nutrientHints.map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                    </ul>
+                  )}
                   {s.notes && <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">{s.notes}</p>}
                 </article>
               );

@@ -148,3 +148,47 @@ describe("groupAlerts", () => {
     expect(groups[0].alerts.map((a) => a.date)).toEqual(["2026-10-05", "2026-10-06", "2026-10-07"]);
   });
 });
+
+describe("Greenhouse cold alert names the coldest night", () => {
+  const gh: Bed = {
+    id: "gh", name: "Gewächshaus", x: 0, y: 0, width: 6, height: 4, cells: [],
+    environmentType: "greenhouse",
+    greenhouseConfig: { material: "polycarbonate", heated: false, ventilation: "manual", minTempC: 5, maxTempC: 35, frostProtectionWeeks: 4 },
+  };
+  // Demo week from the review: Mo 2 °C, Di −1 °C, Mi −6 °C, Do −5 °C.
+  const week = [
+    makeForecast({ date: "2026-10-05", tempMin: 2, tempMax: 14 }),
+    makeForecast({ date: "2026-10-06", tempMin: -1, tempMax: 12 }),
+    makeForecast({ date: "2026-10-07", tempMin: -6, tempMax: 9 }),
+    makeForecast({ date: "2026-10-08", tempMin: -5, tempMax: 4 }),
+  ];
+
+  it("reports the coldest day and value, not the first cold one", () => {
+    const [cold] = detectGreenhouseAlerts(week, [gh]).filter((a) => a.type === "greenhouse_cold");
+    expect(cold.date).toBe("2026-10-07");
+    expect(cold.descriptionParams?.outside).toBe(-6);
+    // Twin-wall polycarbonate: +2 °C conservative night buffer.
+    expect(cold.descriptionParams?.temp).toBe(-4);
+    expect(cold.descriptionParams?.count).toBe(4);
+    expect(cold.severity).toBe("danger");
+    expect(cold.descriptionKey).toBe("alerts.greenhouseFrostDesc");
+  });
+
+  it("uses a smaller buffer for glass and foil", () => {
+    const glass = { ...gh, greenhouseConfig: { ...gh.greenhouseConfig!, material: "glass" as const } };
+    const [cold] = detectGreenhouseAlerts(week, [glass]).filter((a) => a.type === "greenhouse_cold");
+    expect(cold.descriptionParams?.temp).toBe(-5);
+  });
+
+  it("skips the cold alert for heated houses", () => {
+    const heated = { ...gh, greenhouseConfig: { ...gh.greenhouseConfig!, heated: true } };
+    expect(detectGreenhouseAlerts(week, [heated]).some((a) => a.type === "greenhouse_cold")).toBe(false);
+  });
+
+  it("can raise heat and cold for the same house", () => {
+    const mixed = [makeForecast({ date: "2026-05-01", tempMin: 1, tempMax: 31 }), makeForecast({ date: "2026-05-02", tempMin: 8, tempMax: 33 })];
+    const alerts = detectGreenhouseAlerts(mixed, [gh]);
+    expect(alerts.map((a) => a.type).sort()).toEqual(["greenhouse_cold", "greenhouse_hot"]);
+    expect(alerts.find((a) => a.type === "greenhouse_hot")?.date).toBe("2026-05-02");
+  });
+});

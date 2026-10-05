@@ -201,23 +201,25 @@ export function BarChart({
           ]}
         />
       )}
-      <table className="sr-only">
-        <caption>{caption}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{categoryLabel}</th>
-            {series.map((s) => <th key={s.label} scope="col">{s.label}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((d) => (
-            <tr key={d.key}>
-              <th scope="row">{d.fullLabel ?? d.label}</th>
-              {series.map((s, k) => <td key={s.label}>{formatValue(d.values[k] ?? 0)}</td>)}
+      <div className="sr-only">
+        <table>
+          <caption>{caption}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{categoryLabel}</th>
+              {series.map((s) => <th key={s.label} scope="col">{s.label}</th>)}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((d) => (
+              <tr key={d.key}>
+                <th scope="row">{d.fullLabel ?? d.label}</th>
+                {series.map((s, k) => <td key={s.label}>{formatValue(d.values[k] ?? 0)}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 }

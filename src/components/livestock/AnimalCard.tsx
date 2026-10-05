@@ -1,3 +1,4 @@
+import { expectedShareToDate } from "@/lib/metrics";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2 } from "lucide-react";
@@ -58,7 +59,8 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm dark:border-white/5">
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
-          const expected = formatProductAmount(y.product, y.quantity * animal.count, f, t);
+          // Same time basis as the recorded value: expected so far this year (since the animal arrived).
+          const expected = formatProductAmount(y.product, y.quantity * animal.count * expectedShareToDate(y.product, new Date(), animal.acquiredDate), f, t);
           return (
             <div key={y.product}>
               <dt className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -68,7 +70,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
               <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
                 <span className="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-                  {t("livestock.ofExpected", { amount: expected })}
+                  {t("livestock.ofExpectedToDate", { amount: expected })}
                 </span>
               </dd>
             </div>

@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Copy, Eraser, Footprints, Pencil, Trash2, Wand2, ZoomIn, ZoomOut, X, Check, MousePointerClick, ShieldCheck, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Copy, Eraser, Footprints, Pencil, Trash2, Wand2, ZoomIn, ZoomOut, Check, MousePointerClick, ShieldCheck, TriangleAlert } from "lucide-react";
 import type { Bed } from "@/types/garden";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import type { Plant } from "@/types/plant";
@@ -110,7 +110,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
       {/* Mode bar: always says what a tap on the grid will do */}
       <div
         aria-live="polite"
-        className={`sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-x-3 gap-y-1 border-b px-3 py-2 text-sm sm:px-4 ${
+        className={`sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-x-3 gap-y-1 border-b px-3 py-2 text-sm sm:px-4 ${mode === "inspect" && selectedKey ? "max-md:hidden " : ""}${
           mode === "place"
             ? "border-garden-200 bg-garden-50/95 text-garden-900 backdrop-blur dark:border-garden-500/30 dark:bg-garden-950/90 dark:text-garden-100"
             : mode === "path"
@@ -174,11 +174,11 @@ export const BedEditor = memo(function BedEditor(props: Props) {
             {mode === "place" && (
               <>
                 <li className="inline-flex items-center gap-1.5"><span className="flex size-4 items-center justify-center rounded bg-positive/15"><Check size={12} aria-hidden="true" className="text-positive" /></span>{t("planner.legendGood")}</li>
-                <li className="inline-flex items-center gap-1.5"><span className="flex size-4 items-center justify-center rounded bg-danger/10"><X size={12} aria-hidden="true" className="text-danger" /></span>{t("planner.legendBad")}</li>
+                <li className="inline-flex items-center gap-1.5"><span className="flex size-4 items-center justify-center rounded bg-warning/10"><TriangleAlert size={11} aria-hidden="true" className="text-warning" /></span>{t("planner.legendBad")}</li>
               </>
             )}
             {conflicts.length > 0 && (
-              <li className="inline-flex items-center gap-1.5"><span className="size-4 rounded bg-white shadow-[inset_-3px_0_0_0_var(--color-danger)] dark:bg-white/10" />{t("planner.legendConflict")}</li>
+              <li className="inline-flex items-center gap-1.5"><span className="size-4 rounded bg-white shadow-[inset_-3px_0_0_0_var(--color-warning)] dark:bg-white/10" />{t("planner.legendConflict")}</li>
             )}
           </ul>
         )}
@@ -203,7 +203,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
                     className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-white/5"
                   >
                     {pa && <PlantIconDisplay plantId={pa.id} emoji={pa.icon} size={20} />}
-                    <span aria-hidden="true" className="text-danger"><X size={14} /></span>
+                    <span aria-hidden="true" className="text-warning"><TriangleAlert size={14} /></span>
                     {pb && <PlantIconDisplay plantId={pb.id} emoji={pb.icon} size={20} />}
                     <span className="min-w-0 flex-1 font-medium text-gray-900 dark:text-gray-100">
                       {getPlantName(g.a)} ↔ {getPlantName(g.b)}

@@ -48,18 +48,26 @@ export function Modal({ open, onClose, title, children, description, footer, siz
     const dialog = dialogRef.current;
     if (!dialog) return;
     const handleClose = () => onClose();
+    // A click on the backdrop targets the <dialog> itself. Its own padding does
+    // too, so only close when the pointer is outside the dialog box.
+    const handleClick = (e: MouseEvent) => {
+      if (e.target !== dialog) return;
+      const r = dialog.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (!inside) dialog.close();
+    };
     dialog.addEventListener("close", handleClose);
-    return () => dialog.removeEventListener("close", handleClose);
+    dialog.addEventListener("click", handleClick);
+    return () => {
+      dialog.removeEventListener("close", handleClose);
+      dialog.removeEventListener("click", handleClick);
+    };
   }, [onClose]);
 
   return (
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      onClick={(e) => {
-        // Clicks land on the dialog itself only when they hit the backdrop.
-        if (e.target === dialogRef.current) dialogRef.current?.close();
-      }}
       className={`m-0 max-h-[90dvh] w-full max-w-none translate-y-0 self-end overflow-y-auto rounded-t-xl bg-white p-4 pb-sheet text-gray-900 backdrop:bg-black/50 sm:m-auto ${size === "lg" ? "sm:max-w-2xl" : "sm:max-w-lg"} sm:self-center sm:rounded-xl sm:p-6 dark:bg-gray-900 dark:text-gray-100 dark:ring-1 dark:ring-white/10`}
     >
       <div className="mb-4 flex items-start justify-between gap-3">

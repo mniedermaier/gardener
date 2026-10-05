@@ -8,7 +8,7 @@ import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO, toISODate } from "@/lib/format";
-import { getActualProducts, type ProductTotals } from "@/lib/metrics";
+import { getActualProducts, getFeedCostStats, type ProductTotals } from "@/lib/metrics";
 import { EGG_LAYERS, type Animal } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -46,14 +46,12 @@ export function LivestockPage() {
     const now = new Date();
     const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
     const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
-    const month = today.slice(0, 7);
     const eggs = animalProducts.filter((p) => p.type === "eggs");
     return {
       eggsToday: eggs.filter((p) => p.date === today).reduce((s, p) => s + p.quantity, 0),
       eggsWeek: eggs.filter((p) => p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
       year: getActualProducts(animalProducts, year),
-      feedMonth: feedEntries.filter((e) => e.date.startsWith(month)).reduce((s, e) => s + (e.cost ?? 0), 0),
-      feedMonthEntries: feedEntries.filter((e) => e.date.startsWith(month)).length,
+      feed: getFeedCostStats(feedEntries, now),
     };
   }, [animalProducts, feedEntries, today, year]);
 
@@ -141,11 +139,11 @@ export function LivestockPage() {
             <StatCard label={t("livestock.eggsThisYear")} value={f.formatNumber(stats.year.eggs, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
             <StatCard label={t("livestock.honeyThisYear")} value={f.formatWeight(stats.year.honey * 1000)} icon={Droplet} tone="neutral" />
             <StatCard
-              label={t("livestock.feedCostMonth")}
-              value={f.formatCurrency(stats.feedMonth)}
+              label={t("livestock.feedCost30")}
+              value={f.formatCurrency(stats.feed.last30Days)}
               icon={Coins}
               tone="neutral"
-              hint={t("livestock.feedEntriesCount", { count: stats.feedMonthEntries })}
+              hint={stats.feed.total > 0 ? t("livestock.feedPerMonthHint", { amount: f.formatCurrency(stats.feed.perMonth) }) : t("livestock.feedEntriesCount", { count: 0 })}
             />
           </div>
 

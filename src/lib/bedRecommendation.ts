@@ -2,6 +2,7 @@ import type { Plant } from "@/types/plant";
 import type { Bed, CellPlanting } from "@/types/garden";
 import { plantFamilyMap, type PlantFamily } from "@/data/plantFamilies";
 import { differenceInWeeks, parseISO, addWeeks } from "date-fns";
+import { suitsEnvironment } from "@/lib/season";
 
 export type PlantingStrategy =
   | "balanced"       // Default: mix of everything
@@ -54,7 +55,7 @@ export function recommendBedPlanting(
   const direction = config.direction ?? "rows_ew";
 
   const scored = allPlants
-    .filter((p) => p.category !== "berry")
+    .filter((p) => p.category !== "berry" && suitsEnvironment(p, bed.environmentType ?? "outdoor_bed"))
     .map((p) => scorePlant(p, bed, config, strategy))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
@@ -630,6 +631,7 @@ export function getRecommendedPlants(
 ): Array<{ plant: Plant; score: number; reasons: string[] }> {
   const strategy = config.strategy ?? "balanced";
   return allPlants
+    .filter((p) => suitsEnvironment(p, bed.environmentType ?? "outdoor_bed"))
     .map((p) => scorePlant(p, bed, config, strategy))
     .filter((s) => s.score > 30)
     .sort((a, b) => b.score - a.score)

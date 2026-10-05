@@ -1,7 +1,8 @@
 import type { Plant, PreservationMethod } from "@/types/plant";
 import type { Garden } from "@/types/garden";
 import type { Animal } from "@/types/animal";
-import { ANNUAL_YIELD, PRODUCT_NUTRITION } from "@/types/animal";
+import { PRODUCT_NUTRITION } from "@/types/animal";
+import { capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
 import { addWeeks, addDays, parseISO, getMonth } from "date-fns";
 import { getFrostProtectionWeeks } from "@/types/garden";
 
@@ -90,10 +91,15 @@ export interface SufficiencyResult {
 
 // --- Constants ---
 
+/**
+ * Daily reference intake per adult (DGE reference values, rounded):
+ * 2000 kcal (same as metrics.ts), protein 0.8 g/kg × ~65 kg ≈ 50 g,
+ * vitamin C 95–110 mg → 100 mg, fibre ≥ 30 g.
+ */
 const DAILY_NEEDS = {
-  calories: 2000,
+  calories: DAILY_KCAL_PER_PERSON,
   proteinG: 50,
-  vitaminCMg: 90,
+  vitaminCMg: 100,
   fiberG: 30,
 };
 
@@ -195,24 +201,11 @@ export function calculateSufficiency(
   gridCellSizeCm: number,
   lastFrostDate: string = "2026-05-15",
   animals: Animal[] = [],
-  actualAnimalProducts: { type: string; quantity: number; unit: string; date: string }[] = [],
 ): SufficiencyResult {
   const plantMap = new Map(plants.map((p) => [p.id, p]));
 
   // Calculate yields with harvest months
   const plantYields: PlantYieldEstimate[] = [];
-  const plantedIds = new Set<string>();
-  for (const g of gardens) {
-    for (const b of g.beds) {
-      const protection = getFrostProtectionWeeks(b);
-      for (const c of b.cells) {
-        if (!plantedIds.has(c.plantId + "-" + protection)) {
-          plantedIds.add(c.plantId + "-" + protection);
-        }
-      }
-    }
-  }
-
   // Aggregate by plant
   const plantAreas = new Map<string, { area: number; protections: number[] }>();
   for (const g of gardens) {
@@ -237,58 +230,23 @@ export function calculateSufficiency(
   }
 
   // --- Animal yields ---
-  // Use actual production data if available (last 12 months extrapolated to full year),
-  // otherwise fall back to estimated ANNUAL_YIELD constants
+  // Typical herd output (metrics.ts), counted only up to the household's
+  // typical consumption — the same rule as the headline self-sufficiency, so
+  // the nutrition card and the headline never disagree. Non-food products
+  // (wax, wool) are left out.
+  const herd = capToConsumption(getForecastProductKg(animals), familySize);
   const animalYields: AnimalYieldEstimate[] = [];
-  const hasActualData = actualAnimalProducts.length > 0;
-
-  if (hasActualData) {
-    // Group actual production by product type and extrapolate to annual
-    const now = new Date();
-    const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-    const recentProducts = actualAnimalProducts.filter((p) => {
-      try { return parseISO(p.date) >= oneYearAgo; } catch { return false; }
+  for (const productType of PRODUCT_TYPES) {
+    const kg = herd.counted[productType];
+    const nutrition = PRODUCT_NUTRITION[productType];
+    if (kg <= 0 || nutrition.caloriesPer100g <= 0) continue;
+    animalYields.push({
+      animalType: "herd",
+      productType,
+      quantityKg: Math.round(kg * 10) / 10,
+      calories: kg * 10 * nutrition.caloriesPer100g,
+      proteinG: Math.round(kg * 10 * nutrition.proteinPer100g * 10) / 10,
     });
-    const monthsOfData = Math.max(1, Math.min(12, Math.ceil((now.getTime() - oneYearAgo.getTime()) / (30.5 * 24 * 60 * 60 * 1000))));
-
-    // Aggregate by product type
-    const byType = new Map<string, number>();
-    for (const p of recentProducts) {
-      byType.set(p.type, (byType.get(p.type) ?? 0) + p.quantity);
-    }
-
-    for (const [productType, totalQty] of byType) {
-      const annualQty = (totalQty / monthsOfData) * 12;
-      const unit = productType === "eggs" ? "pieces" : "kg";
-      const quantityKg = unit === "pieces" ? annualQty * 0.06 : annualQty;
-      const nutrition = PRODUCT_NUTRITION[productType as keyof typeof PRODUCT_NUTRITION];
-      if (!nutrition) continue;
-      const portions = quantityKg * 10;
-      animalYields.push({
-        animalType: "actual",
-        productType,
-        quantityKg: Math.round(quantityKg * 10) / 10,
-        calories: Math.round(portions * nutrition.caloriesPer100g),
-        proteinG: Math.round(portions * nutrition.proteinPer100g * 10) / 10,
-      });
-    }
-  } else {
-    // Fall back to estimated yields
-    for (const animal of animals) {
-      for (const yield_ of ANNUAL_YIELD[animal.type]) {
-        const totalQty = yield_.quantity * animal.count;
-        const quantityKg = yield_.unit === "pieces" ? totalQty * 0.06 : totalQty;
-        const nutrition = PRODUCT_NUTRITION[yield_.product];
-        const portions = quantityKg * 10;
-        animalYields.push({
-          animalType: animal.type,
-          productType: yield_.product,
-          quantityKg: Math.round(quantityKg * 10) / 10,
-          calories: Math.round(portions * nutrition.caloriesPer100g),
-          proteinG: Math.round(portions * nutrition.proteinPer100g * 10) / 10,
-        });
-      }
-    }
   }
 
   const totalAnimalKg = animalYields.reduce((s, y) => s + y.quantityKg, 0);

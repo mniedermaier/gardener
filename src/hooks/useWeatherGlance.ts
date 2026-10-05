@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
+import { useTranslation } from "react-i18next";
+import { fetchWeather, isWeatherConfigured } from "@/lib/weather";
 
 export interface GlanceDay {
   date: string;
@@ -30,13 +32,6 @@ const CACHE_KEY = "gardener-weather-glance";
 const PAGE_CACHE_KEY = "gardener-weather";
 const MAX_AGE_MS = 30 * 60 * 1000;
 
-interface OwmForecastItem {
-  dt_txt: string;
-  main: { temp: number };
-  weather: Array<{ description: string; icon: string }>;
-  pop?: number;
-}
-
 function readCache(): WeatherGlance | null {
   try {
     const own = sessionStorage.getItem(CACHE_KEY);
@@ -57,60 +52,29 @@ function readCache(): WeatherGlance | null {
   return null;
 }
 
-function summarise(current: { main: { temp: number }; weather: Array<{ description: string; icon: string }> }, list: OwmForecastItem[]): WeatherGlance {
-  const byDay = new Map<string, OwmForecastItem[]>();
-  for (const item of list) {
-    const date = item.dt_txt.slice(0, 10);
-    const arr = byDay.get(date) ?? [];
-    arr.push(item);
-    byDay.set(date, arr);
-  }
-  const days = Array.from(byDay.entries()).slice(0, 5).map(([date, items]) => {
-    const temps = items.map((i) => i.main.temp);
-    const mid = items[Math.floor(items.length / 2)];
-    return {
-      date,
-      tempMin: Math.round(Math.min(...temps)),
-      tempMax: Math.round(Math.max(...temps)),
-      icon: mid.weather[0]?.icon ?? "",
-      description: mid.weather[0]?.description ?? "",
-      precipitation: Math.round(Math.max(...items.map((i) => (i.pop ?? 0) * 100))),
-    };
-  });
-  return {
-    temp: Math.round(current.main.temp),
-    description: current.weather[0]?.description ?? "",
-    icon: current.weather[0]?.icon ?? "",
-    days,
-  };
-}
-
 /**
  * Current weather plus a short forecast for the dashboard. Uses the same
- * OpenWeatherMap key and location as the weather page and caches for 30 min
- * per session, so opening the dashboard does not hammer the API.
+ * provider and location as the weather page (Open-Meteo by default, no key;
+ * OpenWeatherMap when a key is set, see `lib/weather.ts`) and caches for
+ * 30 min per session, so opening the dashboard does not hammer the API.
  */
 export function useWeatherGlance(): GlanceState {
-  const { apiKey, lat, lon, locale } = useStore(
-    useShallow((s) => ({ apiKey: s.weatherApiKey, lat: s.locationLat, lon: s.locationLon, locale: s.locale })),
+  const { t } = useTranslation();
+  const { apiKey, lat, lon, locale, locationName } = useStore(
+    useShallow((s) => ({ apiKey: s.weatherApiKey, lat: s.locationLat, lon: s.locationLon, locale: s.locale, locationName: s.locationName })),
   );
-  const configured = Boolean(apiKey) && lat !== null && lon !== null;
+  const configured = isWeatherConfigured(lat, lon);
   const [state, setState] = useState<GlanceState>(() => {
     const cached = readCache();
     return cached ? { status: "ready", data: cached } : { status: "loading" };
   });
 
   useEffect(() => {
-    if (!configured || state.status !== "loading") return;
+    if (!configured || lat === null || lon === null || state.status !== "loading") return;
     const ctrl = new AbortController();
-    const base = `lat=${lat}&lon=${lon}&appid=${encodeURIComponent(apiKey)}&units=metric&lang=${locale}`;
-    Promise.all([
-      fetch(`https://api.openweathermap.org/data/2.5/weather?${base}`, { signal: ctrl.signal }),
-      fetch(`https://api.openweathermap.org/data/2.5/forecast?${base}`, { signal: ctrl.signal }),
-    ])
-      .then(async ([cur, fc]) => {
-        if (!cur.ok || !fc.ok) throw new Error("weather api");
-        const data = summarise(await cur.json(), ((await fc.json()) as { list: OwmForecastItem[] }).list ?? []);
+    fetchWeather({ lat, lon, apiKey, locale, locationName, t, signal: ctrl.signal })
+      .then(({ data: w }) => {
+        const data: WeatherGlance = { temp: w.current.temp, description: w.current.description, icon: w.current.icon, days: w.forecast };
         try {
           sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data }));
         } catch {
@@ -122,7 +86,7 @@ export function useWeatherGlance(): GlanceState {
         if ((e as Error).name !== "AbortError") setState({ status: "error" });
       });
     return () => ctrl.abort();
-  }, [configured, apiKey, lat, lon, locale, state.status]);
+  }, [configured, apiKey, lat, lon, locale, locationName, t, state.status]);
 
   if (!configured && state.status !== "ready") return { status: "unconfigured" };
   return state;

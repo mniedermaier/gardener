@@ -23,10 +23,13 @@ export interface Step {
   to: string;
 }
 
-/** The first-run checklist, derived from what already exists — no extra state to keep in sync. */
+/**
+ * The first-run checklist, derived from what already exists. Weather needs no
+ * key (Open-Meteo): setting the location is the only step it depends on.
+ */
 export function useGettingStartedSteps(): Step[] {
-  const { gardens, tasks, locationLat, weatherApiKey } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, tasks: s.tasks, locationLat: s.locationLat, weatherApiKey: s.weatherApiKey })),
+  const { gardens, tasks, locationLat } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, tasks: s.tasks, locationLat: s.locationLat })),
   );
   const hasBed = gardens.some((g) => g.beds.length > 0);
   const hasPlant = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
@@ -35,7 +38,6 @@ export function useGettingStartedSteps(): Step[] {
     { id: "bed", done: hasBed, to: "/planner" },
     { id: "plant", done: hasPlant, to: "/planner" },
     { id: "tasks", done: tasks.length > 0, to: "/tasks" },
-    { id: "weather", done: Boolean(weatherApiKey), to: "/settings" },
   ];
 }
 

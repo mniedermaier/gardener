@@ -10,7 +10,7 @@
     "weather": "Clima",
     "calendar": "Calendario",
     "tasks": "Tareas",
-    "settings": "Configuracion",
+    "settings": "Configuración",
     "harvest": "Registro de cosechas",
     "journal": "Diario",
     "pantry": "Despensa",
@@ -26,7 +26,7 @@
     "sufficiency": "Autosuficiencia",
     "expenses": "Costos y ROI",
     "companions": "Compañeras",
-    "more": "Mas",
+    "more": "Más",
     "group": {
       "planning": "Planificación",
       "fieldwork": "Trabajo de campo",
@@ -87,17 +87,17 @@
       "analysis": "Análisis"
     },
     "tabs": {
-      "overview": "Resumen",
+      "overview": "Hoy",
       "weather": "Tiempo",
-      "catalog": "Catálogo",
+      "catalog": "Plantas",
       "companions": "Asociaciones",
-      "season": "Plan de temporada",
+      "season": "Calendario",
       "tasks": "Tareas",
       "animals": "Animales",
       "production": "Producción",
       "feed": "Alimento",
       "health": "Salud",
-      "balance": "Balance",
+      "balance": "Autosuficiencia",
       "foodplan": "Plan alimentario"
     },
     "command": {
@@ -118,13 +118,19 @@
         "animals": "Animales",
         "tasks": "Tareas",
         "journal": "Diario"
-      }
+      },
+      "logHarvestFor": "Registrar cosecha: {{name}}",
+      "plantInBed": "{{plant}} en {{bed}}",
+      "cellCount_one": "{{count}} casilla",
+      "cellCount_many": "{{count}} casillas",
+      "cellCount_other": "{{count}} casillas"
     },
     "sync": {
       "syncing": "Sincronizando…",
       "connected": "Conectado al servidor",
       "offline": "Servidor no disponible: los cambios se quedan en este dispositivo"
-    }
+    },
+    "skipToContent": "Saltar al contenido"
   },
   "dashboard": {
     "title": "Hoy",
@@ -166,10 +172,10 @@
     "openPlanner": "Abrir planificador",
     "weatherTitle": "Tiempo",
     "weatherMore": "Previsión",
-    "weatherConnectTitle": "Conectar el tiempo",
-    "weatherConnectText": "Con tu ubicación y una clave API verás aquí el tiempo y los avisos de helada.",
+    "weatherConnectTitle": "Indica tu ubicación",
+    "weatherConnectText": "Con tu ubicación verás aquí el tiempo y los avisos de helada, sin registro ni clave.",
     "weatherErrorTitle": "Tiempo no disponible",
-    "weatherErrorText": "Revisa la clave API o la conexión a internet.",
+    "weatherErrorText": "Los datos del tiempo no están disponibles ahora. Comprueba la conexión a internet.",
     "openSettings": "Abrir ajustes",
     "frostHint": "Posible helada ({{days}}, hasta {{temp}}). Cubre los cultivos sensibles.",
     "seasonTitle": "Temporada hasta ahora",
@@ -192,14 +198,14 @@
       "dismiss": "Ocultar primeros pasos",
       "done": "hecho",
       "location": "Indica tu ubicación",
-      "locationHint": "Para la luz, el tiempo y las heladas",
+      "locationHint": "Para el tiempo, los avisos de helada, el sol y la fecha de heladas",
       "bed": "Crea tu primer bancal",
       "bedHint": "Elige tamaño y tipo: elevado, invernadero, maceta…",
       "plant": "Coloca tu primera planta",
       "plantHint": "Arrástrala de la paleta a la cuadrícula",
       "tasks": "Generar tareas",
       "tasksHint": "Fechas de siembra y plantación de tu plan",
-      "weather": "Conectar el tiempo",
+      "weather": "Indicar ubicación",
       "weatherHint": "Avisos de helada y riego para tu huerto"
     },
     "backup": {
@@ -259,7 +265,7 @@
     }
   },
   "planner": {
-    "title": "Planificador de huerto",
+    "title": "Planificador",
     "newGarden": "Nuevo huerto",
     "newBed": "Nuevo cantero",
     "deleteBed": "Eliminar cantero",
@@ -278,12 +284,12 @@
     "pathMode": "Dibujar caminos",
     "pathModeHint": "Haz clic en las celdas para agregar o quitar senderos. Los caminos reemplazan cualquier planta en esa celda.",
     "pathModeDone": "Listo",
-    "editCell": "Editar plantacion",
+    "editCell": "Editar plantación",
     "variety": "Variedad",
     "varietyPlaceholder": "ej. San Marzano, Brandywine...",
-    "plantedDate": "Fecha de plantacion",
+    "plantedDate": "Fecha de plantación",
     "confirmDeleteGarden": "¿Eliminar este huerto con todos sus bancales?",
-    "placeMode": "Colocando: {{plant}} - haz clic en las celdas para colocar, ESC para cancelar",
+    "placeMode": "Colocando {{plant}}: haz clic en las casillas para colocar, Esc para cancelar",
     "share": "Compartir plan de huerto",
     "shareCopied": "Enlace copiado",
     "print": "Imprimir",
@@ -299,14 +305,14 @@
       "outdoor_bed": "Cantero exterior",
       "raised_bed": "Cantero elevado",
       "greenhouse": "Invernadero",
-      "cold_frame": "Cama fria",
+      "cold_frame": "Cama fría",
       "polytunnel": "Tunel de plastico",
       "container": "Maceta",
       "windowsill": "Alfeizar",
       "vertical": "Vertical"
     },
     "greenhouse": {
-      "title": "Configuracion del invernadero",
+      "title": "Configuración del invernadero",
       "material": "Material",
       "materials": {
         "glass": "Vidrio",
@@ -314,23 +320,23 @@
         "plastic": "Plastico"
       },
       "heated": "Calefaccionado",
-      "heatingType": "Tipo de calefaccion",
+      "heatingType": "Tipo de calefacción",
       "heatingTypes": {
-        "electric": "Electrica",
+        "electric": "Eléctrica",
         "gas": "Gas",
         "passive_solar": "Solar pasiva"
       },
-      "ventilation": "Ventilacion",
+      "ventilation": "Ventilación",
       "ventilationTypes": {
         "manual": "Manual",
         "automatic": "Automatica"
       },
-      "minTemp": "Temperatura min.",
-      "maxTemp": "Temperatura max.",
-      "frostProtection": "Proteccion contra heladas (semanas de adelanto)"
+      "minTemp": "Temperatura mín.",
+      "maxTemp": "Temperatura máx.",
+      "frostProtection": "Protección contra heladas (semanas de adelanto)"
     },
     "coldFrame": {
-      "frostProtection": "Proteccion contra heladas (semanas de adelanto)"
+      "frostProtection": "Protección contra heladas (semanas de adelanto)"
     },
     "raisedBed": {
       "height": "Altura del cantero (cm)",
@@ -395,7 +401,7 @@
     "zoomIn": "Ampliar",
     "zoomOut": "Reducir",
     "placing": "Colocar {{plant}}",
-    "placingHint": "Toca casillas libres. ✓ buen vecino, ✕ conflicto.",
+    "placingHint": "Toca casillas libres. ✓ buen vecino, ⚠ vecino desfavorable.",
     "done": "Listo",
     "inspectHint": "Toca una planta para verla. Para plantar, elige primero una planta.",
     "pickPlantFirst": "Elige primero una planta para esta casilla.",
@@ -404,17 +410,17 @@
     "cellPosition": "Fila {{row}}, casilla {{col}}",
     "emptyCell": "Casilla vacía, {{position}}",
     "gridLabel": "Cuadrícula {{name}}, {{cols}} × {{rows}} casillas",
-    "conflictWith": "Conflicto con {{plants}}",
-    "conflictWhy": "Los malos vecinos se frenan entre sí o comparten plagas y enfermedades. Mueve una planta o deja una casilla de separación.",
-    "conflictsTitle_one": "{{count}} conflicto en el bancal",
-    "conflictsTitle_many": "{{count}} conflictos en el bancal",
-    "conflictsTitle_other": "{{count}} conflictos en el bancal",
+    "conflictWith": "Desfavorable junto a {{plants}}",
+    "conflictWhy": "Los vecinos desfavorables se frenan entre sí o comparten plagas. Puedes plantarlos igualmente; mejor deja una casilla de separación.",
+    "conflictsTitle_one": "{{count}} vecindad desfavorable en el bancal",
+    "conflictsTitle_many": "{{count}} vecindades desfavorables en el bancal",
+    "conflictsTitle_other": "{{count}} vecindades desfavorables en el bancal",
     "spots_one": "{{count}} lugar",
     "spots_many": "{{count}} lugares",
     "spots_other": "{{count}} lugares",
     "legendGood": "Buen vecino al lado",
-    "legendBad": "Conflicto: aquí no es posible",
-    "legendConflict": "Borde rojo = malos vecinos",
+    "legendBad": "Vecino desfavorable: se puede plantar",
+    "legendConflict": "Borde de color con ⚠ = vecinos desfavorables",
     "paletteTitle": "Elegir planta",
     "sheetPickHint": "Toca una y luego casillas del bancal",
     "sheetChangePlant": "Elegir otra planta",
@@ -430,7 +436,7 @@
     "removePlant": "Quitar",
     "plantRemoved": "{{name}} quitada",
     "thisSeason": "Fechas de esta temporada",
-    "harvestAfter": "Cosecha tras",
+    "harvestAfter": "Lista para cosechar tras",
     "daysRange": "{{min}}–{{max}} días",
     "spacing": "{{value}} cm de separación",
     "bedNamePlaceholder": "p. ej. Bancal sur",
@@ -457,6 +463,10 @@
         "medium": "Medianamente exigentes",
         "light": "Poco exigentes",
         "improver": "Mejoradoras del suelo"
+      },
+      "fixed": {
+        "container": "Maceta: renueva el sustrato cada año en lugar de rotar",
+        "perennial": "Cultivo perenne: sin rotación"
       }
     },
     "families": {
@@ -474,14 +484,16 @@
       "ericaceae": "Ericáceas",
       "grossulariaceae": "Grosulariáceas",
       "other": "Otras"
-    }
+    },
+    "sheetMore": "Detalles, variedad y notas",
+    "sheetLess": "Mostrar menos"
   },
   "plants": {
-    "title": "Base de plantas",
+    "title": "Plantas",
     "search": "Buscar plantas...",
-    "addCustom": "Agregar planta personalizada",
+    "addCustom": "Añadir planta personalizada",
     "customName": "Nombre de la planta",
-    "allCategories": "Todas las categorias",
+    "allCategories": "Todas las categorías",
     "category": {
       "vegetable": "Verduras",
       "fruit": "Frutas",
@@ -500,9 +512,9 @@
       "companions": "Buenos companeros",
       "antagonists": "Evitar junto a",
       "plantedIn": "Actualmente plantado en",
-      "weeksBeforeFrost": "{{weeks}} semanas antes de la ultima helada",
-      "weeksAfterFrost": "{{weeks}} semanas despues de la ultima helada",
-      "daysToHarvest": "{{min}}-{{max}} dias",
+      "weeksBeforeFrost": "{{weeks}} semanas antes de la última helada",
+      "weeksAfterFrost": "{{weeks}} semanas después de la última helada",
+      "daysToHarvest": "{{min}}-{{max}} días",
       "timing": "Calendario"
     },
     "sun": {
@@ -518,31 +530,31 @@
     "catalog": {
       "tomato": {
         "name": "Tomate",
-        "description": "Cultivo de temporada calida, necesita tutor. Muy productivo en buenas condiciones."
+        "description": "Cultivo de temporada cálida, necesita tutor. Muy productivo en buenas condiciones."
       },
       "zucchini": {
-        "name": "Calabacin",
+        "name": "Calabacín",
         "description": "Calabaza de verano muy prolifera. Una o dos plantas suelen ser suficientes."
       },
       "carrot": {
         "name": "Zanahoria",
-        "description": "Hortaliza de raiz que prefiere suelos sueltos y arenosos. Solo siembra directa."
+        "description": "Hortaliza de raíz que prefiere suelos sueltos y arenosos. Solo siembra directa."
       },
       "lettuce": {
         "name": "Lechuga",
-        "description": "Verdura de ensalada de crecimiento rapido. Prefiere temperaturas frescas."
+        "description": "Verdura de ensalada de crecimiento rápido. Prefiere temperaturas frescas."
       },
       "bean": {
         "name": "Poroto arbustivo",
-        "description": "Leguminosa fijadora de nitrogeno. Facil de cultivar y productiva."
+        "description": "Leguminosa fijadora de nitrógeno. Fácil de cultivar y productiva."
       },
       "pea": {
         "name": "Arveja",
-        "description": "Cultivo de temporada fria. Sembrar temprano en primavera, cosechar antes del calor."
+        "description": "Cultivo de temporada fría. Sembrar temprano en primavera, cosechar antes del calor."
       },
       "radish": {
-        "name": "Rabano",
-        "description": "Hortaliza de raiz de crecimiento muy rapido. Lista en 25-30 dias."
+        "name": "Rábano",
+        "description": "Hortaliza de raíz de crecimiento muy rápido. Lista en 25–30 días."
       },
       "cucumber": {
         "name": "Pepino",
@@ -561,20 +573,20 @@
         "description": "Plantar en otono, cosechar en el verano siguiente. Muy bajo mantenimiento."
       },
       "potato": {
-        "name": "Papa",
-        "description": "Cultivo basico. Necesita aporque a medida que crece. Bueno para principiantes."
+        "name": "Patata",
+        "description": "Cultivo básico. Necesita aporque a medida que crece. Bueno para principiantes."
       },
       "strawberry": {
         "name": "Fresa",
-        "description": "Baya perenne. Produce fruta durante varios anos."
+        "description": "Baya perenne. Produce fruta durante varios años."
       },
       "raspberry": {
         "name": "Frambuesa",
         "description": "Arbusto de bayas perenne. Necesita espaldera o soporte."
       },
       "blueberry": {
-        "name": "Arandano",
-        "description": "Necesita suelo acido. Produce fruta despues de 2-3 anos."
+        "name": "Arándano",
+        "description": "Necesita suelo ácido. Produce fruta después de 2–3 años."
       },
       "basil": {
         "name": "Albahaca",
@@ -590,19 +602,19 @@
       },
       "chives": {
         "name": "Cebollino",
-        "description": "Hierba perenne con suave sabor a cebolla. Muy facil de cultivar."
+        "description": "Hierba perenne con suave sabor a cebolla. Muy fácil de cultivar."
       },
       "kale": {
         "name": "Col rizada",
-        "description": "Verdura de hoja resistente. Sabe mas dulce despues de una helada."
+        "description": "Verdura de hoja resistente. Sabe más dulce después de una helada."
       },
       "spinach": {
         "name": "Espinaca",
-        "description": "Verdura de temporada fria. Se espiga rapidamente con el calor."
+        "description": "Verdura de temporada fría. Se espiga rápidamente con el calor."
       },
       "beetroot": {
         "name": "Remolacha",
-        "description": "Doble proposito: se comen raices y hojas. Facil de cultivar."
+        "description": "Doble propósito: se comen raíces y hojas. Fácil de cultivar."
       },
       "leek": {
         "name": "Puerro",
@@ -618,15 +630,15 @@
       },
       "kohlrabi": {
         "name": "Colinabo",
-        "description": "Brasica de crecimiento rapido. Se come el tallo engrosado crudo o cocido."
+        "description": "Brásica de crecimiento rápido. Se come el tallo engrosado crudo o cocido."
       },
       "fennel": {
         "name": "Hinojo",
-        "description": "Hortaliza de bulbo con sabor a anis. No crece bien junto a la mayoria de las otras plantas."
+        "description": "Hortaliza de bulbo con sabor a anís. No crece bien junto a la mayoría de las otras plantas."
       },
       "corn": {
-        "name": "Maiz",
-        "description": "Cereal de crecimiento alto. Plantar en bloques para buena polinizacion."
+        "name": "Maíz",
+        "description": "Cereal de crecimiento alto. Plantar en bloques para buena polinización."
       },
       "sunflower": {
         "name": "Girasol",
@@ -634,7 +646,7 @@
       },
       "cabbage": {
         "name": "Repollo",
-        "description": "Brasica de temporada fria. Bueno para chucrut y almacenamiento."
+        "description": "Brásica de temporada fría. Bueno para chucrut y almacenamiento."
       },
       "broccoli": {
         "name": "Brocoli",
@@ -650,7 +662,7 @@
       },
       "turnip": {
         "name": "Nabo",
-        "description": "Hortaliza de raiz de crecimiento rapido. Tanto las raices como las hojas son comestibles."
+        "description": "Hortaliza de raíz de crecimiento rápido. Tanto las raíces como las hojas son comestibles."
       },
       "mint": {
         "name": "Menta",
@@ -677,24 +689,24 @@
         "description": "Fruto solanacea que ama el calor. Necesita condiciones calidas y suelo rico."
       },
       "arugula": {
-        "name": "Rucula",
-        "description": "Verdura de ensalada picante. Cultivo de temporada fria de crecimiento rapido, lista en semanas."
+        "name": "Rúcula",
+        "description": "Verdura de ensalada picante. Cultivo de temporada fría de crecimiento rápido, lista en semanas."
       },
       "squash": {
         "name": "Calabaza butternut",
         "description": "Calabaza de invierno con pulpa dulce y avellanada. Se almacena bien durante meses."
       },
       "asparagus": {
-        "name": "Esparrago",
-        "description": "Hortaliza perenne. Tarda 2-3 anos en establecerse pero produce por mas de 15 anos."
+        "name": "Espárrago",
+        "description": "Hortaliza perenne. Tarda 2–3 años en establecerse pero produce por más de 15 años."
       },
       "pak_choi": {
         "name": "Pak choi",
-        "description": "Verdura asiatica de crecimiento rapido con tallos blancos crujientes y hojas tiernas."
+        "description": "Verdura asiática de crecimiento rápido con tallos blancos crujientes y hojas tiernas."
       },
       "endive": {
         "name": "Endivia",
-        "description": "Verdura de ensalada ligeramente amarga. Blanquear los corazones para un sabor mas suave."
+        "description": "Verdura de ensalada ligeramente amarga. Blanquear los corazones para un sabor más suave."
       }
     },
     "customIcon": "Icono",
@@ -710,7 +722,7 @@
     "inGarden": "En el huerto",
     "backToList": "Volver a la lista de plantas",
     "placeInPlanner": "Colocar en el planificador",
-    "addSeeds": "Registrar semillas",
+    "addSeeds": "Añadir semillas",
     "logHarvest": "Registrar cosecha",
     "editCustom": "Editar planta propia",
     "saved": "{{name}} guardada",
@@ -729,7 +741,7 @@
       "window": "{{from}} – {{to}}",
       "lastFrost": "Última helada: {{date}}",
       "rowSpacing": "Distancia entre filas {{value}} cm",
-      "harvestAfter": "Cosecha tras",
+      "harvestAfter": "Lista para cosechar tras",
       "yield": "Rendimiento",
       "yieldUnit": "kg/m²",
       "calories": "{{value}} kcal por 100 g",
@@ -751,7 +763,7 @@
       "harvestEntries_one": "{{count}} cosecha",
       "harvestEntries_many": "{{count}} cosechas",
       "harvestEntries_other": "{{count}} cosechas",
-      "lastHarvest": "Última cosecha: {{date}}",
+      "lastHarvest": "última cosecha {{date}}",
       "noHarvests": "Aún no hay cosechas registradas.",
       "seedStock": "Reserva de semillas",
       "noSeeds": "No hay semillas en reserva.",
@@ -759,27 +771,25 @@
       "viability_one": "Germinan {{count}} año",
       "viability_many": "Germinan {{count}} años",
       "viability_other": "Germinan {{count}} años",
-      "isolation": "Distancia de aislamiento {{distance}} m"
+      "isolation": "Distancia de aislamiento {{distance}} m",
+      "harvestDaysUnit": "días"
     }
   },
   "weather": {
-    "title": "Clima",
+    "title": "Tiempo",
     "current": "Clima actual",
     "forecast": "Próximos días",
-    "noApiKey": "Añade una clave de OpenWeatherMap y tu ubicación en Ajustes. Así Gardener te avisará de heladas y calor.",
-    "noLocation": "Indica tu ubicación en Ajustes para que la previsión y los horarios del sol sean correctos.",
     "temp": "Temperatura",
     "humidity": "Humedad",
     "wind": "Viento",
-    "feelsLike": "Sensacion termica",
-    "precipitation": "Precipitacion",
+    "feelsLike": "Sensación térmica",
+    "precipitation": "Precipitación",
     "subtitle": "Previsión y avisos para tu huerto.",
-    "connectTitle": "Conectar el tiempo",
     "toSettings": "Ir a ajustes",
     "refresh": "Actualizar el tiempo",
     "retry": "Reintentar",
     "errorTitle": "No se pudo cargar el tiempo",
-    "errorAuth": "La clave de API fue rechazada. Revísala en Ajustes.",
+    "errorAuth": "OpenWeatherMap rechazó la clave de API. Revísala en Ajustes o bórrala: entonces Gardener usa Open-Meteo, sin clave.",
     "errorNetwork": "No hay conexión con el servicio meteorológico. Revisa tu conexión e inténtalo de nuevo.",
     "alertsLabel": "Avisos meteorológicos",
     "moreAlerts_one": "{{count}} aviso más",
@@ -787,11 +797,46 @@
     "moreAlerts_many": "{{count}} avisos más",
     "updatedAt": "Actualizado a las {{time}}",
     "windValue": "{{speed}} km/h",
-    "forecastDesc": "Mínima y máxima; la marca indica el umbral de helada de {{threshold}}.",
+    "forecastDesc": "Mínima y máxima; la marca indica el umbral de helada de {{threshold}}. «Helada» significa 0 °C o menos, «Riesgo de helada» hasta {{threshold}} (posible helada en el suelo).",
     "rainChance": "Lluvia {{percent}}",
     "rangeLabel": "{{min}} a {{max}}",
     "frost": "Helada",
-    "frostRisk": "Riesgo de helada"
+    "frostRisk": "Riesgo de helada",
+    "locationTitle": "Indica tu ubicación",
+    "locationText": "Gardener obtiene la previsión gratis de Open-Meteo, sin clave de API. Solo indica tu ubicación y Gardener te avisará de heladas y calor y mostrará las horas de sol.",
+    "setLocation": "Indicar ubicación",
+    "sourceLabel": "Datos meteorológicos:",
+    "wmo": {
+      "0": "Despejado",
+      "1": "Mayormente despejado",
+      "2": "Parcialmente nublado",
+      "3": "Cubierto",
+      "45": "Niebla",
+      "48": "Niebla con escarcha",
+      "51": "Llovizna ligera",
+      "53": "Llovizna",
+      "55": "Llovizna intensa",
+      "56": "Llovizna helada ligera",
+      "57": "Llovizna helada",
+      "61": "Lluvia ligera",
+      "63": "Lluvia",
+      "65": "Lluvia intensa",
+      "66": "Lluvia helada ligera",
+      "67": "Lluvia helada",
+      "71": "Nevada ligera",
+      "73": "Nieve",
+      "75": "Nevada intensa",
+      "77": "Granos de nieve",
+      "80": "Chubascos ligeros",
+      "81": "Chubascos",
+      "82": "Chubascos fuertes",
+      "85": "Chubascos de nieve",
+      "86": "Chubascos de nieve fuertes",
+      "95": "Tormenta",
+      "96": "Tormenta con granizo",
+      "99": "Tormenta fuerte con granizo",
+      "unknown": "Sin descripción"
+    }
   },
   "calendar": {
     "subtitle": "Lo que toca en el huerto, ordenado por fecha.",
@@ -817,7 +862,8 @@
       "tomorrow": "Mañana",
       "thisWeek": "Esta semana",
       "later": "Más adelante",
-      "done": "Hechas"
+      "done": "Hechas",
+      "next7": "Próximos 7 días"
     },
     "overdueSince": "vencía {{date}}",
     "recurrence": "Repetir",
@@ -833,7 +879,7 @@
     "taskAdded": "Tarea creada",
     "taskUpdated": "Tarea guardada",
     "taskDeleted": "Tarea eliminada",
-    "nextOccurrence": "Hecha – próxima fecha: {{date}}",
+    "nextOccurrence": "Hecho: {{title}}. Próxima vez: {{date}}",
     "doneOn": "hecha: {{date}}",
     "editTask": "Editar tarea",
     "titlePlaceholder": "p. ej. Desbrotar tomates",
@@ -861,12 +907,12 @@
     "until": "hasta {{date}}",
     "from": "desde {{date}}",
     "title": "Calendario",
-    "noTasks": "Aun no hay tareas. Planifica tu huerto para generar tareas automaticamente.",
+    "noTasks": "Aún no hay tareas. Planifica tu huerto para generar tareas automáticamente.",
     "thisWeek": "Esta semana",
-    "upcoming": "Proximas",
+    "upcoming": "Próximas",
     "overdue": "Atrasadas",
     "completed": "Completadas",
-    "addTask": "Agregar tarea",
+    "addTask": "Añadir tarea",
     "taskTitle": "Titulo",
     "taskType": "Tipo",
     "taskDate": "Fecha",
@@ -891,9 +937,13 @@
       "fertilize": "Fertilizar",
       "scout": "Inspeccionar",
       "preserve": "Conservar",
-      "soil_test": "Analisis de suelo",
+      "soil_test": "Análisis de suelo",
       "custom": "Personalizada"
-    }
+    },
+    "nothingNextPlanted_one": "No empieza nada nuevo para tus cultivos plantados. Ahora puedes sembrar o plantar {{count}} cultivo (ver abajo).",
+    "nothingNextPlanted_many": "No empieza nada nuevo para tus cultivos plantados. Ahora puedes sembrar o plantar {{count}} cultivos (ver abajo).",
+    "nothingNextPlanted_other": "No empieza nada nuevo para tus cultivos plantados. Ahora puedes sembrar o plantar {{count}} cultivos (ver abajo).",
+    "reopenNamed": "Reabrir «{{title}}»"
   },
   "settings": {
     "title": "Ajustes",
@@ -905,13 +955,13 @@
       "system": "Sistema"
     },
     "weather": "Tiempo",
-    "apiKey": "Clave API",
+    "apiKey": "Clave API de OpenWeatherMap (opcional)",
     "location": "Ubicación",
     "latitude": "Latitud",
     "longitude": "Longitud",
     "locationName": "Nombre del lugar",
     "useGeolocation": "Usar mi ubicación",
-    "garden": "Configuracion del huerto",
+    "garden": "Configuración del huerto",
     "lastFrostDate": "Fecha de la última helada",
     "gridSize": "Tamaño de cuadrícula (cm)",
     "backend": "Sincronización",
@@ -924,7 +974,7 @@
       "frostThreshold": "Umbral (°C)",
       "frostDesc": "Cuando la previsión baja del umbral",
       "wateringDesc": "Con calor y sin lluvia",
-      "greenhouseDesc": "Sobrecalentamiento y ventilación",
+      "greenhouseDesc": "Sobrecalentamiento, ventilación y noches frías en el invernadero",
       "weeklyDesc": "Resumen de los próximos días en Tiempo"
     },
     "backendUrl": "URL del servidor",
@@ -941,8 +991,8 @@
     "frostEstimate": "Estimación para tu ubicación: {{date}}",
     "useEstimate": "Usar estimación",
     "gridHint": "Lado de una celda del planificador",
-    "weatherDesc": "Previsión y avisos de helada y riego mediante OpenWeatherMap",
-    "apiKeyHint": "Gratis en",
+    "weatherDesc": "Previsión, avisos de helada y de riego, sin registro, solo con tu ubicación",
+    "apiKeyHint": "Solo es necesaria si prefieres OpenWeatherMap en lugar de Open-Meteo. Gratis en",
     "alertsDesc": "Qué avisos aparecen en Hoy y en Tiempo",
     "backendDesc": "Solo con servidor propio (Docker)",
     "dataDesc": "Copia, restauración y exportación",
@@ -954,7 +1004,13 @@
       "action": "Borrar todos los datos",
       "actionDesc": "Elimina huertos, cosechas, animales y ajustes de este dispositivo. Descarga antes una copia.",
       "confirm": "¿Borrar todos los datos de este dispositivo? Sin copia se perderán."
-    }
+    },
+    "weatherReady": "Previsión para {{place}} activa",
+    "weatherYourLocation": "tu ubicación",
+    "weatherNeedsLocation": "Indica una ubicación arriba y Gardener cargará la previsión",
+    "weatherSource": "Datos meteorológicos:",
+    "weatherAdvanced": "Avanzado: usar tu propia clave de OpenWeatherMap",
+    "weatherProviderActive": "Proveedor activo: {{provider}}. Con clave, Gardener usa OpenWeatherMap; sin clave, Open-Meteo."
   },
   "dataManagement": {
     "title": "Datos y copia de seguridad",
@@ -998,13 +1054,13 @@
     "frostTitle": "Aviso de helada: {{temp}}",
     "frostDesc": "Las temperaturas bajan a {{temp}} el {{date}}. Protege las plantas sensibles.",
     "greenhouseHotTitle": "{{name}}: Riesgo de sobrecalentamiento",
-    "greenhouseHotDesc": "{{name}} podría alcanzar {{temp}} el {{date}} (máx. {{max}}). Asegura la ventilación.",
-    "greenhouseColdTitle": "{{name}}: Alerta de frio",
-    "greenhouseColdDesc": "{{name}} podría bajar a {{temp}} el {{date}} (mín. {{min}}). Valora calefacción o manta térmica.",
+    "greenhouseHotDesc": "El {{date}}, hasta {{temp}} fuera. Con sol, el invernadero cerrado supera con creces {{max}}: ventila por la mañana y pon sombra si hace falta.",
+    "greenhouseColdTitle": "{{name}}: Alerta de frío",
+    "greenhouseColdDesc": "Día más frío: {{date}}, {{outside}} fuera. En el invernadero sin calefacción se esperan unos {{temp}} (mínimo {{min}}). Cubre las plantas con manta térmica. Supuesto: por la noche el invernadero se mantiene unos {{buffer}} por encima del exterior.",
     "wateringNeeded": "Se recomienda regar",
     "wateringNotNeeded": "No es necesario regar",
     "wateringHotDry": "Días calurosos y secos ({{temp}} de media). Riega a fondo por la mañana.",
-    "wateringRainExpected": "Se espera lluvia en los proximos dias. No riegues por ahora.",
+    "wateringRainExpected": "Se espera lluvia en los próximos días. No riegues por ahora.",
     "wateringHighNeedPlants_one": "{{count}} planta con alta demanda de agua necesita atención. No hay lluvia en el pronóstico.",
     "wateringHighNeedPlants_many": "{{count}} plantas con alta demanda de agua necesitan atención. No hay lluvia en el pronóstico.",
     "wateringHighNeedPlants_other": "{{count}} plantas con alta demanda de agua necesitan atención. No hay lluvia en el pronóstico.",
@@ -1019,16 +1075,17 @@
       "warning": "Atención",
       "info": "Aviso"
     },
-    "frostGroupTitle_one": "Helada {{count}} noche, hasta {{temp}}",
-    "frostGroupTitle_other": "Heladas {{count}} noches, hasta {{temp}}",
+    "frostGroupTitle_one": "Riesgo de helada en {{count}} noche, hasta {{temp}}",
+    "frostGroupTitle_other": "Riesgo de helada en {{count}} noches, hasta {{temp}}",
     "frostGroupTitle_many": "Heladas {{count}} noches, hasta {{temp}}",
     "frostAffected_one": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
     "frostAffected_other": "{{count}} cultivos afectados, p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
     "frostAffected_many": "{{count}} cultivos afectados, p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
-    "frostAdvice": "Cubre las plantas sensibles con manta térmica y espera para trasplantar."
+    "frostAdvice": "Cubre las plantas sensibles con manta térmica y espera para trasplantar.",
+    "greenhouseFrostDesc": "Día más frío: {{date}}, {{outside}} fuera. Incluso en el invernadero sin calefacción puede helar (unos {{temp}}). Cubre las plantas sensibles con doble manta térmica o calienta para evitar heladas. Supuesto: unos {{buffer}} más que fuera."
   },
   "harvest": {
-    "title": "Registro de cosechas",
+    "title": "Cosecha",
     "add": "Registrar cosecha",
     "plant": "Planta",
     "bed": "Cantero",
@@ -1092,7 +1149,7 @@
     "showAll_many": "Mostrar los {{count}}"
   },
   "journal": {
-    "title": "Diario del huerto",
+    "title": "Diario",
     "add": "Nueva entrada",
     "entryTitle": "Titulo",
     "text": "Que paso hoy en el huerto?",
@@ -1101,8 +1158,8 @@
     "linkedTo": "Relacionado con",
     "animal": "Animal",
     "all": "Todos",
-    "addPhotos": "Agregar fotos (max. 3)",
-    "photoLimit": "Maximo 3 fotos",
+    "addPhotos": "Añadir fotos (máx. 3)",
+    "photoLimit": "Máximo 3 fotos",
     "photoTooLarge": "Redimensionando foto...",
     "photoError": "No se pudo guardar la foto",
     "subtitle": "Observaciones, fotos y notas: tu memoria para la próxima temporada.",
@@ -1129,7 +1186,7 @@
   },
   "pantry": {
     "title": "Despensa",
-    "add": "Agregar conserva",
+    "add": "Registrar conserva",
     "added": "Existencia guardada",
     "totalStored": "Almacenado",
     "totalUnits": "Unidades",
@@ -1166,7 +1223,7 @@
     "tip2": "Almacena conservas en lugar fresco, oscuro y seco.",
     "tip3": "Blanquea las verduras antes de congelar para mejor color y nutrientes.",
     "tip4": "Revisa alimentos fermentados regularmente — elimina moho superficial.",
-    "tip5": "El sótano necesita 1-4°C y alta humedad. Mantén las papas en oscuridad.",
+    "tip5": "La bodega necesita 1–4 °C y mucha humedad. Guarda las patatas a oscuras.",
     "tip6": "Usa el principio 'primero en entrar, primero en salir'.",
     "methodInfo": {
       "canning": {
@@ -1187,7 +1244,7 @@
       },
       "root_cellar": {
         "shelf": "6 meses de vida útil",
-        "desc": "Almacenamiento fresco y húmedo para raíces, papas, manzanas, repollo."
+        "desc": "Almacenamiento fresco y húmedo para raíces, patatas, manzanas, repollo."
       }
     },
     "subtitle": "Conservas, congelados y almacenados, con la caducidad a la vista.",
@@ -1228,7 +1285,7 @@
     "archive": "Archivar temporada",
     "archiveConfirm": "Archivar la temporada actual y comenzar de nuevo? Todos los canteros se limpiaran pero tus datos de cosecha y diario se conservan.",
     "archives": "Temporadas anteriores",
-    "noArchives": "Aun no hay temporadas archivadas.",
+    "noArchives": "Aún no hay temporadas archivadas.",
     "beds_one": "{{count}} cantero",
     "beds_many": "{{count}} canteros",
     "beds_other": "{{count}} canteros",
@@ -1237,7 +1294,7 @@
     "plants_other": "{{count}} plantas"
   },
   "foodplan": {
-    "title": "Plan de alimentación",
+    "title": "Plan alimentario",
     "subtitle": "Cuánto deberías cultivar de cada cosa para abastecer a tu hogar un año.",
     "coverage": "Autosuficiencia",
     "produced": "Producido / Objetivo",
@@ -1247,8 +1304,8 @@
     "needMore": "-{{kg}} kg (necesitas +{{m2}} m²)",
     "cropPlan": "Plan de cultivo",
     "animalProducts": "Productos animales",
-    "coverageForecast": "Cubierto (previsión)",
-    "coverageActual": "Cubierto (registrado)",
+    "coverageForecast": "Objetivo de cantidad · previsión",
+    "coverageActual": "Objetivo de cantidad · cosechado",
     "ofTarget": "de {{kg}} de objetivo anual",
     "actualKg": "{{kg}} de cultivos del plan registrados",
     "areaNeeded": "harían falta {{area}}",
@@ -1263,13 +1320,19 @@
     "notPlanted": "Sin plantar",
     "rowMeta": "Registrado {{actual}} · previsión {{forecast}} · objetivo {{target}} · {{area}} de {{needed}}",
     "meterLabel": "{{plant}}: registrado {{actual}}, previsión {{forecast}}, objetivo {{target}}",
-    "animalMeta": "Rendimiento anual típico de tus animales",
     "emptyTitle": "Planifica tu necesidad anual",
     "emptyText": "Tu hogar necesita unos {{kg}} de verdura y fruta al año. Planta bancales y el plan te mostrará lo que falta.",
     "howTargets": "Objetivo anual: consumo medio por persona en Europa central (p. ej. 30 kg de patatas, 15 kg de tomates) × tamaño del hogar.",
-    "howCoverage": "Cubierto: suma por cultivo de mín(cantidad, objetivo) dividida por la suma de objetivos. Un excedente de patatas no compensa tomates que faltan.",
+    "howCoverage": "Objetivo de cantidad: suma por cultivo de mín(cantidad, objetivo) dividida por la suma de objetivos. Un excedente de patatas no compensa tomates que faltan.",
     "pctActual": "{{percent}} registrado",
-    "pctForecast": "{{percent}} previsto"
+    "pctForecast": "{{percent}} previsto",
+    "howVsCalories": "No es un valor calórico: la autosuficiencia de la página «Autosuficiencia» cuenta calorías e incluye productos animales. Por eso ambas cifras difieren.",
+    "animalIntro_one": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} persona.",
+    "animalIntro_other": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas.",
+    "animalNeed": "consumo {{amount}}",
+    "animalSurplus": "excedente {{amount}}",
+    "surplusBadge": "Excedente",
+    "animalIntro_many": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas."
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1279,8 +1342,8 @@
     "plantTypes": "Tipos de plantas cultivadas",
     "nutritionCoverage": "Nutrientes",
     "nutrients": {
-      "calories": "Calorias",
-      "protein": "Proteinas",
+      "calories": "Calorías",
+      "protein": "Proteínas",
       "vitaminC": "Vitamina C",
       "fiber": "Fibra"
     },
@@ -1292,7 +1355,7 @@
     "annualCoverage": "Cobertura anual",
     "fresh": "Fresco",
     "stored": "De reserva",
-    "months": "meses de vida util",
+    "months": "meses de vida útil",
     "winterGap": "Hueco de reservas en invierno",
     "winterGapDesc": "En {{months}} tu huerto cubre menos del {{percent}} de la necesidad. Unos {{kg}} de reservas cubrirían esos meses.",
     "storageTitle": "Hacer reservas",
@@ -1335,7 +1398,7 @@
     "kcalValue": "{{kcal}} kcal",
     "noCropsTitle": "Aún no hay cultivos",
     "noCrops": "Planta un bancal en el planificador para ver aquí el rendimiento esperado por cultivo.",
-    "animalsIntro": "Rendimiento anual típico de tus animales, con la producción registrada este año debajo.",
+    "animalsIntro": "Rendimiento anual típico de tus animales y, debajo, la producción registrada este año. Se computa como máximo el consumo habitual de tu hogar.",
     "noAnimalsTitle": "No hay animales",
     "noAnimals": "Añade gallinas, abejas u otros animales para incluir su rendimiento.",
     "nonFood": "no alimentario",
@@ -1343,11 +1406,13 @@
     "storageDesc": "Excedentes que puedes conservar para el invierno (previsión).",
     "shelfLife_one": "se conserva {{count}} mes",
     "shelfLife_other": "se conserva {{count}} meses",
-    "shelfLife_many": "se conserva {{count}} meses"
+    "shelfLife_many": "se conserva {{count}} meses",
+    "kcalCounted": "{{kcal}} kcal computadas",
+    "surplus": "excedente {{amount}}"
   },
   "pests": {
-    "title": "Plagas y enfermedades",
-    "add": "Reportar problema",
+    "title": "Plagas",
+    "add": "Registrar problema",
     "added": "Problema registrado",
     "resolved": "Marcado como resuelto",
     "active": "Activos",
@@ -1355,11 +1420,11 @@
     "name": "Nombre del problema",
     "namePlaceholder": "ej. Pulgones, Tizon del tomate, Oidio...",
     "severity": "Gravedad",
-    "description": "Descripcion",
-    "organic": "Organico",
-    "organicOnly": "Solo tratamiento organico",
+    "description": "Descripción",
+    "organic": "Orgánico",
+    "organicOnly": "Solo tratamiento orgánico",
     "treatment": "Tratamiento",
-    "addTreatment": "Agregar tratamiento",
+    "addTreatment": "Añadir tratamiento",
     "treatmentPrompt": "Que tratamiento se aplico?",
     "resolve": "Marcar como resuelto",
     "types": {
@@ -1385,9 +1450,9 @@
     "treatmentHint": "¿Qué hiciste? Se guarda con la fecha."
   },
   "livestock": {
-    "title": "Gestión de Animales",
-    "addAnimal": "Agregar Animal",
-    "addProduct": "Registrar Producción",
+    "title": "Animales",
+    "addAnimal": "Añadir animal",
+    "addProduct": "Registrar producción",
     "added": "{{name}} añadido",
     "totalAnimals": "Total animales",
     "eggsThisWeek": "Huevos esta semana",
@@ -1409,7 +1474,6 @@
     "feedType": "Tipo de alimento",
     "feedTypePlaceholder": "ej. Mezcla de granos, Heno, Jarabe...",
     "feedCost": "Costo (€)",
-    "feedCostMonth": "Costo alimento/mes",
     "feedTotal": "Coste total de pienso",
     "unit": "Unidad",
     "liters": "Litros",
@@ -1417,7 +1481,7 @@
     "productionEntries_many": "{{count}} registros",
     "productionEntries_other": "{{count}} registros",
     "healthTab": "Salud",
-    "addHealth": "Registro de salud",
+    "addHealth": "Registrar evento de salud",
     "healthAdded": "Registro de salud guardado",
     "noHealth": "Anota vacunas, tratamientos y revisiones para no olvidar nada.",
     "healthType": "Tipo",
@@ -1444,17 +1508,18 @@
       "subtitle": "Huevos, miel y otros rendimientos de tus animales."
     },
     "feed": {
-      "title": "Gestión de alimentación",
-      "thisMonth": "Costo este mes",
-      "lastMonth": "Costo mes anterior",
+      "title": "Alimento",
       "totalCost": "Costo total",
       "totalKg": "Alimento total",
       "perAnimal": "Costo por animal",
       "subtitle": "Cantidades y costes de pienso por animal.",
-      "vsLastMonth": "respecto al mes anterior"
+      "perMonth": "Media mensual",
+      "perMonthHint_one": "en {{count}} mes",
+      "perMonthHint_other": "en {{count}} meses",
+      "perMonthHint_many": "en {{count}} meses"
     },
     "health": {
-      "title": "Resumen de salud",
+      "title": "Salud",
       "totalEvents": "Total registros",
       "totalCost": "Costos veterinarios",
       "losses": "Pérdidas",
@@ -1569,7 +1634,6 @@
     },
     "chartCaption": "{{product}} en los últimos {{months}} meses, {{total}} en total",
     "recordedThisYear": "{{product}} este año",
-    "ofExpected": "de ~{{amount}}/año",
     "productType": "Producto",
     "units": {
       "pieces": "unidades",
@@ -1612,11 +1676,18 @@
     "noFeedTitle": "Aún no hay pienso registrado",
     "noHealthTitle": "No hay registros de salud",
     "noJournalTitle": "No hay entradas de diario",
-    "toJournal": "Ir al diario"
+    "toJournal": "Ir al diario",
+    "feedCost30": "Pienso · 30 días",
+    "feedPerMonthHint": "media {{amount}} al mes",
+    "productionTotal": "Producción total",
+    "weekShort": "Sem. {{week}}",
+    "showEntries": "mostrar entradas",
+    "hideEntries": "ocultar entradas",
+    "ofExpectedToDate": "de ~{{amount}} esperados"
   },
   "seeds": {
-    "title": "Inventario de semillas",
-    "add": "Agregar semillas",
+    "title": "Semillas",
+    "add": "Añadir semillas",
     "added": "Semillas guardadas",
     "items": "Articulos de semillas",
     "expiring": "Por vencer",
@@ -1626,7 +1697,7 @@
     "shoppingList": "Falta para tus bancales",
     "quantity": "Cantidad",
     "unit": "Unidad",
-    "year": "Ano de adquisicion",
+    "year": "Año de adquisición",
     "source": "Origen",
     "expired": "Vencidas",
     "yearsLeft_one": "queda {{count}} año",
@@ -1658,7 +1729,7 @@
     "missingStat": "Falta para bancales",
     "missingStatHint": "Plantado pero sin existencias",
     "shoppingListHint": "Cultivos anuales de tus bancales sin semillas ni material de plantación en el inventario. Las perennes como el romero o las bayas no aparecen.",
-    "addFor": "Registrar {{name}}",
+    "addFor": "Añadir {{name}}",
     "emptyTitle": "Aún no hay semillas",
     "emptyText": "Registra tus sobres de semillas. Verás qué falta para tus bancales y cuándo las semillas viejas necesitan una prueba de germinación.",
     "filterLabel": "Filtrar semillas",
@@ -1683,26 +1754,21 @@
     "years_many": "{{count}} años"
   },
   "soil": {
-    "title": "Gestion del suelo",
+    "title": "Suelo",
     "addTest": "Registrar análisis",
     "addAmendment": "Registrar abonado",
     "tests": "Analisis de suelo",
     "amendments": "Enmiendas",
     "testAdded": "Análisis guardado",
     "amendmentAdded": "Abonado guardado",
-    "noAmendments": "Aun no se han registrado enmiendas.",
-    "organicMatter": "Materia organica",
+    "noAmendments": "Aún no se han registrado enmiendas.",
+    "organicMatter": "Materia orgánica",
     "amendmentType": "Tipo",
     "material": "Material",
-    "materialPlaceholder": "ej. Estiercol de caballo, Compost de jardin...",
-    "phTooAcid": "Muy acido - agregar cal para elevar el pH",
-    "phSlightlyAcid": "Ligeramente acido - la mayoria de las plantas prefieren 6.0-7.0",
-    "phOptimal": "Rango de pH optimo para la mayoria de las hortalizas",
-    "phSlightlyAlkaline": "Ligeramente alcalino - agregar azufre si es necesario",
-    "phTooAlkaline": "Demasiado alcalino - agregar azufre o turba para bajar el pH",
+    "materialPlaceholder": "ej. Estiércol de caballo, Compost de jardín...",
     "types": {
       "compost": "Compost",
-      "manure": "Estiercol",
+      "manure": "Estiércol",
       "lime": "Cal",
       "sulfur": "Azufre",
       "fertilizer": "Fertilizante",
@@ -1727,14 +1793,20 @@
       "limeLight": "Ligeramente ácido",
       "optimal": "En el rango objetivo",
       "noLime": "Ligeramente alcalino",
-      "sulfur": "Demasiado alcalino"
+      "sulfur": "Demasiado alcalino",
+      "limeVeto": "Sin cal",
+      "averseHigh": "Algo alto",
+      "acidify": "Demasiado alcalino"
     },
     "phAdvice": {
       "limeStrong": "Bastante por debajo del rango objetivo (pH {{range}}). Aporta cal agrícola o lithothamnium, mejor en otoño, y vuelve a medir al cabo de un año.",
       "limeLight": "Algo por debajo del rango objetivo (pH {{range}}). Basta una pequeña dosis de lithothamnium; no encales de más.",
-      "optimal": "Dentro del rango objetivo de los cultivos (pH {{range}}). No hace falta cal ni azufre; sigue aportando compost.",
-      "noLime": "Algo por encima del rango objetivo (pH {{range}}). No encales; el compost y el acolchado de hojas o corteza bajan el pH poco a poco. No hace falta azufre.",
-      "sulfur": "Bastante por encima del rango objetivo (pH {{range}}). Incorpora azufre elemental en pequeñas dosis; nada de cal ni ceniza de madera."
+      "optimal": "Dentro del rango objetivo de los cultivos (pH {{range}}). No hace falta cal ni azufre; aporta compost con moderación (2–3 l por m² y año).",
+      "noLime": "Algo por encima del rango objetivo (pH {{range}}). No encales ni uses ceniza de madera. El mantillo de hojas, el compost de corteza y la pinocha bajan el pH poco a poco; el compost normal es neutro o algo alcalino, úsalo con moderación. No hace falta azufre.",
+      "sulfur": "Bastante por encima del rango objetivo (pH {{range}}). Incorpora azufre elemental en pequeñas dosis; nada de cal ni ceniza de madera.",
+      "limeVeto": "No encales: el pH {{ph}} conviene a {{crops}} (objetivo {{range}}). {{reason}} Los demás cultivos del bancal lo toleran; encala después de la cosecha, para el cultivo siguiente.",
+      "averseHigh": "Algo alto para {{crops}} (objetivo {{range}}). {{reason}} No encales ni uses ceniza; el mantillo de hojas o el compost de corteza bajan el pH poco a poco.",
+      "acidify": "Demasiado alto para {{crops}} (objetivo {{range}}). Rellena el bancal o el hoyo con sustrato ácido (tierra para plantas acidófilas, corteza compostada) o baja el pH poco a poco con azufre elemental. Riega con agua de lluvia; la del grifo suele ser calcárea."
     },
     "nutrients": {
       "nitrogen": "Nitrógeno (N)",
@@ -1759,25 +1831,50 @@
     "invalidNumber": "Introduce un número válido",
     "quantityKg": "Cantidad (kg)",
     "cost": "Coste",
-    "unknownBed": "Bancal eliminado"
+    "unknownBed": "Bancal eliminado",
+    "limeReason": {
+      "potato": "La cal favorece la sarna de la patata.",
+      "blueberry": "Los arándanos necesitan suelo ácido y no toleran la cal.",
+      "strawberry": "Las fresas prefieren suelo ligeramente ácido.",
+      "raspberry": "Las frambuesas reaccionan a la cal con hojas amarillas (clorosis)."
+    },
+    "brassicaNote": "Las coles se benefician doblemente: un pH cercano a 7 previene la hernia de la col.",
+    "nutrientAdvice": {
+      "nitrogen": {
+        "low": "Nitrógeno bajo: aporta compost o harina de cuerno (50–100 g/m²) antes de cultivos exigentes y siembra leguminosas como abono verde en otoño.",
+        "high": "Nitrógeno alto: no abones con nitrógeno por ahora, siembra cultivos poco exigentes o abono verde; el exceso de nitrógeno acumula nitratos en las hojas."
+      },
+      "phosphorus": {
+        "low": "Fósforo bajo: incorpora estiércol bien descompuesto o compost.",
+        "high": "Fósforo alto, habitual en huertos: sin estiércol, poco compost y sin abonos completos con fosfato; aporta solo nitrógeno con harina de cuerno."
+      },
+      "potassium": {
+        "low": "Potasio bajo: purín de consuelda, sulfato potásico o un poco de ceniza (no con pH alto).",
+        "high": "Potasio alto: sin abonos potásicos ni ceniza de madera."
+      },
+      "organicMatter": {
+        "low": "Materia orgánica baja: acolcha, siembra abono verde y aporta 2–3 l de compost por m² cada año.",
+        "high": "Materia orgánica muy alta: reduce el compost durante unos años."
+      }
+    }
   },
   "preservation": {
-    "title": "Guia de conservacion",
-    "desc": "Metodos de conservacion recomendados para tus cultivos plantados.",
+    "title": "Guía de conservación",
+    "desc": "Métodos de conservación recomendados para tus cultivos plantados.",
     "methods": {
       "canning": "Envasado",
-      "freezing": "Congelacion",
-      "fermenting": "Fermentacion",
-      "drying": "Deshidratacion",
+      "freezing": "Congelación",
+      "fermenting": "Fermentación",
+      "drying": "Deshidratación",
       "root_cellar": "Bodega"
     },
     "seedSaving": "Obtener semillas",
     "difficulty": {
-      "easy": "Facil",
+      "easy": "Fácil",
       "moderate": "Moderado",
       "advanced": "Avanzado"
     },
-    "years": "anos de viabilidad",
+    "years": "años de viabilidad",
     "emptyTitle": "Aún no hay nada que conservar",
     "emptyText": "Cuando haya bancales plantados verás aquí métodos de conservación y de obtención de semillas.",
     "seedSavingDesc": "Viabilidad de la semilla y distancia mínima a otras variedades.",
@@ -1794,17 +1891,17 @@
   },
   "strategy": {
     "balanced": "Mezcla equilibrada",
-    "balancedDesc": "Seleccion diversa de verduras, hierbas y mas",
-    "calories": "Maximas calorias",
-    "caloriesDesc": "Papa, maiz, porotos - mayor rendimiento calorico por m²",
+    "balancedDesc": "Selección diversa de verduras, hierbas y más",
+    "calories": "Maximas calorías",
+    "caloriesDesc": "Patata, maíz, judías – mayor rendimiento calórico por m²",
     "selfsufficient": "Autosuficiencia",
-    "selfsufficientDesc": "Cubrir todos los nutrientes: calorias, proteinas, vitaminas, fibra + conservable",
-    "yield": "Maximo rendimiento",
-    "yieldDesc": "Tomate, calabacin, pepino - mas kg por m²",
+    "selfsufficientDesc": "Cubrir todos los nutrientes: calorías, proteínas, vitaminas, fibra + conservable",
+    "yield": "Máximo rendimiento",
+    "yieldDesc": "Tomate, calabacín, pepino – más kg por m²",
     "beginner": "Para principiantes",
-    "beginnerDesc": "Facil de cultivar, bajo mantenimiento, siembra directa, resultados rapidos",
-    "quickharvest": "Cosecha rapida",
-    "quickharvestDesc": "Rabano, lechuga, espinaca - cosecha en semanas, no en meses"
+    "beginnerDesc": "Fácil de cultivar, bajo mantenimiento, siembra directa, resultados rápidos",
+    "quickharvest": "Cosecha rápida",
+    "quickharvestDesc": "Rábano, lechuga, espinaca – cosecha en semanas, no en meses"
   },
   "direction": {
     "rows_ew": "E↔O Filas",
@@ -1832,7 +1929,7 @@
     "types": "tipos",
     "plants": "plantas",
     "compatibility": "Compatibilidad",
-    "conflicts": "conflictos",
+    "conflicts": "vecinos desfavorables",
     "occupancy": "Ocupación",
     "species": "Especies",
     "forecast": "Rendimiento (previsión)",
@@ -1840,15 +1937,15 @@
     "goodPairs_one": "{{count}} buena pareja",
     "goodPairs_many": "{{count}} buenas parejas",
     "goodPairs_other": "{{count}} buenas parejas",
-    "conflictPairs_one": "{{count}} conflicto",
-    "conflictPairs_many": "{{count}} conflictos",
-    "conflictPairs_other": "{{count}} conflictos"
+    "conflictPairs_one": "{{count}} vecino desfavorable",
+    "conflictPairs_many": "{{count}} vecinos desfavorables",
+    "conflictPairs_other": "{{count}} vecinos desfavorables"
   },
   "validation": {
-    "antagonistDirect": "{{plant}} y {{neighbor}} son malos vecinos: no los pongas juntos.",
+    "antagonistDirect": "{{plant}} junto a {{neighbor}}: vecinos desfavorables. Mejor deja una casilla de separación.",
     "antagonistNear": "{{neighbor}} está cerca de {{plant}}: no son vecinos ideales.",
     "tooClose": "Demasiado cerca: necesita {{spacing}} cm, aquí solo {{actual}} cm.",
-    "tooMuchSun": "Esta planta prefiere sombra - puede recibir demasiado sol aqui",
+    "tooMuchSun": "Esta planta prefiere sombra – aquí puede recibir demasiado sol",
     "containerTooSmall": "Esta maceta podria ser demasiado pequena para esta planta"
   },
   "advisor": {
@@ -1859,14 +1956,24 @@
     "inWeeks_many": "En {{count}} semanas",
     "emptyTitle": "Nada que sembrar ahora",
     "emptyText": "No hay siembras en las próximas cuatro semanas. El plan de temporada muestra lo que viene.",
-    "openCalendar": "Abrir plan de temporada"
+    "openCalendar": "Abrir plan de temporada",
+    "actions": {
+      "sow_indoors": "Semillero",
+      "sow_outdoors": "Siembra directa",
+      "transplant": "Trasplante",
+      "plant_autumn": "Plantar",
+      "sow_autumn": "Siembra de otoño"
+    },
+    "showMore_one": "Mostrar {{count}} más",
+    "showMore_many": "Mostrar {{count}} más",
+    "showMore_other": "Mostrar {{count}} más"
   },
   "expenses": {
-    "title": "Costes y rendimiento",
-    "add": "Agregar gasto",
-    "description": "Descripcion",
+    "title": "Costes",
+    "add": "Registrar gasto",
+    "description": "Descripción",
     "amount": "Monto (€)",
-    "category": "Categoria",
+    "category": "Categoría",
     "totalExpenses": "Gastos totales",
     "harvestValue": "Valor de la cosecha (precio de mercado)",
     "roi": "Rentabilidad",
@@ -1889,11 +1996,11 @@
     "saved": "{{description}} ({{amount}}) guardado",
     "updated": "Gasto actualizado",
     "deleted": "Gasto eliminado",
-    "period": "Periodo",
+    "period": "Período",
     "season": "Temporada {{year}}",
     "allTime": "Total",
     "totalCosts": "Costes",
-    "inclAnimals": "de ellos {{amount}} de ganadería",
+    "inclAnimals": "incl. {{amount}} de animales",
     "yieldValue": "Valor de lo producido",
     "valueSplit": "Cosecha {{harvest}} · animales {{animals}}",
     "net": "Balance",
@@ -1901,7 +2008,7 @@
     "deficit": "Déficit",
     "roiHint": "Balance en relación con los costes",
     "roiNoCosts": "Aún no hay costes registrados",
-    "howCosts": "Costes: gastos de esta página más pienso y veterinario registrados en ganadería. Una factura anotada en ambos sitios (misma fecha e importe) cuenta una sola vez.",
+    "howCosts": "Costes: gastos de esta página más pienso y veterinario de la sección Animales. Las entradas de pienso cuentan como Pienso, los costes veterinarios como Veterinario.",
     "howValue": "Valor: cosecha registrada (kg × precio de mercado típico del cultivo, 1,20–30 €/kg, si no 3 €/kg) más productos animales registrados × precio por unidad.",
     "howRoi": "Rentabilidad = (valor − costes) ÷ costes.",
     "productPrices": "Precios de productos animales",
@@ -1914,14 +2021,18 @@
       "wool": "Lana (€/kg)",
       "wax": "Cera (€/kg)"
     },
-    "byCategoryDesc": "Parte de los costes totales en el periodo elegido.",
-    "feedLog": "Pienso (ganadería)",
-    "vetLog": "Veterinario (ganadería)",
+    "byCategoryDesc": "Parte de los costes totales en el período elegido.",
     "entries": "Gastos",
-    "noEntriesTitle": "No hay gastos en este periodo",
+    "noEntriesTitle": "No hay gastos en este período",
     "emptyTitle": "¿Cuánto cuesta tu huerto y cuánto da?",
     "emptyText": "Registra gastos y cosechas y Gardener calculará el balance a precios de mercado.",
-    "toHarvest": "Registrar cosecha"
+    "toHarvest": "Registrar cosecha",
+    "howAnimals": "Animales {{total}}: {{expenses}} registrados como gastos, {{log}} del registro de pienso y de salud. Una factura anotada en ambos sitios (mismo importe, como mucho 3 días de diferencia) cuenta una vez.",
+    "duplicatesSkipped_one": "{{count}} entrada duplicada no se ha contado.",
+    "duplicatesSkipped_other": "{{count}} entradas duplicadas no se han contado.",
+    "fromFeedLog": "incl. {{amount}} del registro de pienso",
+    "fromHealthLog": "incl. {{amount}} del registro de salud",
+    "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado."
   },
   "succession": {
     "pick": "Añadir cultivo",
@@ -1953,27 +2064,27 @@
     "hint": "Asociaciones probadas: un toque las coloca en la esquina superior izquierda.",
     "threeSisters": {
       "name": "Las tres hermanas",
-      "desc": "Tradicional: Maiz + Porotos + Calabaza se apoyan mutuamente."
+      "desc": "Tradicional: maíz, judías y calabaza se apoyan mutuamente."
     },
     "tomatoBasil": {
       "name": "Tomate y albahaca",
-      "desc": "Clasica combinacion mediterranea con zanahorias y perejil."
+      "desc": "Clásica combinación mediterránea con zanahorias y perejil."
     },
     "saladBed": {
       "name": "Cantero de ensaladas",
-      "desc": "Mezcla de ensalada de crecimiento rapido con rabano, espinaca y hierbas."
+      "desc": "Mezcla de ensalada de crecimiento rápido con rábano, espinaca y hierbas."
     },
     "mediterranean": {
-      "name": "Mediterraneo",
-      "desc": "Mezcla amante del sol: tomate, pimiento, calabacin con hierbas."
+      "name": "Mediterráneo",
+      "desc": "Mezcla amante del sol: tomate, pimiento, calabacín con hierbas."
     },
     "rootVegetables": {
-      "name": "Hortalizas de raiz",
+      "name": "Hortalizas de raíz",
       "desc": "Cosecha subterranea: zanahorias, remolachas, nabos con alliums."
     },
     "brassica": {
-      "name": "Asociacion de brasicas",
-      "desc": "Familia de las coles con hierbas protectoras y hortalizas de raiz."
+      "name": "Asociación de brásicas",
+      "desc": "Familia de las coles con hierbas protectoras y hortalizas de raíz."
     }
   },
   "sunlight": {
@@ -1981,7 +2092,7 @@
     "sunrise": "Amanecer",
     "sunset": "Atardecer",
     "daylight": "Luz diurna",
-    "maxAltitude": "Angulo maximo del sol",
+    "maxAltitude": "Ángulo máximo del sol",
     "yearlyDaylight": "Luz diurna por mes",
     "desc": "Horarios del sol hoy y duración del día a lo largo del año.",
     "hoursValue": "{{hours}} h",
@@ -2014,7 +2125,7 @@
     "all": "Todos"
   },
   "companions": {
-    "title": "Matriz de asociación",
+    "title": "Asociaciones",
     "search": "Buscar planta...",
     "matrixView": "Matriz",
     "listView": "Lista",
@@ -2100,12 +2211,12 @@
   "quickAdd": {
     "title": "Añadir rápido",
     "harvest": "Registrar cosecha",
-    "task": "Nueva tarea",
+    "task": "Añadir tarea",
     "journal": "Entrada del diario",
     "harvestHint": "Qué, cuánto y de qué bancal",
     "taskHint": "Un recordatorio con fecha",
     "journalHint": "Observación, nota o foto",
-    "pest": "Registrar una plaga",
+    "pest": "Registrar problema",
     "pestHint": "Anota una plaga o enfermedad"
   },
   "records": {
@@ -2149,8 +2260,8 @@
     "forecast": "Previsión",
     "actualShort": "registrado {{value}}",
     "actualVsForecast": "Registrado {{actual}} de {{forecast}} previstos",
-    "selfSufficiencyForecast": "Autosuficiencia (previsión)",
-    "selfSufficiencyActual": "Autosuficiencia (registrada)",
+    "selfSufficiencyForecast": "Autosuficiencia · previsión anual",
+    "selfSufficiencyActual": "Autosuficiencia · registrada hasta hoy",
     "caloriesFor_one": "Calorías necesarias para {{count}} persona",
     "caloriesFor_other": "Calorías necesarias para {{count}} personas",
     "caloriesFor_many": "Calorías necesarias para {{count}} personas",
@@ -2161,10 +2272,21 @@
     "harvestEntries_one": "{{count}} registro de cosecha esta temporada",
     "harvestEntries_other": "{{count}} registros de cosecha esta temporada",
     "harvestEntries_many": "{{count}} registros de cosecha esta temporada",
-    "howForecast": "Previsión: superficie plantada × rendimiento esperado por m² de cada cultivo, más el rendimiento anual típico de tus animales (p. ej. 250 huevos por gallina). Vale para una temporada completa.",
-    "howActual": "Registrado: suma de tus cosechas y productos animales desde el 1 de enero. Los registros sin peso no cuentan.",
-    "howNeed": "Necesidad: {{kcal}} kcal por persona y día. La autosuficiencia es la parte de esa necesidad anual que cubren huerto y animales (como máximo 100 %).",
+    "howForecast": "Previsión anual: superficie plantada × rendimiento esperado por m² de cada cultivo, más el rendimiento anual típico de tus animales (p. ej. 220 huevos por gallina, 20 kg de miel por colmena).",
+    "howActual": "Registrado hasta hoy: tus cosechas y productos animales desde el 1 de enero, con la misma regla. Los registros sin peso no cuentan.",
+    "howNeed": "Autosuficiencia = parte de la necesidad calórica de tu hogar ({{kcal}} kcal por persona y día) que huerto y animales cubren en un año (como máximo 100 %).",
     "meterLegend": "Barra llena = registrado, rayada = previsión.",
-    "pricesEditable": "Puedes ajustar el precio por huevo, kg o litro en Costes."
+    "pricesEditable": "Puedes ajustar el precio por huevo, kg o litro en Costes.",
+    "expectedToDate": "esperado hasta hoy: {{value}}",
+    "actualVsToDateShort": "registrado {{actual}} · esperado hasta hoy {{expected}}",
+    "howCap": "Los productos animales cuentan solo hasta el consumo habitual (por persona y año unos 240 huevos, 1 kg de miel, 52 kg de carne, 300 l de leche). La miel es muy calórica, pero no es un alimento básico: dos colmenas dan unos 40 kg y un hogar consume 1–2 kg. Lo que excede es excedente para intercambiar o vender y no te alimenta. Hortalizas y fruta cuentan por completo.",
+    "howToDate": "Esperado hasta hoy: la parte de la previsión anual que debería haber llegado ya – para cada cultivo su ventana de cosecha desde la última helada, miel de mayo a agosto, huevos repartidos en el año. Si lo registrado queda muy por debajo, suelen faltar registros.",
+    "howVsFoodPlan": "El plan de alimentación mide otra cosa: kilos frente a un objetivo de cantidad para 20 hortalizas y frutas, sin productos animales. Por eso su «objetivo de cantidad» difiere de este valor calórico.",
+    "compositionTitle": "De qué se compone la previsión",
+    "compositionDesc": "Parte de la necesidad calórica anual, según su origen.",
+    "compositionLabel": "Huerto {{garden}}, productos animales {{animals}} de la necesidad anual",
+    "fromGarden": "Huerto",
+    "fromAnimals": "Productos animales",
+    "surplusNote": "No se cuenta por superar el consumo habitual: {{items}}."
   }
 }

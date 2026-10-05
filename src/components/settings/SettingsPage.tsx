@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, Coffee, ExternalLink, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
+import { Check, ChevronRight, Coffee, ExternalLink, MapPin, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
 import { estimateLastFrost } from "@/lib/location";
+import { getWeatherProvider, isWeatherConfigured } from "@/lib/weather";
 import { clearAllData } from "@/lib/dataImport";
 import { useFormat } from "@/hooks/useFormat";
 import { Card } from "@/components/ui/Card";
@@ -118,6 +119,8 @@ export function SettingsPage() {
 
   const frostYear = Number(store.lastFrostDate.slice(0, 4)) || new Date().getFullYear();
   const frostEstimate = store.locationLat !== null && elevation !== undefined ? estimateLastFrost(store.locationLat, elevation, frostYear) : null;
+  const hasLocation = isWeatherConfigured(store.locationLat, store.locationLon);
+  const provider = getWeatherProvider(store.weatherApiKey);
 
   return (
     <div className="pb-8">
@@ -194,22 +197,58 @@ export function SettingsPage() {
         </Section>
 
         <Section id="settings-weather" title={t("settings.weather")} description={t("settings.weatherDesc")}>
-          <Input
-            label={t("settings.apiKey")}
-            type="password"
-            autoComplete="off"
-            spellCheck={false}
-            value={store.weatherApiKey}
-            onChange={(e) => store.setWeatherApiKey(e.target.value.trim())}
-            hint={
-              <>
-                {t("settings.apiKeyHint")}{" "}
-                <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
-                  openweathermap.org <ExternalLink size={12} aria-hidden="true" />
-                </a>
-              </>
-            }
-          />
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <span className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${hasLocation ? "bg-positive/10 text-positive" : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"}`} aria-hidden="true">
+                {hasLocation ? <Check size={16} /> : <MapPin size={16} />}
+              </span>
+              <div className="min-w-0 text-sm">
+                <p className="font-medium text-gray-900 dark:text-gray-100">
+                  {hasLocation ? t("settings.weatherReady", { place: store.locationName || t("settings.weatherYourLocation") }) : t("settings.weatherNeedsLocation")}
+                </p>
+                <p className="mt-0.5 text-gray-500 dark:text-gray-400">
+                  {t("settings.weatherSource")}{" "}
+                  {provider === "openweathermap" ? (
+                    "OpenWeatherMap"
+                  ) : (
+                    <>
+                      <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
+                        Open-Meteo.com <ExternalLink size={12} aria-hidden="true" />
+                      </a>{" "}
+                      (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">CC BY 4.0</a>)
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+            <details className="group border-t border-gray-100 pt-3 dark:border-white/10" open={Boolean(store.weatherApiKey) || undefined}>
+              <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 [&::-webkit-details-marker]:hidden">
+                <ChevronRight size={16} aria-hidden="true" className="text-gray-500 transition-transform group-open:rotate-90 dark:text-gray-400" />
+                {t("settings.weatherAdvanced")}
+              </summary>
+              <div className="space-y-3 pt-2 pl-6">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {t("settings.weatherProviderActive", { provider: provider === "openweathermap" ? "OpenWeatherMap" : "Open-Meteo" })}
+                </p>
+                <Input
+                  label={t("settings.apiKey")}
+                  type="password"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={store.weatherApiKey}
+                  onChange={(e) => store.setWeatherApiKey(e.target.value.trim())}
+                  hint={
+                    <>
+                      {t("settings.apiKeyHint")}{" "}
+                      <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
+                        openweathermap.org <ExternalLink size={12} aria-hidden="true" />
+                      </a>
+                    </>
+                  }
+                />
+              </div>
+            </details>
+          </div>
         </Section>
 
         <Section id="settings-alerts" title={t("settings.alerts")} description={t("settings.alertsDesc")}>

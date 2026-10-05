@@ -10,6 +10,7 @@ import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useHarvestReady } from "@/hooks/useHarvestReady";
+import { useSowingAgenda } from "@/hooks/useSowingAgenda";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { Card } from "@/components/ui/Card";
@@ -63,6 +64,7 @@ export function Dashboard() {
   const steps = useGettingStartedSteps();
   const wide = useWide();
   const harvestReady = useHarvestReady(now);
+  const sowing = useSowingAgenda();
   const [nowTab, setNowTab] = useState<NowTab>(() => (harvestReady.length > 0 ? "harvest" : "sow"));
 
   const totalBeds = gardens.reduce((s, g) => s + g.beds.length, 0);
@@ -100,7 +102,7 @@ export function Dashboard() {
           totalBeds > 0 && <span className="hidden sm:contents">
             <Button onClick={addHarvest}>
               <Plus size={16} aria-hidden="true" />
-              {t("quickAdd.harvest")}
+              {t("harvest.add")}
             </Button>
           </span>
         }
@@ -127,7 +129,7 @@ export function Dashboard() {
                 className="[&>[role=tablist]]:px-2"
                 items={[
                   { value: "harvest", label: t("dashboard.tabHarvest"), count: harvestReady.length },
-                  { value: "sow", label: t("dashboard.tabSow") },
+                  { value: "sow", label: t("dashboard.tabSow"), count: sowing.now.length },
                 ]}
               >
                 <div className="-mt-4">
@@ -175,7 +177,9 @@ export function Dashboard() {
                     value={formatPercent(m.selfSufficiency.forecastRatio)}
                     icon={Target}
                     tone="neutral"
-                    hint={t("metrics.actualShort", { value: formatPercent(m.selfSufficiency.actualRatio) })}
+                    hint={m.selfSufficiency.forecastToDateRatio !== null
+                      ? t("metrics.actualVsToDateShort", { actual: formatPercent(m.selfSufficiency.actualRatio), expected: formatPercent(m.selfSufficiency.forecastToDateRatio) })
+                      : t("metrics.actualShort", { value: formatPercent(m.selfSufficiency.actualRatio) })}
                     className={TILE_LINK}
                   />
                 </Link>

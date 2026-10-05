@@ -1,17 +1,17 @@
 {
   "app": {
     "title": "Gardener",
-    "subtitle": "Self-Sufficiency Garden Planner"
+    "subtitle": "Self-sufficiency garden planner"
   },
   "nav": {
     "dashboard": "Dashboard",
-    "planner": "Garden Planner",
-    "plants": "Plant Database",
+    "planner": "Garden planner",
+    "plants": "Plant database",
     "weather": "Weather",
     "calendar": "Calendar",
     "tasks": "Tasks",
     "settings": "Settings",
-    "harvest": "Harvest Log",
+    "harvest": "Harvest log",
     "journal": "Journal",
     "pantry": "Pantry",
     "seeds": "Seeds",
@@ -22,14 +22,14 @@
     "livestockProduction": "Production",
     "livestockFeed": "Feed",
     "livestockHealth": "Health",
-    "foodplan": "Food Plan",
+    "foodplan": "Food plan",
     "sufficiency": "Self-Sufficiency",
     "expenses": "Costs & ROI",
     "companions": "Companions",
     "more": "More",
     "group": {
       "planning": "Planning",
-      "fieldwork": "Field Work",
+      "fieldwork": "Fieldwork",
       "livestock": "Livestock",
       "records": "Records",
       "analysis": "Analysis"
@@ -87,17 +87,17 @@
       "analysis": "Insights"
     },
     "tabs": {
-      "overview": "Overview",
+      "overview": "Today",
       "weather": "Weather",
-      "catalog": "Catalogue",
+      "catalog": "Plants",
       "companions": "Companions",
-      "season": "Season plan",
+      "season": "Calendar",
       "tasks": "Tasks",
       "animals": "Animals",
       "production": "Production",
       "feed": "Feed",
       "health": "Health",
-      "balance": "Overview",
+      "balance": "Self-sufficiency",
       "foodplan": "Food plan"
     },
     "command": {
@@ -118,13 +118,18 @@
         "animals": "Animals",
         "tasks": "Tasks",
         "journal": "Journal"
-      }
+      },
+      "logHarvestFor": "Log harvest: {{name}}",
+      "plantInBed": "{{plant}} in {{bed}}",
+      "cellCount_one": "{{count}} cell",
+      "cellCount_other": "{{count}} cells"
     },
     "sync": {
       "syncing": "Syncing…",
       "connected": "Connected to the server",
       "offline": "Server unreachable – changes stay on this device"
-    }
+    },
+    "skipToContent": "Skip to content"
   },
   "dashboard": {
     "title": "Today",
@@ -162,10 +167,10 @@
     "openPlanner": "Open planner",
     "weatherTitle": "Weather",
     "weatherMore": "Forecast",
-    "weatherConnectTitle": "Connect weather",
-    "weatherConnectText": "Add your location and an API key to see weather and frost warnings here.",
+    "weatherConnectTitle": "Set your location",
+    "weatherConnectText": "With your location you see the weather and frost warnings here – no sign-up or key needed.",
     "weatherErrorTitle": "Weather unavailable",
-    "weatherErrorText": "Check the API key or your internet connection.",
+    "weatherErrorText": "Weather data is not reachable right now. Check your internet connection.",
     "openSettings": "Open settings",
     "frostHint": "Frost possible ({{days}}, down to {{temp}}). Cover tender crops.",
     "seasonTitle": "Season so far",
@@ -185,14 +190,14 @@
       "dismiss": "Hide getting started",
       "done": "done",
       "location": "Set your location",
-      "locationHint": "For sunlight, weather and frost dates",
+      "locationHint": "For weather, frost warnings, sun position and frost date",
       "bed": "Create your first bed",
       "bedHint": "Choose size and type: raised bed, greenhouse, pot…",
       "plant": "Place your first plant",
       "plantHint": "Drag it from the palette onto the grid",
       "tasks": "Generate tasks",
       "tasksHint": "Sowing and planting dates from your plan",
-      "weather": "Connect weather",
+      "weather": "Set your location",
       "weatherHint": "Frost and watering hints for your garden"
     },
     "backup": {
@@ -251,12 +256,12 @@
     }
   },
   "planner": {
-    "title": "Garden Planner",
-    "newGarden": "New Garden",
-    "newBed": "New Bed",
-    "deleteBed": "Delete Bed",
-    "gardenName": "Garden Name",
-    "bedName": "Bed Name",
+    "title": "Planner",
+    "newGarden": "New garden",
+    "newBed": "New bed",
+    "deleteBed": "Delete bed",
+    "gardenName": "Garden name",
+    "bedName": "Bed name",
     "width": "Width",
     "height": "Height",
     "dragPlant": "Tap a plant, then tap cells in the bed – or drag it into the bed.",
@@ -266,38 +271,38 @@
     "autoFillDone_other": "Placed {{count}} plants",
     "clearBed": "Clear bed…",
     "path": "Path",
-    "pathMode": "Draw Paths",
+    "pathMode": "Draw paths",
     "pathModeHint": "Click on cells to add or remove walkways. Paths replace any plants on that cell.",
     "pathModeDone": "Done",
-    "editCell": "Edit Planting",
+    "editCell": "Edit planting",
     "variety": "Variety",
     "varietyPlaceholder": "e.g. San Marzano, Brandywine...",
     "plantedDate": "Planted date",
     "confirmDeleteGarden": "Delete this garden with all its beds?",
-    "placeMode": "Placing: {{plant}} - click on cells to place, ESC to cancel",
+    "placeMode": "Placing {{plant}}: click cells to place, Esc to cancel",
     "share": "Share garden plan",
     "shareCopied": "Share link copied",
     "print": "Print",
     "printTitle": "Print bed layout",
     "legend": "Legend",
-    "importTemplate": "Import Garden Template",
+    "importTemplate": "Import garden template",
     "importNow": "Import",
     "importError": "Invalid or expired share link.",
     "companions": "Good companions",
     "antagonists": "Bad neighbors",
     "environment": "Environment",
     "environmentTypes": {
-      "outdoor_bed": "Outdoor Bed",
-      "raised_bed": "Raised Bed",
+      "outdoor_bed": "Outdoor bed",
+      "raised_bed": "Raised bed",
       "greenhouse": "Greenhouse",
-      "cold_frame": "Cold Frame",
+      "cold_frame": "Cold frame",
       "polytunnel": "Polytunnel",
       "container": "Container",
       "windowsill": "Windowsill",
       "vertical": "Vertical"
     },
     "greenhouse": {
-      "title": "Greenhouse Configuration",
+      "title": "Greenhouse settings",
       "material": "Material",
       "materials": {
         "glass": "Glass",
@@ -383,7 +388,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "placing": "Placing {{plant}}",
-    "placingHint": "Tap free cells. ✓ good neighbour, ✕ conflict.",
+    "placingHint": "Tap free cells. ✓ good neighbour, ⚠ unfavourable neighbour.",
     "done": "Done",
     "inspectHint": "Tap a plant to inspect it. To plant, choose a plant first.",
     "pickPlantFirst": "Choose a plant first to fill this cell.",
@@ -392,15 +397,15 @@
     "cellPosition": "Row {{row}}, cell {{col}}",
     "emptyCell": "Empty cell, {{position}}",
     "gridLabel": "{{name}} grid, {{cols}} × {{rows}} cells",
-    "conflictWith": "Conflict with {{plants}}",
-    "conflictWhy": "Bad neighbours stunt each other or share pests and diseases. Move one plant or leave a cell between them.",
-    "conflictsTitle_one": "{{count}} conflict in this bed",
-    "conflictsTitle_other": "{{count}} conflicts in this bed",
+    "conflictWith": "Unfavourable next to {{plants}}",
+    "conflictWhy": "Unfavourable neighbours stunt each other or share pests. You can still plant them – better leave a cell between them.",
+    "conflictsTitle_one": "{{count}} unfavourable pairing in this bed",
+    "conflictsTitle_other": "{{count}} unfavourable pairings in this bed",
     "spots_one": "{{count}} spot",
     "spots_other": "{{count}} spots",
     "legendGood": "Good neighbour next to it",
-    "legendBad": "Conflict – not possible here",
-    "legendConflict": "Red edge = bad neighbours",
+    "legendBad": "Unfavourable neighbour – still possible",
+    "legendConflict": "Coloured edge with ⚠ = unfavourable neighbours",
     "paletteTitle": "Choose a plant",
     "sheetPickHint": "Tap one, then tap cells in the bed",
     "sheetChangePlant": "Choose another plant",
@@ -416,7 +421,7 @@
     "removePlant": "Remove",
     "plantRemoved": "{{name}} removed",
     "thisSeason": "Dates this season",
-    "harvestAfter": "Harvest after",
+    "harvestAfter": "Ready to harvest after",
     "daysRange": "{{min}}–{{max}} days",
     "spacing": "{{value}} cm spacing",
     "bedNamePlaceholder": "e.g. South raised bed",
@@ -443,6 +448,10 @@
         "medium": "Medium feeders",
         "light": "Light feeders",
         "improver": "Soil improvers"
+      },
+      "fixed": {
+        "container": "Pot: renew the soil each year instead of rotating",
+        "perennial": "Perennial crop – no rotation"
       }
     },
     "families": {
@@ -460,14 +469,16 @@
       "ericaceae": "Heath family",
       "grossulariaceae": "Gooseberry family",
       "other": "Other"
-    }
+    },
+    "sheetMore": "Details, variety & notes",
+    "sheetLess": "Show less"
   },
   "plants": {
-    "title": "Plant Database",
+    "title": "Plants",
     "search": "Search plants...",
-    "addCustom": "Add Custom Plant",
-    "customName": "Plant Name",
-    "allCategories": "All Categories",
+    "addCustom": "Add custom plant",
+    "customName": "Plant name",
+    "allCategories": "All categories",
     "category": {
       "vegetable": "Vegetables",
       "fruit": "Fruit",
@@ -528,7 +539,7 @@
       },
       "radish": {
         "name": "Radish",
-        "description": "Very fast-growing root vegetable. Ready in 25-30 days."
+        "description": "Very fast-growing root vegetable. Ready in 25–30 days."
       },
       "cucumber": {
         "name": "Cucumber",
@@ -560,7 +571,7 @@
       },
       "blueberry": {
         "name": "Blueberry",
-        "description": "Needs acidic soil. Produces fruit after 2-3 years."
+        "description": "Needs acidic soil. Produces fruit after 2–3 years."
       },
       "basil": {
         "name": "Basil",
@@ -672,7 +683,7 @@
       },
       "asparagus": {
         "name": "Asparagus",
-        "description": "Perennial vegetable. Takes 2-3 years to establish but produces for 15+ years."
+        "description": "Perennial vegetable. Takes 2–3 years to establish but produces for 15+ years."
       },
       "pak_choi": {
         "name": "Pak Choi",
@@ -714,7 +725,7 @@
       "window": "{{from}} – {{to}}",
       "lastFrost": "Last frost: {{date}}",
       "rowSpacing": "Row spacing {{value}} cm",
-      "harvestAfter": "Harvest after",
+      "harvestAfter": "Ready to harvest after",
       "yield": "Yield",
       "yieldUnit": "kg/m²",
       "calories": "{{value}} kcal per 100 g",
@@ -734,45 +745,78 @@
       "yourHarvests": "Your harvests",
       "harvestEntries_one": "{{count}} harvest",
       "harvestEntries_other": "{{count}} harvests",
-      "lastHarvest": "Last harvest: {{date}}",
+      "lastHarvest": "last harvested {{date}}",
       "noHarvests": "No harvest logged yet.",
       "seedStock": "Seed stock",
       "noSeeds": "No seeds in stock.",
       "storage": "Preserving & seed saving",
       "viability_one": "Viable for {{count}} year",
       "viability_other": "Viable for {{count}} years",
-      "isolation": "Isolation distance {{distance}} m"
+      "isolation": "Isolation distance {{distance}} m",
+      "harvestDaysUnit": "days"
     }
   },
   "weather": {
     "title": "Weather",
-    "current": "Current Weather",
+    "current": "Current weather",
     "forecast": "Next days",
-    "noApiKey": "Add an OpenWeatherMap key and your location in Settings. Gardener will then warn you about frost and heat.",
-    "noLocation": "Set your location in Settings so forecast and sun times are correct.",
     "temp": "Temperature",
     "humidity": "Humidity",
     "wind": "Wind",
     "feelsLike": "Feels like",
     "precipitation": "Precipitation",
     "subtitle": "Forecast and advice for your garden.",
-    "connectTitle": "Connect weather",
     "toSettings": "Open settings",
     "refresh": "Refresh weather",
     "retry": "Try again",
     "errorTitle": "Weather couldn't be loaded",
-    "errorAuth": "The API key was rejected. Check it in Settings.",
+    "errorAuth": "OpenWeatherMap rejected the API key. Check it in Settings or remove it – Gardener then uses Open-Meteo, no key required.",
     "errorNetwork": "Can't reach the weather service. Check your connection and try again.",
     "alertsLabel": "Weather alerts",
     "moreAlerts_one": "{{count}} more alert",
     "moreAlerts_other": "{{count}} more alerts",
     "updatedAt": "Updated {{time}}",
     "windValue": "{{speed}} km/h",
-    "forecastDesc": "Low and high; the tick marks the frost threshold of {{threshold}}.",
+    "forecastDesc": "Low and high; the tick marks the frost threshold of {{threshold}}. “Frost” means 0 °C or colder, “Frost risk” up to {{threshold}} (ground frost possible).",
     "rainChance": "Rain {{percent}}",
     "rangeLabel": "{{min}} to {{max}}",
     "frost": "Frost",
-    "frostRisk": "Frost risk"
+    "frostRisk": "Frost risk",
+    "locationTitle": "Set your location",
+    "locationText": "Gardener gets the forecast from Open-Meteo for free, no API key needed. Just set your location and Gardener warns you about frost and heat and shows sun times.",
+    "setLocation": "Set location",
+    "sourceLabel": "Weather data:",
+    "wmo": {
+      "0": "Clear sky",
+      "1": "Mainly clear",
+      "2": "Partly cloudy",
+      "3": "Overcast",
+      "45": "Fog",
+      "48": "Freezing fog",
+      "51": "Light drizzle",
+      "53": "Drizzle",
+      "55": "Heavy drizzle",
+      "56": "Light freezing drizzle",
+      "57": "Freezing drizzle",
+      "61": "Light rain",
+      "63": "Rain",
+      "65": "Heavy rain",
+      "66": "Light freezing rain",
+      "67": "Freezing rain",
+      "71": "Light snow",
+      "73": "Snow",
+      "75": "Heavy snow",
+      "77": "Snow grains",
+      "80": "Light showers",
+      "81": "Showers",
+      "82": "Heavy showers",
+      "85": "Snow showers",
+      "86": "Heavy snow showers",
+      "95": "Thunderstorm",
+      "96": "Thunderstorm with hail",
+      "99": "Severe thunderstorm with hail",
+      "unknown": "No description"
+    }
   },
   "calendar": {
     "subtitle": "What's coming up in the garden, sorted by due date.",
@@ -798,7 +842,8 @@
       "tomorrow": "Tomorrow",
       "thisWeek": "This week",
       "later": "Later",
-      "done": "Done"
+      "done": "Done",
+      "next7": "Next 7 days"
     },
     "overdueSince": "due {{date}}",
     "recurrence": "Repeat",
@@ -814,7 +859,7 @@
     "taskAdded": "Task added",
     "taskUpdated": "Task saved",
     "taskDeleted": "Task deleted",
-    "nextOccurrence": "Done – next due: {{date}}",
+    "nextOccurrence": "Done: {{title}} – next on {{date}}",
     "doneOn": "done: {{date}}",
     "editTask": "Edit task",
     "titlePlaceholder": "e.g. Pinch out tomatoes",
@@ -841,11 +886,11 @@
     "from": "from {{date}}",
     "title": "Calendar",
     "noTasks": "No tasks yet. Plan your garden to generate tasks automatically.",
-    "thisWeek": "This Week",
+    "thisWeek": "This week",
     "upcoming": "Upcoming",
     "overdue": "Overdue",
     "completed": "Completed",
-    "addTask": "Add Task",
+    "addTask": "Add task",
     "taskTitle": "Title",
     "taskType": "Type",
     "taskDate": "Date",
@@ -859,17 +904,20 @@
     "deletedCompleted_one": "Deleted {{count}} completed task",
     "deletedCompleted_other": "Deleted {{count}} completed tasks",
     "taskTypes": {
-      "sow_indoors": "Sow Indoors",
-      "sow_outdoors": "Sow Outdoors",
+      "sow_indoors": "Sow indoors",
+      "sow_outdoors": "Sow outdoors",
       "transplant": "Transplant",
       "water": "Water",
       "harvest": "Harvest",
       "fertilize": "Fertilize",
-      "scout": "Scout/Inspect",
+      "scout": "Inspect",
       "preserve": "Preserve",
-      "soil_test": "Soil Test",
+      "soil_test": "Soil test",
       "custom": "Custom"
-    }
+    },
+    "nothingNextPlanted_one": "Nothing new starts for your planted crops. {{count}} crop can be sown or planted now (see below).",
+    "nothingNextPlanted_other": "Nothing new starts for your planted crops. {{count}} crops can be sown or planted now (see below).",
+    "reopenNamed": "Reopen “{{title}}”"
   },
   "settings": {
     "title": "Settings",
@@ -881,13 +929,13 @@
       "system": "System"
     },
     "weather": "Weather",
-    "apiKey": "API key",
+    "apiKey": "OpenWeatherMap API key (optional)",
     "location": "Location",
     "latitude": "Latitude",
     "longitude": "Longitude",
-    "locationName": "Location Name",
+    "locationName": "Location name",
     "useGeolocation": "Use my location",
-    "garden": "Garden Settings",
+    "garden": "Garden settings",
     "lastFrostDate": "Last frost date",
     "gridSize": "Grid size (cm)",
     "backend": "Sync",
@@ -900,7 +948,7 @@
       "frostThreshold": "Threshold (°C)",
       "frostDesc": "When the forecast drops below the threshold",
       "wateringDesc": "In hot, dry spells",
-      "greenhouseDesc": "Overheating and ventilation",
+      "greenhouseDesc": "Overheating, ventilation and cold nights in the greenhouse",
       "weeklyDesc": "A short summary of the coming days in Weather"
     },
     "backendUrl": "Backend URL",
@@ -917,8 +965,8 @@
     "frostEstimate": "Estimate for your location: {{date}}",
     "useEstimate": "Use estimate",
     "gridHint": "Side length of one planner cell",
-    "weatherDesc": "Forecast, frost and watering hints via OpenWeatherMap",
-    "apiKeyHint": "Free from",
+    "weatherDesc": "Forecast, frost and watering hints – no sign-up, just your location",
+    "apiKeyHint": "Only needed if you prefer OpenWeatherMap over Open-Meteo. Free from",
     "alertsDesc": "Which warnings appear on Today and in Weather",
     "backendDesc": "Only with your own server (Docker)",
     "dataDesc": "Back up, restore and export",
@@ -930,7 +978,13 @@
       "action": "Delete all data",
       "actionDesc": "Removes gardens, harvests, animals and settings from this device. Download a backup first.",
       "confirm": "Delete all data on this device? Without a backup it is gone for good."
-    }
+    },
+    "weatherReady": "Forecast for {{place}} is active",
+    "weatherYourLocation": "your location",
+    "weatherNeedsLocation": "Set a location above and Gardener loads the forecast",
+    "weatherSource": "Weather data:",
+    "weatherAdvanced": "Advanced: use your own OpenWeatherMap key",
+    "weatherProviderActive": "Active provider: {{provider}}. With a key Gardener uses OpenWeatherMap, without one Open-Meteo."
   },
   "dataManagement": {
     "title": "Data & backup",
@@ -968,17 +1022,17 @@
   "alerts": {
     "frostTitle": "Frost warning: {{temp}}",
     "frostDesc": "Temperatures drop to {{temp}} on {{date}}. Protect tender plants.",
-    "greenhouseHotTitle": "{{name}}: Overheating risk",
-    "greenhouseHotDesc": "{{name}} may reach {{temp}} on {{date}} (max {{max}}). Make sure it's ventilated.",
-    "greenhouseColdTitle": "{{name}}: Cold warning",
-    "greenhouseColdDesc": "{{name}} may drop to {{temp}} on {{date}} (min {{min}}). Consider heating or fleece.",
+    "greenhouseHotTitle": "{{name}}: overheating risk",
+    "greenhouseHotDesc": "Up to {{temp}} outside on {{date}}. In sun a closed house heats up far beyond {{max}}: open the vents in the morning and shade if needed.",
+    "greenhouseColdTitle": "{{name}}: cold warning",
+    "greenhouseColdDesc": "Coldest day: {{date}}, {{outside}} outside. Expect about {{temp}} inside the unheated house (minimum {{min}}). Cover plants with fleece. Assumption: at night the house stays about {{buffer}} warmer than outside.",
     "wateringNeeded": "Watering recommended",
     "wateringNotNeeded": "No watering needed",
     "wateringHotDry": "Hot, dry days ahead ({{temp}} on average). Water deeply in the morning.",
     "wateringRainExpected": "Rain expected in the next days. Hold off on watering.",
     "wateringHighNeedPlants_one": "{{count}} high-water plant needs attention. No rain in forecast.",
     "wateringHighNeedPlants_other": "{{count}} high-water plants need attention. No rain in forecast.",
-    "weeklySummaryTitle": "Weekly Garden Outlook",
+    "weeklySummaryTitle": "Weekly garden outlook",
     "weeklySummaryNeutral": "Settled week: {{minTemp}} to {{maxTemp}}, {{rainyDays}} rainy days.",
     "weeklySummaryFrost": "Frost risk this week, down to {{minTemp}}. Protect tender plants and delay transplanting.",
     "weeklySummaryHotDry": "Hot, dry week up to {{maxTemp}}. Watering and mulching come first.",
@@ -989,15 +1043,16 @@
       "warning": "Caution",
       "info": "Note"
     },
-    "frostGroupTitle_one": "Frost on {{count}} night, down to {{temp}}",
-    "frostGroupTitle_other": "Frost on {{count}} nights, down to {{temp}}",
+    "frostGroupTitle_one": "Frost risk on {{count}} night, down to {{temp}}",
+    "frostGroupTitle_other": "Frost risk on {{count}} nights, down to {{temp}}",
     "frostAffected_one": "Affected: {{plants}}. Cover with fleece or bring indoors.",
     "frostAffected_other": "{{count}} crops affected, e.g. {{plants}}. Cover with fleece or bring indoors.",
-    "frostAdvice": "Cover tender plants with fleece and hold off on transplanting."
+    "frostAdvice": "Cover tender plants with fleece and hold off on transplanting.",
+    "greenhouseFrostDesc": "Coldest day: {{date}}, {{outside}} outside. Even the unheated house will likely freeze (about {{temp}}). Cover tender plants with a double layer of fleece or heat frost-free. Assumption: about {{buffer}} warmer than outside."
   },
   "harvest": {
-    "title": "Harvest Log",
-    "add": "Log Harvest",
+    "title": "Harvest",
+    "add": "Log harvest",
     "plant": "Plant",
     "bed": "Bed",
     "date": "Date",
@@ -1055,8 +1110,8 @@
     "log": "Log"
   },
   "journal": {
-    "title": "Garden Journal",
-    "add": "New Entry",
+    "title": "Journal",
+    "add": "New entry",
     "entryTitle": "Title",
     "text": "What happened in the garden today?",
     "tags": "Tags",
@@ -1092,7 +1147,7 @@
   },
   "pantry": {
     "title": "Pantry",
-    "add": "Add Preserves",
+    "add": "Log preserves",
     "added": "Item saved",
     "totalStored": "Stored",
     "totalUnits": "Units",
@@ -1122,14 +1177,14 @@
     "shelfLife": "Shelf life",
     "yield": "Yield",
     "months": "months",
-    "plantGuides": "Preservation by Plant",
-    "tipsTitle": "Preservation Tips",
+    "plantGuides": "Preservation by plant",
+    "tipsTitle": "Preservation tips",
     "tip1": "Always label jars and freezer bags with the date and contents.",
     "tip2": "Store canned goods in a cool, dark, dry place. Avoid direct sunlight.",
     "tip3": "Blanch vegetables before freezing for better color, texture and nutrient retention.",
     "tip4": "Check fermented foods regularly — remove any surface mold immediately.",
-    "tip5": "Root cellar storage needs 1-4°C and high humidity. Keep potatoes in the dark.",
-    "tip6": "Use the 'First In, First Out' principle — consume oldest preserves first.",
+    "tip5": "Root cellar storage needs 1–4 °C and high humidity. Keep potatoes in the dark.",
+    "tip6": "Use the “first in, first out” principle – eat the oldest preserves first.",
     "methodInfo": {
       "canning": {
         "shelf": "24 months shelf life",
@@ -1149,7 +1204,7 @@
       },
       "root_cellar": {
         "shelf": "6 months shelf life",
-        "desc": "Cool, humid storage for root vegetables, potatoes, apples, cabbage. 1-4°C optimal."
+        "desc": "Cool, humid storage for root vegetables, potatoes, apples, cabbage. 1–4 °C optimal."
       }
     },
     "subtitle": "Preserved, frozen and stored food – with shelf life in view.",
@@ -1184,9 +1239,9 @@
   },
   "season": {
     "current": "Season {{year}}",
-    "archive": "Archive Season",
+    "archive": "Archive season",
     "archiveConfirm": "Archive the current season and start fresh? All beds will be cleared but your harvest data and journal remain.",
-    "archives": "Past Seasons",
+    "archives": "Past seasons",
     "noArchives": "No archived seasons yet.",
     "beds_one": "{{count}} bed",
     "beds_other": "{{count}} beds",
@@ -1197,15 +1252,15 @@
     "title": "Food plan",
     "subtitle": "How much of each crop you'd need to grow to feed your household for a year.",
     "coverage": "Self-sufficiency",
-    "produced": "Produced / Target",
+    "produced": "Produced / target",
     "area": "Planted area",
     "deficits": "Crops with a gap",
     "deficitsTitle": "Biggest shortfalls",
     "needMore": "-{{kg}} kg (need +{{m2}} m²)",
     "cropPlan": "Crop plan",
     "animalProducts": "Animal products",
-    "coverageForecast": "Covered (forecast)",
-    "coverageActual": "Covered (recorded)",
+    "coverageForecast": "Quantity target · forecast",
+    "coverageActual": "Quantity target · harvested so far",
     "ofTarget": "of {{kg}} annual target",
     "actualKg": "{{kg}} of planned crops recorded",
     "areaNeeded": "{{area}} needed",
@@ -1219,13 +1274,18 @@
     "notPlanted": "Not planted",
     "rowMeta": "Recorded {{actual}} · forecast {{forecast}} · target {{target}} · {{area}} of {{needed}}",
     "meterLabel": "{{plant}}: recorded {{actual}}, forecast {{forecast}}, target {{target}}",
-    "animalMeta": "Typical annual yield of your animals",
     "emptyTitle": "Plan your annual needs",
     "emptyText": "Your household needs about {{kg}} of vegetables and fruit per year. Plant some beds and the plan shows what's missing.",
     "howTargets": "Annual target: average consumption per person in central Europe (e.g. 30 kg potatoes, 15 kg tomatoes) × household size.",
-    "howCoverage": "Covered: the sum of min(amount, target) per crop divided by the sum of all targets. A potato surplus doesn't make up for missing tomatoes.",
+    "howCoverage": "Quantity target: the sum of min(amount, target) per crop divided by the sum of all targets. A potato surplus doesn't make up for missing tomatoes.",
     "pctActual": "{{percent}} recorded",
-    "pctForecast": "{{percent}} forecast"
+    "pctForecast": "{{percent}} forecast",
+    "howVsCalories": "This is not a calorie figure: self-sufficiency on the “Self-sufficiency” page counts calories and includes animal products. The two numbers therefore differ.",
+    "animalIntro_one": "Typical annual yield of your animals and the typical consumption of {{count}} person.",
+    "animalIntro_other": "Typical annual yield of your animals and the typical consumption of {{count}} people.",
+    "animalNeed": "consumption {{amount}}",
+    "animalSurplus": "surplus {{amount}}",
+    "surplusBadge": "Surplus"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1243,7 +1303,7 @@
     "gaps": "Nutrient gaps (below 50%) and crops that help",
     "covered": "covered",
     "suggestion": "Consider adding",
-    "yieldByPlant": "Yield by Plant",
+    "yieldByPlant": "Yield by plant",
     "monthlyTitle": "Supply per month",
     "annualCoverage": "Annual coverage",
     "fresh": "Fresh",
@@ -1252,7 +1312,7 @@
     "winterGap": "Winter storage gap",
     "winterGapDesc": "In {{months}} your garden covers less than {{percent}} of your needs. About {{kg}} of stored food would bridge these months.",
     "storageTitle": "Build up stores",
-    "animalYields": "Animal Yields",
+    "animalYields": "Animal yields",
     "subtitle": "How much of your annual needs your garden and animals cover.",
     "people_one": "person",
     "people_other": "people",
@@ -1288,18 +1348,20 @@
     "kcalValue": "{{kcal}} kcal",
     "noCropsTitle": "No crops yet",
     "noCrops": "Plant a bed in the planner to see the expected yield per crop here.",
-    "animalsIntro": "Typical annual yield of your animals, with this year's recorded production below.",
+    "animalsIntro": "Typical annual yield of your animals, with this year's recorded production below. At most your household's typical consumption is counted.",
     "noAnimalsTitle": "No animals added",
     "noAnimals": "Add chickens, bees or other animals to include their yields.",
     "nonFood": "not food",
     "perYear": "{{amount}} per year",
     "storageDesc": "Surplus you can preserve for winter (forecast).",
     "shelfLife_one": "keeps {{count}} month",
-    "shelfLife_other": "keeps {{count}} months"
+    "shelfLife_other": "keeps {{count}} months",
+    "kcalCounted": "{{kcal}} kcal counted",
+    "surplus": "surplus {{amount}}"
   },
   "pests": {
-    "title": "Pests & diseases",
-    "add": "Report Problem",
+    "title": "Pests",
+    "add": "Report problem",
     "added": "Problem recorded",
     "resolved": "Marked as resolved",
     "active": "Active",
@@ -1337,9 +1399,9 @@
     "treatmentHint": "What did you do? Saved with today's date."
   },
   "livestock": {
-    "title": "Livestock Management",
-    "addAnimal": "Add Animal",
-    "addProduct": "Log Production",
+    "title": "Animals",
+    "addAnimal": "Add animal",
+    "addProduct": "Log production",
     "added": "{{name}} added",
     "totalAnimals": "Total animals",
     "eggsThisWeek": "Eggs this week",
@@ -1355,26 +1417,25 @@
     "pieces": "pcs",
     "year": "year",
     "feedTab": "Feed",
-    "addFeed": "Log Feed",
+    "addFeed": "Log feed",
     "feedAdded": "Feed logged",
     "noFeed": "With feed amounts and costs you'll see what your animals cost.",
     "feedType": "Feed type",
     "feedTypePlaceholder": "e.g. Grain mix, Hay, Sugar syrup...",
     "feedCost": "Cost (€)",
-    "feedCostMonth": "Feed cost/month",
     "feedTotal": "Total feed costs",
     "unit": "Unit",
     "liters": "Liters",
     "productionEntries_one": "{{count}} entry",
     "productionEntries_other": "{{count}} entries",
     "healthTab": "Health",
-    "addHealth": "Health Entry",
+    "addHealth": "Log health event",
     "healthAdded": "Health entry logged",
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
     "healthDesc": "Description",
     "healthDescPlaceholder": "e.g. Newcastle vaccination, deworming with...",
-    "editAnimal": "Edit Animal",
+    "editAnimal": "Edit animal",
     "updated": "Animal updated",
     "since": "since",
     "allAnimals": "All animals",
@@ -1387,7 +1448,7 @@
     "noJournal": "Link journal entries to this animal and they'll show up here.",
     "notesPlaceholder": "e.g. breed, special notes...",
     "production": {
-      "title": "Production Log",
+      "title": "Production",
       "totalEggs": "Total eggs",
       "totalHoney": "Total honey",
       "totalMilk": "Total milk",
@@ -1395,17 +1456,17 @@
       "subtitle": "Eggs, honey and other yields from your animals."
     },
     "feed": {
-      "title": "Feed Management",
-      "thisMonth": "Cost this month",
-      "lastMonth": "Cost last month",
+      "title": "Feed",
       "totalCost": "Total cost",
       "totalKg": "Total feed",
       "perAnimal": "Cost per animal",
       "subtitle": "Feed amounts and costs per animal.",
-      "vsLastMonth": "compared with last month"
+      "perMonth": "Avg. per month",
+      "perMonthHint_one": "over {{count}} month",
+      "perMonthHint_other": "over {{count}} months"
     },
     "health": {
-      "title": "Health Overview",
+      "title": "Health",
       "totalEvents": "Total entries",
       "totalCost": "Veterinary costs",
       "losses": "Losses",
@@ -1433,9 +1494,9 @@
     },
     "types": {
       "chicken": "Chickens",
-      "duck": "Runner Ducks",
+      "duck": "Runner ducks",
       "rabbit": "Rabbits",
-      "bee": "Bee Hives",
+      "bee": "Bee hives",
       "goat": "Goats",
       "sheep": "Sheep",
       "quail": "Quail"
@@ -1506,7 +1567,6 @@
     },
     "chartCaption": "{{product}} over the last {{months}} months, {{total}} in total",
     "recordedThisYear": "{{product}} this year",
-    "ofExpected": "of ~{{amount}}/year",
     "productType": "Product",
     "units": {
       "pieces": "pieces",
@@ -1548,11 +1608,18 @@
     "noFeedTitle": "No feed logged yet",
     "noHealthTitle": "No health entries",
     "noJournalTitle": "No journal entries",
-    "toJournal": "Open journal"
+    "toJournal": "Open journal",
+    "feedCost30": "Feed costs · 30 days",
+    "feedPerMonthHint": "avg. {{amount}} per month",
+    "productionTotal": "Total production",
+    "weekShort": "Week {{week}}",
+    "showEntries": "show entries",
+    "hideEntries": "hide entries",
+    "ofExpectedToDate": "of ~{{amount}} expected"
   },
   "seeds": {
-    "title": "Seed Inventory",
-    "add": "Add Seeds",
+    "title": "Seeds",
+    "add": "Add seeds",
     "added": "Seeds saved",
     "items": "Seed items",
     "expiring": "Expiring",
@@ -1614,10 +1681,10 @@
     "invalidYear": "Enter a year between 1950 and today"
   },
   "soil": {
-    "title": "Soil Management",
+    "title": "Soil",
     "addTest": "Log soil test",
     "addAmendment": "Log amendment",
-    "tests": "Soil Tests",
+    "tests": "Soil tests",
     "amendments": "Amendments",
     "testAdded": "Soil test saved",
     "amendmentAdded": "Amendment saved",
@@ -1626,11 +1693,6 @@
     "amendmentType": "Type",
     "material": "Material",
     "materialPlaceholder": "e.g. Horse manure, Garden compost...",
-    "phTooAcid": "Very acidic - add lime to raise pH",
-    "phSlightlyAcid": "Slightly acidic - most plants prefer 6.0-7.0",
-    "phOptimal": "Optimal pH range for most vegetables",
-    "phSlightlyAlkaline": "Slightly alkaline - add sulfur if needed",
-    "phTooAlkaline": "Too alkaline - add sulfur or peat to lower pH",
     "types": {
       "compost": "Compost",
       "manure": "Manure",
@@ -1658,14 +1720,20 @@
       "limeLight": "Slightly acidic",
       "optimal": "In target range",
       "noLime": "Slightly alkaline",
-      "sulfur": "Too alkaline"
+      "sulfur": "Too alkaline",
+      "limeVeto": "No lime",
+      "averseHigh": "Slightly high",
+      "acidify": "Too alkaline"
     },
     "phAdvice": {
       "limeStrong": "Well below the target range (pH {{range}}). Apply garden lime or calcified seaweed, ideally in autumn, and test again after a year.",
       "limeLight": "Slightly below the target range (pH {{range}}). A small dose of calcified seaweed is enough – do not over-lime.",
-      "optimal": "Within the crops' target range (pH {{range}}). No lime or sulphur needed – keep adding compost.",
-      "noLime": "Slightly above the target range (pH {{range}}). Do not lime; compost and leaf or bark mulch lower the pH slowly. Sulphur is not needed.",
-      "sulfur": "Well above the target range (pH {{range}}). Work in elemental sulphur in small doses; no lime and no wood ash."
+      "optimal": "Within the crops' target range (pH {{range}}). No lime or sulphur needed – add compost in moderation (2–3 l per m² a year).",
+      "noLime": "Slightly above the target range (pH {{range}}). Do not lime and no wood ash. Leaf mould, bark compost and pine needles lower the pH slowly; ordinary garden compost is neutral to alkaline, so use it sparingly. Sulphur is not needed.",
+      "sulfur": "Well above the target range (pH {{range}}). Work in elemental sulphur in small doses; no lime and no wood ash.",
+      "limeVeto": "Do not lime: pH {{ph}} suits {{crops}} (target {{range}}). {{reason}} The other crops in the bed cope with it; lime after the harvest, for the next crop.",
+      "averseHigh": "Slightly too high for {{crops}} (target {{range}}). {{reason}} Do not lime, no wood ash; leaf mould or bark compost lowers the pH slowly.",
+      "acidify": "Far too high for {{crops}} (target {{range}}). Fill the bed or planting hole with acidic substrate (ericaceous compost, composted bark) or lower the pH slowly with elemental sulphur. Water with rainwater; tap water is often hard."
     },
     "nutrients": {
       "nitrogen": "Nitrogen (N)",
@@ -1690,10 +1758,35 @@
     "invalidNumber": "Enter a valid number",
     "quantityKg": "Quantity (kg)",
     "cost": "Cost",
-    "unknownBed": "Deleted bed"
+    "unknownBed": "Deleted bed",
+    "limeReason": {
+      "potato": "Lime encourages potato scab.",
+      "blueberry": "Blueberries need acidic soil and do not tolerate lime.",
+      "strawberry": "Strawberries prefer slightly acidic soil.",
+      "raspberry": "Raspberries react to lime with yellow leaves (chlorosis)."
+    },
+    "brassicaNote": "Brassicas benefit twice: a pH around 7 also helps prevent clubroot.",
+    "nutrientAdvice": {
+      "nitrogen": {
+        "low": "Nitrogen low: give compost or hoof and horn meal (50–100 g/m²) before hungry crops; sow legumes as green manure in autumn.",
+        "high": "Nitrogen high: hold off nitrogen feeds, grow light feeders or green manure – too much nitrogen makes leafy greens high in nitrate."
+      },
+      "phosphorus": {
+        "low": "Phosphorus low: work in well-rotted manure or compost.",
+        "high": "Phosphorus high, common in home gardens: no manure, little compost and no phosphate-containing general fertiliser; add nitrogen only, with hoof and horn meal."
+      },
+      "potassium": {
+        "low": "Potassium low: comfrey tea, sulphate of potash or a little wood ash (not at high pH).",
+        "high": "Potassium high: no potassium fertiliser and no wood ash."
+      },
+      "organicMatter": {
+        "low": "Organic matter low: mulch, sow green manure and add 2–3 l of compost per m² every year.",
+        "high": "Organic matter very high: cut back on compost for a few years."
+      }
+    }
   },
   "preservation": {
-    "title": "Preservation Guide",
+    "title": "Preservation guide",
     "desc": "Recommended preservation methods for your planted crops.",
     "methods": {
       "canning": "Canning",
@@ -1723,22 +1816,22 @@
     }
   },
   "strategy": {
-    "balanced": "Balanced Mix",
+    "balanced": "Balanced mix",
     "balancedDesc": "Diverse selection of vegetables, herbs, and more",
-    "calories": "Maximum Calories",
-    "caloriesDesc": "Potato, corn, beans - highest calorie output per m²",
+    "calories": "Maximum calories",
+    "caloriesDesc": "Potato, corn, beans – highest calorie output per m²",
     "selfsufficient": "Self-Sufficiency",
     "selfsufficientDesc": "Cover all nutrients: calories, protein, vitamins, fiber + preservable",
-    "yield": "Maximum Yield",
-    "yieldDesc": "Tomato, zucchini, cucumber - most kg per m²",
-    "beginner": "Beginner Friendly",
+    "yield": "Maximum yield",
+    "yieldDesc": "Tomato, courgette, cucumber – most kg per m²",
+    "beginner": "Beginner-friendly",
     "beginnerDesc": "Easy to grow, low maintenance, direct sow, fast results",
-    "quickharvest": "Quick Harvest",
-    "quickharvestDesc": "Radish, lettuce, spinach - harvest in weeks, not months"
+    "quickharvest": "Quick harvest",
+    "quickharvestDesc": "Radish, lettuce, spinach – harvest in weeks, not months"
   },
   "direction": {
-    "rows_ew": "E↔W Rows",
-    "rows_ns": "N↔S Rows",
+    "rows_ew": "E↔W rows",
+    "rows_ns": "N↔S rows",
     "blocks": "Blocks",
     "companion_clusters": "Companions"
   },
@@ -1762,21 +1855,21 @@
     "types": "types",
     "plants": "plants",
     "compatibility": "Compatibility",
-    "conflicts": "conflicts",
+    "conflicts": "unfavourable neighbours",
     "occupancy": "Occupancy",
     "species": "Species",
     "forecast": "Yield (forecast)",
     "neighbours": "Neighbours",
     "goodPairs_one": "{{count}} good pair",
     "goodPairs_other": "{{count}} good pairs",
-    "conflictPairs_one": "{{count}} conflict",
-    "conflictPairs_other": "{{count}} conflicts"
+    "conflictPairs_one": "{{count}} unfavourable pair",
+    "conflictPairs_other": "{{count}} unfavourable pairs"
   },
   "validation": {
-    "antagonistDirect": "{{plant}} and {{neighbor}} are bad neighbours – don’t place them side by side.",
+    "antagonistDirect": "{{plant}} next to {{neighbor}} – unfavourable neighbours. Better leave a cell between them.",
     "antagonistNear": "{{neighbor}} is close to {{plant}} – not ideal neighbours.",
     "tooClose": "Too close: needs {{spacing}} cm spacing, only {{actual}} cm here.",
-    "tooMuchSun": "This plant prefers shade - may get too much sun here",
+    "tooMuchSun": "This plant prefers shade – may get too much sun here",
     "containerTooSmall": "This container might be too small for this plant"
   },
   "advisor": {
@@ -1786,11 +1879,20 @@
     "inWeeks_other": "In {{count}} weeks",
     "emptyTitle": "Nothing to sow right now",
     "emptyText": "Nothing is due in the next four weeks. The season plan shows what comes next.",
-    "openCalendar": "Open season plan"
+    "openCalendar": "Open season plan",
+    "actions": {
+      "sow_indoors": "Sow indoors",
+      "sow_outdoors": "Direct sowing",
+      "transplant": "Plant out",
+      "plant_autumn": "Plant",
+      "sow_autumn": "Autumn sowing"
+    },
+    "showMore_one": "Show {{count}} more",
+    "showMore_other": "Show {{count}} more"
   },
   "expenses": {
-    "title": "Costs & yield",
-    "add": "Add Expense",
+    "title": "Costs",
+    "add": "Log expense",
     "description": "Description",
     "amount": "Amount (€)",
     "category": "Category",
@@ -1801,12 +1903,12 @@
     "noEntries": "Record seeds, soil or tools to see what your garden costs.",
     "categories": {
       "seeds": "Seeds",
-      "soil": "Soil & Compost",
+      "soil": "Soil & compost",
       "tools": "Tools",
       "fertilizer": "Fertilizer",
       "infrastructure": "Infrastructure",
       "water": "Water",
-      "animal_feed": "Animal Feed",
+      "animal_feed": "Animal feed",
       "veterinary": "Veterinary",
       "other": "Other"
     },
@@ -1820,7 +1922,7 @@
     "season": "Season {{year}}",
     "allTime": "All time",
     "totalCosts": "Costs",
-    "inclAnimals": "incl. {{amount}} from livestock",
+    "inclAnimals": "incl. {{amount}} for animals",
     "yieldValue": "Value of yields",
     "valueSplit": "Harvest {{harvest}} · animals {{animals}}",
     "net": "Balance",
@@ -1828,7 +1930,7 @@
     "deficit": "Shortfall",
     "roiHint": "Balance relative to costs",
     "roiNoCosts": "No costs recorded yet",
-    "howCosts": "Costs: expenses on this page plus feed and vet costs from livestock. A bill recorded in both places (same date and amount) counts only once.",
+    "howCosts": "Costs: expenses on this page plus feed and vet costs from Animals. Feed log entries count as Animal feed, vet costs as Veterinary.",
     "howValue": "Value: recorded harvest (kg × typical market price of the crop, €1.20–30/kg, otherwise €3/kg) plus recorded animal products × price per unit.",
     "howRoi": "Return = (value − costs) ÷ costs.",
     "productPrices": "Prices for animal products",
@@ -1842,13 +1944,16 @@
       "wax": "Wax (€/kg)"
     },
     "byCategoryDesc": "Share of total costs in the selected period.",
-    "feedLog": "Feed (livestock)",
-    "vetLog": "Vet (livestock)",
     "entries": "Expenses",
     "noEntriesTitle": "No expenses in this period",
     "emptyTitle": "What does your garden cost, and what does it return?",
     "emptyText": "Record expenses and harvests and Gardener works out the balance at market prices.",
-    "toHarvest": "Log harvest"
+    "toHarvest": "Log harvest",
+    "howAnimals": "Animals {{total}}: {{expenses}} recorded as expenses, {{log}} from the feed log and health records. A bill recorded in both places (same amount, at most 3 days apart) counts once.",
+    "duplicatesSkipped_one": "{{count}} duplicate entry was not counted.",
+    "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
+    "fromFeedLog": "incl. {{amount}} from the feed log",
+    "fromHealthLog": "incl. {{amount}} from health records"
   },
   "succession": {
     "pick": "Add a crop",
@@ -1863,7 +1968,7 @@
     "schedule": "Sowing dates",
     "generateCount_one": "Add {{count}} date to tasks",
     "generateCount_other": "Add {{count}} dates to tasks",
-    "title": "Succession Planting",
+    "title": "Succession planting",
     "desc": "Stagger your sowings for continuous harvest throughout the season.",
     "interval": "Every",
     "weeks": "weeks",
@@ -1872,18 +1977,18 @@
     "generateTasks": "Add to calendar"
   },
   "guilds": {
-    "title": "Plant Guilds",
+    "title": "Plant guilds",
     "hint": "Proven companion groups – one tap places them in the top-left corner.",
     "threeSisters": {
       "name": "Three Sisters",
-      "desc": "Traditional: Corn + Beans + Squash support each other."
+      "desc": "Traditional: corn, beans and squash support each other."
     },
     "tomatoBasil": {
-      "name": "Tomato & Basil",
+      "name": "Tomato & basil",
       "desc": "Classic Mediterranean pairing with carrots and parsley."
     },
     "saladBed": {
-      "name": "Salad Bed",
+      "name": "Salad bed",
       "desc": "Quick-growing salad mix with radish, spinach and herbs."
     },
     "mediterranean": {
@@ -1891,11 +1996,11 @@
       "desc": "Sun-loving mix: tomato, pepper, zucchini with herbs."
     },
     "rootVegetables": {
-      "name": "Root Vegetables",
+      "name": "Root vegetables",
       "desc": "Underground harvest: carrots, beets, turnips with alliums."
     },
     "brassica": {
-      "name": "Brassica Guild",
+      "name": "Brassica guild",
       "desc": "Cabbage family with protective herbs and root vegetables."
     }
   },
@@ -1937,7 +2042,7 @@
     "all": "All"
   },
   "companions": {
-    "title": "Companion Planting Matrix",
+    "title": "Companions",
     "search": "Search plant...",
     "matrixView": "Matrix",
     "listView": "List",
@@ -1963,7 +2068,7 @@
     "emptyFilter": "No plant matches the search."
   },
   "water": {
-    "title": "Irrigation",
+    "title": "Watering",
     "add": "Log watering",
     "added": "Watering logged",
     "liters": "liters",
@@ -2017,13 +2122,13 @@
   },
   "quickAdd": {
     "title": "Quick add",
-    "harvest": "Log a harvest",
-    "task": "Add a task",
-    "journal": "Journal entry",
+    "harvest": "Log harvest",
+    "task": "Add task",
+    "journal": "New journal entry",
     "harvestHint": "What, how much, from which bed",
     "taskHint": "A reminder with a due date",
     "journalHint": "Observation, note or photo",
-    "pest": "Report a pest",
+    "pest": "Report problem",
     "pestHint": "Record an infestation or disease"
   },
   "records": {
@@ -2065,8 +2170,8 @@
     "forecast": "Forecast",
     "actualShort": "recorded {{value}}",
     "actualVsForecast": "Recorded {{actual}} of {{forecast}} forecast",
-    "selfSufficiencyForecast": "Self-sufficiency (forecast)",
-    "selfSufficiencyActual": "Self-sufficiency (recorded)",
+    "selfSufficiencyForecast": "Self-sufficiency · annual forecast",
+    "selfSufficiencyActual": "Self-sufficiency · recorded so far",
     "caloriesFor_one": "Calorie needs of {{count}} person",
     "caloriesFor_other": "Calorie needs of {{count}} people",
     "recordedSince": "Harvests and animal products since 1 January {{year}}",
@@ -2075,10 +2180,21 @@
     "plantsOnly": "from your current bed plan",
     "harvestEntries_one": "{{count}} harvest entry this season",
     "harvestEntries_other": "{{count}} harvest entries this season",
-    "howForecast": "Forecast: planted area × expected yield per m² of each crop, plus the typical annual yield of your animals (e.g. 250 eggs per hen). It covers a full season.",
-    "howActual": "Recorded: the sum of your harvest entries and animal products since 1 January. Entries without a weight are not counted.",
-    "howNeed": "Need: {{kcal}} kcal per person per day. Self-sufficiency is the share of that annual need covered by garden and animals (at most 100%).",
+    "howForecast": "Annual forecast: planted area × expected yield per m² of each crop, plus the typical annual yield of your animals (e.g. 220 eggs per hen, 20 kg honey per colony).",
+    "howActual": "Recorded so far: your harvest entries and animal products since 1 January, by the same rule. Entries without a weight are not counted.",
+    "howNeed": "Self-sufficiency = the share of your household's calorie need ({{kcal}} kcal per person per day) that garden and animals cover in a year (at most 100%).",
     "meterLegend": "Solid bar = recorded, hatched = forecast.",
-    "pricesEditable": "You can adjust the price per egg, kg or litre on the Costs page."
+    "pricesEditable": "You can adjust the price per egg, kg or litre on the Costs page.",
+    "expectedToDate": "expected by today: {{value}}",
+    "actualVsToDateShort": "recorded {{actual}} · expected by today {{expected}}",
+    "howCap": "Animal products count only up to typical consumption (per person and year about 240 eggs, 1 kg honey, 52 kg meat, 300 l milk). Honey is calorie-dense but not a staple: two colonies give about 40 kg, a household eats 1–2 kg of it. Anything above is surplus to swap or sell and does not feed you. Vegetables and fruit count in full.",
+    "howToDate": "Expected by today: the part of the annual forecast that should be in by now – each crop's harvest window from the last frost, honey May to August, eggs evenly over the year. If “recorded so far” is well below it, entries are usually missing.",
+    "howVsFoodPlan": "The food plan measures something else: kilograms against a quantity target for 20 vegetable and fruit crops, without animal products. Its “quantity target” therefore differs from this calorie figure.",
+    "compositionTitle": "What the forecast is made of",
+    "compositionDesc": "Share of the annual calorie need, by source.",
+    "compositionLabel": "Garden {{garden}}, animal products {{animals}} of the annual need",
+    "fromGarden": "Garden",
+    "fromAnimals": "Animal products",
+    "surplusNote": "Not counted because above typical consumption: {{items}}."
   }
 }

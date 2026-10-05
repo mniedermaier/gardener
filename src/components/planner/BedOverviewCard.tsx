@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Copy, Pencil, Trash2, Wand2, X, ShieldCheck, Maximize2 } from "lucide-react";
+import { Copy, Pencil, Trash2, Wand2, TriangleAlert, ShieldCheck, Maximize2 } from "lucide-react";
 import type { Bed } from "@/types/garden";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import type { Plant } from "@/types/plant";
@@ -96,7 +96,7 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
         {species.length > 0 && <span className="text-xs text-gray-500 dark:text-gray-400">{t("planner.speciesCount", { count: species.length })}</span>}
         <span className="ml-auto flex flex-wrap gap-1.5">
           {frostWeeks > 0 && <Badge tone="info" icon={ShieldCheck}>{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge>}
-          {conflicts.length > 0 && <Badge tone="danger" icon={X}>{t("bedStats.conflictPairs", { count: conflicts.length })}</Badge>}
+          {conflicts.length > 0 && <Badge tone="warning" icon={TriangleAlert}>{t("bedStats.conflictPairs", { count: conflicts.length })}</Badge>}
         </span>
       </div>
     </article>

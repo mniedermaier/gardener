@@ -2,7 +2,7 @@ import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CalendarRange, LayoutGrid } from "lucide-react";
-import { addDays, addWeeks, addYears, differenceInCalendarDays, endOfYear, setYear, startOfDay, startOfYear } from "date-fns";
+import { addWeeks, addYears, differenceInCalendarDays, endOfYear, startOfDay, startOfYear } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
@@ -15,20 +15,12 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { List, ListRow } from "@/components/ui/List";
-import { Badge } from "@/components/ui/Badge";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
-
-type Phase = "sowIndoors" | "sowOutdoors" | "transplant" | "harvest";
-const PHASES: Phase[] = ["sowIndoors", "sowOutdoors", "transplant", "harvest"];
-
-/** Categorical colours for the four phases (same in legend, bars and list). */
-const PHASE_BAR: Record<Phase, string> = {
-  sowIndoors: "bg-violet-400 dark:bg-violet-400/80",
-  sowOutdoors: "bg-garden-500 dark:bg-garden-400/80",
-  transplant: "bg-sky-500 dark:bg-sky-400/80",
-  harvest: "bg-amber-500 dark:bg-amber-400/80",
-};
+import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
+import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
+import { PlantableNowRows } from "./PlantableNowList";
+import { useSowingAgenda } from "@/hooks/useSowingAgenda";
 
 interface Range {
   start: Date;
@@ -51,6 +43,8 @@ export function SeasonTimeline() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [filter, setFilter] = useState<string>("all");
+  const sowing = useSowingAgenda();
+  const plantableCount = sowing.now.length;
 
   const todayKey = todayISO();
   const today = useMemo(() => startOfDay(toDate(todayKey) ?? new Date()), [todayKey]);
@@ -58,10 +52,7 @@ export function SeasonTimeline() {
   const yearStart = startOfYear(today);
   const yearDays = differenceInCalendarDays(endOfYear(today), yearStart) + 1;
   // The timeline shows the current season: the frost date's day and month in this year.
-  const frostDate = useMemo(() => {
-    const y = today.getFullYear();
-    return setYear(toDate(lastFrostDate) ?? new Date(y, 4, 15), y);
-  }, [lastFrostDate, today]);
+  const frostDate = useMemo(() => seasonFrost(lastFrostDate, today), [lastFrostDate, today]);
 
   const plantedBeds = useMemo(() => {
     const beds: Array<{ id: string; name: string; envType: EnvironmentType; plantCount: number }> = [];
@@ -84,25 +75,12 @@ export function SeasonTimeline() {
     for (const g of gardens) {
       for (const bed of g.beds) {
         if (filter !== "all" && bed.id !== filter) continue;
-        const effectiveFrost = addWeeks(frostDate, -getFrostProtectionWeeks(bed));
+        const protection = getFrostProtectionWeeks(bed);
         for (const plantId of new Set(bed.cells.map((c) => c.plantId))) {
           const plant = plantMap.get(plantId);
           if (!plant) continue;
           const phases: PlantTimeline["phases"] = {};
-          const window = (weeks: number | null, len: number) => {
-            if (weeks === null) return undefined;
-            const start = addWeeks(effectiveFrost, weeks);
-            return { start, end: addWeeks(start, len) };
-          };
-          phases.sowIndoors = window(plant.sowIndoorsWeeks, 3);
-          phases.sowOutdoors = window(plant.sowOutdoorsWeeks, 3);
-          phases.transplant = window(plant.transplantWeeks, 2);
-          const base = plant.transplantWeeks !== null
-            ? addWeeks(effectiveFrost, plant.transplantWeeks)
-            : plant.sowOutdoorsWeeks !== null ? addWeeks(effectiveFrost, plant.sowOutdoorsWeeks) : effectiveFrost;
-          if (plant.harvestDaysMax < 365) {
-            phases.harvest = { start: addDays(base, plant.harvestDaysMin), end: addDays(base, plant.harvestDaysMax) };
-          }
+          for (const w of getPhaseWindows(plant, frostDate, { frostProtectionWeeks: protection })) phases[w.phase] = { start: w.start, end: w.end };
           result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases });
         }
       }
@@ -143,8 +121,17 @@ export function SeasonTimeline() {
     return { now, next, later: later.slice(0, 5) };
   }, [timelines, today]);
 
+
+  // Same agenda as the dashboard: what can be sown or planted, planted or not.
+  const sowingList = sowing.now.length + sowing.soon.length > 0 && (
+    <List header={`${t("advisor.title")} · ${sowing.now.length}`}>
+      <PlantableNowRows now={sowing.now} soon={sowing.soon} limit={8} />
+    </List>
+  );
+
   if (plantedBeds.length === 0) {
     return (
+      <div className="space-y-6">
       <Card>
         <EmptyState
           icon={CalendarRange}
@@ -153,6 +140,8 @@ export function SeasonTimeline() {
           action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("calendar.toPlanner")}</Button>}
         />
       </Card>
+      {sowingList}
+      </div>
     );
   }
 
@@ -182,12 +171,7 @@ export function SeasonTimeline() {
         key={`${tl.bedId}-${tl.plantId}-${phase}`}
         leading={plant ? <PlantIconDisplay plantId={tl.plantId} emoji={plant.icon} size={28} /> : undefined}
         title={getPlantName(tl.plantId)}
-        badges={
-          <Badge>
-            <span className={`mr-1.5 inline-block size-2 rounded-full ${PHASE_BAR[phase]}`} aria-hidden="true" />
-            {phaseLabel(phase)}
-          </Badge>
-        }
+        badges={<PhaseBadge phase={phase} />}
         meta={[
           tl.bedName,
           kind === "now"
@@ -211,8 +195,9 @@ export function SeasonTimeline() {
         <List header={`${t("calendar.next4Weeks")} · ${agenda.next.length}`}>
           {agenda.next.length > 0
             ? agenda.next.map((a) => agendaRow(a, "next"))
-            : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNext")}</li>}
+            : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{plantableCount > 0 ? t("calendar.nothingNextPlanted", { count: plantableCount }) : t("calendar.nothingNext")}</li>}
         </List>
+        {sowingList}
         {agenda.later.length > 0 && (
           <List header={t("calendar.upNext")}>
             {agenda.later.map((a) => agendaRow(a, "next"))}
@@ -239,7 +224,7 @@ export function SeasonTimeline() {
                     <div key={m} className="flex-1 border-l border-gray-200 pl-1 dark:border-white/10">{formatDate(new Date(year, m, 1), "month")}</div>
                   ))}
                 </div>
-                <span className="absolute top-0 -translate-x-1/2 rounded bg-garden-600 px-1.5 text-xs font-medium whitespace-nowrap text-white dark:bg-garden-500" style={{ left: `${todayPct}%` }}>
+                <span className="absolute top-0 -translate-x-1/2 rounded bg-garden-600 px-1.5 text-xs font-medium whitespace-nowrap text-white dark:bg-garden-700" style={{ left: `${todayPct}%` }}>
                   {t("calendar.today")}
                 </span>
                 {Math.abs(frostPct - todayPct) > 6 && (
@@ -271,12 +256,7 @@ export function SeasonTimeline() {
 
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-600 dark:text-gray-300">
-          {PHASES.map((p) => (
-            <span key={p} className="flex items-center gap-1.5">
-              <span className={`inline-block h-2.5 w-4 rounded-sm ${PHASE_BAR[p]}`} aria-hidden="true" />
-              {phaseLabel(p)}
-            </span>
-          ))}
+          <PhaseLegend phases={PHASES} />
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-0.5 bg-garden-600 dark:bg-garden-400" aria-hidden="true" />
             {t("calendar.today")}
@@ -287,6 +267,7 @@ export function SeasonTimeline() {
           </span>
         </div>
       </Card>
+      {sowingList && <div className="hidden sm:block">{sowingList}</div>}
     </>
   );
 }
@@ -324,11 +305,12 @@ const TimelineRow = memo(function TimelineRow({
           if (!r) return null;
           const left = pct(r.start);
           const width = Math.max(pct(r.end) - left, 1);
+          const fill = phaseFill(p);
           return (
             <div
               key={p}
-              className={`absolute h-[7px] rounded-sm ${PHASE_BAR[p]}`}
-              style={{ left: `${left}%`, width: `${width}%`, top: `${2 + i * 8}px` }}
+              className={`absolute h-[7px] rounded-sm ${fill.className}`}
+              style={{ ...fill.style, left: `${left}%`, width: `${width}%`, top: `${2 + i * 8}px` }}
               title={describe(p, r)}
             />
           );

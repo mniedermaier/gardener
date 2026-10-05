@@ -2,12 +2,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Bird, Coins, Pencil, Plus, Scale, Trash2, Wheat } from "lucide-react";
-import { subMonths } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { toISODate } from "@/lib/format";
+import { getFeedCostStats } from "@/lib/metrics";
 import type { FeedEntry } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -41,22 +40,15 @@ export function FeedPage() {
   );
 
   const stats = useMemo(() => {
-    const now = new Date();
-    const month = toISODate(now).slice(0, 7);
-    const prev = toISODate(subMonths(now, 1)).slice(0, 7);
-    const sum = (list: FeedEntry[]) => list.reduce((s, e) => s + (e.cost ?? 0), 0);
     const perAnimal = new Map<string, number>();
     for (const e of feedEntries) perAnimal.set(e.animalId, (perAnimal.get(e.animalId) ?? 0) + (e.cost ?? 0));
     return {
-      thisMonth: sum(feedEntries.filter((e) => e.date.startsWith(month))),
-      lastMonth: sum(feedEntries.filter((e) => e.date.startsWith(prev))),
-      total: sum(feedEntries),
+      ...getFeedCostStats(feedEntries),
       totalKg: feedEntries.reduce((s, e) => s + (e.unit === "kg" ? e.quantity : e.unit === "g" ? e.quantity / 1000 : 0), 0),
       perAnimal: [...perAnimal.entries()].filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]),
     };
   }, [feedEntries]);
 
-  const diff = stats.thisMonth - stats.lastMonth;
   const groups = groupByMonth(filtered);
   const addButton = (
     <Button onClick={openAdd}>
@@ -81,14 +73,19 @@ export function FeedPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard
-              label={t("livestock.feed.thisMonth")}
-              value={f.formatCurrency(stats.thisMonth)}
+              label={t("livestock.feedCost30")}
+              value={f.formatCurrency(stats.last30Days)}
               icon={Coins}
               tone="neutral"
-              trend={stats.lastMonth > 0 ? { label: f.formatCurrency(Math.abs(diff)), direction: diff > 0 ? "up" : diff < 0 ? "down" : "flat", tone: "neutral" } : undefined}
-              hint={stats.lastMonth > 0 ? t("livestock.feed.vsLastMonth") : undefined}
+              hint={t("livestock.feedEntriesCount", { count: stats.entriesLast30Days })}
             />
-            <StatCard label={t("livestock.feed.lastMonth")} value={f.formatCurrency(stats.lastMonth)} icon={Coins} tone="neutral" />
+            <StatCard
+              label={t("livestock.feed.perMonth")}
+              value={f.formatCurrency(stats.perMonth)}
+              icon={Coins}
+              tone="neutral"
+              hint={t("livestock.feed.perMonthHint", { count: Math.round(stats.months) })}
+            />
             <StatCard label={t("livestock.feed.totalCost")} value={f.formatCurrency(stats.total)} icon={Coins} tone="neutral" />
             <StatCard label={t("livestock.feed.totalKg")} value={f.formatWeight(stats.totalKg * 1000)} icon={Scale} tone="neutral" />
           </div>

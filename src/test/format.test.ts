@@ -64,6 +64,13 @@ describe("formatDate", () => {
     expect(rel("2026-10-04", "en")).toBe("Yesterday");
     expect(rel("2026-10-02", "es")).toBe("Hace 3 días");
   });
+
+  it("relativeInline stays lower case for the middle of a sentence", () => {
+    const inl = (iso: string, locale = "de") => formatDate(iso, "relativeInline", { locale, now: NOW });
+    expect(inl("2026-10-02")).toBe("vor 3 Tagen");
+    expect(inl("2026-10-04", "en")).toBe("yesterday");
+    expect(inl("2026-09-01")).toBe("1. Sept.");
+  });
 });
 
 describe("numbers and units", () => {
@@ -92,7 +99,10 @@ describe("numbers and units", () => {
     expect(n(formatVolume(10, { locale: "de" }))).toBe("10 l");
     expect(n(formatVolume(2.25, { locale: "en" }))).toBe("2.3 l");
     expect(n(formatArea(13.5, { locale: "de" }))).toBe("13,5 m²");
-    expect(n(formatTemperature(-1.4, { locale: "de" }))).toBe("-1 °C");
+    expect(n(formatTemperature(-1.4, { locale: "de" }))).toBe("\u22121 °C");
+    expect(n(formatTemperature(-0.3, { locale: "de" }))).toBe("0 °C");
+    expect(n(formatCurrency(-181.51, { locale: "de" }))).toBe("\u2212181,51 €");
+    expect(n(formatNumber(-2.5, { locale: "en" }))).toBe("\u22122.5");
     expect(n(formatPercent(0.25, { locale: "de" }))).toBe("25 %");
     expect(n(formatPercent(0.25, { locale: "en" }))).toBe("25%");
   });

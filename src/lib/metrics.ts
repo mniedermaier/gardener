@@ -19,7 +19,8 @@ import type { Plant } from "@/types/plant";
 import type { HarvestEntry } from "@/types/harvest";
 import type { Expense, ExpenseCategory } from "@/types/expense";
 import type { Animal, AnimalProduct, FeedEntry, HealthEvent, ProductType } from "@/types/animal";
-import { ANNUAL_YIELD, PRODUCT_NUTRITION } from "@/types/animal";
+import { ANNUAL_YIELD, EGG_WEIGHT_KG_BY_ANIMAL, PRODUCT_NUTRITION } from "@/types/animal";
+import { getFrostProtectionWeeks } from "@/types/garden";
 
 // ------------------------------------------------------------------ prices
 
@@ -158,15 +159,88 @@ export function getForecastProducts(animals: Animal[]): ProductTotals {
   return totals;
 }
 
-/** Edible weight in kg of a product amount (eggs → 60 g each; milk ≈ 1 kg/l). */
+/** Edible weight in kg of a product amount (eggs → 60 g each, i.e. hen's eggs; milk ≈ 1 kg/l). */
 export function productToKg(type: ProductType, quantity: number): number {
   return type === "eggs" ? quantity * EGG_WEIGHT_KG : quantity;
 }
 
+/** Product amounts as edible mass in kg (eggs weighed per species). */
+export type ProductKg = Record<ProductType, number>;
+
+const eggWeight = (animal: Animal | undefined) => (animal && EGG_WEIGHT_KG_BY_ANIMAL[animal.type]) ?? EGG_WEIGHT_KG;
+
+/** Recorded products as edible kg — a quail egg weighs 11 g, not 60 g. */
+export function getActualProductKg(products: AnimalProduct[], animals: Animal[], period: Period): ProductKg {
+  const byId = new Map(animals.map((a) => [a.id, a]));
+  const kg = emptyTotals();
+  for (const p of products) {
+    if (!inPeriod(p.date, period)) continue;
+    const q = p.unit === "g" ? p.quantity / 1000 : p.quantity;
+    kg[p.type] += p.type === "eggs" ? q * eggWeight(byId.get(p.animalId)) : q;
+  }
+  return kg;
+}
+
+/** Expected annual products of the herd as edible kg. */
+export function getForecastProductKg(animals: Animal[]): ProductKg {
+  const kg = emptyTotals();
+  for (const a of animals)
+    for (const y of ANNUAL_YIELD[a.type] ?? []) kg[y.product] += y.quantity * a.count * (y.product === "eggs" ? eggWeight(a) : 1);
+  return kg;
+}
+
+/** kcal of products given as edible kg. */
+export function productKgCalories(kg: ProductKg): number {
+  let kcal = 0;
+  for (const type of PRODUCT_TYPES) kcal += kg[type] * 10 * PRODUCT_NUTRITION[type].caloriesPer100g;
+  return kcal;
+}
+
+/** kcal of products in recording units (eggs counted as hen's eggs). */
 export function productCalories(totals: ProductTotals): number {
   let kcal = 0;
   for (const type of PRODUCT_TYPES) kcal += productToKg(type, totals[type]) * 10 * PRODUCT_NUTRITION[type].caloriesPer100g;
   return kcal;
+}
+
+/**
+ * Typical annual consumption per person in Germany (edible kg; milk in
+ * litres incl. what goes into cheese and yoghurt). Self-sufficiency counts an
+ * animal product only up to this amount: a small flock or two bee colonies
+ * quickly produce far more eggs or honey than a household eats, and that
+ * surplus (sold, swapped, given away) feeds nobody at home.
+ * Sources: BLE Versorgungsbilanzen 2023 (≈ 230–240 eggs, ≈ 1 kg honey,
+ * ≈ 52 kg meat per person and year).
+ */
+export const ANNUAL_CONSUMPTION_KG_PER_PERSON: Partial<Record<ProductType, number>> = {
+  eggs: 240 * EGG_WEIGHT_KG, // 240 hen's eggs ≈ 14.4 kg
+  honey: 1,
+  meat: 52,
+  milk: 300,
+};
+
+export interface CappedProducts {
+  /** Counted towards self-sufficiency (≤ typical consumption), edible kg. */
+  counted: ProductKg;
+  /** Above typical consumption, edible kg. */
+  surplus: ProductKg;
+}
+
+/** Splits product kg into what the household eats and the surplus. */
+export function capToConsumption(kg: ProductKg, householdSize: number): CappedProducts {
+  const counted = emptyTotals();
+  const surplus = emptyTotals();
+  const persons = Math.max(1, householdSize);
+  for (const type of PRODUCT_TYPES) {
+    const cap = ANNUAL_CONSUMPTION_KG_PER_PERSON[type];
+    if (cap === undefined) {
+      counted[type] = kg[type];
+      continue;
+    }
+    counted[type] = Math.min(kg[type], cap * persons);
+    surplus[type] = Math.max(0, kg[type] - cap * persons);
+  }
+  return { counted, surplus };
 }
 
 // ------------------------------------------------------------------ value & costs
@@ -190,39 +264,114 @@ export interface CostBreakdown {
   expenses: number;
   /** Feed costs logged in the livestock section (minus entries already in expenses), € */
   feed: number;
-  /** Health/vet costs logged in the livestock section, € */
+  /** Health/vet costs logged in the livestock section (minus entries already in expenses), € */
   veterinary: number;
   /** Sum of the three, € */
   total: number;
-  /** Expenses per category, € (cost page entries only) */
+  /**
+   * Costs per category, € — **including** the livestock logs: feed entries
+   * count as `animal_feed`, vet costs from the health log as `veterinary`.
+   * This is the one breakdown every page shows.
+   */
   byCategory: Partial<Record<ExpenseCategory, number>>;
+  /** Cost page entries only, per category, € */
+  expenseByCategory: Partial<Record<ExpenseCategory, number>>;
+  /** All livestock costs (animal_feed + veterinary, both sources), € */
+  animals: number;
+  /** Livestock log entries skipped because the same bill is already an expense. */
+  duplicatesSkipped: number;
 }
 
+/** A log entry within this many days of an expense with the same amount is the same bill. */
+const DUPLICATE_WINDOW_DAYS = 3;
+
 export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]; healthEvents?: HealthEvent[]; period: Period }): CostBreakdown {
-  const byCategory: Partial<Record<ExpenseCategory, number>> = {};
+  const expenseByCategory: Partial<Record<ExpenseCategory, number>> = {};
   let expenses = 0;
   for (const e of input.expenses) {
     if (!inPeriod(e.date, input.period)) continue;
     const eur = e.amountCents / 100;
     expenses += eur;
-    byCategory[e.category] = (byCategory[e.category] ?? 0) + eur;
+    expenseByCategory[e.category] = (expenseByCategory[e.category] ?? 0) + eur;
   }
   // A bill entered both as expense and in the livestock log counts once:
-  // log entries matching an animal_feed/veterinary expense (same date and
-  // amount) are skipped.
-  const expenseKeys = new Set(
-    input.expenses
-      .filter((e) => e.category === "animal_feed" || e.category === "veterinary")
-      .map((e) => `${e.category}|${e.date}|${e.amountCents}`),
-  );
-  const isDuplicate = (category: ExpenseCategory, date: string, cost: number) => expenseKeys.has(`${category}|${date}|${Math.round(cost * 100)}`);
-  const feed = (input.feedEntries ?? [])
-    .filter((f) => inPeriod(f.date, input.period) && !isDuplicate("animal_feed", f.date, f.cost ?? 0))
-    .reduce((s, f) => s + (f.cost ?? 0), 0);
-  const veterinary = (input.healthEvents ?? [])
-    .filter((h) => inPeriod(h.date, input.period) && !isDuplicate("veterinary", h.date, h.cost ?? 0))
-    .reduce((s, h) => s + (h.cost ?? 0), 0);
-  return { expenses, feed, veterinary, total: expenses + feed + veterinary, byCategory };
+  // a log entry is skipped when an animal_feed/veterinary expense with the
+  // same amount lies within ±3 days. Each expense absorbs at most one entry.
+  const used = new Set<string>();
+  let duplicatesSkipped = 0;
+  const isDuplicate = (category: ExpenseCategory, date: string, cost: number) => {
+    const cents = Math.round(cost * 100);
+    const t = Date.parse(date);
+    const match = input.expenses.find(
+      (e) => !used.has(e.id) && e.category === category && e.amountCents === cents && Math.abs(Date.parse(e.date) - t) <= DUPLICATE_WINDOW_DAYS * 86_400_000,
+    );
+    if (!match) return false;
+    used.add(match.id);
+    duplicatesSkipped++;
+    return true;
+  };
+  const sumLog = (entries: { date: string; cost?: number }[], category: ExpenseCategory) =>
+    entries
+      .filter((x) => inPeriod(x.date, input.period) && (x.cost ?? 0) > 0 && !isDuplicate(category, x.date, x.cost ?? 0))
+      .reduce((s, x) => s + (x.cost ?? 0), 0);
+  const feed = sumLog(input.feedEntries ?? [], "animal_feed");
+  const veterinary = sumLog(input.healthEvents ?? [], "veterinary");
+
+  const byCategory = { ...expenseByCategory };
+  if (feed > 0) byCategory.animal_feed = (byCategory.animal_feed ?? 0) + feed;
+  if (veterinary > 0) byCategory.veterinary = (byCategory.veterinary ?? 0) + veterinary;
+  return {
+    expenses,
+    feed,
+    veterinary,
+    total: expenses + feed + veterinary,
+    byCategory,
+    expenseByCategory,
+    animals: (byCategory.animal_feed ?? 0) + (byCategory.veterinary ?? 0),
+    duplicatesSkipped,
+  };
+}
+
+export interface FeedCostStats {
+  /** Calendar month of `now`, € */
+  thisMonth: number;
+  /** Previous calendar month, € */
+  lastMonth: number;
+  /** Rolling 30 days up to `now`, € */
+  last30Days: number;
+  /** All entries, € */
+  total: number;
+  /**
+   * Average per month over the logging span (first entry → now, at least one
+   * month), € — the stable figure for "what does feed cost me per month".
+   */
+  perMonth: number;
+  /** Months the average spans (≥ 1). */
+  months: number;
+  /** Entries in the last 30 days. */
+  entriesLast30Days: number;
+}
+
+/** Feed cost figures from the livestock feed log (one definition for all pages). */
+export function getFeedCostStats(feedEntries: FeedEntry[], now: Date = new Date()): FeedCostStats {
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const month = iso(now).slice(0, 7);
+  const prev = iso(new Date(now.getFullYear(), now.getMonth() - 1, 1)).slice(0, 7);
+  const from30 = iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29));
+  const today = iso(now);
+  let thisMonth = 0, lastMonth = 0, last30Days = 0, total = 0, entriesLast30Days = 0;
+  let first: string | null = null;
+  for (const e of feedEntries) {
+    const c = e.cost ?? 0;
+    total += c;
+    if (e.date.startsWith(month)) thisMonth += c;
+    if (e.date.startsWith(prev)) lastMonth += c;
+    if (e.date >= from30 && e.date <= today) { last30Days += c; entriesLast30Days++; }
+    if (first === null || e.date < first) first = e.date;
+  }
+  const span = first ? (now.getTime() - Date.parse(first)) / (30.44 * 86_400_000) : 1;
+  const months = Math.max(1, span);
+  return { thisMonth, lastMonth, last30Days, total, perMonth: total / months, months, entriesLast30Days };
 }
 
 export interface Balance {
@@ -256,6 +405,21 @@ export function getBalance(input: {
   return { costs, produceValue: pv, animalValue: av, totalValue, net, roi: costs.total > 0 ? net / costs.total : null };
 }
 
+/**
+ * Share of a product's annual amount expected by `asOf` in the current year,
+ * counting only from `since` (e.g. when the animal arrived) if that is later
+ * than 1 January. Honey comes in May–August, everything else evenly.
+ */
+export function expectedShareToDate(type: ProductType, asOf: Date = new Date(), since?: string): number {
+  const year = asOf.getFullYear();
+  const [start, end] = productWindow(type, year);
+  const from = since ? new Date(Math.max(start.getTime(), Date.parse(since))) : start;
+  if (from >= end) return 0;
+  const full = end.getTime() - start.getTime();
+  const covered = Math.max(0, Math.min(asOf.getTime(), end.getTime()) - from.getTime());
+  return Math.min(1, covered / full);
+}
+
 // ------------------------------------------------------------------ self-sufficiency
 
 export function annualCalorieNeed(householdSize: number): number {
@@ -270,18 +434,63 @@ export function harvestCalories(byPlantGrams: Record<string, number>, plants: Pl
   return kcal;
 }
 
+// ------------------------------------------------------------------ seasonality
+
+const DAY_MS = 86_400_000;
+
+/** Share (0–1) of a [start, end] window that has passed at `asOf`. */
+function elapsedShare(start: Date, end: Date, asOf: Date): number {
+  if (asOf <= start) return 0;
+  if (asOf >= end || end <= start) return 1;
+  return (asOf.getTime() - start.getTime()) / (end.getTime() - start.getTime());
+}
+
+/**
+ * Harvest window of a crop in `year`: planting date (last frost shifted by
+ * the bed's frost protection, plus transplant/sowing offset) + harvest days.
+ * Perennials (harvest after ≥ 1 year) are assumed to crop June–September.
+ */
+export function harvestWindow(plant: Plant, lastFrostDate: string, protectionWeeks: number, year: number): [Date, Date] {
+  if (plant.harvestDaysMax >= 365) return [new Date(year, 5, 1), new Date(year, 8, 30)];
+  const [, m, d] = lastFrostDate.split("-").map(Number);
+  const frost = new Date(year, (m || 5) - 1, d || 15);
+  const offsetWeeks = (plant.transplantWeeks ?? plant.sowOutdoorsWeeks ?? 0) - protectionWeeks;
+  const base = new Date(frost.getTime() + offsetWeeks * 7 * DAY_MS);
+  return [new Date(base.getTime() + plant.harvestDaysMin * DAY_MS), new Date(base.getTime() + plant.harvestDaysMax * DAY_MS)];
+}
+
+/** When animal products come in over the year (honey and wax: May–August harvests, the rest evenly). */
+function productWindow(type: ProductType, year: number): [Date, Date] {
+  return type === "honey" || type === "wax" ? [new Date(year, 4, 15), new Date(year, 7, 31)] : [new Date(year, 0, 1), new Date(year, 11, 31, 23, 59)];
+}
+
+// ------------------------------------------------------------------ self-sufficiency
+
 export interface SelfSufficiency {
   householdSize: number;
   /** Annual calorie need of the household. */
   needKcal: number;
-  /** kcal recorded (harvests + animal products) in the period. */
+  /** kcal recorded (harvests + animal products up to typical consumption) in the period. */
   actualKcal: number;
-  /** kcal the plan should produce in a full season (plants + herd). */
+  actualPlantKcal: number;
+  actualAnimalKcal: number;
+  /** kcal the plan should produce in a full season (plants + herd up to typical consumption). */
   forecastKcal: number;
-  /** actualKcal / needKcal, capped at 1. */
+  forecastPlantKcal: number;
+  forecastAnimalKcal: number;
+  /**
+   * Part of the season forecast that should have come in by `asOf` (same
+   * time basis as `actualKcal`). null when the period is not the current year.
+   */
+  forecastToDateKcal: number | null;
+  /** actualKcal / needKcal, capped at 1 — share of the *annual* need recorded so far. */
   actualRatio: number;
   /** forecastKcal / needKcal, capped at 1. */
   forecastRatio: number;
+  /** forecastToDateKcal / needKcal, capped at 1; null like forecastToDateKcal. */
+  forecastToDateRatio: number | null;
+  /** Animal products above typical consumption (forecast, edible kg) — not counted. */
+  forecastSurplusKg: ProductKg;
 }
 
 export function getSelfSufficiency(input: {
@@ -293,21 +502,62 @@ export function getSelfSufficiency(input: {
   gridCellSizeCm: number;
   householdSize: number;
   period: Period;
+  /** Needed for the "expected by today" value; defaults to 15 May. */
+  lastFrostDate?: string;
+  /** Reference date for `forecastToDate*`; defaults to now. */
+  asOf?: Date;
 }): SelfSufficiency {
+  const plantMap = input.plants instanceof Map ? input.plants : new Map(input.plants.map((p) => [p.id, p]));
   const needKcal = annualCalorieNeed(input.householdSize);
-  const actualKcal =
-    harvestCalories(getActualYield(input.harvests, input.period).byPlant, input.plants) +
-    productCalories(getActualProducts(input.animalProducts, input.period));
-  const forecastKcal =
-    harvestCalories(getForecastYield(input.gardens, input.plants, input.gridCellSizeCm).byPlant, input.plants) +
-    productCalories(getForecastProducts(input.animals));
+  const asOf = input.asOf ?? new Date();
+
+  const actualPlantKcal = harvestCalories(getActualYield(input.harvests, input.period).byPlant, plantMap);
+  const actualAnimalKcal = productKgCalories(
+    capToConsumption(getActualProductKg(input.animalProducts, input.animals, input.period), input.householdSize).counted,
+  );
+  const forecastPlantKcal = harvestCalories(getForecastYield(input.gardens, plantMap, input.gridCellSizeCm).byPlant, plantMap);
+  const herd = capToConsumption(getForecastProductKg(input.animals), input.householdSize);
+  const forecastAnimalKcal = productKgCalories(herd.counted);
+
+  let forecastToDateKcal: number | null = null;
+  if (input.period !== null && input.period === asOf.getFullYear()) {
+    const year = input.period;
+    const frost = input.lastFrostDate ?? `${year}-05-15`;
+    const cellArea = (input.gridCellSizeCm / 100) ** 2;
+    let kcal = 0;
+    for (const g of input.gardens)
+      for (const b of g.beds) {
+        const protection = getFrostProtectionWeeks(b);
+        for (const c of b.cells) {
+          const p = plantMap.get(c.plantId);
+          if (!p) continue;
+          const [start, end] = harvestWindow(p, frost, protection, year);
+          kcal += cellArea * (p.expectedYieldKgPerM2 ?? 0) * 10 * (p.caloriesPer100g ?? 0) * elapsedShare(start, end, asOf);
+        }
+      }
+    for (const type of PRODUCT_TYPES) {
+      const [start, end] = productWindow(type, year);
+      kcal += herd.counted[type] * 10 * PRODUCT_NUTRITION[type].caloriesPer100g * elapsedShare(start, end, asOf);
+    }
+    forecastToDateKcal = kcal;
+  }
+
+  const actualKcal = actualPlantKcal + actualAnimalKcal;
+  const forecastKcal = forecastPlantKcal + forecastAnimalKcal;
   return {
     householdSize: input.householdSize,
     needKcal,
     actualKcal,
+    actualPlantKcal,
+    actualAnimalKcal,
     forecastKcal,
+    forecastPlantKcal,
+    forecastAnimalKcal,
+    forecastToDateKcal,
     actualRatio: Math.min(1, actualKcal / needKcal),
     forecastRatio: Math.min(1, forecastKcal / needKcal),
+    forecastToDateRatio: forecastToDateKcal === null ? null : Math.min(1, forecastToDateKcal / needKcal),
+    forecastSurplusKg: herd.surplus,
   };
 }
 

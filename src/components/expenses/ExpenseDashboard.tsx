@@ -131,13 +131,14 @@ export function ExpenseDashboard() {
     return out;
   }, [visible]);
 
+  // One breakdown (metrics.getCosts): livestock feed/vet logs are part of
+  // the animal_feed/veterinary categories, with their origin as a note.
   const categoryRows = useMemo(() => {
-    const rows: { key: string; label: string; icon: LucideIcon; amount: number }[] = CATEGORIES
+    const fromLog: Partial<Record<ExpenseCategory, number>> = { animal_feed: balance.costs.feed, veterinary: balance.costs.veterinary };
+    return CATEGORIES
       .filter((c) => (balance.costs.byCategory[c] ?? 0) > 0)
-      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0 }));
-    if (balance.costs.feed > 0) rows.push({ key: "feedLog", label: t("expenses.feedLog"), icon: Wheat, amount: balance.costs.feed });
-    if (balance.costs.veterinary > 0) rows.push({ key: "vetLog", label: t("expenses.vetLog"), icon: Stethoscope, amount: balance.costs.veterinary });
-    return rows.sort((a, b) => b.amount - a.amount);
+      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0, fromLog: fromLog[c] ?? 0 }))
+      .sort((a, b) => b.amount - a.amount);
   }, [balance.costs, t]);
 
   const hasAnything = expenses.length > 0 || harvests.length > 0 || balance.costs.total > 0 || balance.totalValue > 0;
@@ -176,7 +177,7 @@ export function ExpenseDashboard() {
               value={f.formatCurrency(balance.costs.total)}
               icon={Coins}
               tone="neutral"
-              hint={balance.costs.feed + balance.costs.veterinary > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.feed + balance.costs.veterinary) }) : undefined}
+              hint={balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined}
             />
             <StatCard
               label={t("expenses.yieldValue")}
@@ -203,6 +204,16 @@ export function ExpenseDashboard() {
 
           <HowCalculated>
               <p>{t("expenses.howCosts")}</p>
+              {balance.costs.animals > 0 && (
+                <p>
+                  {t("expenses.howAnimals", {
+                    total: f.formatCurrency(balance.costs.animals),
+                    expenses: f.formatCurrency((balance.costs.expenseByCategory.animal_feed ?? 0) + (balance.costs.expenseByCategory.veterinary ?? 0)),
+                    log: f.formatCurrency(balance.costs.feed + balance.costs.veterinary),
+                  })}
+                  {balance.costs.duplicatesSkipped > 0 && <> {t("expenses.duplicatesSkipped", { count: balance.costs.duplicatesSkipped })}</>}
+                </p>
+              )}
               <p>{t("expenses.howValue")}</p>
               <p>{t("expenses.howRoi")}</p>
               <div>
@@ -245,6 +256,11 @@ export function ExpenseDashboard() {
                         </span>
                       </div>
                       <Meter actual={r.amount} max={categoryRows[0].amount} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
+                      {r.fromLog > 0 && (
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {t(r.key === "veterinary" ? "expenses.fromHealthLog" : "expenses.fromFeedLog", { amount: f.formatCurrency(r.fromLog) })}
+                        </p>
+                      )}
                     </li>
                   );
                 })}

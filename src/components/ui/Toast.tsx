@@ -137,7 +137,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {/* Confirm dialog */}
       {confirmState && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => handleConfirm(false)} />
+          <div role="presentation" className="absolute inset-0 bg-black/50" onClick={() => handleConfirm(false)} />
           <div role="alertdialog" aria-modal="true" aria-label={confirmState.message} className="relative mx-4 w-full max-w-sm rounded-xl border border-transparent bg-white p-6 shadow-xl dark:border-white/10 dark:bg-gray-900">
             <p className="mb-5 text-sm text-gray-800 dark:text-gray-200">{confirmState.message}</p>
             <div className="flex justify-end gap-2">

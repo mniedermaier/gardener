@@ -1,77 +1,57 @@
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { Check, ArrowRight, ClipboardCheck, Plus, Repeat } from "lucide-react";
-import { addDays, isBefore, isSameDay } from "date-fns";
+import { ArrowRight, ClipboardCheck, Plus } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { useFormat } from "@/hooks/useFormat";
 import { usePlantMap } from "@/hooks/usePlants";
-import { toDate } from "@/lib/format";
+import { useTaskActions } from "@/hooks/useTaskActions";
+import { groupTasksByDue, type TaskGroup } from "@/lib/tasks";
 import type { Task } from "@/types/task";
 import { Card } from "@/components/ui/Card";
-import { List, ListRow } from "@/components/ui/List";
+import { List } from "@/components/ui/List";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { useToast } from "@/components/ui/Toast";
+import { TaskRow } from "@/components/calendar/TaskRow";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 
 const MAX_ROWS = 7;
+/** The dashboard shows the near part of the task page's groups, same names. */
+const NEAR: TaskGroup[] = ["overdue", "today", "tomorrow", "next7"];
 
 /**
- * "Heute & überfällig": open tasks up to the end of the coming week,
- * checkable right here with an undo toast.
+ * "Aufgaben" on the dashboard: overdue, today, tomorrow and the next seven
+ * days, shortened. Same rows, grouping and check-off as the task page.
  */
 export const TodayTasks = memo(function TodayTasks({ now, hideWhenEmpty = false }: { now: Date; hideWhenEmpty?: boolean }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { formatDate } = useFormat();
   const plantMap = usePlantMap();
-  const { tasks, gardens, completeTask, updateTask } = useStore(
-    useShallow((s) => ({ tasks: s.tasks, gardens: s.gardens, completeTask: s.completeTask, updateTask: s.updateTask })),
-  );
+  const { complete } = useTaskActions();
+  const { tasks, gardens } = useStore(useShallow((s) => ({ tasks: s.tasks, gardens: s.gardens })));
 
   const bedNames = useMemo(() => {
     const map = new Map<string, string>();
-    for (const g of gardens) for (const b of g.beds) map.set(b.id, b.name);
+    for (const g of gardens) for (const b of g.beds) map.set(b.id, gardens.length > 1 ? `${g.name} · ${b.name}` : b.name);
     return map;
   }, [gardens]);
 
-  const { overdue, today, soon } = useMemo(() => {
-    const horizon = addDays(now, 7);
-    const open = tasks
-      .filter((task) => !task.completedDate)
-      .map((task) => ({ task, due: toDate(task.dueDate) }))
-      .filter((x): x is { task: Task; due: Date } => x.due !== null && isBefore(x.due, horizon))
-      .sort((a, b) => a.task.dueDate.localeCompare(b.task.dueDate));
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return {
-      overdue: open.filter((x) => isBefore(x.due, startOfToday)).map((x) => x.task),
-      today: open.filter((x) => isSameDay(x.due, now)).map((x) => x.task),
-      soon: open.filter((x) => !isBefore(x.due, startOfToday) && !isSameDay(x.due, now)).map((x) => x.task),
-    };
-  }, [tasks, now]);
+  const near = useMemo(
+    () => groupTasksByDue(tasks.filter((x) => !x.completedDate), now).filter((g) => NEAR.includes(g.group)),
+    [tasks, now],
+  );
+  const overdueCount = near.find((g) => g.group === "overdue")?.tasks.length ?? 0;
+  const total = near.reduce((s, g) => s + g.tasks.length, 0);
 
-  const complete = (task: Task) => {
-    completeTask(task.id);
-    toast(t("dashboard.taskDone", { title: task.title }), "success", {
-      action: { label: t("common.undo"), onClick: () => updateTask(task.id, { completedDate: undefined }) },
-    });
-  };
-
-  const total = overdue.length + today.length + soon.length;
-  // At most MAX_ROWS rows, filled in order: overdue, today, the coming week.
-  const shownOverdue = overdue.slice(0, MAX_ROWS);
-  const shownToday = today.slice(0, MAX_ROWS - shownOverdue.length);
-  const shownSoon = soon.slice(0, MAX_ROWS - shownOverdue.length - shownToday.length);
-  const groups = [
-    { key: "overdue", label: t("dashboard.groupOverdue"), items: shownOverdue },
-    { key: "today", label: t("dashboard.groupToday"), items: shownToday },
-    { key: "soon", label: t("dashboard.groupSoon"), items: shownSoon },
-  ].filter((g) => g.items.length > 0);
-  const hidden = total - shownOverdue.length - shownToday.length - shownSoon.length;
+  // At most MAX_ROWS rows, filled in group order.
+  const groups = near
+    .map((g, i) => {
+      const before = near.slice(0, i).reduce((n, x) => n + x.tasks.length, 0);
+      return { ...g, items: g.tasks.slice(0, Math.max(0, MAX_ROWS - before)) };
+    })
+    .filter((g) => g.items.length > 0);
+  const hidden = total - groups.reduce((s, g) => s + g.items.length, 0);
+  const openTask = (task: Task) => navigate(`/tasks?task=${encodeURIComponent(task.id)}`);
 
   const header = (
     <div className="mb-3 flex items-end justify-between gap-3">
@@ -80,8 +60,8 @@ export const TodayTasks = memo(function TodayTasks({ now, hideWhenEmpty = false 
         <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
           {total === 0
             ? t("dashboard.todayClear")
-            : overdue.length > 0
-              ? t("dashboard.overdueCount", { count: overdue.length })
+            : overdueCount > 0
+              ? t("dashboard.overdueCount", { count: overdueCount })
               : t("dashboard.openCount", { count: total })}
         </p>
       </div>
@@ -118,48 +98,19 @@ export const TodayTasks = memo(function TodayTasks({ now, hideWhenEmpty = false 
     <section>
       {header}
       <div className="space-y-3">
-        {groups.map((group) => (
-          <List key={group.key} header={group.label}>
-            {group.items.map((task) => {
-              const plant = task.plantId ? plantMap.get(task.plantId) : undefined;
-              const bed = task.bedId ? bedNames.get(task.bedId) : undefined;
-              const meta = (
-                <>
-                  {group.key !== "today" && (
-                    <time dateTime={task.dueDate} className={group.key === "overdue" ? "font-medium text-danger" : undefined}>
-                      {formatDate(task.dueDate, "relative")}
-                    </time>
-                  )}
-                  {group.key !== "today" && bed && " · "}
-                  {bed}
-                </>
-              );
-              return (
-                <ListRow
-                  key={task.id}
-                  leading={
-                    <button
-                      type="button"
-                      onClick={() => complete(task)}
-                      aria-label={t("dashboard.markDone", { title: task.title })}
-                      className="group/check relative z-10 -m-1.5 inline-flex size-11 items-center justify-center rounded-full"
-                    >
-                      <span className="inline-flex size-6 items-center justify-center rounded-full border-2 border-gray-300 text-transparent transition-colors group-hover/check:border-garden-600 group-hover/check:text-garden-600 dark:border-white/25 dark:group-hover/check:border-garden-400 dark:group-hover/check:text-garden-300">
-                        <Check size={14} strokeWidth={3} aria-hidden="true" />
-                      </span>
-                    </button>
-                  }
-                  title={task.title}
-                  badges={
-                    <>
-                      {task.recurring && <Repeat size={14} aria-label={t("dashboard.recurring")} className="text-gray-500 dark:text-gray-400" />}
-                    </>
-                  }
-                  meta={group.key !== "today" || bed ? meta : undefined}
-                  trailing={plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={22} /> : undefined}
-                />
-              );
-            })}
+        {groups.map(({ group, items }) => (
+          <List key={group} header={<span className={group === "overdue" ? "text-danger" : undefined}>{t(`calendar.groups.${group}`)}</span>}>
+            {items.map((task) => (
+              <TaskRow
+                key={task.id}
+                task={task}
+                group={group}
+                plant={task.plantId ? plantMap.get(task.plantId) : undefined}
+                bedName={task.bedId ? bedNames.get(task.bedId) : undefined}
+                onComplete={complete}
+                onOpen={openTask}
+              />
+            ))}
           </List>
         ))}
         {hidden > 0 && (

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Camera, ImagePlus, LayoutGrid, PawPrint, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useStore } from "@/store";
@@ -7,6 +7,7 @@ import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 import { todayISO } from "@/lib/format";
 import { putPhoto, deletePhotos } from "@/lib/photoStore";
 import type { JournalEntry } from "@/types/journal";
@@ -122,6 +123,25 @@ export function GardenJournal() {
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
   useOpenAddOnNavigate(openAddPlain);
   useAddFromUrl(openAdd);
+
+  // Deep link from the command palette: #/journal?entry=<id> scrolls to the entry and highlights it.
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const showEntry = useCallback((id: string) => {
+    if (!journalEntries.some((e) => e.id === id)) return false;
+    setFilterTag(null);
+    setHighlightId(id);
+  }, [journalEntries]);
+  useOpenFromParam("entry", showEntry);
+  useEffect(() => {
+    if (!highlightId) return;
+    const frame = requestAnimationFrame(() => {
+      const el = document.getElementById(`journal-entry-${highlightId}`);
+      el?.scrollIntoView({ block: "center", behavior: "smooth" });
+      el?.focus({ preventScroll: true });
+    });
+    const timer = setTimeout(() => setHighlightId(null), 2500);
+    return () => { cancelAnimationFrame(frame); clearTimeout(timer); };
+  }, [highlightId]);
 
   const openEdit = (e: JournalEntry) => {
     setEditingId(e.id);
@@ -285,7 +305,14 @@ export function GardenJournal() {
                     const animal = entry.animalId ? animalLabel(entry.animalId) : undefined;
                     const photos = entry.photos ?? [];
                     return (
-                      <article key={entry.id} className="relative rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
+                      <article
+                        key={entry.id}
+                        id={`journal-entry-${entry.id}`}
+                        tabIndex={-1}
+                        className={`relative rounded-xl border border-gray-200 bg-white shadow-xs transition-shadow dark:border-white/10 dark:bg-gray-900 ${
+                          highlightId === entry.id ? "ring-2 ring-garden-500 ring-offset-2 ring-offset-gray-50 dark:ring-garden-400 dark:ring-offset-gray-950" : ""
+                        }`}
+                      >
                         {photos.length > 0 && (
                           <div className={`grid gap-0.5 overflow-hidden rounded-t-xl ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
                             {photos.map((photo, idx) => (

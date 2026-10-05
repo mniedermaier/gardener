@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { addDays, addWeeks, differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
+import { differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
 import {
   ArrowLeft, Check, X, Ruler, CalendarClock, Scale, Sun, LayoutGrid, Package, Apple, Pencil, Network, Leaf,
 } from "lucide-react";
@@ -10,7 +10,9 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { intlLocale, toDate } from "@/lib/format";
+import { intlLocale } from "@/lib/format";
+import { getPhaseWindows, seasonFrost, type PhaseWindow } from "@/lib/season";
+import { PHASE_META, PhaseSwatch, phaseFill } from "@/components/ui/phase";
 import type { Plant } from "@/types/plant";
 import type { EnvironmentType } from "@/types/garden";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
@@ -34,38 +36,16 @@ interface PlantDetailProps {
   onEdit?: () => void;
 }
 
-type PhaseKey = "sowIndoors" | "sowOutdoors" | "transplant" | "harvest";
+type Phase = PhaseWindow & { key: PhaseWindow["phase"] };
 
-interface Phase {
-  key: PhaseKey;
-  start: Date;
-  end: Date;
+/** Season windows for the user's own last-frost date (shared with the calendar). */
+function buildPhases(plant: Plant, frost: Date): Phase[] {
+  return getPhaseWindows(plant, frost).map((w) => ({ ...w, key: w.phase }));
 }
 
-const PHASE_BAR: Record<PhaseKey, string> = {
-  sowIndoors: "bg-info/70",
-  sowOutdoors: "bg-garden-500",
-  transplant: "bg-garden-300 dark:bg-garden-400/70",
-  harvest: "bg-earth-400 dark:bg-earth-300/80",
-};
-
-/** Absolute season windows for the user's own last-frost date. */
-function buildPhases(plant: Plant, frost: Date): Phase[] {
-  const phases: Phase[] = [];
-  const at = (weeks: number | null) => (weeks === null ? null : addWeeks(frost, weeks));
-  const indoors = at(plant.sowIndoorsWeeks);
-  const outdoors = at(plant.sowOutdoorsWeeks);
-  const transplant = at(plant.transplantWeeks);
-  if (indoors) phases.push({ key: "sowIndoors", start: indoors, end: addWeeks(indoors, 3) });
-  if (outdoors) phases.push({ key: "sowOutdoors", start: outdoors, end: addWeeks(outdoors, 4) });
-  if (transplant) phases.push({ key: "transplant", start: transplant, end: addWeeks(transplant, 3) });
-  // Harvest counts from planting out (or direct sowing). Perennials (≥ 200 days) get no window.
-  const base = transplant ?? outdoors;
-  if (base && plant.harvestDaysMax < 200) {
-    const baseEnd = addWeeks(base, transplant ? 3 : 4);
-    phases.push({ key: "harvest", start: addDays(base, plant.harvestDaysMin), end: addDays(baseEnd, plant.harvestDaysMax) });
-  }
-  return phases;
+function PhaseIcon({ phase }: { phase: Phase["key"] }) {
+  const Icon = PHASE_META[phase].icon;
+  return <Icon size={14} aria-hidden="true" className={`shrink-0 ${PHASE_META[phase].text}`} />;
 }
 
 /** 12-month strip with one labelled row per phase and a today marker. */
@@ -141,14 +121,17 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
           return (
             <li key={p.key} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
               <span className="flex items-baseline justify-between gap-2 text-sm sm:block sm:w-28 sm:shrink-0">
-                <span className="font-medium text-gray-800 dark:text-gray-200">{label}</span>
+                <span className="inline-flex items-center gap-1.5 font-medium text-gray-800 dark:text-gray-200">
+                  <PhaseIcon phase={p.key} />
+                  {label}
+                </span>
                 <span className="text-xs text-gray-500 sm:hidden dark:text-gray-400">{range}</span>
               </span>
               <span className="relative block h-7 w-full shrink-0 overflow-hidden rounded-md bg-gray-50 sm:w-auto sm:flex-1 dark:bg-white/5">
                 {grid}
                 <span
-                  className={`absolute inset-y-1 rounded ${PHASE_BAR[p.key]}`}
-                  style={{ left: `${left}%`, width: `${Math.min(width, 100 - left)}%` }}
+                  className={`absolute inset-y-1 rounded ${phaseFill(p.key).className}`}
+                  style={{ ...phaseFill(p.key).style, left: `${left}%`, width: `${Math.min(width, 100 - left)}%` }}
                   title={`${label}: ${range}`}
                 />
                 <span className="sr-only">{`${label}: ${range}`}</span>
@@ -174,7 +157,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
         {phases.map((p) => (
           <div key={p.key} className="flex items-center justify-between gap-3 border-b border-gray-100 pb-2 dark:border-white/5">
             <dt className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300">
-              <span className={`size-2.5 rounded-sm ${PHASE_BAR[p.key]}`} aria-hidden="true" />
+              <PhaseSwatch phase={p.key} className="h-2.5 w-3.5" />
               {t(`plants.details.${p.key}`)}
             </dt>
             <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">
@@ -186,6 +169,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
     </div>
   );
 });
+
 
 function PartnerChips({ ids, kind, onSelect }: { ids: string[]; kind: "good" | "bad"; onSelect: (id: string) => void }) {
   const getPlantName = usePlantName();
@@ -223,7 +207,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
     useShallow((s) => ({ gardens: s.gardens, harvests: s.harvests, seeds: s.seeds, lastFrostDate: s.lastFrostDate })),
   );
 
-  const frost = useMemo(() => toDate(lastFrostDate) ?? new Date(new Date().getFullYear(), 4, 15), [lastFrostDate]);
+  const frost = useMemo(() => seasonFrost(lastFrostDate), [lastFrostDate]);
   const phases = useMemo(() => buildPhases(plant, frost), [plant, frost]);
 
   // Relations are symmetric, like in the companion matrix.
@@ -318,7 +302,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           value={plant.harvestDaysMin === plant.harvestDaysMax
             ? formatNumber(plant.harvestDaysMin)
             : `${formatNumber(plant.harvestDaysMin)}–${formatNumber(plant.harvestDaysMax)}`}
-          unit={t("common.days")}
+          unit={t("plants.detail.harvestDaysUnit")}
         />
         <StatCard
           icon={Scale}
@@ -389,7 +373,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                   title={loc.bedName}
                   meta={gardens.length > 1 ? loc.gardenName : undefined}
                   trailing={t("plants.detail.plantCount", { count: loc.count })}
-                  onClick={() => navigate("/planner")}
+                  onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
                 />
               ))}
             </List>
@@ -412,7 +396,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                 <p className="text-2xl font-semibold text-gray-900 tabular-nums dark:text-gray-50">{formatWeight(harvestStats.grams)}</p>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {t("plants.detail.harvestEntries", { count: harvestStats.count })}
-                  {harvestStats.last && <> · {t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relative") })}</>}
+                  {harvestStats.last && <> · {t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") })}</>}
                 </p>
               </>
             ) : (

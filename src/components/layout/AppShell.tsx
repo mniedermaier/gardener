@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
@@ -8,6 +9,7 @@ import { SectionTabs } from "./SectionTabs";
 import { CommandPalette } from "./CommandPalette";
 
 export function AppShell() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const { pathname } = useLocation();
@@ -38,11 +40,23 @@ export function AppShell() {
     // h-dvh instead of h-screen: on mobile browsers the address bar shrinks
     // the visible viewport, and h-screen would leave the bottom nav off-screen.
     <div className="flex h-dvh overflow-hidden bg-gray-50 dark:bg-gray-950">
+      {/* Skip link: first tab stop, jumps past sidebar, top bar and section tabs.
+          A hash link would fight the HashRouter, so it moves focus directly. */}
+      <a
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          mainRef.current?.focus();
+        }}
+        className="sr-only z-[60] rounded-lg bg-white px-4 py-3 text-sm font-semibold text-garden-800 shadow-lg focus:not-sr-only focus:fixed focus:top-2 focus:left-2 dark:bg-gray-900 dark:text-garden-200"
+      >
+        {t("shell.skipToContent")}
+      </a>
       <Sidebar open={sidebarOpen} onClose={closeSidebar} />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <TopBar onMenuClick={() => setSidebarOpen(true)} onSearchClick={() => setPaletteOpen(true)} />
         <SectionTabs />
-        <main ref={mainRef} id="main" className="flex-1 overflow-y-auto bg-gray-50 p-4 pb-safe-nav sm:pb-6 md:p-6 lg:px-8 dark:bg-gray-950">
+        <main ref={mainRef} id="main" tabIndex={-1} className="flex-1 focus-visible:outline-none overflow-y-auto bg-gray-50 p-4 pb-safe-nav sm:pb-6 md:p-6 lg:px-8 dark:bg-gray-950">
           <Outlet />
         </main>
       </div>

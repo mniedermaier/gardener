@@ -1,0 +1,1865 @@
+{
+ "locale": "de",
+ "theme": "light",
+ "gardens": [
+  {
+   "id": "g-hof",
+   "name": "Hausgarten Lindenhof",
+   "season": "2026",
+   "beds": [
+    {
+     "id": "b-hochbeet",
+     "name": "Hochbeet Süd",
+     "x": 0,
+     "y": 0,
+     "width": 4,
+     "height": 8,
+     "environmentType": "raised_bed",
+     "raisedBedConfig": {
+      "heightCm": 80,
+      "layers": [
+       "Äste",
+       "Laub",
+       "Kompost",
+       "Erde"
+      ]
+     },
+     "cells": [
+      {
+       "cellX": 0,
+       "cellY": 0,
+       "plantId": "lettuce",
+       "variety": "Kopfsalat 'Maikönig'",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 1,
+       "plantId": "lettuce",
+       "variety": "Kopfsalat 'Maikönig'",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 0,
+       "plantId": "lettuce",
+       "variety": "Kopfsalat 'Maikönig'",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 1,
+       "plantId": "lettuce",
+       "variety": "Kopfsalat 'Maikönig'",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 0,
+       "plantId": "radish",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 1,
+       "plantId": "radish",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 0,
+       "plantId": "radish",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 1,
+       "plantId": "radish",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 2,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 3,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 2,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 3,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 2,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 3,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 2,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 3,
+       "plantId": "carrot",
+       "variety": "Nantaise",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 4,
+       "plantId": "onion",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 5,
+       "plantId": "onion",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 4,
+       "plantId": "onion",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 5,
+       "plantId": "onion",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 4,
+       "plantId": "beetroot",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 5,
+       "plantId": "beetroot",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 4,
+       "plantId": "beetroot",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 5,
+       "plantId": "beetroot",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 6,
+       "plantId": "chard",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 7,
+       "plantId": "chard",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 6,
+       "plantId": "chard",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 7,
+       "plantId": "chard",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 6,
+       "plantId": "spinach",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 6,
+       "plantId": "spinach",
+       "plantedDate": "2026-05-08"
+      }
+     ]
+    },
+    {
+     "id": "b-gh",
+     "name": "Gewächshaus",
+     "x": 0,
+     "y": 1,
+     "width": 6,
+     "height": 4,
+     "environmentType": "greenhouse",
+     "greenhouseConfig": {
+      "material": "polycarbonate",
+      "heated": false,
+      "ventilation": "manual",
+      "minTempC": 5,
+      "maxTempC": 35,
+      "frostProtectionWeeks": 4
+     },
+     "cells": [
+      {
+       "cellX": 0,
+       "cellY": 0,
+       "plantId": "tomato",
+       "variety": "Ochsenherz",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 1,
+       "plantId": "tomato",
+       "variety": "Ochsenherz",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 0,
+       "plantId": "tomato",
+       "variety": "Ochsenherz",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 1,
+       "plantId": "tomato",
+       "variety": "Ochsenherz",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 0,
+       "plantId": "tomato",
+       "variety": "Ochsenherz",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 1,
+       "plantId": "tomato",
+       "variety": "Ochsenherz",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 0,
+       "plantId": "pepper",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 4,
+       "cellY": 0,
+       "plantId": "pepper",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 5,
+       "cellY": 0,
+       "plantId": "pepper",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 1,
+       "plantId": "cucumber",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 4,
+       "cellY": 1,
+       "plantId": "cucumber",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 5,
+       "cellY": 1,
+       "plantId": "cucumber",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 2,
+       "plantId": "basil",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 2,
+       "plantId": "basil",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 2,
+       "plantId": "eggplant",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 3,
+       "plantId": "eggplant",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 2,
+       "plantId": "eggplant",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 3,
+       "plantId": "eggplant",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 3,
+       "plantId": "tomato",
+       "variety": "Black Cherry",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 3,
+       "plantId": "tomato",
+       "variety": "Black Cherry",
+       "plantedDate": "2026-05-08"
+      }
+     ]
+    },
+    {
+     "id": "b-acker",
+     "name": "Kartoffelacker",
+     "x": 0,
+     "y": 2,
+     "width": 8,
+     "height": 5,
+     "environmentType": "outdoor_bed",
+     "paths": [
+      "0-2",
+      "1-2",
+      "2-2",
+      "3-2",
+      "4-2",
+      "5-2",
+      "6-2",
+      "7-2"
+     ],
+     "cells": [
+      {
+       "cellX": 0,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 4,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 4,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 5,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 5,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 6,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 6,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 7,
+       "cellY": 0,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 7,
+       "cellY": 1,
+       "plantId": "potato",
+       "variety": "Linda",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 3,
+       "plantId": "pumpkin",
+       "variety": "Hokkaido",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 4,
+       "plantId": "pumpkin",
+       "variety": "Hokkaido",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 3,
+       "plantId": "pumpkin",
+       "variety": "Hokkaido",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 4,
+       "plantId": "pumpkin",
+       "variety": "Hokkaido",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 3,
+       "plantId": "pumpkin",
+       "variety": "Hokkaido",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 4,
+       "plantId": "pumpkin",
+       "variety": "Hokkaido",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 3,
+       "plantId": "bean",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 3,
+       "cellY": 4,
+       "plantId": "bean",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 4,
+       "cellY": 3,
+       "plantId": "bean",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 4,
+       "cellY": 4,
+       "plantId": "bean",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 5,
+       "cellY": 3,
+       "plantId": "bean",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 5,
+       "cellY": 4,
+       "plantId": "bean",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 6,
+       "cellY": 3,
+       "plantId": "corn",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 6,
+       "cellY": 4,
+       "plantId": "corn",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 7,
+       "cellY": 3,
+       "plantId": "corn",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 7,
+       "cellY": 4,
+       "plantId": "corn",
+       "plantedDate": "2026-05-08"
+      }
+     ]
+    },
+    {
+     "id": "b-kraeuter",
+     "name": "Kräuterkübel",
+     "x": 0,
+     "y": 3,
+     "width": 3,
+     "height": 3,
+     "environmentType": "container",
+     "containerConfig": {
+      "volumeLiters": 40,
+      "material": "terracotta"
+     },
+     "cells": [
+      {
+       "cellX": 0,
+       "cellY": 0,
+       "plantId": "rosemary",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 0,
+       "plantId": "thyme",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 0,
+       "plantId": "thyme",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 1,
+       "plantId": "parsley",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 1,
+       "plantId": "parsley",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 2,
+       "cellY": 1,
+       "plantId": "parsley",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 0,
+       "cellY": 2,
+       "plantId": "chives",
+       "plantedDate": "2026-05-08"
+      },
+      {
+       "cellX": 1,
+       "cellY": 2,
+       "plantId": "chives",
+       "plantedDate": "2026-05-08"
+      }
+     ]
+    }
+   ],
+   "createdAt": "2026-03-19T08:00:00.000Z",
+   "updatedAt": "2026-10-04T08:00:00.000Z"
+  }
+ ],
+ "activeGardenId": "g-hof",
+ "tasks": [
+  {
+   "id": "t1",
+   "gardenId": "g-hof",
+   "type": "harvest",
+   "plantId": "pumpkin",
+   "bedId": "b-acker",
+   "title": "Hokkaido ernten und nachreifen lassen",
+   "dueDate": "2026-10-05"
+  },
+  {
+   "id": "t2",
+   "gardenId": "g-hof",
+   "type": "sow_outdoors",
+   "plantId": "spinach",
+   "bedId": "b-hochbeet",
+   "title": "Wintersalat & Spinat säen",
+   "dueDate": "2026-10-06"
+  },
+  {
+   "id": "t3",
+   "gardenId": "g-hof",
+   "type": "water",
+   "bedId": "b-gh",
+   "title": "Gewächshaus gießen",
+   "dueDate": "2026-10-05",
+   "recurring": {
+    "interval": "daily"
+   }
+  },
+  {
+   "id": "t4",
+   "gardenId": "g-hof",
+   "type": "fertilize",
+   "bedId": "b-hochbeet",
+   "title": "Kompost aufbringen",
+   "dueDate": "2026-10-09"
+  },
+  {
+   "id": "t5",
+   "gardenId": "g-hof",
+   "type": "custom",
+   "title": "Knoblauch stecken",
+   "plantId": "garlic",
+   "dueDate": "2026-10-12"
+  },
+  {
+   "id": "t6",
+   "gardenId": "g-hof",
+   "type": "scout",
+   "bedId": "b-gh",
+   "title": "Tomaten auf Braunfäule kontrollieren",
+   "dueDate": "2026-10-03"
+  },
+  {
+   "id": "t7",
+   "gardenId": "g-hof",
+   "type": "preserve",
+   "plantId": "tomato",
+   "title": "Tomatensoße einkochen",
+   "dueDate": "2026-09-30",
+   "completedDate": "2026-09-30"
+  },
+  {
+   "id": "t8",
+   "gardenId": "g-hof",
+   "type": "soil_test",
+   "bedId": "b-acker",
+   "title": "Bodenprobe Kartoffelacker",
+   "dueDate": "2026-10-17"
+  }
+ ],
+ "harvests": [
+  {
+   "id": "h0",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "radish",
+   "date": "2026-06-07",
+   "weightGrams": 450,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h1",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "radish",
+   "date": "2026-07-12",
+   "weightGrams": 300,
+   "quality": 3
+  },
+  {
+   "id": "h2",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "lettuce",
+   "date": "2026-06-27",
+   "weightGrams": 500,
+   "quality": 5
+  },
+  {
+   "id": "h3",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "lettuce",
+   "date": "2026-07-22",
+   "weightGrams": 400,
+   "quality": 4
+  },
+  {
+   "id": "h4",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "spinach",
+   "date": "2026-07-02",
+   "weightGrams": 350,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h5",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "chard",
+   "date": "2026-08-06",
+   "weightGrams": 300,
+   "quality": 4
+  },
+  {
+   "id": "h6",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "onion",
+   "date": "2026-08-11",
+   "weightGrams": 1500,
+   "quality": 4
+  },
+  {
+   "id": "h7",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "tomato",
+   "date": "2026-07-27",
+   "weightGrams": 500,
+   "quality": 5
+  },
+  {
+   "id": "h8",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "cucumber",
+   "date": "2026-07-31",
+   "weightGrams": 400,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h9",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "tomato",
+   "date": "2026-08-06",
+   "weightGrams": 800,
+   "quality": 5
+  },
+  {
+   "id": "h10",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "pepper",
+   "date": "2026-08-16",
+   "weightGrams": 300,
+   "quality": 3
+  },
+  {
+   "id": "h11",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "tomato",
+   "date": "2026-08-16",
+   "weightGrams": 1000,
+   "quality": 5
+  },
+  {
+   "id": "h12",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "cucumber",
+   "date": "2026-08-16",
+   "weightGrams": 450,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h13",
+   "gardenId": "g-hof",
+   "bedId": "b-acker",
+   "plantId": "bean",
+   "date": "2026-08-18",
+   "weightGrams": 500,
+   "quality": 4
+  },
+  {
+   "id": "h14",
+   "gardenId": "g-hof",
+   "bedId": "b-kraeuter",
+   "plantId": "basil",
+   "date": "2026-08-21",
+   "weightGrams": 70,
+   "quality": 5
+  },
+  {
+   "id": "h15",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "tomato",
+   "date": "2026-08-26",
+   "weightGrams": 1100,
+   "quality": 4
+  },
+  {
+   "id": "h16",
+   "gardenId": "g-hof",
+   "bedId": "b-kraeuter",
+   "plantId": "parsley",
+   "date": "2026-08-26",
+   "weightGrams": 60,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h17",
+   "gardenId": "g-hof",
+   "bedId": "b-acker",
+   "plantId": "bean",
+   "date": "2026-08-28",
+   "weightGrams": 350,
+   "quality": 4
+  },
+  {
+   "id": "h18",
+   "gardenId": "g-hof",
+   "bedId": "b-acker",
+   "plantId": "potato",
+   "date": "2026-08-31",
+   "weightGrams": 5200,
+   "quality": 5
+  },
+  {
+   "id": "h19",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "eggplant",
+   "date": "2026-08-31",
+   "weightGrams": 600,
+   "quality": 4
+  },
+  {
+   "id": "h20",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "carrot",
+   "date": "2026-09-05",
+   "weightGrams": 1800,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h21",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "tomato",
+   "date": "2026-09-05",
+   "weightGrams": 800,
+   "quality": 4
+  },
+  {
+   "id": "h22",
+   "gardenId": "g-hof",
+   "bedId": "b-acker",
+   "plantId": "corn",
+   "date": "2026-09-10",
+   "weightGrams": 300,
+   "quality": 3
+  },
+  {
+   "id": "h23",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "pepper",
+   "date": "2026-09-15",
+   "weightGrams": 350,
+   "quality": 4
+  },
+  {
+   "id": "h24",
+   "gardenId": "g-hof",
+   "bedId": "b-acker",
+   "plantId": "pumpkin",
+   "date": "2026-09-17",
+   "weightGrams": 2400,
+   "quality": 5,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h25",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "beetroot",
+   "date": "2026-09-23",
+   "weightGrams": 1200,
+   "quality": 4
+  },
+  {
+   "id": "h26",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "carrot",
+   "date": "2026-09-25",
+   "weightGrams": 700,
+   "quality": 4
+  },
+  {
+   "id": "h27",
+   "gardenId": "g-hof",
+   "bedId": "b-gh",
+   "plantId": "tomato",
+   "date": "2026-09-29",
+   "weightGrams": 450,
+   "quality": 3
+  },
+  {
+   "id": "h28",
+   "gardenId": "g-hof",
+   "bedId": "b-hochbeet",
+   "plantId": "chard",
+   "date": "2026-10-02",
+   "weightGrams": 400,
+   "quality": 4,
+   "notes": "Sehr aromatisch, kaum Schädlinge"
+  },
+  {
+   "id": "h29",
+   "gardenId": "g-hof",
+   "bedId": "b-kraeuter",
+   "plantId": "parsley",
+   "date": "2026-10-03",
+   "weightGrams": 120,
+   "quality": 5
+  }
+ ],
+ "journalEntries": [
+  {
+   "id": "j1",
+   "gardenId": "g-hof",
+   "date": "2026-10-04",
+   "title": "Erster Frost angekündigt",
+   "text": "Vlies über das Hochbeet gelegt, Kürbisse rein geholt. Die Tomaten im Gewächshaus tragen noch erstaunlich gut.",
+   "tags": [
+    "frost",
+    "ernte"
+   ],
+   "bedId": "b-hochbeet"
+  },
+  {
+   "id": "j2",
+   "gardenId": "g-hof",
+   "date": "2026-09-26",
+   "title": "Hühner mausern",
+   "text": "Henriette und Frieda verlieren Federn, Legeleistung deutlich runter. Mehr Eiweiß ins Futter (Mehlwürmer).",
+   "tags": [
+    "tiere"
+   ],
+   "animalId": "a1"
+  },
+  {
+   "id": "j3",
+   "gardenId": "g-hof",
+   "date": "2026-09-14",
+   "title": "Kartoffeln geerntet",
+   "text": "5,2 kg 'Linda' aus 16 Pflanzen. Kaum Drahtwurm, Schorf nur vereinzelt.",
+   "tags": [
+    "ernte",
+    "kartoffel"
+   ],
+   "bedId": "b-acker",
+   "plantId": "potato"
+  },
+  {
+   "id": "j4",
+   "gardenId": "g-hof",
+   "date": "2026-08-22",
+   "title": "Braunfäule im Freiland",
+   "text": "Die zwei Freilandtomaten hat es erwischt — nächstes Jahr nur noch im Gewächshaus.",
+   "tags": [
+    "krankheit"
+   ],
+   "plantId": "tomato"
+  }
+ ],
+ "expenses": [
+  {
+   "id": "e1",
+   "gardenId": "g-hof",
+   "date": "2026-03-29",
+   "category": "seeds",
+   "description": "Saatgut Bingenheimer",
+   "amountCents": 4380
+  },
+  {
+   "id": "e2",
+   "gardenId": "g-hof",
+   "date": "2026-04-18",
+   "category": "soil",
+   "description": "Kompost 1 m³",
+   "amountCents": 6500
+  },
+  {
+   "id": "e3",
+   "gardenId": "g-hof",
+   "date": "2026-04-28",
+   "category": "infrastructure",
+   "description": "Gewächshaus-Fundament",
+   "amountCents": 18900
+  },
+  {
+   "id": "e4",
+   "gardenId": "g-hof",
+   "date": "2026-06-07",
+   "category": "tools",
+   "description": "Grabegabel",
+   "amountCents": 5490
+  },
+  {
+   "id": "e5",
+   "gardenId": "g-hof",
+   "date": "2026-08-06",
+   "category": "animal_feed",
+   "description": "Legemehl 25 kg",
+   "amountCents": 2290
+  },
+  {
+   "id": "e6",
+   "gardenId": "g-hof",
+   "date": "2026-09-05",
+   "category": "water",
+   "description": "Regentonne 300 l",
+   "amountCents": 7900
+  },
+  {
+   "id": "e7",
+   "gardenId": "g-hof",
+   "date": "2026-09-21",
+   "category": "veterinary",
+   "description": "Entwurmung Hühner",
+   "amountCents": 1850
+  }
+ ],
+ "seeds": [
+  {
+   "id": "s1",
+   "plantId": "tomato",
+   "variety": "Ochsenherz",
+   "quantity": 2,
+   "unit": "packets",
+   "yearAcquired": 2025,
+   "source": "shop",
+   "shopName": "Bingenheimer",
+   "cost": 3.9
+  },
+  {
+   "id": "s2",
+   "plantId": "bean",
+   "variety": "Blauhilde",
+   "quantity": 120,
+   "unit": "grams",
+   "yearAcquired": 2026,
+   "source": "saved"
+  },
+  {
+   "id": "s3",
+   "plantId": "carrot",
+   "variety": "Nantaise 2",
+   "quantity": 1,
+   "unit": "packets",
+   "yearAcquired": 2022,
+   "source": "shop",
+   "cost": 2.5,
+   "notes": "Keimfähigkeit prüfen"
+  },
+  {
+   "id": "s4",
+   "plantId": "pumpkin",
+   "variety": "Hokkaido",
+   "quantity": 25,
+   "unit": "seeds",
+   "yearAcquired": 2026,
+   "source": "saved"
+  },
+  {
+   "id": "s5",
+   "plantId": "lettuce",
+   "variety": "Maikönig",
+   "quantity": 3,
+   "unit": "packets",
+   "yearAcquired": 2024,
+   "source": "traded"
+  },
+  {
+   "id": "s6",
+   "plantId": "parsley",
+   "quantity": 1,
+   "unit": "packets",
+   "yearAcquired": 2023,
+   "source": "gifted"
+  }
+ ],
+ "soilTests": [
+  {
+   "id": "st1",
+   "bedId": "b-hochbeet",
+   "date": "2026-04-08",
+   "ph": 6.8,
+   "nitrogen": 45,
+   "phosphorus": 38,
+   "potassium": 160,
+   "organicMatter": 6.2
+  },
+  {
+   "id": "st2",
+   "bedId": "b-acker",
+   "date": "2026-04-13",
+   "ph": 5.6,
+   "nitrogen": 18,
+   "phosphorus": 22,
+   "potassium": 95,
+   "organicMatter": 2.9,
+   "notes": "Leicht sauer, kalken"
+  },
+  {
+   "id": "st3",
+   "bedId": "b-gh",
+   "date": "2026-05-08",
+   "ph": 7.1,
+   "nitrogen": 60,
+   "phosphorus": 55,
+   "potassium": 210,
+   "organicMatter": 5.1
+  }
+ ],
+ "amendments": [
+  {
+   "id": "am1",
+   "bedId": "b-acker",
+   "date": "2026-04-23",
+   "type": "lime",
+   "material": "Algenkalk",
+   "quantityKg": 4,
+   "cost": 12.9
+  },
+  {
+   "id": "am2",
+   "bedId": "b-hochbeet",
+   "date": "2026-04-28",
+   "type": "compost",
+   "material": "Eigenkompost",
+   "quantityKg": 60
+  },
+  {
+   "id": "am3",
+   "bedId": "b-gh",
+   "date": "2026-06-27",
+   "type": "mulch",
+   "material": "Rasenschnitt",
+   "quantityKg": 15
+  }
+ ],
+ "pests": [
+  {
+   "id": "p1",
+   "plantId": "tomato",
+   "bedId": "b-gh",
+   "date": "2026-08-22",
+   "type": "disease",
+   "name": "Kraut- und Braunfäule",
+   "severity": 4,
+   "treatment": "Befallene Blätter entfernt, Schachtelhalmbrühe",
+   "treatmentDate": "2026-08-23",
+   "organic": true,
+   "resolved": false
+  },
+  {
+   "id": "p2",
+   "plantId": "lettuce",
+   "bedId": "b-hochbeet",
+   "date": "2026-06-27",
+   "type": "pest",
+   "name": "Nacktschnecken",
+   "severity": 3,
+   "treatment": "Schneckenzaun, Bierfallen",
+   "organic": true,
+   "resolved": true,
+   "resolvedDate": "2026-07-17"
+  },
+  {
+   "id": "p3",
+   "plantId": "kale",
+   "bedId": "b-hochbeet",
+   "date": "2026-09-15",
+   "type": "pest",
+   "name": "Kohlweißling",
+   "severity": 2,
+   "organic": true,
+   "resolved": false
+  }
+ ],
+ "waterEntries": [
+  {
+   "id": "w0",
+   "bedId": "b-hochbeet",
+   "gardenId": "g-hof",
+   "date": "2026-10-05",
+   "liters": 10,
+   "method": "drip"
+  },
+  {
+   "id": "w1",
+   "bedId": "b-gh",
+   "gardenId": "g-hof",
+   "date": "2026-10-02",
+   "liters": 15,
+   "method": "manual"
+  },
+  {
+   "id": "w2",
+   "bedId": "b-hochbeet",
+   "gardenId": "g-hof",
+   "date": "2026-09-29",
+   "liters": 20,
+   "method": "manual"
+  },
+  {
+   "id": "w3",
+   "bedId": "b-gh",
+   "gardenId": "g-hof",
+   "date": "2026-09-26",
+   "liters": 25,
+   "method": "drip"
+  },
+  {
+   "id": "w4",
+   "bedId": "b-hochbeet",
+   "gardenId": "g-hof",
+   "date": "2026-09-23",
+   "liters": 10,
+   "method": "manual"
+  },
+  {
+   "id": "w5",
+   "bedId": "b-gh",
+   "gardenId": "g-hof",
+   "date": "2026-09-20",
+   "liters": 15,
+   "method": "manual"
+  },
+  {
+   "id": "w6",
+   "bedId": "b-hochbeet",
+   "gardenId": "g-hof",
+   "date": "2026-09-17",
+   "liters": 20,
+   "method": "drip"
+  },
+  {
+   "id": "w7",
+   "bedId": "b-gh",
+   "gardenId": "g-hof",
+   "date": "2026-09-14",
+   "liters": 25,
+   "method": "manual"
+  },
+  {
+   "id": "w8",
+   "bedId": "b-hochbeet",
+   "gardenId": "g-hof",
+   "date": "2026-09-11",
+   "liters": 10,
+   "method": "manual"
+  },
+  {
+   "id": "w9",
+   "bedId": "b-gh",
+   "gardenId": "g-hof",
+   "date": "2026-09-08",
+   "liters": 15,
+   "method": "drip"
+  },
+  {
+   "id": "w-rain",
+   "bedId": "b-acker",
+   "gardenId": "g-hof",
+   "date": "2026-10-01",
+   "liters": 120,
+   "method": "rain"
+  }
+ ],
+ "animals": [
+  {
+   "id": "a1",
+   "type": "chicken",
+   "name": "Hühnerschar",
+   "count": 6,
+   "acquiredDate": "2025-08-31",
+   "notes": "Sussex & Grünleger"
+  },
+  {
+   "id": "a2",
+   "type": "bee",
+   "name": "Volk Linde",
+   "count": 2,
+   "acquiredDate": "2025-12-09"
+  }
+ ],
+ "animalProducts": [
+  {
+   "id": "ap0",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-10-05",
+   "quantity": 3,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap1",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-10-03",
+   "quantity": 5,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap2",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-10-01",
+   "quantity": 7,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap3",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-29",
+   "quantity": 4,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap4",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-27",
+   "quantity": 6,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap5",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-25",
+   "quantity": 6,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap6",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-23",
+   "quantity": 8,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap7",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-21",
+   "quantity": 10,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap8",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-19",
+   "quantity": 7,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap9",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-17",
+   "quantity": 9,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap10",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-15",
+   "quantity": 6,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap11",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-13",
+   "quantity": 8,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap12",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-11",
+   "quantity": 10,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap13",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-09",
+   "quantity": 7,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap14",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-07",
+   "quantity": 9,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap15",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-05",
+   "quantity": 6,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap16",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-03",
+   "quantity": 8,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap17",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-09-01",
+   "quantity": 10,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap18",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-30",
+   "quantity": 7,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap19",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-28",
+   "quantity": 9,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap20",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-26",
+   "quantity": 6,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap21",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-24",
+   "quantity": 8,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap22",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-22",
+   "quantity": 10,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap23",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-20",
+   "quantity": 7,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap24",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-18",
+   "quantity": 9,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap25",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-16",
+   "quantity": 6,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap26",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-14",
+   "quantity": 8,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap27",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-12",
+   "quantity": 10,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap28",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-10",
+   "quantity": 7,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap29",
+   "animalId": "a1",
+   "type": "eggs",
+   "date": "2026-08-08",
+   "quantity": 9,
+   "unit": "pieces"
+  },
+  {
+   "id": "ap-h1",
+   "animalId": "a2",
+   "type": "honey",
+   "date": "2026-07-27",
+   "quantity": 14,
+   "unit": "kg"
+  },
+  {
+   "id": "ap-w1",
+   "animalId": "a2",
+   "type": "wax",
+   "date": "2026-07-27",
+   "quantity": 0.4,
+   "unit": "kg"
+  }
+ ],
+ "feedEntries": [
+  {
+   "id": "f1",
+   "animalId": "a1",
+   "date": "2026-08-06",
+   "feedType": "Legemehl",
+   "quantity": 25,
+   "unit": "kg",
+   "cost": 22.9
+  },
+  {
+   "id": "f2",
+   "animalId": "a1",
+   "date": "2026-09-10",
+   "feedType": "Körnermischung",
+   "quantity": 10,
+   "unit": "kg",
+   "cost": 11.5
+  },
+  {
+   "id": "f3",
+   "animalId": "a2",
+   "date": "2026-08-26",
+   "feedType": "Zuckerwasser 3:2",
+   "quantity": 12,
+   "unit": "liters",
+   "cost": 9
+  }
+ ],
+ "healthEvents": [
+  {
+   "id": "he1",
+   "animalId": "a1",
+   "date": "2026-09-21",
+   "type": "deworming",
+   "description": "Entwurmung mit Flubenvet",
+   "cost": 18.5
+  },
+  {
+   "id": "he2",
+   "animalId": "a2",
+   "date": "2026-08-16",
+   "type": "treatment",
+   "description": "Varroabehandlung Ameisensäure"
+  }
+ ],
+ "pantryItems": [
+  {
+   "id": "pi1",
+   "plantId": "tomato",
+   "method": "canning",
+   "quantityKg": 2.5,
+   "units": 5,
+   "unitLabel": "Gläser",
+   "date": "2026-09-30",
+   "expiresDate": "2028-09-24",
+   "label": "Tomatensoße Sept",
+   "consumed": false,
+   "supplyCost": 8
+  },
+  {
+   "id": "pi2",
+   "plantId": "bean",
+   "method": "freezing",
+   "quantityKg": 0.4,
+   "units": 2,
+   "unitLabel": "Beutel",
+   "date": "2026-08-21",
+   "expiresDate": "2027-08-21",
+   "consumed": false
+  },
+  {
+   "id": "pi3",
+   "plantId": "potato",
+   "method": "root_cellar",
+   "quantityKg": 4,
+   "date": "2026-09-01",
+   "expiresDate": "2027-03-04",
+   "consumed": false
+  },
+  {
+   "id": "pi4",
+   "plantId": "cucumber",
+   "method": "fermenting",
+   "quantityKg": 0.5,
+   "units": 1,
+   "unitLabel": "Gläser",
+   "date": "2026-08-06",
+   "expiresDate": "2026-10-25",
+   "consumed": false
+  }
+ ],
+ "customPlants": [],
+ "seasonArchives": [],
+ "weatherHistory": [
+  {
+   "date": "2026-10-05",
+   "tempMin": 4,
+   "tempMax": 13,
+   "precipitation": 4.2,
+   "humidity": 70
+  },
+  {
+   "date": "2026-10-04",
+   "tempMin": 5,
+   "tempMax": 14,
+   "precipitation": 0,
+   "humidity": 75
+  },
+  {
+   "date": "2026-10-03",
+   "tempMin": 6,
+   "tempMax": 15,
+   "precipitation": 0,
+   "humidity": 80
+  },
+  {
+   "date": "2026-10-02",
+   "tempMin": 7,
+   "tempMax": 16,
+   "precipitation": 4.2,
+   "humidity": 85
+  },
+  {
+   "date": "2026-10-01",
+   "tempMin": 8,
+   "tempMax": 17,
+   "precipitation": 0,
+   "humidity": 70
+  },
+  {
+   "date": "2026-09-30",
+   "tempMin": 4,
+   "tempMax": 18,
+   "precipitation": 0,
+   "humidity": 75
+  },
+  {
+   "date": "2026-09-29",
+   "tempMin": 5,
+   "tempMax": 13,
+   "precipitation": 4.2,
+   "humidity": 80
+  },
+  {
+   "date": "2026-09-28",
+   "tempMin": 6,
+   "tempMax": 14,
+   "precipitation": 0,
+   "humidity": 85
+  },
+  {
+   "date": "2026-09-27",
+   "tempMin": 7,
+   "tempMax": 15,
+   "precipitation": 0,
+   "humidity": 70
+  },
+  {
+   "date": "2026-09-26",
+   "tempMin": 8,
+   "tempMax": 16,
+   "precipitation": 4.2,
+   "humidity": 75
+  },
+  {
+   "date": "2026-09-25",
+   "tempMin": 4,
+   "tempMax": 17,
+   "precipitation": 0,
+   "humidity": 80
+  },
+  {
+   "date": "2026-09-24",
+   "tempMin": 5,
+   "tempMax": 18,
+   "precipitation": 0,
+   "humidity": 85
+  },
+  {
+   "date": "2026-09-23",
+   "tempMin": 6,
+   "tempMax": 13,
+   "precipitation": 4.2,
+   "humidity": 70
+  },
+  {
+   "date": "2026-09-22",
+   "tempMin": 7,
+   "tempMax": 14,
+   "precipitation": 0,
+   "humidity": 75
+  }
+ ],
+ "weatherApiKey": "demo-key",
+ "locationLat": 48.137,
+ "locationLon": 11.575,
+ "locationName": "München",
+ "lastFrostDate": "2026-05-15",
+ "gridCellSizeCm": 30,
+ "backendUrl": null,
+ "alerts": {
+  "frostAlertEnabled": true,
+  "frostThresholdC": 2,
+  "wateringReminders": true,
+  "greenhouseAlerts": true,
+  "weeklyDigest": true
+ },
+ "lastBackupDate": "2026-08-26",
+ "lastSyncedAt": null
+}

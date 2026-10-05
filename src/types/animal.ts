@@ -53,9 +53,18 @@ export const PRODUCT_NUTRITION: Record<ProductType, { caloriesPer100g: number; p
   wool: { caloriesPer100g: 0, proteinPer100g: 0 },
 };
 
-// Estimated annual production per animal/hive
+/**
+ * Typical annual production per animal/hive in a home flock (central Europe):
+ * - chicken 220 eggs: hybrids lay 280+ in their first year, heritage breeds
+ *   150–200; moult, winter break and older hens are averaged in.
+ * - duck 150 eggs (runner ducks up to 200), quail 300 eggs (small, ~11 g).
+ * - rabbit 2.5 kg: one fattening rabbit's carcass per counted animal.
+ * - bee colony 20 kg honey (German average 2020s ≈ 25–35 kg; conservative
+ *   for hobby hives) and 0.5 kg wax.
+ * - goat 800 l milk per lactation, sheep 4 kg raw wool + 20 kg lamb meat.
+ */
 export const ANNUAL_YIELD: Record<AnimalType, { product: ProductType; quantity: number; unit: string }[]> = {
-  chicken: [{ product: "eggs", quantity: 250, unit: "pieces" }],
+  chicken: [{ product: "eggs", quantity: 220, unit: "pieces" }],
   duck: [{ product: "eggs", quantity: 150, unit: "pieces" }],
   rabbit: [{ product: "meat", quantity: 2.5, unit: "kg" }],
   bee: [{ product: "honey", quantity: 20, unit: "kg" }, { product: "wax", quantity: 0.5, unit: "kg" }],
@@ -83,6 +92,13 @@ export const PRODUCT_TYPES_BY_ANIMAL: Record<AnimalType, ProductType[]> = {
   goat: ["milk", "meat"],
   sheep: ["wool", "meat"],
   quail: ["eggs"],
+};
+
+/** Average egg weight (edible part incl. shell is close enough) per laying species, kg. */
+export const EGG_WEIGHT_KG_BY_ANIMAL: Partial<Record<AnimalType, number>> = {
+  chicken: 0.06,
+  duck: 0.075,
+  quail: 0.011,
 };
 
 /** Animal types that lay eggs (quick egg log). */

@@ -55,7 +55,7 @@ export default defineConfig({
             options: { cacheName: "translations-cache", expiration: { maxEntries: 10, maxAgeSeconds: 86400 * 30 } },
           },
           {
-            urlPattern: /api\.openweathermap\.org/,
+            urlPattern: /api\.open-meteo\.com\/v1\/forecast|api\.openweathermap\.org/,
             handler: "StaleWhileRevalidate",
             options: { cacheName: "weather-cache", expiration: { maxEntries: 5, maxAgeSeconds: 3600 } },
           },
