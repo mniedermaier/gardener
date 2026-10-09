@@ -6,6 +6,8 @@ export interface LegendItem {
   color: SeriesColor;
   /** "solid" (default), "hatched" (forecast/estimate), "dotted" (rain), "line" (target/marker). */
   swatch?: "solid" | "hatched" | "dotted" | "line";
+  /** Drawn at reduced opacity in the chart: the swatch matches. */
+  muted?: boolean;
 }
 
 /** Hatch pattern for forecast/estimate marks — meaning never by colour alone. */
@@ -44,7 +46,7 @@ export const Legend = memo(function Legend({ items, className = "" }: { items: L
           ) : it.swatch === "line" ? (
             <span className="h-0.5 w-3 bg-gray-700 dark:bg-gray-300" aria-hidden="true" />
           ) : (
-            <span className={`size-3 rounded-sm ${SERIES_BG[it.color]}`} aria-hidden="true" />
+            <span className={`size-3 rounded-sm ${SERIES_BG[it.color]} ${it.muted ? "opacity-60" : ""}`} aria-hidden="true" />
           )}
           {it.label}
         </li>

@@ -28,9 +28,9 @@ interface MonthStripProps {
 const STEPS = [
   "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300",
   // Steps 1–3: below the threshold, muted tints that still tell 3 % from 7 %.
-  "bg-garden-50 text-garden-900 dark:bg-garden-500/[0.08] dark:text-garden-200",
-  "bg-garden-100 text-garden-900 dark:bg-garden-500/[0.16] dark:text-garden-100",
-  "bg-garden-200 text-garden-900 dark:bg-garden-500/[0.26] dark:text-garden-100",
+  "bg-garden-50 text-garden-900 dark:bg-garden-500/[0.10] dark:text-garden-200",
+  "bg-garden-100 text-garden-900 dark:bg-garden-500/[0.22] dark:text-garden-100",
+  "bg-garden-200 text-garden-900 dark:bg-garden-500/[0.38] dark:text-garden-50",
   // Steps 4–5: the threshold is reached — bright fill, dark text on the top step in dark mode.
   "bg-garden-400 text-white dark:bg-garden-500 dark:text-gray-950",
   "bg-garden-600 text-white dark:bg-garden-300 dark:text-gray-950",

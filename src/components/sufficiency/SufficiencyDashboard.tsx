@@ -112,6 +112,7 @@ export function SufficiencyDashboard() {
   const lowCount = result.lowMonths.length;
   const gap = result.winterGap;
   const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
+  const hasForecast = result.monthlyFood.some((m) => m.month > currentMonth && m.freshKg > 0);
   const hasAnimals = result.monthlyFood.some((m) => m.animalKg > 0);
   // Small shares get a decimal, so "erwartet bis heute" late in the year does not
   // read as the same 4 % as the annual forecast.
@@ -196,15 +197,15 @@ export function SufficiencyDashboard() {
                   key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month],
                   values: [
                     m.month <= currentMonth ? logged[m.month] : 0,
-                    m.month > currentMonth ? m.freshKg : 0,
+                    ...(hasForecast ? [m.month > currentMonth ? m.freshKg : 0] : []),
                     ...(hasStored ? [m.storedKg] : []),
                     ...(hasAnimals ? [m.animalKg] : []),
                   ],
                 }))}
                 series={[
                   { label: t("sufficiency.harvested"), color: "brand" },
-                  { label: t("sufficiency.freshForecast"), color: "brand", hatched: true },
                   // Legend only for a series that is actually drawn.
+                  ...(hasForecast ? [{ label: t("sufficiency.freshForecast"), color: "brand" as const, hatched: true }] : []),
                   ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const }] : []),
                   ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const, muted: true }] : []),
                 ]}

@@ -76,7 +76,8 @@ export function BarChart({
   const y = (v: number) => M.top + plotH - (Math.min(v, top) / top) * plotH;
   // Thin the axis by the real label width ("KW 34" needs more room than "Okt.").
   const labelEvery = axisLabelStep(data.map((d) => d.label), band);
-  const labelAnchor = marker && marker.index >= 0 && marker.index < data.length ? marker.index : data.length - 1;
+  // Labels start at the first bar (Jan, Mär, Mai …); the marker carries its own label.
+  const labelAnchor = 0;
   const showLabel = (i: number) => (((i - labelAnchor) % labelEvery) + labelEvery) % labelEvery === 0;
 
   const onKey = (e: KeyboardEvent) => {
@@ -205,7 +206,7 @@ export function BarChart({
         <Legend
           className="mt-2"
           items={[
-            ...series.map((s) => ({ label: s.label, color: s.color, swatch: s.hatched ? ("hatched" as const) : s.dotted ? ("dotted" as const) : ("solid" as const) })),
+            ...series.map((s) => ({ label: s.label, color: s.color, muted: s.muted, swatch: s.hatched ? ("hatched" as const) : s.dotted ? ("dotted" as const) : ("solid" as const) })),
             ...(target ? [{ label: target.label, color: "muted" as const, swatch: "line" as const }] : []),
           ]}
         />
