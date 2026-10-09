@@ -258,7 +258,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
         </div>
 
         {/* Phones: the card fills the screen and the footer sits at the bottom, in thumb reach. */}
-        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[36rem] sm:flex-none">
+        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[41rem] sm:flex-none">
           {step === "welcome" && (
             <>
               <StepHeader icon={Sprout} title={t("onboarding.welcome")} description={t("onboarding.welcomeDesc")} visual={<GardenVignette />} />
