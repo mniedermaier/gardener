@@ -243,7 +243,7 @@
     "getStarted": "Get started",
     "locationTitle": "Where is your garden?",
     "locationDesc": "Your location lets us work out sunlight, weather and the typical last frost.",
-    "skip": "Set later",
+    "skip": "Continue without location",
     "frostTitle": "When is the last frost?",
     "frostDesc": "Sowing, planting out and harvest dates are based on it. You can change it at any time.",
     "frostEstimate": "Estimated for {{place}}: around {{date}}. Local experience beats any estimate.",
@@ -281,7 +281,9 @@
       "mild": "Mild",
       "mid": "Average",
       "cold": "Harsh"
-    }
+    },
+    "locationPrivate": "Stays on this device, no account needed.",
+    "locationUses": "Used only for weather, sunlight and frost dates."
   },
   "planner": {
     "title": "Planner",

@@ -276,14 +276,14 @@ aside::-webkit-scrollbar-thumb,
    ("local"), the shadows stay with the box ("scroll"). */
 @utility scroll-shadow-y {
   --scroll-bg: var(--color-white);
-  --scroll-shadow: rgb(0 0 0 / 0.12);
+  --scroll-shadow: rgb(0 0 0 / 0.07);
   background:
     linear-gradient(var(--scroll-bg) 30%, transparent) top / 100% 2rem no-repeat local,
     linear-gradient(transparent, var(--scroll-bg) 70%) bottom / 100% 2rem no-repeat local,
-    radial-gradient(farthest-side at 50% 0, var(--scroll-shadow), transparent) top / 100% 0.75rem no-repeat scroll,
-    radial-gradient(farthest-side at 50% 100%, var(--scroll-shadow), transparent) bottom / 100% 0.75rem no-repeat scroll;
+    linear-gradient(var(--scroll-shadow), transparent) top / 100% 0.5rem no-repeat scroll,
+    linear-gradient(transparent, var(--scroll-shadow)) bottom / 100% 0.5rem no-repeat scroll;
   &:where(.dark, .dark *) {
     --scroll-bg: var(--color-gray-900);
-    --scroll-shadow: rgb(0 0 0 / 0.5);
+    --scroll-shadow: rgb(0 0 0 / 0.35);
   }
 }

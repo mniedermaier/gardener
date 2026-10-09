@@ -169,13 +169,14 @@ export function LocationPicker({ value, onChange, prominent = false }: LocationP
         </ul>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant={prominent ? "primary" : "secondary"} className={prominent ? "w-full sm:w-auto" : undefined} onClick={locate} disabled={locating}>
+      <div className={prominent ? "flex flex-col items-start gap-1" : "flex flex-wrap items-center gap-2"}>
+        <Button variant={prominent ? "primary" : "secondary"} className={prominent ? "w-full" : undefined} onClick={locate} disabled={locating}>
           {locating ? <Loader2 size={16} aria-hidden="true" className="animate-spin" /> : <LocateFixed size={16} aria-hidden="true" />}
           {t("location.useDevice")}
         </Button>
-        <Button variant={prominent ? "secondary" : "ghost"} className={prominent ? "w-full sm:w-auto" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
-          {prominent && <Keyboard size={16} aria-hidden="true" />}
+        {/* First run: coordinates are the expert path, so a quiet link under the main action. */}
+        <Button variant="ghost" size={prominent ? "sm" : undefined} className={prominent ? "-ml-2 min-h-11 text-garden-700 dark:text-garden-300" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+          {prominent && <Keyboard size={14} aria-hidden="true" />}
           {t("location.manual")}
         </Button>
         {hasCoords && (

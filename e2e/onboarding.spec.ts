@@ -13,7 +13,7 @@ test("onboarding wizard completes successfully", async ({ page }) => {
 
   await expect(page.getByRole("heading", { name: /Where is your garden/i })).toBeVisible({ timeout: 10000 });
   await expect(page.getByText("Step 2 of 4")).toBeVisible();
-  await page.getByRole("button", { name: /Set later/i }).click();
+  await page.getByRole("button", { name: /Continue without location/i }).click();
 
   await expect(page.getByRole("heading", { name: /frost/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: /Next/i }).click();
@@ -32,12 +32,12 @@ test("onboarding can be done in German, with the example garden", async ({ page 
   await page.getByRole("button", { name: /geht/i }).click();
 
   await expect(page.getByRole("heading", { name: /Garten/i })).toBeVisible({ timeout: 10000 });
-  await page.getByRole("button", { name: /Später festlegen/i }).click();
+  await page.getByRole("button", { name: /Ohne Standort weiter/i }).click();
 
   await expect(page.getByRole("heading", { name: /Frost/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: /Zurück/i }).click();
   await expect(page.getByRole("heading", { name: /Wo liegt/i })).toBeVisible();
-  await page.getByRole("button", { name: /Später festlegen/i }).click();
+  await page.getByRole("button", { name: /Ohne Standort weiter/i }).click();
   await page.getByRole("button", { name: /Weiter/i }).click();
 
   await page.getByPlaceholder(/Hausgarten/i).fill("Mein Garten");

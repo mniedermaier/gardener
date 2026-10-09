@@ -239,7 +239,7 @@
     "getStarted": "Los geht’s",
     "locationTitle": "Wo liegt dein Garten?",
     "locationDesc": "Mit dem Standort berechnen wir Sonnenstand, Wetter und den typischen letzten Frost.",
-    "skip": "Später festlegen",
+    "skip": "Ohne Standort weiter",
     "frostTitle": "Wann ist der letzte Frost?",
     "frostDesc": "Von diesem Datum hängen Aussaat, Auspflanzen und Ernte ab. Du kannst es jederzeit ändern.",
     "frostEstimate": "Für {{place}} geschätzt: um den {{date}}. Lokale Erfahrung schlägt jede Schätzung.",
@@ -277,7 +277,9 @@
       "mild": "Mild",
       "mid": "Mittel",
       "cold": "Rau"
-    }
+    },
+    "locationPrivate": "Bleibt auf diesem Gerät, kein Konto nötig.",
+    "locationUses": "Nur für Wetter, Sonnenstand und Frosttermine."
   },
   "search": {
     "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen…",

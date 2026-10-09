@@ -255,7 +255,7 @@
     "getStarted": "Empezar",
     "locationTitle": "¿Dónde está tu huerto?",
     "locationDesc": "Con la ubicación calculamos la luz solar, el tiempo y la última helada habitual.",
-    "skip": "Más tarde",
+    "skip": "Seguir sin ubicación",
     "frostTitle": "¿Cuándo es la última helada?",
     "frostDesc": "De esta fecha dependen la siembra, el trasplante y la cosecha. Puedes cambiarla cuando quieras.",
     "frostEstimate": "Estimación para {{place}}: hacia el {{date}}. La experiencia local vale más que cualquier estimación.",
@@ -293,7 +293,9 @@
       "mild": "Suave",
       "mid": "Medio",
       "cold": "Duro"
-    }
+    },
+    "locationPrivate": "Se queda en este dispositivo, sin cuenta.",
+    "locationUses": "Solo para el tiempo, la luz solar y las heladas."
   },
   "planner": {
     "title": "Planificador",

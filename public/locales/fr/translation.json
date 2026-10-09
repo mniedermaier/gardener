@@ -255,7 +255,7 @@
     "getStarted": "C’est parti",
     "locationTitle": "Où se trouve votre jardin ?",
     "locationDesc": "Votre position nous permet de calculer l’ensoleillement, la météo et la dernière gelée habituelle.",
-    "skip": "Plus tard",
+    "skip": "Continuer sans position",
     "frostTitle": "Quand a lieu la dernière gelée ?",
     "frostDesc": "Les dates de semis, de plantation et de récolte en dépendent. Vous pouvez la modifier à tout moment.",
     "frostEstimate": "Estimation pour {{place}} : vers le {{date}}. L’expérience locale vaut mieux que toute estimation.",
@@ -293,7 +293,9 @@
       "mild": "Doux",
       "mid": "Moyen",
       "cold": "Rude"
-    }
+    },
+    "locationPrivate": "Reste sur cet appareil, sans compte.",
+    "locationUses": "Uniquement pour la météo, l’ensoleillement et les gelées."
   },
   "planner": {
     "title": "Plan du jardin",

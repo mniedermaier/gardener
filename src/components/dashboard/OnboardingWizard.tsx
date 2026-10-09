@@ -2,7 +2,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { LucideIcon } from "lucide-react";
 import {
-  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck,
+  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck, Sun,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -95,7 +95,7 @@ function GardenVignette() {
       <div className="mx-auto grid max-w-72 grid-cols-4 gap-2 rounded-xl border-4 border-earth-300 bg-earth-100 p-2 dark:border-earth-700 dark:bg-earth-900/40">
         {HERO_PLANTS.map((id) => (
           <span key={id} className="flex aspect-square items-center justify-center rounded-lg bg-white/70 dark:bg-white/5">
-            <PlantIconDisplay plantId={id} emoji="" size={30} />
+            <PlantIconDisplay plantId={id} emoji="" size={36} />
           </span>
         ))}
       </div>
@@ -124,7 +124,7 @@ function FrostPreview({ frost }: { frost: string }) {
   ];
   return (
     <div className="mt-5">
-      <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("onboarding.previewTitle")}</p>
+      <p className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("onboarding.previewTitle")}</p>
       <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 dark:divide-white/5 dark:border-white/10">
         {rows.map((r) => (
           <li key={r.id} className="flex items-center gap-3 px-3 py-2 text-sm">
@@ -258,7 +258,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
         </div>
 
         {/* Phones: the card fills the screen and the footer sits at the bottom, in thumb reach. */}
-        <Card className="flex flex-1 flex-col shadow-sm sm:block sm:flex-none">
+        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[40rem] sm:flex-none">
           {step === "welcome" && (
             <>
               <StepHeader icon={Sprout} title={t("onboarding.welcome")} description={t("onboarding.welcomeDesc")} visual={<GardenVignette />} />
@@ -284,6 +284,14 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             <>
               <StepHeader icon={MapPin} title={t("onboarding.locationTitle")} description={t("onboarding.locationDesc")} />
               <LocationPicker value={location} onChange={setLocationDraft} prominent />
+              <ul className="mt-6 space-y-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-white/5 dark:text-gray-400">
+                {([[ShieldCheck, "onboarding.locationPrivate"], [Sun, "onboarding.locationUses"]] as const).map(([Icon, key]) => (
+                  <li key={key} className="flex items-start gap-2.5">
+                    <Icon size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
+                    {t(key)}
+                  </li>
+                ))}
+              </ul>
             </>
           )}
 
@@ -312,7 +320,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               )}
               {!estimate && (
                 <div className="mt-4">
-                  <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("onboarding.climateLabel")}</p>
+                  <p className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("onboarding.climateLabel")}</p>
                   <SegmentedControl
                     label={t("onboarding.climateLabel")}
                     value={CLIMATES.find((c) => shownFrost.slice(5) === c.md)?.value ?? ""}
@@ -376,7 +384,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "ghost" : "primary"}>
                 {busy && <Loader2 size={16} aria-hidden="true" className="animate-spin" />}
                 {primaryLabel}
-                {step !== "start" && !skipLocation && <ArrowRight size={16} aria-hidden="true" />}
+                {step !== "start" && <ArrowRight size={16} aria-hidden="true" />}
               </Button>
             </div>
           </div>
