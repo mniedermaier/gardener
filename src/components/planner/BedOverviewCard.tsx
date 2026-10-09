@@ -9,6 +9,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { Badge } from "@/components/ui/Badge";
 import { Menu } from "@/components/ui/Menu";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { PLOT_BACKDROP } from "@/components/ui/plot";
 import { EnvironmentChip } from "./environment";
 import { MiniBedGrid } from "./BedGrid";
 
@@ -74,7 +75,7 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
         </div>
       </div>
 
-      <div className="mt-3 flex flex-1 items-center justify-center overflow-hidden rounded-lg py-1">
+      <div className={`mt-3 flex flex-1 items-center justify-center overflow-hidden rounded-lg p-3 ${PLOT_BACKDROP}`}>
         <MiniBedGrid bed={bed} plantMap={plantMap} conflicts={conflictMap} />
       </div>
 

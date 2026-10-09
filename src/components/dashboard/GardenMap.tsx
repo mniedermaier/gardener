@@ -15,13 +15,15 @@ import type { Bed, EnvironmentType, Garden } from "@/types/garden";
 import type { HarvestReadyItem } from "@/lib/season";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { PLOT_BACKDROP } from "@/components/ui/plot";
 import { useElementWidth } from "@/components/ui/charts/scale";
 
 // ------------------------------------------------------------------ layout
 
 const GAP_X = 16;
 const GAP_Y = 10;
-const LABEL_H = 22;
+/** Room for a two-line bed name below each row (narrow slots wrap instead of truncating). */
+const LABEL_H = 36;
 /** Strip above each row for the pins, so they never cover the top row of crops. */
 const PIN_H = 30;
 /** A bed's slot is at least this wide so its name stays readable. */
@@ -183,7 +185,7 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
       </div>
       <div
         ref={ref}
-        className="relative mx-4 mb-3 rounded-lg bg-garden-50 bg-[radial-gradient(circle_at_2px_2px,rgb(63_135_75/0.12)_1px,transparent_0)] bg-[length:12px_12px] p-4 sm:mx-5 dark:bg-garden-950/40 dark:bg-[radial-gradient(circle_at_2px_2px,rgb(143_194_150/0.07)_1px,transparent_0)]"
+        className={`relative mx-4 mb-3 rounded-lg p-4 sm:mx-5 ${PLOT_BACKDROP}`}
       >
         {width === 0 ? <div style={{ height: 180 }} aria-hidden="true" /> : (
           <ul aria-label={t("dashboard.mapLabel")} className="relative" style={{ height }}>
@@ -238,7 +240,7 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
                         </span>
                       )}
                     </span>
-                    <span className="mt-1.5 block truncate text-center text-xs font-medium text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-gray-50">
+                    <span className="mt-1.5 line-clamp-2 hyphens-auto break-words text-center text-xs leading-tight font-medium text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-gray-50">
                       {bed.name}
                     </span>
                   </Link>

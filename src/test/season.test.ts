@@ -147,7 +147,7 @@ describe("autumn season: tasks, palette, garden agenda agree", () => {
 
   it("keeps winter salads going under glass, but no garlic or onion sets there", () => {
     const palette = ids(getPlantableNow(plants, FROST, { now: new Date(2026, 9, 25), ...glass }));
-    expect(palette).toEqual(expect.arrayContaining(["spinach", "lambs_lettuce", "lettuce"]));
+    expect(palette).toEqual(expect.arrayContaining(["spinach", "lambs_lettuce", "lettuce", "winter_purslane"]));
     expect(palette).not.toContain("garlic");
     expect(palette).not.toContain("onion");
   });
@@ -157,6 +157,9 @@ describe("autumn season: tasks, palette, garden agenda agree", () => {
     expect(ids(getPlantableNow(plants, FROST, { now: late, environmentType: "outdoor_bed" }))).not.toContain("spinach");
     expect(ids(getPlantableNow(plants, FROST, { now: late, ...raised }))).toContain("spinach");
     expect(ids(getPlantableNow(plants, FROST, { now: new Date(2026, 10, 10), ...glass }))).toContain("spinach");
+    // Winter purslane: open ground until the end of September, under glass until the end of October.
+    expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...raised }))).not.toContain("winter_purslane");
+    expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...glass }))).toContain("winter_purslane");
   });
 
   it("garden agenda is exactly the union of the bed palettes, with the beds named", () => {

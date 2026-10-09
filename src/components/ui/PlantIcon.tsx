@@ -421,6 +421,20 @@ const PLANT_SVGS: Record<string, string> = {
     <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#65a30d" transform="rotate(28 12 14)"/>
     <path d="M12 14L9.2 8.8M12 14L14.8 8.8M12 14L6.6 13M12 14L17.4 13" stroke="#365314" stroke-width="0.5" stroke-linecap="round" opacity="0.6"/>
     <circle cx="12" cy="14" r="1.6" fill="#84cc16"/>`,
+
+  // Winterportulak: fleshy spoon leaves below, round leaf discs pierced by the flower stalk.
+  winter_purslane: `
+    <path d="M12 22V8M12 22L7 10M12 22L17 10" stroke="#4d7c0f" stroke-width="1.1" stroke-linecap="round"/>
+    <ellipse cx="7.5" cy="19" rx="3.2" ry="1.6" fill="#65a30d" transform="rotate(-25 7.5 19)"/>
+    <ellipse cx="16.5" cy="19" rx="3.2" ry="1.6" fill="#65a30d" transform="rotate(25 16.5 19)"/>
+    <ellipse cx="7" cy="11" rx="3.4" ry="2.4" fill="#4d7c0f"/>
+    <ellipse cx="17" cy="11" rx="3.4" ry="2.4" fill="#4d7c0f"/>
+    <ellipse cx="12" cy="9" rx="4" ry="2.8" fill="#65a30d"/>
+    <ellipse cx="12" cy="8.6" rx="2.6" ry="1.6" fill="#84cc16" opacity="0.5"/>
+    <path d="M7 11V7.5M17 11V7.5M12 9V4.5" stroke="#4d7c0f" stroke-width="0.8" stroke-linecap="round"/>
+    <circle cx="7" cy="7" r="1.1" fill="#ffffff" stroke="#d4d4d8" stroke-width="0.3"/>
+    <circle cx="17" cy="7" r="1.1" fill="#ffffff" stroke="#d4d4d8" stroke-width="0.3"/>
+    <circle cx="12" cy="4" r="1.2" fill="#ffffff" stroke="#d4d4d8" stroke-width="0.3"/>`,
 };
 
 import { memo, useId, useMemo } from "react";

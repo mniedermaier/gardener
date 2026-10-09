@@ -1668,5 +1668,37 @@
       "isolationDistanceM": 50,
       "seedViabilityYears": 4
     }
+  },
+  {
+    "id": "winter_purslane",
+    "category": "vegetable",
+    "sowIndoorsWeeks": null,
+    "sowOutdoorsWeeks": -6,
+    "transplantWeeks": null,
+    "harvestDaysMin": 42,
+    "harvestDaysMax": 70,
+    "spacingCm": 10,
+    "rowSpacingCm": 20,
+    "sunRequirement": "partial",
+    "waterNeed": "medium",
+    "companions": [
+      "lambs_lettuce",
+      "spinach",
+      "radish"
+    ],
+    "antagonists": [],
+    "color": "#4d7c0f",
+    "icon": "🌱",
+    "caloriesPer100g": 20,
+    "proteinPer100g": 2,
+    "vitaminCPer100g": 33,
+    "fiberPer100g": 1,
+    "expectedYieldKgPerM2": 1,
+    "preservationMethods": [],
+    "seedSaving": {
+      "difficulty": "easy",
+      "isolationDistanceM": 10,
+      "seedViabilityYears": 3
+    }
   }
 ]

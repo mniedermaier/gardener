@@ -734,6 +734,10 @@
       "lambs_lettuce": {
         "name": "Canónigos",
         "description": "Ensalada de invierno resistente a las heladas. Siembra de julio a principios de octubre, cosecha de otoño a primavera."
+      },
+      "winter_purslane": {
+        "name": "Verdolaga de invierno",
+        "description": "Verdura de hoja resistente a las heladas, de hojas carnosas. Siembra en agosto y septiembre, bajo cristal hasta finales de octubre; cosecha hasta la primavera."
       }
     },
     "customIcon": "Icono",

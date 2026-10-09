@@ -716,6 +716,10 @@
       "lambs_lettuce": {
         "name": "Lamb's lettuce",
         "description": "Hardy winter salad. Sow from July to early October, harvest from autumn to spring."
+      },
+      "winter_purslane": {
+        "name": "Winter purslane",
+        "description": "Hardy salad green with succulent leaves. Sow in August and September, under glass until the end of October; harvest into spring."
       }
     },
     "customIcon": "Icon",

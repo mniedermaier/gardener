@@ -59,6 +59,7 @@ export const plantFamilyMap: Record<string, PlantFamily> = {
   squash: "cucurbitaceae",
   asparagus: "other",
   lambs_lettuce: "other", // Feldsalat: Geißblattgewächse (früher Baldriangewächse), fruchtfolgeneutral
+  winter_purslane: "other", // Winterportulak: Quellkrautgewächse (Montiaceae), fruchtfolgeneutral
   pak_choi: "brassicaceae",
   endive: "asteraceae",
 };

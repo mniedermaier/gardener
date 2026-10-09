@@ -21,6 +21,7 @@ import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
 import { PlantableNowRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
+import { agendaPlantCount } from "@/lib/advisor";
 import { useToday } from "@/hooks/useToday";
 
 interface Range {
@@ -46,7 +47,7 @@ export function SeasonTimeline() {
   const getPlantName = usePlantName();
   const [filter, setFilter] = useState<string>("all");
   const sowing = useSowingAgenda();
-  const plantableCount = sowing.now.length;
+  const plantableCount = agendaPlantCount(sowing.now);
 
   const todayKey = todayISO();
   const today = useMemo(() => startOfDay(toDate(todayKey) ?? now), [todayKey, now]);
@@ -126,7 +127,7 @@ export function SeasonTimeline() {
 
   // Same agenda as the dashboard: what can be sown or planted, planted or not.
   const sowingList = sowing.now.length + sowing.soon.length > 0 && (
-    <List header={`${t("advisor.title")} · ${sowing.now.length}`}>
+    <List header={`${t("advisor.title")} · ${plantableCount}`}>
       <PlantableNowRows now={sowing.now} soon={sowing.soon} limit={8} />
     </List>
   );

@@ -11,6 +11,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useHarvestReady } from "@/hooks/useHarvestReady";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
+import { agendaPlantCount } from "@/lib/advisor";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { Card } from "@/components/ui/Card";
@@ -140,7 +141,7 @@ export function Dashboard() {
                 className="[&>[role=tablist]]:px-2"
                 items={[
                   { value: "harvest", label: t("dashboard.tabHarvest"), count: harvestReady.length },
-                  { value: "sow", label: t("dashboard.tabSow"), count: sowing.now.length },
+                  { value: "sow", label: t("dashboard.tabSow"), count: agendaPlantCount(sowing.now) },
                 ]}
               >
                 <div className="-mt-4">

@@ -49,6 +49,7 @@ interface AutumnWindow {
  * sowing calendars (e.g. Mein schöner Garten, Bayerische Gartenakademie):
  * - Winter spinach: sow mid-August to early October for a spring cut; under glass into November.
  * - Lamb's lettuce (Feldsalat): sow mid-July to early October; under glass until the end of October.
+ * - Winter purslane (Winterportulak): sow August and September; under glass until the end of October.
  * - Winter lettuce: sow August to mid-September, plant out mid-September to mid-October; under glass until the end of October.
  * - Garlic cloves and winter onion sets: September to mid-November / mid-October, open ground only.
  * - Bare-root berry shrubs: October and November.
@@ -63,6 +64,7 @@ const AUTUMN_WINDOWS: Record<string, AutumnWindow[]> = {
   strawberry: [{ action: "plant_autumn", from: [8, 1], to: [9, 30] }],
   spinach: [{ action: "sow_autumn", from: [8, 15], to: [10, 10], protectedTo: [11, 15] }],
   lambs_lettuce: [{ action: "sow_autumn", from: [7, 15], to: [10, 10], protectedTo: [10, 31] }],
+  winter_purslane: [{ action: "sow_autumn", from: [8, 1], to: [9, 30], protectedTo: [10, 31] }],
   arugula: [{ action: "sow_autumn", from: [8, 1], to: [9, 30], protectedTo: [10, 31] }],
   radish: [{ action: "sow_autumn", from: [8, 1], to: [9, 30], protectedTo: [10, 31] }],
   lettuce: [
@@ -216,6 +218,11 @@ export function getGardenSowingAgenda(
     now: [...now.values()].sort((a, b) => a.until.getTime() - b.until.getTime()),
     soon: [...soon.values()].filter((i) => !nowIds.has(i.plantId)).sort((a, b) => a.from.getTime() - b.from.getTime()),
   };
+}
+
+/** Crops on an agenda list: one per plant, as the rows show them (lettuce sown under glass and planted out counts once). */
+export function agendaPlantCount(items: Array<{ plantId: string }>): number {
+  return new Set(items.map((i) => i.plantId)).size;
 }
 
 /** Task type of an agenda action (autumn sowing is a direct sowing, autumn planting a planting out). */

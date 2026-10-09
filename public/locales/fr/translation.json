@@ -734,6 +734,10 @@
       "lambs_lettuce": {
         "name": "Mâche",
         "description": "Salade d’hiver rustique. Semis de juillet à début octobre, récolte de l’automne au printemps."
+      },
+      "winter_purslane": {
+        "name": "Claytone de Cuba",
+        "description": "Salade d’hiver rustique aux feuilles charnues. Semis en août et septembre, sous abri jusqu’à fin octobre ; récolte jusqu’au printemps."
       }
     },
     "customIcon": "Icône",

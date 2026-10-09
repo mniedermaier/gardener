@@ -716,6 +716,10 @@
       "lambs_lettuce": {
         "name": "Feldsalat",
         "description": "Winterharter Wintersalat. Aussaat Juli bis Anfang Oktober, Ernte von Herbst bis Frühjahr."
+      },
+      "winter_purslane": {
+        "name": "Winterportulak",
+        "description": "Winterharter Blattsalat mit fleischigen Blättern. Aussaat August bis September, unter Glas bis Ende Oktober; Ernte bis ins Frühjahr."
       }
     },
     "customIcon": "Symbol",

@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { usePlantMap } from "@/hooks/usePlants";
@@ -9,7 +9,26 @@ import { ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { PhaseBadge, actionPhase } from "@/components/ui/phase";
 
-type Item = { kind: "now"; item: PlantableNow } | { kind: "soon"; item: PlantableSoon };
+/** One row per plant: a crop can be due for different actions in different beds (lettuce: sow under glass, plant out in the raised bed). */
+interface Item { kind: "now" | "soon"; plantId: string; actions: PlantableNow["action"][]; date: Date; beds: AgendaBed[] }
+
+function groupByPlant(kind: Item["kind"], rows: Array<PlantableNow | PlantableSoon>): Item[] {
+  const byPlant = new Map<string, Item>();
+  for (const row of rows) {
+    const date = kind === "now" ? (row as PlantableNow).until : (row as PlantableSoon).from;
+    const hit = byPlant.get(row.plantId);
+    if (!hit) {
+      byPlant.set(row.plantId, { kind, plantId: row.plantId, actions: [row.action], date, beds: [...(row.beds ?? [])] });
+      continue;
+    }
+    if (!hit.actions.includes(row.action)) hit.actions.push(row.action);
+    // Now: open until the latest close; soon: from the earliest opening.
+    if (kind === "now" ? date > hit.date : date < hit.date) hit.date = date;
+    for (const b of row.beds ?? []) if (!hit.beds.some((x) => x.id === b.id)) hit.beds.push(b);
+  }
+  // A merged row can close later (open earlier) than its first action: sort again.
+  return [...byPlant.values()].sort((a, b) => a.date.getTime() - b.date.getTime());
+}
 
 /**
  * Rows of the sowing agenda (`useSowingAgenda`): what can be sown or planted
@@ -27,29 +46,30 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const bedLabel = (beds?: AgendaBed[]) =>
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
-  const items: Item[] = [...now.map((item) => ({ kind: "now" as const, item })), ...soon.map((item) => ({ kind: "soon" as const, item }))];
+  const items = useMemo(() => [...groupByPlant("now", now), ...groupByPlant("soon", soon)], [now, soon]);
   const shown = expanded ? items : items.slice(0, limit);
   const hidden = items.length - shown.length;
 
   return (
     <>
-      {shown.map(({ kind, item }) => {
+      {shown.map((item) => {
         const plant = plantMap.get(item.plantId);
         if (!plant) return null;
-        const date = kind === "now" ? (item as PlantableNow).until : (item as PlantableSoon).from;
         return (
           <ListRow
-            key={`${item.plantId}-${item.action}`}
+            key={`${item.kind}-${item.plantId}`}
             leading={<PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />}
             title={getPlantName(item.plantId)}
-            badges={<PhaseBadge phase={actionPhase(item.action)} label={t(`advisor.actions.${item.action}`)} />}
+            badges={item.actions.map((action) => (
+              <PhaseBadge key={action} phase={actionPhase(action)} label={t(`advisor.actions.${action}`)} />
+            ))}
             meta={[
-              kind === "now" ? t("calendar.until", { date: formatDate(date, "short") }) : t("calendar.from", { date: formatDate(date, "short") }),
+              item.kind === "now" ? t("calendar.until", { date: formatDate(item.date, "short") }) : t("calendar.from", { date: formatDate(item.date, "short") }),
               bedLabel(item.beds),
             ].filter(Boolean).join(" · ")}
             onClick={() => {
               // With beds: straight to placing it (one bed: that bed; several: pick one). Indoors: the plant.
-              const beds = item.beds ?? [];
+              const beds = item.beds;
               if (beds.length === 0) navigate(`/plants?plant=${encodeURIComponent(plant.id)}`);
               else navigate(beds.length === 1 ? `/planner?bed=${encodeURIComponent(beds[0].id)}` : "/planner", { state: { placePlantId: plant.id } });
             }}
