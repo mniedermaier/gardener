@@ -187,6 +187,8 @@ export function SeasonTimeline() {
             ? t("calendar.until", { date: formatDate(range.end, "short") })
             : t("calendar.from", { date: formatDate(range.start, "short") }),
         ]}
+        // Same behaviour as the sowing rows below: every agenda row opens its plant.
+        onClick={() => navigate(`/plants?plant=${encodeURIComponent(tl.plantId)}`)}
       />
     );
   };
@@ -201,19 +203,21 @@ export function SeasonTimeline() {
             ? agenda.now.map((a) => agendaRow(a, "now", nowPhase === null))
             : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNow")}</li>}
         </List>
-        {/* Nothing starts soon: one line, not a whole card saying "0". */}
-        {agenda.next.length > 0 ? (
+        {agenda.next.length > 0 && (
           <List headingLevel={2} header={[t("calendar.next4Weeks"), nextPhase && phaseLabel(nextPhase), agenda.next.length].filter((x) => x !== null).join(" · ")}>
             {agenda.next.map((a) => agendaRow(a, "next", nextPhase === null))}
           </List>
-        ) : (
-          <p className="px-1 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNextLine")}</p>
         )}
         {sowingList}
+        {/* Nothing starts in the next 4 weeks: the header says when the next window opens,
+            instead of a separate "nothing new" line above a list of things to sow. */}
         {agenda.later.length > 0 && (
-          <List headingLevel={2} header={t("calendar.upNext")}>
+          <List headingLevel={2} header={t("calendar.upNextFrom", { date: formatDate(agenda.later[0].range.start, "short") })}>
             {agenda.later.map((a) => agendaRow(a, "next"))}
           </List>
+        )}
+        {agenda.next.length === 0 && agenda.later.length === 0 && !sowingList && (
+          <p className="px-1 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNextLine")}</p>
         )}
       </div>
 

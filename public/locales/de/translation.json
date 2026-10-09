@@ -925,14 +925,11 @@
     "allBeds": "Alle Beete",
     "today": "Heute",
     "lastFrost": "Letzter Frost",
-    "upNext": "Als Nächstes",
     "nowDue": "Jetzt dran",
     "next4Weeks": "Nächste 4 Wochen",
     "nothingNow": "Gerade läuft kein Aussaat-, Pflanz- oder Erntefenster.",
     "until": "bis {{date}}",
     "from": "ab {{date}}",
-    "bedsUntil": "{{beds}} bis {{date}}",
-    "bedsFrom": "{{beds}} ab {{date}}",
     "title": "Kalender",
     "noTasks": "Noch keine Aufgaben. Plane deinen Garten um automatisch Aufgaben zu erstellen.",
     "thisWeek": "Diese Woche",
@@ -965,7 +962,10 @@
       "custom": "Eigene"
     },
     "reopenNamed": "„{{title}}“ wieder öffnen",
-    "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete."
+    "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
+    "untilRange": "bis {{first}} – {{last}} je nach Beet",
+    "fromRange": "ab {{first}} – {{last}} je nach Beet",
+    "upNextFrom": "Als Nächstes · ab {{date}}"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1040,7 +1040,17 @@
     "weatherProviderActive": "Aktiver Anbieter: {{provider}}. Mit Schlüssel nutzt Gardener OpenWeatherMap, ohne Schlüssel Open-Meteo.",
     "weatherKeyRejected": "Schlüssel abgelehnt – Open-Meteo wird verwendet. Prüfe den OpenWeatherMap-Schlüssel oder lösche ihn.",
     "weatherOwmUnavailable": "OpenWeatherMap ist gerade nicht erreichbar – Open-Meteo wird verwendet.",
-    "weatherKeyChecking": "Schlüssel wird geprüft …"
+    "weatherKeyChecking": "Schlüssel wird geprüft …",
+    "analysisTitle": "Auswertung",
+    "analysisDesc": "Grundlage für Selbstversorgung und Ernährungsplan.",
+    "pricesHint": "Preise für Eier, Honig und andere Tierprodukte stellst du bei den Kosten ein.",
+    "pricesLink": "Zu den Kosten",
+    "aboutTitle": "Über Gardener",
+    "aboutDesc": "Version, Datenschutz und Quellcode.",
+    "version": "Version",
+    "privacyPolicy": "Datenschutzerklärung",
+    "sourceCode": "Quellcode auf GitHub",
+    "license": "Lizenz (MIT)"
   },
   "dataManagement": {
     "title": "Daten & Backup",
@@ -1118,7 +1128,8 @@
     "frostGroupTitleMixed_one": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
     "frostGroupTitleMixed_other": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
     "frostHardNights_one": "Frost in {{count}} Nacht",
-    "frostHardNights_other": "Frost in {{count}} Nächten"
+    "frostHardNights_other": "Frost in {{count}} Nächten",
+    "frostAdviceNoPlants": "Mit dem Auspflanzen warten, bis die Frostnächte vorbei sind."
   },
   "harvest": {
     "title": "Ernte",
@@ -1893,7 +1904,9 @@
     },
     "openInPlanner": "Im Planer öffnen",
     "yourNote": "Notiz:",
-    "emptyNoBeds": "Bodentests und Düngungen gehören zu einem Beet. Lege zuerst im Planer ein Beet an."
+    "emptyNoBeds": "Bodentests und Düngungen gehören zu einem Beet. Lege zuerst im Planer ein Beet an.",
+    "moreMeasures_one": "{{count}} weitere Maßnahme",
+    "moreMeasures_other": "{{count}} weitere Maßnahmen"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2278,7 +2291,7 @@
     "allPlants": "Alle Pflanzen"
   },
   "importPage": {
-    "title": "Geteilten Garten importieren",
+    "title": "Garten importieren",
     "subtitle": "Jemand hat einen Gartenplan mit dir geteilt. Prüfe die Vorschau und lege ihn als neuen Garten an.",
     "invalidTitle": "Dieser Link funktioniert nicht",
     "invalidText": "Der Teilen-Link ist unvollständig oder beschädigt. Bitte die Person, ihn noch einmal zu schicken.",
@@ -2294,7 +2307,10 @@
     "bedsHeader": "Beete in der Vorlage",
     "size": "{{w}} × {{h}} Felder",
     "importAction": "Als neuen Garten anlegen",
-    "done": "„{{name}}“ wurde angelegt"
+    "done": "„{{name}}“ wurde angelegt",
+    "noLinkSubtitle": "Gartenpläne aus einem Teilen-Link übernehmen.",
+    "noLinkTitle": "Garten aus einem Link übernehmen",
+    "noLinkText": "Hat jemand einen Gartenplan mit dir geteilt? Öffne den Link, dann siehst du hier die Vorschau. Deine eigenen Daten stellst du aus einem Backup wieder her."
   },
   "charts": {
     "month": "Monat",

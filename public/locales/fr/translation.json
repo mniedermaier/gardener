@@ -950,14 +950,11 @@
     "allBeds": "Toutes les planches",
     "today": "Aujourd'hui",
     "lastFrost": "Dernières gelées",
-    "upNext": "Ensuite",
     "nowDue": "En ce moment",
     "next4Weeks": "4 prochaines semaines",
     "nothingNow": "Aucune fenêtre de semis, plantation ou récolte n'est ouverte en ce moment.",
     "until": "jusqu'au {{date}}",
     "from": "à partir du {{date}}",
-    "bedsUntil": "{{beds}} jusqu'au {{date}}",
-    "bedsFrom": "{{beds}} à partir du {{date}}",
     "title": "Calendrier",
     "noTasks": "Aucune tâche pour le moment. Planifiez votre jardin pour générer des tâches automatiquement.",
     "thisWeek": "Cette semaine",
@@ -993,7 +990,10 @@
       "custom": "Personnalisée"
     },
     "reopenNamed": "Rouvrir « {{title}} »",
-    "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches."
+    "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
+    "untilRange": "jusqu’au {{first}} – {{last}} selon la planche",
+    "fromRange": "dès le {{first}} – {{last}} selon la planche",
+    "upNextFrom": "Ensuite · dès le {{date}}"
   },
   "settings": {
     "title": "Paramètres",
@@ -1068,7 +1068,17 @@
     "weatherProviderActive": "Fournisseur actif : {{provider}}. Avec une clé, Gardener utilise OpenWeatherMap ; sans clé, Open-Meteo.",
     "weatherKeyRejected": "Clé refusée – Open-Meteo est utilisé. Vérifiez la clé OpenWeatherMap ou supprimez-la.",
     "weatherOwmUnavailable": "OpenWeatherMap est injoignable pour l’instant – Open-Meteo est utilisé.",
-    "weatherKeyChecking": "Vérification de la clé…"
+    "weatherKeyChecking": "Vérification de la clé…",
+    "analysisTitle": "Analyse",
+    "analysisDesc": "La base de l’autonomie et du plan alimentaire.",
+    "pricesHint": "Les prix des œufs, du miel et des autres produits animaux se règlent dans les coûts.",
+    "pricesLink": "Aller aux coûts",
+    "aboutTitle": "À propos de Gardener",
+    "aboutDesc": "Version, confidentialité et code source.",
+    "version": "Version",
+    "privacyPolicy": "Politique de confidentialité",
+    "sourceCode": "Code source sur GitHub",
+    "license": "Licence (MIT)"
   },
   "dataManagement": {
     "title": "Données et sauvegarde",
@@ -1156,7 +1166,8 @@
     "frostGroupTitleMixed_many": "{{hard}}, risque de gel {{count}} autres nuits, jusqu’à {{temp}} ({{day}})",
     "frostHardNights_one": "Gel {{count}} nuit",
     "frostHardNights_other": "Gel {{count}} nuits",
-    "frostHardNights_many": "Gel {{count}} nuits"
+    "frostHardNights_many": "Gel {{count}} nuits",
+    "frostAdviceNoPlants": "Attendez la fin des nuits de gel pour repiquer."
   },
   "harvest": {
     "title": "Récolte",
@@ -1976,7 +1987,10 @@
     },
     "openInPlanner": "Ouvrir dans le planificateur",
     "yourNote": "Note :",
-    "emptyNoBeds": "Les analyses et amendements se rattachent à une planche. Créez d’abord une planche dans le planificateur."
+    "emptyNoBeds": "Les analyses et amendements se rattachent à une planche. Créez d’abord une planche dans le planificateur.",
+    "moreMeasures_one": "{{count}} autre mesure",
+    "moreMeasures_other": "{{count}} autres mesures",
+    "moreMeasures_many": "{{count}} autres mesures"
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -2379,7 +2393,7 @@
     "allPlants": "Toutes les plantes"
   },
   "importPage": {
-    "title": "Importer un jardin partagé",
+    "title": "Importer un jardin",
     "subtitle": "Quelqu’un a partagé un plan de jardin avec vous. Vérifiez l’aperçu et ajoutez-le comme nouveau jardin.",
     "invalidTitle": "Ce lien ne fonctionne pas",
     "invalidText": "Le lien de partage est incomplet ou endommagé. Demandez à l’expéditeur de le renvoyer.",
@@ -2397,7 +2411,10 @@
     "importAction": "Ajouter comme nouveau jardin",
     "done": "« {{name}} » a été créé",
     "beds_many": "{{count}} planches",
-    "plantings_many": "{{count}} plantations"
+    "plantings_many": "{{count}} plantations",
+    "noLinkSubtitle": "Reprendre des plans de jardin depuis un lien de partage.",
+    "noLinkTitle": "Reprendre un jardin depuis un lien",
+    "noLinkText": "Quelqu’un a partagé un plan de jardin avec vous ? Ouvrez le lien et l’aperçu s’affiche ici. Vos propres données se restaurent depuis une sauvegarde."
   },
   "charts": {
     "month": "Mois",

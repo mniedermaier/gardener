@@ -17,6 +17,8 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
+import { Link } from "react-router-dom";
+import { HouseholdSizeField } from "@/components/sufficiency/HouseholdSizeField";
 import { DataManagement } from "./DataManagement";
 import { LocationPicker, type PickedLocation } from "./LocationPicker";
 import { useToday } from "@/hooks/useToday";
@@ -365,6 +367,16 @@ export function SettingsPage() {
           />
         </Section>}
 
+        <Section id="settings-analysis" title={t("settings.analysisTitle")} description={t("settings.analysisDesc")}>
+          <div className="space-y-3">
+            <HouseholdSizeField />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("settings.pricesHint")}{" "}
+              <Link to="/expenses" className="font-medium text-garden-700 hover:underline dark:text-garden-300">{t("settings.pricesLink")}</Link>
+            </p>
+          </div>
+        </Section>
+
         <Section id="settings-data" title={t("dataManagement.title")} description={t("settings.dataDesc")}>
           <DataManagement />
         </Section>
@@ -384,6 +396,27 @@ export function SettingsPage() {
             </a>
           </div>
         </Section>}
+
+        <Section id="settings-about" title={t("settings.aboutTitle")} description={t("settings.aboutDesc")}>
+          <dl className="divide-y divide-gray-100 text-sm dark:divide-white/5">
+            <div className="flex items-center justify-between gap-3 pb-3">
+              <dt className="text-gray-600 dark:text-gray-400">{t("settings.version")}</dt>
+              <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">{__APP_VERSION__}</dd>
+            </div>
+            {[
+              { href: `${import.meta.env.BASE_URL}privacy.html`, label: t("settings.privacyPolicy") },
+              { href: "https://github.com/mniedermaier/gardener", label: t("settings.sourceCode") },
+              { href: "https://github.com/mniedermaier/gardener/blob/main/LICENSE", label: t("settings.license") },
+            ].map((l) => (
+              <div key={l.href} className="py-1 last:pb-0">
+                <a href={l.href} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-between gap-3 font-medium text-gray-900 hover:text-garden-700 dark:text-gray-100 dark:hover:text-garden-300">
+                  {l.label}
+                  <ExternalLink size={14} aria-hidden="true" className="text-gray-500" />
+                </a>
+              </div>
+            ))}
+          </dl>
+        </Section>
 
         <Section id="settings-danger" title={t("settings.danger.title")} description={t("settings.danger.desc")} tone="danger">
           <div className="flex flex-wrap items-center justify-between gap-3">

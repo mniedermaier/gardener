@@ -85,9 +85,10 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
       }
       meta={meta}
       description={task.description}
-      // One slot, one shape: the plant when the task has one, else the task type — always in the same tile.
+      // One slot, one size: the plant when the task has one, else the task type. No fill —
+      // a grey tile read as a button and swallowed pale plant icons (garlic).
       trailing={
-        <span className="inline-flex size-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
+        <span className="inline-flex size-8 items-center justify-center text-gray-500 dark:text-gray-400" aria-hidden="true">
           {plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} /> : <TypeIcon size={16} />}
         </span>
       }

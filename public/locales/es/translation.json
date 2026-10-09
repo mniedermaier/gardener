@@ -950,14 +950,11 @@
     "allBeds": "Todos los bancales",
     "today": "Hoy",
     "lastFrost": "Última helada",
-    "upNext": "Lo siguiente",
     "nowDue": "Ahora",
     "next4Weeks": "Próximas 4 semanas",
     "nothingNow": "Ahora no hay ninguna ventana de siembra, trasplante o cosecha abierta.",
     "until": "hasta {{date}}",
     "from": "desde {{date}}",
-    "bedsUntil": "{{beds}} hasta {{date}}",
-    "bedsFrom": "{{beds}} desde {{date}}",
     "title": "Calendario",
     "noTasks": "Aún no hay tareas. Planifica tu huerto para generar tareas automáticamente.",
     "thisWeek": "Esta semana",
@@ -993,7 +990,10 @@
       "custom": "Personalizada"
     },
     "reopenNamed": "Reabrir «{{title}}»",
-    "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales."
+    "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
+    "untilRange": "hasta {{first}} – {{last}} según bancal",
+    "fromRange": "desde {{first}} – {{last}} según bancal",
+    "upNextFrom": "Lo siguiente · desde el {{date}}"
   },
   "settings": {
     "title": "Ajustes",
@@ -1068,7 +1068,17 @@
     "weatherProviderActive": "Proveedor activo: {{provider}}. Con clave, Gardener usa OpenWeatherMap; sin clave, Open-Meteo.",
     "weatherKeyRejected": "Clave rechazada: se usa Open-Meteo. Revisa la clave de OpenWeatherMap o elimínala.",
     "weatherOwmUnavailable": "OpenWeatherMap no está disponible ahora: se usa Open-Meteo.",
-    "weatherKeyChecking": "Comprobando la clave…"
+    "weatherKeyChecking": "Comprobando la clave…",
+    "analysisTitle": "Análisis",
+    "analysisDesc": "La base para la autosuficiencia y el plan de alimentación.",
+    "pricesHint": "Los precios de huevos, miel y otros productos animales se ajustan en los costes.",
+    "pricesLink": "Ir a los costes",
+    "aboutTitle": "Acerca de Gardener",
+    "aboutDesc": "Versión, privacidad y código fuente.",
+    "version": "Versión",
+    "privacyPolicy": "Política de privacidad",
+    "sourceCode": "Código fuente en GitHub",
+    "license": "Licencia (MIT)"
   },
   "dataManagement": {
     "title": "Datos y copia de seguridad",
@@ -1156,7 +1166,8 @@
     "frostGroupTitleMixed_many": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
     "frostHardNights_one": "Helada en {{count}} noche",
     "frostHardNights_other": "Helada en {{count}} noches",
-    "frostHardNights_many": "Helada en {{count}} noches"
+    "frostHardNights_many": "Helada en {{count}} noches",
+    "frostAdviceNoPlants": "Espera a trasplantar hasta que pasen las noches de helada."
   },
   "harvest": {
     "title": "Cosecha",
@@ -1976,7 +1987,10 @@
     },
     "openInPlanner": "Abrir en el planificador",
     "yourNote": "Nota:",
-    "emptyNoBeds": "Los análisis y las enmiendas pertenecen a un bancal. Crea primero un bancal en el planificador."
+    "emptyNoBeds": "Los análisis y las enmiendas pertenecen a un bancal. Crea primero un bancal en el planificador.",
+    "moreMeasures_one": "{{count}} medida más",
+    "moreMeasures_other": "{{count}} medidas más",
+    "moreMeasures_many": "{{count}} medidas más"
   },
   "preservation": {
     "title": "Guía de conservación",
@@ -2379,7 +2393,7 @@
     "allPlants": "Todas las plantas"
   },
   "importPage": {
-    "title": "Importar huerto compartido",
+    "title": "Importar huerto",
     "subtitle": "Alguien ha compartido un plan de huerto contigo. Revisa la vista previa y añádelo como huerto nuevo.",
     "invalidTitle": "Este enlace no funciona",
     "invalidText": "El enlace está incompleto o dañado. Pide a quien te lo envió que lo mande de nuevo.",
@@ -2397,7 +2411,10 @@
     "importAction": "Añadir como huerto nuevo",
     "done": "Se ha creado «{{name}}»",
     "beds_many": "{{count}} bancales",
-    "plantings_many": "{{count}} plantaciones"
+    "plantings_many": "{{count}} plantaciones",
+    "noLinkSubtitle": "Adopta planes de huerto desde un enlace compartido.",
+    "noLinkTitle": "Adoptar un huerto desde un enlace",
+    "noLinkText": "¿Alguien ha compartido un plan de huerto contigo? Abre el enlace y aquí verás la vista previa. Tus propios datos se restauran desde una copia de seguridad."
   },
   "charts": {
     "month": "Mes",

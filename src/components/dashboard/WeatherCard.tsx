@@ -112,7 +112,11 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
                 <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{formatDate(d.date, "weekday")}</p>
                 <WeatherIcon code={d.icon} size={20} label={d.description} className="mx-auto my-1.5 text-gray-600 dark:text-gray-300" />
                 <p className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{formatTemperature(d.tempMax)}</p>
-                <p className={`text-xs tabular-nums ${frost ? "font-medium text-danger" : "text-gray-500 dark:text-gray-400"}`}>{formatTemperature(d.tempMin)}</p>
+                {/* Neutral number; the snowflake marks the frost night (colour carries meaning once, not on the figure). */}
+                <p className="inline-flex items-center justify-center gap-1 text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                  {frost && <Snowflake size={12} aria-label={t("weather.frostRisk")} className="text-info" />}
+                  {formatTemperature(d.tempMin)}
+                </p>
               </li>
             );
           })}

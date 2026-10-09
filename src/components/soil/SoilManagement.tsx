@@ -8,7 +8,7 @@ import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { useFormat } from "@/hooks/useFormat";
 import { todayISO } from "@/lib/format";
-import { assessPh, bedPhTarget, NUTRIENT_RANGE, nutrientLevel, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
+import { assessPh, bedPhTarget, phStatus, NUTRIENT_RANGE, nutrientLevel, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
 import { usePlantName } from "@/hooks/usePlantName";
 import type { Amendment, AmendmentType, SoilTest } from "@/types/soil";
 import { Card } from "@/components/ui/Card";
@@ -33,7 +33,7 @@ const AMENDMENT_ICONS: Record<AmendmentType, LucideIcon> = {
   compost: Recycle, manure: Tractor, lime: Mountain, sulfur: FlaskConical, fertilizer: Sprout, mulch: Leaf, other: Package,
 };
 const ADVICE_TONE: Record<PhAdvice, Tone> = {
-  limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "info", sulfur: "warning", limeVeto: "info", averseHigh: "warning", acidify: "danger",
+  limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "warning", sulfur: "warning", limeVeto: "info", averseHigh: "warning", acidify: "danger",
 };
 const NUTRIENTS: Nutrient[] = ["nitrogen", "phosphorus", "potassium", "organicMatter"];
 
@@ -227,8 +227,8 @@ export function SoilManagement() {
             />
           </Card>
         ) : (
-          // items-start: a short card keeps its own height instead of stretching to its neighbour's.
-          <div className="grid items-start gap-4 md:grid-cols-2">
+          // Masonry columns: cards keep their own height and fill the holes a two-column grid leaves.
+          <div className="gap-4 md:columns-2">
             {sortedTests.map((s) => {
               const assessment = assessPh(s.ph, beds.byId.get(s.bedId)?.plantIds ?? []);
               const { advice, target } = assessment;
@@ -241,7 +241,7 @@ export function SoilManagement() {
                 return level === "optimal" ? [] : [t(`soil.nutrientAdvice.${n}.${level}`)];
               });
               return (
-                <article key={s.id} className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
+                <article key={s.id} className="relative mb-4 break-inside-avoid rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
@@ -280,7 +280,7 @@ export function SoilManagement() {
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("soil.ph")}</span>
                       <span className="flex items-baseline gap-2">
                         <span className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-50">{formatNumber(s.ph)}</span>
-                        <Badge tone={ADVICE_TONE[advice]} dot>{t(`soil.phStatus.${advice}`)}</Badge>
+                        <Badge tone={ADVICE_TONE[phStatus(advice)]} dot>{t(`soil.phStatus.${phStatus(advice)}`)}</Badge>
                       </span>
                     </div>
                     <Scale value={s.ph} min={target.min} max={target.max} scaleMin={4} scaleMax={9} label={`${t("soil.ph")} ${formatNumber(s.ph)}, ${t("soil.target")} ${rangeText(target)}`} />
@@ -322,10 +322,21 @@ export function SoilManagement() {
                       );
                     })}
                   </dl>
+                  {/* Two measures up front, the rest one tap away, so a card stays scannable. */}
                   {nutrientHints.length > 0 && (
                     <ul className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
-                      {nutrientHints.map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                      {nutrientHints.slice(0, 2).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
                     </ul>
+                  )}
+                  {nutrientHints.length > 2 && (
+                    <details className="relative z-10 mt-1 text-sm text-gray-700 dark:text-gray-300">
+                      <summary className="inline-flex min-h-11 cursor-pointer items-center font-medium text-garden-700 hover:underline sm:min-h-0 sm:py-1 dark:text-garden-300">
+                        {t("soil.moreMeasures", { count: nutrientHints.length - 2 })}
+                      </summary>
+                      <ul className="mt-1 space-y-1">
+                        {nutrientHints.slice(2).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                      </ul>
+                    </details>
                   )}
                   {/* The user's own words, set apart from the advice above so the two cannot be read as one. */}
                   {s.notes && (
