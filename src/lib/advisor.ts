@@ -210,6 +210,10 @@ export function getPlantableNow(plants: Plant[], lastFrostDate: string, opts: Om
 export interface AgendaBedContext extends AgendaBed {
   environmentType: EnvironmentType;
   frostProtectionWeeks: number;
+  /** Free cells now; a full bed offers nothing to sow or plant *now*. Unknown = not checked. */
+  freeCells?: number;
+  /** Crops standing in the bed: no second sowing of the same crop is suggested there now. */
+  plantIds?: string[];
 }
 
 /**
@@ -231,6 +235,8 @@ export function getGardenSowingAgenda(
   for (const bed of beds) {
     const agenda = getSowingAgenda(plants, lastFrostDate, { ...opts, frostProtectionWeeks: bed.frostProtectionWeeks, environmentType: bed.environmentType });
     for (const item of agenda.now) {
+      // "Now" needs room now, and not the same crop again where it still stands.
+      if (bed.freeCells === 0 || bed.plantIds?.includes(item.plantId)) continue;
       const key = `${item.plantId}|${item.action}`;
       const ref = { id: bed.id, name: bed.name, date: item.until };
       const hit = now.get(key);

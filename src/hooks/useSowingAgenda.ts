@@ -21,6 +21,8 @@ export function useSowingAgenda() {
       name: gardens.length > 1 ? `${g.name} · ${b.name}` : b.name,
       environmentType: b.environmentType ?? "outdoor_bed",
       frostProtectionWeeks: getFrostProtectionWeeks(b),
+      freeCells: b.width * b.height - new Set(b.paths ?? []).size - b.cells.length,
+      plantIds: [...new Set(b.cells.map((c) => c.plantId))],
     }))),
     [gardens],
   );

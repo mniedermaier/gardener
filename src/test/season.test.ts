@@ -167,6 +167,17 @@ describe("autumn season: tasks, palette, garden agenda agree", () => {
     expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...glass }))).toContain("winter_purslane");
   });
 
+  it("garden agenda skips full beds and beds where the crop already stands", () => {
+    const beds = [
+      { id: "full", name: "Voll", ...raised, freeCells: 0 },
+      { id: "has", name: "Feldsalat steht", ...raised, freeCells: 4, plantIds: ["lambs_lettuce"] },
+      { id: "free", name: "Frei", ...raised, freeCells: 4 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    const row = agenda.now.find((r) => r.plantId === "lambs_lettuce");
+    expect(row?.beds?.map((b) => b.id)).toEqual(["free"]);
+  });
+
   it("garden agenda is exactly the union of the bed palettes, with the beds named", () => {
     const beds = [
       { id: "hb", name: "Hochbeet", ...raised },

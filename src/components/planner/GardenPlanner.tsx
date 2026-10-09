@@ -208,6 +208,8 @@ export function GardenPlanner() {
       ? getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks, environmentType: openBed.environmentType })
       : getGardenSowingAgenda(plants, lastFrostDate, (activeGarden?.beds ?? []).map((b) => ({
           id: b.id, name: b.name, environmentType: b.environmentType ?? "outdoor_bed", frostProtectionWeeks: getFrostProtectionWeeks(b),
+          freeCells: b.width * b.height - new Set(b.paths ?? []).size - b.cells.length,
+          plantIds: [...new Set(b.cells.map((c) => c.plantId))],
         }))).now.filter((r) => r.action !== "sow_indoors"),
     [plants, lastFrostDate, frostWeeks, openBed, activeGarden?.beds],
   );

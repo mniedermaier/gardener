@@ -810,7 +810,7 @@
       "seasonDesc": "Windows for your location, based on the last frost date in settings.",
       "noFixedDates": "This crop has no fixed sowing dates – it is perennial or planted in autumn.",
       "partners": "Companions",
-      "allPartners": "Companion matrix",
+      "allPartners": "All companions",
       "noPartners": "No known companions.",
       "plantCount_one": "{{count}} plant",
       "plantCount_other": "{{count}} plants",

@@ -520,7 +520,7 @@
     "cropListCount_other": "{{count}} Pflanzen",
     "cropListHarvest": "Ernte {{range}}",
     "cropListHarvestOver": "Ernte vorbei ({{range}})",
-    "cropListHarvestLate": "Ernte {{range}} · zügig ernten"
+    "cropListHarvestLate": "Ernte {{range}} · Zügig ernten"
   },
   "plants": {
     "title": "Pflanzen",
@@ -810,7 +810,7 @@
       "seasonDesc": "Zeitfenster für deinen Standort, berechnet aus dem letzten Frosttag in den Einstellungen.",
       "noFixedDates": "Für diese Kultur gibt es keine festen Aussaattermine – sie ist mehrjährig oder wird im Herbst gesetzt.",
       "partners": "Pflanzpartner",
-      "allPartners": "Partner-Matrix",
+      "allPartners": "Alle Pflanzpartner",
       "noPartners": "Keine bekannten Pflanzpartner.",
       "plantCount_one": "{{count}} Pflanze",
       "plantCount_other": "{{count}} Pflanzen",
@@ -1305,7 +1305,7 @@
     "unitCount": "Gläser/Beutel",
     "label": "Name",
     "labelPlaceholder": "z. B. Tomatensoße",
-    "supplyCost": "Zubehörkosten (€)",
+    "supplyCost": "Materialkosten (€)",
     "storedOn": "eingelagert",
     "expiresOn": "haltbar bis",
     "consumedOn": "verbraucht",
@@ -1370,7 +1370,7 @@
     "needQuantity": "Bitte eine Menge in kg eingeben",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "methodSummary": "{{shelf}} haltbar (bis {{date}}) · Ausbeute ca. {{yield}}",
-    "quantityKg": "Menge (kg)",
+    "quantityKg": "Gewicht (kg)",
     "unitLabel": "Einheit",
     "unitLabelPlaceholder": "z. B. Eimer",
     "storedDate": "Eingelagert am",

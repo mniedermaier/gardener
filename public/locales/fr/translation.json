@@ -833,7 +833,7 @@
       "seasonDesc": "Périodes pour votre lieu, calculées à partir de la dernière gelée indiquée dans les paramètres.",
       "noFixedDates": "Cette culture n’a pas de dates de semis fixes : elle est vivace ou se plante en automne.",
       "partners": "Associations",
-      "allPartners": "Matrice des associations",
+      "allPartners": "Toutes les associations",
       "noPartners": "Aucune association connue.",
       "plantCount_one": "{{count}} plante",
       "plantCount_many": "{{count}} plantes",

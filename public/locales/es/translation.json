@@ -833,7 +833,7 @@
       "seasonDesc": "Ventanas para tu ubicación, calculadas a partir de la última helada en los ajustes.",
       "noFixedDates": "Este cultivo no tiene fechas fijas de siembra: es perenne o se planta en otoño.",
       "partners": "Asociaciones",
-      "allPartners": "Matriz de asociaciones",
+      "allPartners": "Todas las asociaciones",
       "noPartners": "No hay asociaciones conocidas.",
       "plantCount_one": "{{count}} planta",
       "plantCount_many": "{{count}} plantas",
