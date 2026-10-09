@@ -92,10 +92,12 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
   const allWeeks = groupByWeek(products);
   const weeks = initialWeeks !== undefined && !showAll ? allWeeks.slice(0, initialWeeks) : allWeeks;
   const hiddenWeeks = allWeeks.length - weeks.length;
-  // Month totals by the date of each entry — the same split as the monthly
-  // chart — and over all entries, also those behind "Ältere Wochen anzeigen".
+  // The header adds up exactly the weeks listed under it (ISO weeks belong to
+  // the month of their Thursday), over all weeks — also those behind
+  // "Ältere Wochen anzeigen" — so header and rows always agree.
+  const fullMonths = new Map(weeksByMonth(allWeeks).map((m) => [m.key, m.weeks]));
   const monthTotal = (key: string, ty: (typeof PRODUCT_TYPES)[number]) =>
-    products.filter((p) => p.type === ty && p.date.slice(0, 7) === key).reduce((s, p) => s + p.quantity, 0);
+    (fullMonths.get(key) ?? []).reduce((s, w) => s + w.totals[ty], 0);
 
   return (
     <div className="space-y-3">
