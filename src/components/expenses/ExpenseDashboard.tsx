@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat, type LucideIcon, HeartPulse, Link2 } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat, type LucideIcon, HeartPulse } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -337,7 +337,7 @@ export function ExpenseDashboard() {
                     title={e.description}
                     meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")]}
                     // Same bill also in a livestock log: counted once, marked with the same source badge.
-                    badges={balance.costs.matchedExpenses[e.id] ? <SourceBadge source={balance.costs.matchedExpenses[e.id]} linked /> : undefined}
+                    badges={balance.costs.matchedExpenses[e.id] ? <SourceBadge source={balance.costs.matchedExpenses[e.id]} /> : undefined}
                     trailing={f.formatCurrency(e.amountCents / 100)}
                     onClick={() => openEdit(e)}
                     actions={
@@ -397,13 +397,11 @@ export function ExpenseDashboard() {
 }
 
 /**
- * Where a cost row comes from: "Futter" for entries made only in the feed
- * log, "auch Futter" (link icon) for a manual expense matched to one — short,
- * so the badge fits beside a phone row's amount and menu —
- * two meanings, two labels, so "davon x € aus Futter" adds up.
+ * The other log a cost also lives in, one badge for both cases (booked there,
+ * or a manual expense matched to it — counted once either way, see "Wie
+ * berechnet?"): two near-identical badges read as two kinds of feed.
  */
-function SourceBadge({ source, linked = false }: { source: "feed" | "health"; linked?: boolean }) {
+function SourceBadge({ source }: { source: "feed" | "health" }) {
   const { t } = useTranslation();
-  const key = source === "feed" ? (linked ? "expenses.alsoInFeedBook" : "expenses.sourceFeed") : (linked ? "expenses.alsoInHealthBook" : "expenses.sourceHealth");
-  return <Badge variant="outline" size="sm" icon={linked ? Link2 : source === "feed" ? Wheat : HeartPulse}>{t(key)}</Badge>;
+  return <Badge variant="outline" size="sm" icon={source === "feed" ? Wheat : HeartPulse}>{t(source === "feed" ? "expenses.sourceFeed" : "expenses.sourceHealth")}</Badge>;
 }

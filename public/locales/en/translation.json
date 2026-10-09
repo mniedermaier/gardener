@@ -1847,7 +1847,8 @@
     "chooseAnimal": "Choose animal…",
     "valueHint": "{{amount}} × {{price}}",
     "ofExpectedSince": "expected ~{{amount}} since {{date}}",
-    "recordedSince": "Recorded since {{date}}"
+    "recordedSince": "Recorded since {{date}}",
+    "weekSpan": "wk {{from}}–{{to}}"
   },
   "seeds": {
     "title": "Seeds",
@@ -2200,15 +2201,13 @@
     "howAnimals": "Animals {{total}}: {{expenses}} recorded as expenses, {{log}} from the feed log and health records. A bill recorded in both places (same amount, at most 3 days apart) counts once.",
     "duplicatesSkipped_one": "{{count}} duplicate entry was not counted.",
     "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
-    "fromFeedLog": "{{amount}} of it from the feed log",
-    "fromHealthLog": "{{amount}} of it from health",
+    "fromFeedLog": "{{amount}} of it logged only in the feed log",
+    "fromHealthLog": "{{amount}} of it logged only under health",
     "openFeedBook": "Open in feed log",
     "openHealthBook": "Open in health log",
     "notesPlaceholder": "e.g. shop, invoice number…",
     "sourceFeed": "Feed log",
-    "sourceHealth": "Health",
-    "alsoInFeedBook": "also in feed log",
-    "alsoInHealthBook": "also in health"
+    "sourceHealth": "Health"
   },
   "succession": {
     "pick": "Pick a crop",

@@ -1611,7 +1611,7 @@
     "liters": "Liter",
     "productionEntries_one": "{{count}} Eintrag",
     "productionEntries_other": "{{count}} Einträge",
-    "addHealth": "Gesundheitseintrag erfassen",
+    "addHealth": "Gesundheit erfassen",
     "healthAdded": "Gesundheitseintrag erfasst",
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
@@ -1684,7 +1684,7 @@
       "emptyTitle": "Impfungen und Behandlungen im Blick",
       "notesPlaceholder": "z. B. Tierarzt, nächster Termin …",
       "vaccCoverageScoped": "Impfschutz",
-      "addEntry": "Gesundheitseintrag erfassen",
+      "addEntry": "Gesundheit erfassen",
       "lossesHint": "seit Bestandsbeginn",
       "vaccScopeHint_one": "{{count}} Tiergruppe mit Impfpflicht",
       "vaccScopeHint_other": "{{count}} Tiergruppen mit Impfpflicht"
@@ -1847,7 +1847,8 @@
     "chooseAnimal": "Tier wählen …",
     "valueHint": "{{amount}} × {{price}}",
     "ofExpectedSince": "erwartet ~{{amount}} seit {{date}}",
-    "recordedSince": "Erfasst seit {{date}}"
+    "recordedSince": "Erfasst seit {{date}}",
+    "weekSpan": "KW {{from}}–{{to}}"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1883,7 +1884,7 @@
     "edit": "Saatgut bearbeiten",
     "testRecommended": "Keimprobe empfohlen",
     "testHintShort": "Ältere Samen vor der Aussaat testen",
-    "testExplain": "Meist {{years}} keimfähig – vor dem Säen eine Keimprobe machen.",
+    "testExplain": "Keimprobe vor dem Säen – meist {{years}} keimfähig.",
     "years_one": "{{count}} Jahr",
     "years_other": "{{count}} Jahre",
     "plantingStock": "Pflanzgut",
@@ -2200,15 +2201,13 @@
     "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futter und Gesundheit. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
     "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
-    "fromFeedLog": "davon {{amount}} aus Futter",
-    "fromHealthLog": "davon {{amount}} aus Gesundheit",
+    "fromFeedLog": "davon {{amount}} nur im Futterbuch erfasst",
+    "fromHealthLog": "davon {{amount}} nur unter Gesundheit erfasst",
     "openFeedBook": "Unter Futter öffnen",
     "openHealthBook": "Unter Gesundheit öffnen",
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
-    "sourceFeed": "Futter",
-    "sourceHealth": "Gesundheit",
-    "alsoInFeedBook": "auch Futter",
-    "alsoInHealthBook": "auch Gesundheit"
+    "sourceFeed": "Futterbuch",
+    "sourceHealth": "Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",

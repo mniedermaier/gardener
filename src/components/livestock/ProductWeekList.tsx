@@ -118,7 +118,14 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
           key={g.key}
           header={
             <span className="flex items-center justify-between gap-2">
-              <span>{f.formatDate(g.date, "monthYear")}</span>
+              {/* The week span says why this total may differ from the calendar-month chart. */}
+              <span>
+                {f.formatDate(g.date, "monthYear")}
+                {(() => {
+                  const ws = (fullMonths.get(g.key) ?? g.weeks).map((w) => w.week);
+                  return ws.length > 0 ? <span className="font-normal normal-case"> · {t("livestock.weekSpan", { from: Math.min(...ws), to: Math.max(...ws) })}</span> : null;
+                })()}
+              </span>
               <span className="font-medium tabular-nums">
                 {PRODUCT_TYPES.filter((ty) => monthTotal(g.key, ty) > 0)
                   .map((ty) => {

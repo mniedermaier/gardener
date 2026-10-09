@@ -17,6 +17,7 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlants } from "@/hooks/usePlants";
 import type { Plant } from "@/types/plant";
 import { familyOf } from "@/data/plantFamilies";
+import { PartnerChips } from "./PartnerChips";
 
 type Relation = "good" | "bad" | null;
 type View = "matrix" | "plant";
@@ -367,10 +368,39 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
           ))}
         </div>
       </Card>
-      <div className="grid gap-4 lg:grid-cols-2">
-        {group(good, "good")}
-        {group(bad, "bad")}
-      </div>
+      {bedsByPlant.size > 0 ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {group(good, "good")}
+          {group(bad, "bad")}
+        </div>
+      ) : (
+        // No beds, so no garden context per row: both groups as compact chips
+        // (as on the plant page), with the one known reason as a line below.
+        <Card className="space-y-4">
+          {(["good", "bad"] as const).map((kind) => {
+            const items = kind === "good" ? good : bad;
+            const sameFamily = kind === "bad" ? items.filter((p) => familyOf(p.id, p) === familyOf(selected.id, selected)) : [];
+            return (
+              <section key={kind}>
+                <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {kind === "good"
+                    ? <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
+                    : <TriangleAlert size={14} strokeWidth={2.5} aria-hidden="true" className="text-warning" />}
+                  {t(kind === "good" ? "companions.goodCount" : "companions.badCount", { count: items.length })}
+                </h3>
+                {items.length === 0
+                  ? <p className="text-sm text-gray-500 dark:text-gray-400">{t("companions.noneKnown")}</p>
+                  : <PartnerChips ids={items.map((p) => p.id)} kind={kind} onSelect={onSelect} />}
+                {sameFamily.length > 0 && (
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    {sameFamily.map((p) => names.get(p.id)).join(", ")}: {t("companions.sameFamilyReason")}
+                  </p>
+                )}
+              </section>
+            );
+          })}
+        </Card>
+      )}
     </div>
   );
 }

@@ -1937,7 +1937,8 @@
     "chooseAnimal": "Elegir animal…",
     "valueHint": "{{amount}} × {{price}}",
     "ofExpectedSince": "esperados ~{{amount}} desde el {{date}}",
-    "recordedSince": "Registrado desde el {{date}}"
+    "recordedSince": "Registrado desde el {{date}}",
+    "weekSpan": "sem. {{from}}–{{to}}"
   },
   "seeds": {
     "title": "Semillas",
@@ -2312,9 +2313,7 @@
     "openHealthBook": "Abrir en salud",
     "notesPlaceholder": "p. ej. tienda, número de factura…",
     "sourceFeed": "Alimentación",
-    "sourceHealth": "Salud",
-    "alsoInFeedBook": "también en alimentación",
-    "alsoInHealthBook": "también en salud"
+    "sourceHealth": "Salud"
   },
   "succession": {
     "pick": "Elegir cultivo",

@@ -250,8 +250,14 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     }
     for (const j of journalEntries) {
       if (!cap("journal")) break;
-      if (normalize(j.title).includes(q) || normalize(j.text).includes(q)) {
-        out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint: formatDate(j.date, "short"), icon: BookOpen, run: () => go(`/journal?entry=${encodeURIComponent(j.id)}`) });
+      const inTitle = normalize(j.title).includes(q);
+      if (inTitle || normalize(j.text).includes(q)) {
+        // A match only in the body shows where: a short snippet around it, so the row explains itself.
+        const at = normalize(j.text).indexOf(q);
+        const hint = inTitle || at < 0
+          ? formatDate(j.date, "short")
+          : `${at > 12 ? "…" : ""}${j.text.slice(Math.max(0, at - 12), at + q.length + 18).trim()}…`;
+        out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint, icon: BookOpen, run: () => go(`/journal?entry=${encodeURIComponent(j.id)}`) });
       }
     }
     return out;

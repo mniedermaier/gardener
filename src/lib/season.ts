@@ -118,6 +118,8 @@ export interface HarvestReadyItem {
   cells: number;
   /** Past the expected window: harvest soon or it gets woody. */
   late: boolean;
+  /** Earliest end of the window among the cells (sort key: what closes first). */
+  end: Date;
 }
 
 /** Days a harvest stays listed after its window closed (then marked late). */
@@ -180,12 +182,14 @@ export function getHarvestReady(
         // Window open, and at most three weeks past its end.
         if (isBefore(day, from) || isAfter(day, addDays(to, grace))) continue;
         const key = `${b.id}:${c.plantId}`;
-        const entry = byKey.get(key) ?? { key, plantId: c.plantId, bedId: b.id, gardenId: g.id, bedName: b.name, cells: 0, late: false };
+        const entry = byKey.get(key) ?? { key, plantId: c.plantId, bedId: b.id, gardenId: g.id, bedName: b.name, cells: 0, late: false, end: to };
         entry.cells += 1;
+        if (to < entry.end) entry.end = to;
         entry.late = entry.late || isAfter(day, to);
         byKey.set(key, entry);
       }
     }
   }
-  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || b.cells - a.cells);
+  // Late first, then what closes first — the same order as the calendar's "Jetzt dran".
+  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || a.end.getTime() - b.end.getTime() || b.cells - a.cells);
 }

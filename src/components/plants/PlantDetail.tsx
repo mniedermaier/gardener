@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { usePlants, usePlantMap } from "@/hooks/usePlants";
+import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useAddBed } from "@/hooks/useAddBed";
 import { useFormat } from "@/hooks/useFormat";
@@ -20,6 +20,7 @@ import type { Plant } from "@/types/plant";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
+import { PartnerChips } from "./PartnerChips";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -175,29 +176,6 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
   );
 });
 
-
-function PartnerChips({ ids, kind, onSelect }: { ids: string[]; kind: "good" | "bad"; onSelect: (id: string) => void }) {
-  const getPlantName = usePlantName();
-  const plantMap = usePlantMap();
-  // The group heading says good or bad; the chip carries only the plant (border tone as a quiet second cue).
-  return (
-    <div className="flex flex-wrap gap-2">
-      {ids.map((id) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => onSelect(id)}
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border py-1 pl-2 pr-3 text-sm text-gray-800 transition-colors hover:bg-gray-50 sm:min-h-9 dark:text-gray-100 dark:hover:bg-white/5 ${
-            kind === "good" ? "border-positive/40" : "border-warning/40"
-          }`}
-        >
-          <PlantIconDisplay plantId={id} emoji={plantMap.get(id)?.icon ?? ""} size={18} />
-          {getPlantName(id)}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 /** Neutral icon tile for the rows of "Dein Bestand" (same size as EnvironmentChip). */
 function StockTile({ icon: Icon }: { icon: LucideIcon }) {

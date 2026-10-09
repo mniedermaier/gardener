@@ -167,7 +167,8 @@
     "companions": [
       "cucumber",
       "potato",
-      "zucchini"
+      "zucchini",
+      "beetroot"
     ],
     "antagonists": [
       "onion",
@@ -786,11 +787,10 @@
       "onion",
       "garlic",
       "lettuce",
-      "kale"
-    ],
-    "antagonists": [
+      "kale",
       "bean"
     ],
+    "antagonists": [],
     "color": "#881337",
     "icon": "🟣",
     "caloriesPer100g": 43,
