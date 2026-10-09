@@ -88,8 +88,9 @@ function MethodPicker({ label, value, options, onChange }: { label: string; valu
   return (
     <div>
       <p className={LABEL_CLASS}>{label}</p>
-      {/* Same tile as the planner and livestock pickers: icon inline, two columns on phones. */}
-      <div role="radiogroup" aria-label={label} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {/* Same tile as the planner and livestock pickers (icon inline); three columns
+          everywhere, so five methods fill two rows without a lone tile. */}
+      <div role="radiogroup" aria-label={label} className="grid grid-cols-3 gap-2">
         {options.map((m, i) => {
           const Icon = METHOD_ICON[m];
           const selected = m === value;
@@ -103,14 +104,14 @@ function MethodPicker({ label, value, options, onChange }: { label: string; valu
               tabIndex={selected ? 0 : -1}
               onClick={() => onChange(m)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
+              className={`flex min-h-11 min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2 text-left text-xs leading-tight font-medium transition-colors sm:gap-2 sm:px-3 sm:text-sm ${
                 selected
                   ? "border-garden-600 bg-garden-50 text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
                   : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
               }`}
             >
               <Icon size={16} aria-hidden="true" className="shrink-0" />
-              <span className="min-w-0 truncate">{t(`preservation.methods.${m}`)}</span>
+              <span className="min-w-0 break-words hyphens-auto">{t(`preservation.methods.${m}`)}</span>
             </button>
           );
         })}
@@ -498,13 +499,18 @@ export function PantryPage() {
             />
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
-          <div>
-            <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method, unitKind: draft.unitKind === DEFAULT_UNIT[draft.method] ? DEFAULT_UNIT[method] : draft.unitKind })} />
-            <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-              {t("pantry.methodSummary", { shelf: shelfText, date: formatDate(expiresDate, "short"), yield: formatPercent(PRESERVATION_YIELD[draft.method]) })}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+          <Input label={t("pantry.label")} optional value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
+          {/* The methods depend on the crop: shown (and preselected) once a plant is chosen,
+              so no shelf life is promised for nothing. */}
+          {draft.plantId && (
+            <div>
+              <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method, unitKind: draft.unitKind === DEFAULT_UNIT[draft.method] ? DEFAULT_UNIT[method] : draft.unitKind })} />
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                {t("pantry.methodSummary", { shelf: shelfText, date: formatDate(expiresDate, "short"), yield: formatPercent(PRESERVATION_YIELD[draft.method]) })}
+              </p>
+            </div>
+          )}
+          <div className="grid grid-cols-2 items-end gap-4">
             <Input label={t("pantry.quantityKg")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(1.5) })} error={errors.quantity} />
             <Input label={t("pantry.unitCount")} optional inputMode="numeric" value={draft.units} onChange={(e) => patch({ units: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(5, { maximumFractionDigits: 0 }) })} error={errors.units} />
           </div>
@@ -524,7 +530,6 @@ export function PantryPage() {
               )}
             </div>
           )}
-          <Input label={t("pantry.label")} optional value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
           <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
           <Input label={t("pantry.supplyCost")} optional inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("pantry.supplyCostHint")} error={errors.cost} />
           <Textarea label={t("harvest.notes")} optional placeholder={t("pantry.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />

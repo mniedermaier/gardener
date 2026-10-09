@@ -1624,12 +1624,11 @@
     "productionEntries_one": "{{count}} entrée",
     "productionEntries_many": "{{count}} entrées",
     "productionEntries_other": "{{count}} entrées",
-    "addHealth": "Saisir un soin",
+    "addHealth": "Saisir la santé",
     "healthAdded": "Entrée de santé enregistrée",
     "noHealth": "Notez vaccins, traitements et contrôles pour ne rien oublier.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "p. ex. Flubenvet 5 jours",
     "editAnimal": "Modifier l'animal",
     "updated": "Animal mis à jour",
     "since": "depuis",
@@ -1698,7 +1697,7 @@
       "dueNames": "Vérifier la vaccination : {{names}}",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire.",
       "emptyTitle": "Vaccins et soins en un coup d’œil",
-      "notesPlaceholder": "p. ex. dosage, vétérinaire…"
+      "notesPlaceholder": "p. ex. vétérinaire, prochain rendez-vous…"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1800,7 +1799,8 @@
       "pieces": "pièces",
       "kg": "kg",
       "g": "g",
-      "liters": "litres"
+      "liters": "litres",
+      "litersShort": "l"
     },
     "editProduct": "Modifier la production",
     "productSaved": "{{amount}} de {{product}} enregistré",
@@ -1855,7 +1855,17 @@
     "noEggsToday": "Aucun œuf noté aujourd’hui",
     "notesPlaceholder": "p. ex. comportement, marque d’aliment…",
     "monthAvgLabel": "Moyenne par mois",
-    "bestMonth": "Meilleur mois"
+    "bestMonth": "Meilleur mois",
+    "healthDescPlaceholders": {
+      "vaccination": "p. ex. Newcastle (ND), eau de boisson",
+      "deworming": "p. ex. Flubenvet, 7 jours",
+      "illness": "p. ex. rhume, diarrhée",
+      "injury": "p. ex. blessure à la crête",
+      "checkup": "p. ex. plumage, fientes, poids",
+      "treatment": "p. ex. traitement anti-acariens",
+      "death": "p. ex. renard, vieillesse",
+      "other": "p. ex. parage des onglons"
+    }
   },
   "seeds": {
     "title": "Semences",

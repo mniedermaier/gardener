@@ -63,9 +63,9 @@ export function DateField({ label, value, onChange, allowFuture = false, mode = 
         onChange={select}
         options={[
           ...presets.map((p) => ({ value: p.value, label: p.label })),
-          // One look in every dialog and at every width: short "Datum …" with the
-          // calendar icon, so no segment wraps (four segments fit 390 px).
-          { value: "custom", label: t("records.otherDateShort"), icon: CalendarDays },
+          // One look in every dialog: "Datum …" with the calendar icon. With four
+          // segments (tasks) it is icon-only on phones, so no label wraps at 390 px.
+          { value: "custom", label: t("records.otherDateShort"), icon: CalendarDays, compact: mode === "future" },
         ]}
       />
       {choice === "custom" ? (
