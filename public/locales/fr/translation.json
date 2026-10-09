@@ -239,7 +239,10 @@
       "frost": "Gel pour les cultures sensibles"
     },
     "mapFrostPlants": "Gel : risque pour {{plants}}",
-    "frostDetails": "Détails dans Météo"
+    "frostDetails": "Détails dans Météo",
+    "sowNowCount_one": "{{count}} culture à semer et planter maintenant",
+    "sowNowCount_many": "{{count}} cultures à semer et planter maintenant",
+    "sowNowCount_other": "{{count}} cultures à semer et planter maintenant"
   },
   "search": {
     "placeholder": "Rechercher plantes, tâches, journal…",
@@ -536,7 +539,8 @@
     "cropListCount_other": "{{count}} plantes",
     "cropListCount_many": "{{count}} plantes",
     "cropListHarvest": "récolte {{range}}",
-    "cropListHarvestOver": "récolte terminée ({{range}})"
+    "cropListHarvestOver": "récolte terminée ({{range}})",
+    "cropListHarvestLate": "récolte {{range}} · à récolter vite"
   },
   "plants": {
     "title": "Plantes",

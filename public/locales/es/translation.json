@@ -239,7 +239,10 @@
       "frost": "Helada para cultivos sensibles"
     },
     "mapFrostPlants": "Helada: riesgo para {{plants}}",
-    "frostDetails": "Detalles en el tiempo"
+    "frostDetails": "Detalles en el tiempo",
+    "sowNowCount_one": "{{count}} cultivo para sembrar y plantar ahora",
+    "sowNowCount_many": "{{count}} cultivos para sembrar y plantar ahora",
+    "sowNowCount_other": "{{count}} cultivos para sembrar y plantar ahora"
   },
   "search": {
     "placeholder": "Buscar plantas, tareas, diario…",
@@ -536,7 +539,8 @@
     "cropListCount_other": "{{count}} plantas",
     "cropListCount_many": "{{count}} plantas",
     "cropListHarvest": "cosecha {{range}}",
-    "cropListHarvestOver": "cosecha terminada ({{range}})"
+    "cropListHarvestOver": "cosecha terminada ({{range}})",
+    "cropListHarvestLate": "cosecha {{range}} · cosechar ya"
   },
   "plants": {
     "title": "Plantas",

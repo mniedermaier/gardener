@@ -379,8 +379,16 @@ export function TaskCalendar() {
               options={gardens.map((g) => ({ value: g.id, label: g.name }))}
             />
           )}
-          {/* Bed and plant share one row; the plant takes the full width when there is no bed to pick. */}
+          {/* Plant and bed share one row (plant first, as in every record dialog); the plant takes the full width when there is no bed to pick. */}
           <div className={bedOptions.length > 0 ? "grid gap-4 sm:grid-cols-2" : undefined}>
+            {/* The searchable plant field of every other dialog, not a 47-entry select. */}
+            <PlantCombobox
+              label={t("harvest.plant")}
+              plants={plants}
+              optional
+              value={draft.plantId}
+              onChange={({ plantId }) => patch({ plantId })}
+            />
             {bedOptions.length > 0 && (
               <Select
                 label={t("harvest.bed")}
@@ -391,14 +399,6 @@ export function TaskCalendar() {
                 options={bedOptions}
               />
             )}
-            {/* The searchable plant field of every other dialog, not a 47-entry select. */}
-            <PlantCombobox
-              label={t("harvest.plant")}
-              plants={plants}
-              optional
-              value={draft.plantId}
-              onChange={({ plantId }) => patch({ plantId })}
-            />
           </div>
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.recurrence")}</p>

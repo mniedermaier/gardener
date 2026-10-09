@@ -85,7 +85,13 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
                 <span className="block text-xs text-gray-500 dark:text-gray-400">
                   {t("planner.cropListCount", { count })}
                   {/* A window (plus the late grace) that is over says so: the cells are free to clear. */}
-                  {window && <> · {t(addDays(window.end, HARVEST_GRACE_DAYS) < today ? "planner.cropListHarvestOver" : "planner.cropListHarvest", { range: range(window.start, window.end) })}</>}
+                  {window && <> · {t(
+                    addDays(window.end, HARVEST_GRACE_DAYS) < today ? "planner.cropListHarvestOver"
+                      // Past its window but still listed on Heute and Kalender: the same "Zügig ernten".
+                      : window.end < today ? "planner.cropListHarvestLate"
+                      : "planner.cropListHarvest",
+                    { range: range(window.start, window.end) },
+                  )}</>}
                 </span>
               </span>
             </button>

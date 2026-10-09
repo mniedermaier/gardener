@@ -227,7 +227,9 @@
       "frost": "Frost for tender crops"
     },
     "mapFrostPlants": "Frost: {{plants}} at risk",
-    "frostDetails": "Details in Weather"
+    "frostDetails": "Details in Weather",
+    "sowNowCount_one": "{{count}} crop to sow & plant now",
+    "sowNowCount_other": "{{count}} crops to sow & plant now"
   },
   "search": {
     "placeholder": "Search plants, tasks, journal…",
@@ -517,7 +519,8 @@
     "cropListCount_one": "{{count}} plant",
     "cropListCount_other": "{{count}} plants",
     "cropListHarvest": "harvest {{range}}",
-    "cropListHarvestOver": "harvest over ({{range}})"
+    "cropListHarvestOver": "harvest over ({{range}})",
+    "cropListHarvestLate": "harvest {{range}} · pick now"
   },
   "plants": {
     "title": "Plants",

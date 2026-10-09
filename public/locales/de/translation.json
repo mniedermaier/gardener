@@ -227,7 +227,9 @@
       "frost": "Frost für empfindliche Kulturen"
     },
     "mapFrostPlants": "Frost: {{plants}} gefährdet",
-    "frostDetails": "Details im Wetter"
+    "frostDetails": "Details im Wetter",
+    "sowNowCount_one": "{{count}} Kultur jetzt säen & pflanzen",
+    "sowNowCount_other": "{{count}} Kulturen jetzt säen & pflanzen"
   },
   "onboarding": {
     "stepOf": "Schritt {{current}} von {{total}}",
@@ -517,7 +519,8 @@
     "cropListCount_one": "{{count}} Pflanze",
     "cropListCount_other": "{{count}} Pflanzen",
     "cropListHarvest": "Ernte {{range}}",
-    "cropListHarvestOver": "Ernte vorbei ({{range}})"
+    "cropListHarvestOver": "Ernte vorbei ({{range}})",
+    "cropListHarvestLate": "Ernte {{range}} · zügig ernten"
   },
   "plants": {
     "title": "Pflanzen",
@@ -1453,7 +1456,7 @@
     "rowMissing": "fehlen {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Ziel laut Prognose erreicht",
-    "rowNothingLogged": "noch nichts erfasst"
+    "rowNothingLogged": "nichts erfasst"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -2033,8 +2036,8 @@
     "staleHint_one": "{{count}} Bodentest ist älter als 5 Monate – im Frühjahr neu beproben.",
     "staleHint_other": "{{count}} Bodentests sind älter als 5 Monate – im Frühjahr neu beproben.",
     "nutrientsPpm": "Nährstoffe (ppm)",
-    "staleHintPlanned_one": "{{count}} Bodentest ist älter als 5 Monate – die nächste Probe ist für {{date}} geplant.",
-    "staleHintPlanned_other": "{{count}} Bodentests sind älter als 5 Monate – die nächste Probe ist für {{date}} geplant."
+    "staleHintPlanned_one": "{{count}} Bodentest ist älter als 5 Monate – die nächste Probe ist am {{date}} geplant.",
+    "staleHintPlanned_other": "{{count}} Bodentests sind älter als 5 Monate – die nächste Probe ist am {{date}} geplant."
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2436,7 +2439,7 @@
     "pestHint": "Befall oder Krankheit festhalten",
     "water": "Bewässerung erfassen",
     "waterHint": "Menge und Beet",
-    "production": "Ertrag erfassen",
+    "production": "Tierertrag erfassen",
     "productionHint": "Eier, Honig, Milch …"
   },
   "records": {

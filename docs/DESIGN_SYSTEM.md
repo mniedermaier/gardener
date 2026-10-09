@@ -107,7 +107,9 @@ covered here, copy the pattern from the reference page
    - An optional cost field sits on its own full-width row after the amounts,
      with the shared hint `common.costHint` ("Fließt in die Bilanz …").
    - Save stays disabled until the required fields are valid.
-   - **Choosing a type:** up to 3 options → `SegmentedControl`; up to 8 →
+   - **Choosing a type:** up to 3 options → `SegmentedControl` (a short
+     scale or interval may take 4, e.g. task "Wiederholen": Nie / Täglich /
+     Wöchentlich / 14-tägig, as long as every label fits at 390 px); up to 8 →
      `ui/ChoiceTiles` (animal species, health "Art", bed environment, pantry
      method); more than 8 → `Select` (task type, plant). `ChoiceTiles` picks
      the column count so no row ends with a lone tile (8 → 4 × 2, 7 → 4 + 3,

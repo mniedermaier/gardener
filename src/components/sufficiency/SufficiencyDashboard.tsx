@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getDaysInMonth } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { Apple, Beef, Citrus, Lightbulb, Sprout, Target, Wheat, Archive, Plus } from "lucide-react";
+import { Beef, Citrus, Lightbulb, Sprout, Target, Wheat, Archive, Plus } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -32,8 +32,10 @@ import { useAddBed } from "@/hooks/useAddBed";
 import { roundShares } from "@/lib/format";
 
 type View = "overview" | "crops" | "animals" | "preserve";
-const NUTRIENTS = ["calories", "protein", "vitaminC", "fiber"] as const;
-const NUTRIENT_ICON = { calories: Apple, protein: Beef, vitaminC: Citrus, fiber: Wheat };
+// Calories are the page's headline (with the logged-harvest floor); the card lists the other nutrients only,
+// so one figure never shows two values.
+const NUTRIENTS = ["protein", "vitaminC", "fiber"] as const;
+const NUTRIENT_ICON = { protein: Beef, vitaminC: Citrus, fiber: Wheat };
 /** Calorie-dense staples considered as levers ("+5 m² → +x %"). */
 // One entry per kind: pumpkin stands for all squashes (Butternut would repeat it).
 const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "pea"];
@@ -255,7 +257,7 @@ export function SufficiencyDashboard() {
                 {NUTRIENTS.map((key) => {
                   const data = result.nutrition[key];
                   const Icon = NUTRIENT_ICON[key];
-                  const unit = key === "calories" ? "kcal" : key === "vitaminC" ? "mg" : "g";
+                  const unit = key === "vitaminC" ? "mg" : "g";
                   const label = t(`sufficiency.nutrients.${key}`);
                   return (
                     <li key={key}>
@@ -291,11 +293,11 @@ export function SufficiencyDashboard() {
                   );
                 })}
               </ul>
-              {result.gaps.length > 0 && (
+              {result.gaps.some((g) => g.nutrient !== "calories") && (
                 <div className="mt-4 border-t border-gray-100 pt-3 dark:border-white/5">
                   <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("sufficiency.gaps")}</p>
                   <ul className="space-y-1.5 text-sm">
-                    {result.gaps.map((g) => (
+                    {result.gaps.filter((g) => g.nutrient !== "calories").map((g) => (
                       <li key={g.nutrient} className="text-gray-700 dark:text-gray-300">
                         <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100, g.percent < 10 ? 1 : 0)}</span>
                         {" – "}

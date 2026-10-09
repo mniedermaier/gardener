@@ -2,7 +2,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { LucideIcon } from "lucide-react";
 import {
-  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck, Sun, CloudSun,
+  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, SquareDashed, Upload, Sparkles, Loader2, ShieldCheck, Sun, CloudSun,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -70,7 +70,7 @@ function StartOption({ id, name, value, checked, onSelect, icon: Icon, title, de
         value={value}
         checked={checked}
         onChange={() => onSelect(value)}
-        className="relative z-10 mt-1 size-4 shrink-0"
+        className="relative z-10 mt-1 size-4 shrink-0 accent-garden-600 dark:accent-garden-400"
       />
       <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg ${checked ? "bg-garden-600 text-white" : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"}`} aria-hidden="true">
         <Icon size={18} />
@@ -376,7 +376,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                 />
                 <StartOption
                   id={`${radioName}-empty`} name={radioName} value="empty" checked={mode === "empty"} onSelect={setMode}
-                  icon={Square} title={t("onboarding.modeEmpty")} description={t("onboarding.modeEmptyDesc")}
+                  icon={SquareDashed} title={t("onboarding.modeEmpty")} description={t("onboarding.modeEmptyDesc")}
                 />
                 <StartOption
                   id={`${radioName}-import`} name={radioName} value="import" checked={mode === "import"} onSelect={setMode}

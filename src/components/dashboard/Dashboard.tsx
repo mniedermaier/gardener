@@ -124,6 +124,20 @@ export function Dashboard() {
         <div className="min-w-0 space-y-8 lg:col-span-2">
           <GettingStarted steps={steps} />
 
+          {/* No beds yet: the season still has something to start now — one line to the calendar. */}
+          {totalBeds === 0 && visibleNow.length > 0 && (
+            <Link
+              to="/calendar"
+              className="flex min-h-11 items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm hover:bg-gray-50 dark:border-white/10 dark:bg-gray-900 dark:hover:bg-white/5"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium text-gray-900 dark:text-gray-100">{t("dashboard.sowNowCount", { count: visibleNow.length })}</span>
+                <span className="block truncate text-xs text-gray-500 dark:text-gray-400">{visibleNow.slice(0, 4).map((r) => getPlantName(r.plantId)).join(", ")}</span>
+              </span>
+              <ArrowRight size={16} aria-hidden="true" className="shrink-0 text-gray-400" />
+            </Link>
+          )}
+
           {wide && map}
 
           <TodayTasks now={now} hideWhenEmpty={!steps.find((s) => s.id === "tasks")?.done} />
