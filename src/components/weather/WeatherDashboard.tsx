@@ -325,7 +325,7 @@ export function WeatherDashboard() {
                         max={day.tempMax}
                         domain={domain}
                         threshold={alertConfig.frostThresholdC}
-                        emphasis={frost}
+                        emphasis={day.tempMin <= 0}
                         label={t("weather.rangeLabel", { min: f.formatTemperature(day.tempMin), max: f.formatTemperature(day.tempMax) })}
                       />
                       <span className="w-12 text-sm font-medium tabular-nums text-gray-900 dark:text-gray-100 sm:w-auto">{f.formatTemperature(day.tempMax)}</span>
