@@ -324,13 +324,13 @@ export function WaterTracker() {
               })}
             </div>
           </div>
-          {/* Stacked on phones: "Tropfbewässerung" does not fit a half-width select. */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          {/* A short pair: side by side on phones too (design system rule 9). */}
+          <div className="grid grid-cols-2 gap-4">
             <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
-            <Input label={t("water.durationLabel")} optional inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} error={errors.duration} />
+            <Input label={t("water.durationLabel")} optional inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder={t("common.examplePlaceholder", { value: 15 })} error={errors.duration} />
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
-          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("water.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

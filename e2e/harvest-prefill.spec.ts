@@ -41,7 +41,7 @@ test.describe("harvest prefill", () => {
     await expect(page).toHaveURL(/#\/harvest/);
     const dialog = page.getByRole("dialog", { name: "Ernte erfassen" });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("combobox", { name: "Was hast du geerntet?" })).toHaveValue(new RegExp(plant));
+    await expect(dialog.getByRole("combobox", { name: "Pflanze" })).toHaveValue(new RegExp(plant));
     await expect(dialog.locator("select")).not.toHaveValue("");
   });
 
@@ -53,7 +53,7 @@ test.describe("harvest prefill", () => {
 
     const dialog = page.getByRole("dialog", { name: "Ernte erfassen" });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("combobox", { name: "Was hast du geerntet?" })).toHaveValue(/Tomate/);
+    await expect(dialog.getByRole("combobox", { name: "Pflanze" })).toHaveValue(/Tomate/);
     // Tomatoes grow only in the greenhouse, so that bed is preselected.
     await expect(dialog.locator("select")).toHaveValue("b-gh");
   });

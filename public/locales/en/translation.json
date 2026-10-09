@@ -306,7 +306,7 @@
     "editCell": "Edit planting",
     "closeInspector": "Close planting details",
     "variety": "Variety",
-    "varietyPlaceholder": "e.g. variety name",
+    "varietyPlaceholder": "e.g. Oxheart…",
     "varietyPlaceholderFor": "e.g. {{examples}}",
     "plantedDate": "Planted date",
     "confirmDeleteGarden": "All beds in this garden are deleted with it. You can still undo this right afterwards.",
@@ -976,7 +976,8 @@
     "untilRange": "until {{first}}–{{last}}, by bed",
     "fromRange": "from {{first}}–{{last}}, by bed",
     "upNextFrom": "Coming up next · from {{date}}",
-    "alsoAction": "also: {{action}}"
+    "alsoAction": "also: {{action}}",
+    "notesPlaceholder": "e.g. tools, reminders…"
   },
   "settings": {
     "title": "Settings",
@@ -1209,7 +1210,7 @@
     "entryTitle": "Title",
     "text": "What happened in the garden today?",
     "tags": "Tags",
-    "tagsPlaceholder": "e.g. sowing, frost, harvest (comma-separated)",
+    "tagsPlaceholder": "e.g. sowing, frost, harvest…",
     "animal": "Animal",
     "all": "All",
     "addPhotos": "Add photos (max. 3)",
@@ -1236,7 +1237,8 @@
     "suggestedTags": "Suggestions:",
     "noAnimal": "No animal",
     "linkToggle": "Link a plant, bed or animal",
-    "photoHintShort": "Up to {{max}} photos, stored on this device only."
+    "photoHintShort": "Up to {{max}} photos, stored on this device only.",
+    "tagsHint": "Separate several tags with commas."
   },
   "pantry": {
     "title": "Pantry",
@@ -1251,7 +1253,7 @@
     "noConsumed": "Nothing consumed yet.",
     "method": "Method",
     "quantity": "Quantity",
-    "unitCount": "Number of jars/bags",
+    "unitCount": "Jars/bags",
     "label": "Label",
     "labelPlaceholder": "e.g. Tomato Sauce August 2026",
     "supplyCost": "Supply cost (€)",
@@ -1324,7 +1326,7 @@
     "unitLabel": "Unit",
     "unitLabelPlaceholder": "e.g. buckets",
     "storedDate": "Stored on",
-    "supplyCostHint": "Jars, lids, bags",
+    "supplyCostHint": "Jars, lids, bags. Counts towards the balance under Costs.",
     "unitOther": "Other …",
     "unitOtherLabel": "Custom unit",
     "unitNames": {
@@ -1341,7 +1343,8 @@
       "piece_one": "piece",
       "piece_other": "pieces"
     },
-    "totalItems": "Items in stock"
+    "totalItems": "Items in stock",
+    "notesPlaceholder": "e.g. recipe, storage spot…"
   },
   "season": {
     "current": "Season {{year}}",
@@ -1516,7 +1519,8 @@
     "date": "Noticed on",
     "treatmentOrganic": "Treatment (organic)",
     "descriptionPlaceholder": "e.g. leaves curling, sticky undersides",
-    "treatmentPlaceholder": "e.g. hosed off, nettle tea"
+    "treatmentPlaceholder": "e.g. hosed off, nettle tea",
+    "kindLabel": "Type"
   },
   "livestock": {
     "title": "Animals",
@@ -1550,7 +1554,7 @@
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "e.g. Newcastle vaccination",
+    "healthDescPlaceholder": "e.g. weight check, deworming…",
     "editAnimal": "Edit animal",
     "updated": "Animal updated",
     "since": "since",
@@ -1716,7 +1720,6 @@
     "healthUpdated": "Health entry updated",
     "healthDeleted": "Health entry deleted",
     "cost": "Cost (€)",
-    "costHint": "Counts towards the balance under Costs.",
     "filterAnimal": "Animal",
     "filterProduct": "Product",
     "emptyFilter": "No entries for this selection.",
@@ -1756,7 +1759,8 @@
     "tabTreatments": "Treatments",
     "costPerUnit": "Cost per unit",
     "noEggsToday": "No eggs logged today yet",
-    "addYield": "Log yield"
+    "addYield": "Log yield",
+    "notesPlaceholder": "e.g. behaviour, feed brand…"
   },
   "seeds": {
     "title": "Seeds",
@@ -1820,7 +1824,8 @@
     "needPlant": "Choose a plant",
     "invalidNumber": "Enter a valid number",
     "invalidYear": "Enter a year between 1950 and today",
-    "orOnionSets": "or onion sets"
+    "orOnionSets": "or onion sets",
+    "notesPlaceholder": "e.g. germination rate, origin…"
   },
   "soil": {
     "title": "Soil",
@@ -1930,7 +1935,9 @@
     "yourNote": "Note:",
     "emptyNoBeds": "Soil tests and amendments belong to a bed. Create a bed in the planner first.",
     "moreMeasures_one": "{{count}} more measure",
-    "moreMeasures_other": "{{count}} more measures"
+    "moreMeasures_other": "{{count}} more measures",
+    "notesPlaceholder": "e.g. weather, worked in…",
+    "testNotesPlaceholder": "e.g. sampling spot, lab…"
   },
   "preservation": {
     "title": "Preservation guide",
@@ -2210,7 +2217,8 @@
     },
     "examplePlaceholder": "e.g. {{value}}",
     "optionalMark": "(optional)",
-    "notesPlaceholder": "e.g. observations, variety, weather…"
+    "notesPlaceholder": "e.g. observations, variety, weather…",
+    "costHint": "Counts towards the balance under Costs."
   },
   "companions": {
     "title": "Companions",
@@ -2295,7 +2303,8 @@
     "rainSeparate": "Rain counted separately: {{amount}}",
     "onlyWatering": "watering only, no rain",
     "sparkLabel_one": "Watering over the last {{count}} week, {{amount}} this week",
-    "sparkLabel_other": "Watering over the last {{count}} weeks, {{amount}} this week"
+    "sparkLabel_other": "Watering over the last {{count}} weeks, {{amount}} this week",
+    "notesPlaceholder": "e.g. soil still moist, rain barrel empty…"
   },
   "storage": {
     "full": "Storage full — changes are no longer being saved. Export a backup and remove old entries.",
@@ -2322,7 +2331,8 @@
     "plantedNow": "In your beds",
     "allPlants": "All plants",
     "tomorrow": "Tomorrow",
-    "inAWeek": "In 1 week"
+    "inAWeek": "In 1 week",
+    "otherDateShort": "Date…"
   },
   "importPage": {
     "title": "Import garden",

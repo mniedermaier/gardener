@@ -223,10 +223,11 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
           inputMode={type === "eggs" ? "numeric" : "decimal"}
           value={qty}
           onChange={(e) => setQty(e.target.value)}
+          placeholder={t("common.examplePlaceholder", { value: f.formatNumber(type === "eggs" ? 6 : type === "milk" ? 2 : 1.5) })}
           autoFocus
         />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -294,7 +295,14 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
         <Input label={t("livestock.feedType")} value={feedType} onChange={(e) => setFeedType(e.target.value)} placeholder={t("livestock.feedTypePlaceholder")} autoFocus />
         <div className="grid grid-cols-2 gap-3">
-          <Input label={t("livestock.quantity")} inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} />
+          {/* The label carries the unit chosen beside it ("Menge (kg)"). */}
+          <Input
+            label={`${t("livestock.quantity")} (${t(`livestock.units.${unit}`)})`}
+            inputMode="decimal"
+            value={qty}
+            onChange={(e) => setQty(e.target.value)}
+            placeholder={t("common.examplePlaceholder", { value: f.formatNumber(unit === "g" ? 500 : unit === "liters" ? 2 : 10) })}
+          />
           <Select
             label={t("livestock.unit")}
             value={unit}
@@ -306,9 +314,9 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
             ]}
           />
         </div>
-        <Input label={t("livestock.cost")} optional hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
+        <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -376,9 +384,9 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
           options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))}
         />
         <Input label={t("livestock.healthDesc")} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} autoFocus />
-        <Input label={t("livestock.cost")} optional hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
+        <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -488,7 +496,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
           <Input label={t("livestock.count")} inputMode="numeric" value={count} onChange={(e) => setCount(e.target.value)} />
           <DatePicker label={t("livestock.acquired")} value={acquired} onChange={(e) => setAcquired(e.target.value)} />
         </div>
-        <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );

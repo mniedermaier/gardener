@@ -44,7 +44,9 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
   // grey stub that reads as broken), but never shrinks below its content, so
   // a long one still scrolls inside its wrapper. From sm on it hugs its content.
   const width = inline ? "inline-flex shrink-0" : fullWidth ? "flex w-full" : size === "md" ? "flex w-full min-w-max sm:inline-flex sm:w-auto" : "inline-flex";
-  const segment = inline ? "" : fullWidth ? "flex-1" : size === "md" ? "flex-1 sm:flex-none" : "";
+  // Full width: segments share the row and may wrap to two lines — a long
+  // label ("Anderes Datum", "Alle 2 Wochen") must never push past the edge.
+  const segment = inline ? "whitespace-nowrap" : fullWidth ? "min-w-0 flex-1 text-center leading-tight" : size === "md" ? "flex-1 whitespace-nowrap sm:flex-none" : "whitespace-nowrap";
 
   return (
     <div role="radiogroup" aria-label={label} className={`${width} gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-white/5 ${className}`}>
@@ -61,13 +63,13 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`inline-flex items-center justify-center gap-1.5 rounded-md font-medium whitespace-nowrap transition-colors ${segment} ${box} ${
+            className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1 font-medium transition-colors ${segment} ${box} ${
               selected
                 ? "bg-white text-gray-900 shadow-xs dark:bg-gray-700 dark:text-gray-50"
                 : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             }`}
           >
-            {Icon && <Icon size={14} aria-hidden="true" />}
+            {Icon && <Icon size={14} aria-hidden="true" className="shrink-0" />}
             {o.label}
             {o.count !== undefined && " "}
             {o.count !== undefined && (

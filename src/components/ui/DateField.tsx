@@ -63,7 +63,10 @@ export function DateField({ label, value, onChange, allowFuture = false, mode = 
         onChange={select}
         options={[
           ...presets.map((p) => ({ value: p.value, label: p.label })),
-          { value: "custom", label: t("records.otherDate"), icon: CalendarDays },
+          // Four segments on a phone: "Datum …" instead of "Anderes Datum", no icon.
+          mode === "future"
+            ? { value: "custom", label: <><span className="sm:hidden">{t("records.otherDateShort")}</span><span className="hidden sm:inline">{t("records.otherDate")}</span></> }
+            : { value: "custom", label: t("records.otherDate"), icon: CalendarDays },
         ]}
       />
       {choice === "custom" ? (

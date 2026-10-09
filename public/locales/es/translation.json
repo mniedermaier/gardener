@@ -319,7 +319,7 @@
     "editCell": "Editar plantación",
     "closeInspector": "Cerrar detalles de la plantación",
     "variety": "Variedad",
-    "varietyPlaceholder": "p. ej., nombre de la variedad",
+    "varietyPlaceholder": "p. ej. Corazón de buey…",
     "varietyPlaceholderFor": "p. ej., {{examples}}",
     "plantedDate": "Fecha de plantación",
     "confirmDeleteGarden": "También se eliminarán todos sus bancales. Justo después aún podrás deshacerlo.",
@@ -1006,7 +1006,8 @@
     "untilRange": "hasta {{first}}–{{last}}, según bancal",
     "fromRange": "desde {{first}}–{{last}}, según bancal",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
-    "alsoAction": "también: {{action}}"
+    "alsoAction": "también: {{action}}",
+    "notesPlaceholder": "p. ej. herramientas, avisos…"
   },
   "settings": {
     "title": "Ajustes",
@@ -1254,7 +1255,7 @@
     "entryTitle": "Titulo",
     "text": "Que paso hoy en el huerto?",
     "tags": "Etiquetas",
-    "tagsPlaceholder": "p. ej. siembra, helada, cosecha (separadas por comas)",
+    "tagsPlaceholder": "p. ej. siembra, helada, cosecha…",
     "animal": "Animal",
     "all": "Todos",
     "addPhotos": "Añadir fotos (máx. 3)",
@@ -1281,7 +1282,8 @@
     "suggestedTags": "Sugerencias:",
     "noAnimal": "Sin animal",
     "linkToggle": "Vincular planta, bancal o animal",
-    "photoHintShort": "Hasta {{max}} fotos, solo en este dispositivo."
+    "photoHintShort": "Hasta {{max}} fotos, solo en este dispositivo.",
+    "tagsHint": "Separa varias etiquetas con comas."
   },
   "pantry": {
     "title": "Despensa",
@@ -1296,7 +1298,7 @@
     "noConsumed": "Nada consumido aún.",
     "method": "Método",
     "quantity": "Cantidad",
-    "unitCount": "Número de tarros/bolsas",
+    "unitCount": "Tarros/bolsas",
     "label": "Etiqueta",
     "labelPlaceholder": "ej. Salsa de tomate agosto 2026",
     "supplyCost": "Coste de insumos (€)",
@@ -1370,7 +1372,7 @@
     "unitLabel": "Unidad",
     "unitLabelPlaceholder": "p. ej. cubos",
     "storedDate": "Guardado el",
-    "supplyCostHint": "Tarros, tapas, bolsas",
+    "supplyCostHint": "Tarros, tapas, bolsas. Cuenta en el balance de Costes.",
     "withinDays_many": "en los próximos {{count}} días",
     "daysLeft_many": "quedan {{count}} días",
     "monthsCount_many": "{{count}} meses",
@@ -1396,7 +1398,8 @@
       "pack_many": "paquetes",
       "piece_many": "unidades"
     },
-    "totalItems": "Artículos en stock"
+    "totalItems": "Artículos en stock",
+    "notesPlaceholder": "p. ej. receta, lugar de almacenaje…"
   },
   "season": {
     "current": "Temporada {{year}}",
@@ -1583,7 +1586,8 @@
     "date": "Detectado el",
     "treatmentOrganic": "Tratamiento (ecológico)",
     "descriptionPlaceholder": "p. ej. hojas enrolladas, envés pegajoso",
-    "treatmentPlaceholder": "p. ej. lavado con agua, purín de ortiga"
+    "treatmentPlaceholder": "p. ej. lavado con agua, purín de ortiga",
+    "kindLabel": "Tipo"
   },
   "livestock": {
     "title": "Animales",
@@ -1618,7 +1622,7 @@
     "noHealth": "Anota vacunas, tratamientos y revisiones para no olvidar nada.",
     "healthType": "Tipo",
     "healthDesc": "Descripción",
-    "healthDescPlaceholder": "ej. vacuna Newcastle",
+    "healthDescPlaceholder": "p. ej. control de peso, desparasitación…",
     "editAnimal": "Editar animal",
     "updated": "Animal actualizado",
     "since": "desde",
@@ -1798,7 +1802,6 @@
     "healthUpdated": "Registro de salud actualizado",
     "healthDeleted": "Registro de salud eliminado",
     "cost": "Coste (€)",
-    "costHint": "Cuenta en el balance de Costes.",
     "filterAnimal": "Animal",
     "filterProduct": "Producto",
     "emptyFilter": "No hay registros para esta selección.",
@@ -1839,7 +1842,8 @@
     "tabTreatments": "Tratamientos",
     "costPerUnit": "Coste por unidad",
     "noEggsToday": "Hoy aún no hay huevos registrados",
-    "addYield": "Registrar rendimiento"
+    "addYield": "Registrar rendimiento",
+    "notesPlaceholder": "p. ej. comportamiento, marca de pienso…"
   },
   "seeds": {
     "title": "Semillas",
@@ -1908,7 +1912,8 @@
     "invalidNumber": "Introduce un número válido",
     "invalidYear": "Introduce un año entre 1950 y hoy",
     "years_many": "{{count}} años",
-    "orOnionSets": "o bulbillos"
+    "orOnionSets": "o bulbillos",
+    "notesPlaceholder": "p. ej. tasa de germinación, origen…"
   },
   "soil": {
     "title": "Suelo",
@@ -2019,7 +2024,9 @@
     "emptyNoBeds": "Los análisis y las enmiendas pertenecen a un bancal. Crea primero un bancal en el planificador.",
     "moreMeasures_one": "{{count}} medida más",
     "moreMeasures_other": "{{count}} medidas más",
-    "moreMeasures_many": "{{count}} medidas más"
+    "moreMeasures_many": "{{count}} medidas más",
+    "notesPlaceholder": "p. ej. tiempo, incorporado…",
+    "testNotesPlaceholder": "p. ej. muestreo, laboratorio…"
   },
   "preservation": {
     "title": "Guía de conservación",
@@ -2310,7 +2317,8 @@
     },
     "examplePlaceholder": "p. ej. {{value}}",
     "optionalMark": "(opcional)",
-    "notesPlaceholder": "p. ej. observaciones, variedad, tiempo…"
+    "notesPlaceholder": "p. ej. observaciones, variedad, tiempo…",
+    "costHint": "Cuenta en el balance de Costes."
   },
   "companions": {
     "title": "Asociaciones",
@@ -2402,7 +2410,8 @@
     "onlyWatering": "solo riego, sin lluvia",
     "sparkLabel_one": "Riego de la última {{count}} semana, esta semana {{amount}}",
     "sparkLabel_other": "Riego de las últimas {{count}} semanas, esta semana {{amount}}",
-    "sparkLabel_many": "Riego de las últimas {{count}} semanas, esta semana {{amount}}"
+    "sparkLabel_many": "Riego de las últimas {{count}} semanas, esta semana {{amount}}",
+    "notesPlaceholder": "p. ej. suelo aún húmedo, bidón vacío…"
   },
   "storage": {
     "full": "Almacenamiento lleno: los cambios ya no se guardan. Exporta una copia y elimina entradas antiguas.",
@@ -2429,7 +2438,8 @@
     "plantedNow": "En tus bancales",
     "allPlants": "Todas las plantas",
     "tomorrow": "Mañana",
-    "inAWeek": "En 1 semana"
+    "inAWeek": "En 1 semana",
+    "otherDateShort": "Fecha…"
   },
   "importPage": {
     "title": "Importar huerto",

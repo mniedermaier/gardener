@@ -88,7 +88,8 @@ function MethodPicker({ label, value, options, onChange }: { label: string; valu
   return (
     <div>
       <p className={LABEL_CLASS}>{label}</p>
-      <div role="radiogroup" aria-label={label} className="grid grid-cols-3 gap-2">
+      {/* Same tile as the planner and livestock pickers: icon inline, two columns on phones. */}
+      <div role="radiogroup" aria-label={label} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {options.map((m, i) => {
           const Icon = METHOD_ICON[m];
           const selected = m === value;
@@ -102,14 +103,14 @@ function MethodPicker({ label, value, options, onChange }: { label: string; valu
               tabIndex={selected ? 0 : -1}
               onClick={() => onChange(m)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg border px-1 text-center text-xs font-medium transition-colors sm:min-h-11 sm:flex-row sm:justify-start sm:gap-2 sm:px-3 sm:text-left sm:text-sm ${
+              className={`flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
                 selected
                   ? "border-garden-600 bg-garden-50 text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
                   : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
               }`}
             >
               <Icon size={16} aria-hidden="true" className="shrink-0" />
-              {t(`preservation.methods.${m}`)}
+              <span className="min-w-0 truncate">{t(`preservation.methods.${m}`)}</span>
             </button>
           );
         })}
@@ -526,7 +527,7 @@ export function PantryPage() {
           <Input label={t("pantry.label")} optional value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
           <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
           <Input label={t("pantry.supplyCost")} optional inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("pantry.supplyCostHint")} error={errors.cost} />
-          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("pantry.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

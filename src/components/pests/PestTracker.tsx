@@ -255,9 +255,10 @@ export function PestTracker() {
         }
       >
         <div className="space-y-4">
+          <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("pests.kindLabel")}</p>
           <SegmentedControl
             fullWidth
-            label={t("pests.types.pest") + " / " + t("pests.types.disease")}
+            label={t("pests.kindLabel")}
             value={draft.type}
             onChange={(type) => patch({ type })}
             options={[

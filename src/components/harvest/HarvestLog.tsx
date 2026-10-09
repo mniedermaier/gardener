@@ -403,7 +403,7 @@ export function HarvestLog() {
         <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           <div>
             <PlantCombobox
-              label={t("harvest.what")}
+              label={t("harvest.plant")}
               plants={plants}
               beds={beds.beds}
               value={draft.plantId}

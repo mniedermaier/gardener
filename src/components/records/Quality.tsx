@@ -54,6 +54,11 @@ export function QualityInput({ label, value, onChange }: { label: string; value:
           </button>
         ))}
       </div>
+      {/* Endpoint captions, as on the pest severity scale: the stars' meaning without hovering. */}
+      <div className="flex w-[13.75rem] justify-between text-xs text-gray-500 sm:w-[12.5rem] dark:text-gray-400" aria-hidden="true">
+        <span>{t("harvest.qualityLevel.1")}</span>
+        <span>{t("harvest.qualityLevel.5")}</span>
+      </div>
     </div>
   );
 }

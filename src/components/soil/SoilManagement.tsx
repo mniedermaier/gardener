@@ -436,7 +436,7 @@ export function SoilManagement() {
             <Input label={t("soil.kShort")} inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder="150" error={testErrors.k} />
           </div>
           <p className="-mt-2 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
-          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("soil.testNotesPlaceholder")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
         </div>
       </Modal>
 
@@ -469,11 +469,11 @@ export function SoilManagement() {
           </div>
           <Input label={t("soil.material")} value={amend.material} onChange={(e) => patchAmend({ material: e.target.value })} placeholder={t("soil.materialPlaceholder")} error={amendErrors.material} />
           <div className="grid grid-cols-2 gap-4">
-            <Input label={t("soil.quantityKg")} inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder="10" error={amendErrors.kg} />
-            <Input label={t("soil.cost")} optional inputMode="decimal" value={amend.cost} onChange={(e) => patchAmend({ cost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(12.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} error={amendErrors.cost} />
+            <Input label={t("soil.quantityKg")} inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(10) })} error={amendErrors.kg} />
+            <Input label={t("soil.cost")} optional inputMode="decimal" value={amend.cost} onChange={(e) => patchAmend({ cost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(12.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("common.costHint")} error={amendErrors.cost} />
           </div>
           <DateField label={t("harvest.date")} value={amend.date} onChange={(date) => patchAmend({ date })} />
-          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={amend.notes} onChange={(e) => patchAmend({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("soil.notesPlaceholder")} rows={2} value={amend.notes} onChange={(e) => patchAmend({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

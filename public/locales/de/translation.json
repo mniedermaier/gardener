@@ -306,7 +306,7 @@
     "editCell": "Pflanzung bearbeiten",
     "closeInspector": "Pflanzungsdetails schließen",
     "variety": "Sorte",
-    "varietyPlaceholder": "z. B. Sortenname",
+    "varietyPlaceholder": "z. B. Ochsenherz …",
     "varietyPlaceholderFor": "z. B. {{examples}}",
     "plantedDate": "Pflanzdatum",
     "confirmDeleteGarden": "Alle Beete dieses Gartens werden mitgelöscht. Direkt danach kannst du das noch rückgängig machen.",
@@ -976,7 +976,8 @@
     "untilRange": "bis {{first}}–{{last}}, je nach Beet",
     "fromRange": "ab {{first}}–{{last}}, je nach Beet",
     "upNextFrom": "Als Nächstes · ab {{date}}",
-    "alsoAction": "auch {{action}}"
+    "alsoAction": "auch {{action}}",
+    "notesPlaceholder": "z. B. Werkzeug, Hinweise …"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1209,7 +1210,7 @@
     "entryTitle": "Titel",
     "text": "Was ist heute im Garten passiert?",
     "tags": "Tags",
-    "tagsPlaceholder": "z. B. aussaat, frost, ernte (kommagetrennt)",
+    "tagsPlaceholder": "z. B. aussaat, frost, ernte …",
     "animal": "Tier",
     "all": "Alle",
     "addPhotos": "Fotos hinzufügen (max. 3)",
@@ -1236,7 +1237,8 @@
     "suggestedTags": "Vorschläge:",
     "noAnimal": "Kein Tier",
     "linkToggle": "Pflanze, Beet oder Tier verknüpfen",
-    "photoHintShort": "Bis zu {{max}} Fotos, nur auf diesem Gerät gespeichert."
+    "photoHintShort": "Bis zu {{max}} Fotos, nur auf diesem Gerät gespeichert.",
+    "tagsHint": "Mehrere Schlagwörter mit Komma trennen."
   },
   "pantry": {
     "title": "Vorrat",
@@ -1251,7 +1253,7 @@
     "noConsumed": "Noch nichts verbraucht.",
     "method": "Methode",
     "quantity": "Menge",
-    "unitCount": "Anzahl Gläser/Beutel",
+    "unitCount": "Gläser/Beutel",
     "label": "Bezeichnung",
     "labelPlaceholder": "z. B. Tomatensauce August 2026",
     "supplyCost": "Zubehörkosten (€)",
@@ -1324,7 +1326,7 @@
     "unitLabel": "Einheit",
     "unitLabelPlaceholder": "z. B. Eimer",
     "storedDate": "Eingelagert am",
-    "supplyCostHint": "Gläser, Deckel, Beutel",
+    "supplyCostHint": "Gläser, Deckel, Beutel. Fließt in die Bilanz unter Kosten ein.",
     "unitOther": "Andere …",
     "unitOtherLabel": "Eigene Einheit",
     "unitNames": {
@@ -1341,7 +1343,8 @@
       "piece_one": "Stück",
       "piece_other": "Stück"
     },
-    "totalItems": "Posten im Vorrat"
+    "totalItems": "Posten im Vorrat",
+    "notesPlaceholder": "z. B. Rezept, Lagerort …"
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1516,7 +1519,8 @@
     "date": "Bemerkt am",
     "treatmentOrganic": "Behandlung (bio)",
     "descriptionPlaceholder": "z. B. Blätter rollen sich ein, klebrige Unterseiten",
-    "treatmentPlaceholder": "z. B. Mit Wasser abgespritzt, Brennnesseljauche"
+    "treatmentPlaceholder": "z. B. Mit Wasser abgespritzt, Brennnesseljauche",
+    "kindLabel": "Art"
   },
   "livestock": {
     "title": "Tiere",
@@ -1550,7 +1554,7 @@
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
     "healthDesc": "Beschreibung",
-    "healthDescPlaceholder": "z. B. Newcastle-Impfung",
+    "healthDescPlaceholder": "z. B. Gewichtskontrolle, Entwurmung …",
     "editAnimal": "Tier bearbeiten",
     "updated": "Tier aktualisiert",
     "since": "seit",
@@ -1716,7 +1720,6 @@
     "healthUpdated": "Gesundheitseintrag aktualisiert",
     "healthDeleted": "Gesundheitseintrag gelöscht",
     "cost": "Kosten (€)",
-    "costHint": "Fließt in die Bilanz unter Kosten ein.",
     "filterAnimal": "Tier",
     "filterProduct": "Produkt",
     "emptyFilter": "Keine Einträge für diese Auswahl.",
@@ -1756,7 +1759,8 @@
     "tabTreatments": "Behandlungen",
     "costPerUnit": "Kosten je Einheit",
     "noEggsToday": "Heute noch keine Eier erfasst",
-    "addYield": "Ertrag erfassen"
+    "addYield": "Ertrag erfassen",
+    "notesPlaceholder": "z. B. Verhalten, Futtermarke …"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1820,7 +1824,8 @@
     "needPlant": "Bitte eine Pflanze wählen",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben",
-    "orOnionSets": "oder Steckzwiebeln"
+    "orOnionSets": "oder Steckzwiebeln",
+    "notesPlaceholder": "z. B. Keimrate, Herkunft …"
   },
   "soil": {
     "title": "Boden",
@@ -1930,7 +1935,9 @@
     "yourNote": "Notiz:",
     "emptyNoBeds": "Bodentests und Düngungen gehören zu einem Beet. Lege zuerst im Planer ein Beet an.",
     "moreMeasures_one": "{{count}} weitere Maßnahme",
-    "moreMeasures_other": "{{count}} weitere Maßnahmen"
+    "moreMeasures_other": "{{count}} weitere Maßnahmen",
+    "notesPlaceholder": "z. B. Wetter, eingearbeitet …",
+    "testNotesPlaceholder": "z. B. Probenahme, Labor …"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2210,7 +2217,8 @@
     },
     "examplePlaceholder": "z. B. {{value}}",
     "optionalMark": "(optional)",
-    "notesPlaceholder": "z. B. Beobachtungen, Sorte, Wetter …"
+    "notesPlaceholder": "z. B. Beobachtungen, Sorte, Wetter …",
+    "costHint": "Fließt in die Bilanz unter Kosten ein."
   },
   "companions": {
     "title": "Pflanzpartner",
@@ -2295,7 +2303,8 @@
     "rainSeparate": "Regen separat: {{amount}}",
     "onlyWatering": "nur Gießwasser, ohne Regen",
     "sparkLabel_one": "Gießwasser der letzten {{count}} Woche, diese Woche {{amount}}",
-    "sparkLabel_other": "Gießwasser der letzten {{count}} Wochen, diese Woche {{amount}}"
+    "sparkLabel_other": "Gießwasser der letzten {{count}} Wochen, diese Woche {{amount}}",
+    "notesPlaceholder": "z. B. Boden noch feucht, Regentonne leer …"
   },
   "storage": {
     "full": "Speicher voll — Änderungen werden nicht mehr gesichert. Exportiere ein Backup und lösche alte Einträge.",
@@ -2322,7 +2331,8 @@
     "plantedNow": "In deinen Beeten",
     "allPlants": "Alle Pflanzen",
     "tomorrow": "Morgen",
-    "inAWeek": "In 1 Woche"
+    "inAWeek": "In 1 Woche",
+    "otherDateShort": "Datum …"
   },
   "importPage": {
     "title": "Garten importieren",

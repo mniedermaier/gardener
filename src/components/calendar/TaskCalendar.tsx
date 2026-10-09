@@ -403,7 +403,7 @@ export function TaskCalendar() {
               options={(["none", "daily", "weekly", "biweekly"] as const).map((r) => ({ value: r, label: t(`calendar.recurring.${r}`) }))}
             />
           </div>
-          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("calendar.notesPlaceholder")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>

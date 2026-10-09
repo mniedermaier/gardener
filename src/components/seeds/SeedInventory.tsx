@@ -339,7 +339,7 @@ export function SeedInventory() {
           <Input label={t("planner.variety")} optional value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
           {/* Short pairs stay side by side on phones too; one grid per row so the fields line up. */}
           <div className="grid grid-cols-2 gap-4">
-            <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
+            <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(draft.unit === "grams" ? 5 : draft.unit === "packets" ? 1 : 50) })} error={errors.quantity} />
             {/* A select, not a segmented toggle: three units do not fit a half-width column. */}
             <Select
               label={t("seeds.unit")}
@@ -367,11 +367,12 @@ export function SeedInventory() {
               value={draft.cost}
               onChange={(e) => patch({ cost: e.target.value })}
               placeholder={t("common.examplePlaceholder", { value: formatNumber(3.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
+              hint={t("common.costHint")}
               error={errors.cost}
             />
           </div>
           )}
-          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("seeds.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

@@ -37,14 +37,26 @@ covered here, copy the pattern from the reference page
      required fields stay unmarked.
    - **Units** sit in the label in parentheses: "Kosten (€)", "Menge (l)",
      "Dauer (Min.)", "Ernte ab (Tage)". Placeholders are plain example numbers
-     ("z. B. 4,00"), never a currency string.
+     ("z. B. 4,00"), never a currency string. Every numeric field shows such an
+     example; where a unit picker sits beside the amount, the label follows it
+     ("Menge (kg)").
+   - **Costs** that feed the balance (seeds, pantry supplies, soil, feed, health)
+     carry the hint `common.costHint` ("Fließt in die Bilanz unter Kosten ein.").
    - **Numbers** use a text field with `inputMode="decimal"`/`"numeric"`, not
      `type="number"` (no spin arrows, the decimal comma works). Short pairs
-     (amount + unit, year + source, amount + category) stay side by side on phones.
+     (amount + unit, year + source, amount + category, method + duration) stay
+     side by side on phones.
+   - **Plant fields** are a `PlantCombobox` labelled "Pflanze" in every dialog.
+   - **Scales** (harvest quality, pest severity) show their two endpoint
+     captions under the control.
    - **Dates:** `DateField` — Heute/Gestern/Anderes Datum for records,
      `mode="future"` (Heute/Morgen/In 1 Woche) for tasks. A native
      `DatePicker` only for one-off dates such as "Im Bestand seit".
-   - **Notizen** is always an optional `Textarea` with `common.notesPlaceholder`.
+   - **Notizen** is always an optional `Textarea` with a placeholder that fits
+     the record: `common.notesPlaceholder` for crops, otherwise the page's own
+     key (`livestock.`, `calendar.`, `water.`, `seeds.`, `pantry.`, `soil.notesPlaceholder`).
+   - A full-width `SegmentedControl` never overflows: its segments shrink and
+     wrap to two lines; keep labels short ("Datum …" on phones).
    - Placeholders end in a typographic ellipsis "…" (German with a space before it).
    - Save stays disabled until the required fields are valid.
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.

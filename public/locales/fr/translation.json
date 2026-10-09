@@ -319,7 +319,7 @@
     "editCell": "Modifier la plantation",
     "closeInspector": "Fermer les détails de la plantation",
     "variety": "Variété",
-    "varietyPlaceholder": "ex. : nom de la variété",
+    "varietyPlaceholder": "p. ex. Cœur de bœuf…",
     "varietyPlaceholderFor": "ex. : {{examples}}",
     "plantedDate": "Date de plantation",
     "confirmDeleteGarden": "Toutes ses planches seront aussi supprimées. Vous pourrez encore l’annuler juste après.",
@@ -1006,7 +1006,8 @@
     "untilRange": "jusqu’au {{first}}–{{last}}, selon la planche",
     "fromRange": "dès le {{first}}–{{last}}, selon la planche",
     "upNextFrom": "Ensuite · dès le {{date}}",
-    "alsoAction": "aussi : {{action}}"
+    "alsoAction": "aussi : {{action}}",
+    "notesPlaceholder": "p. ex. outils, rappels…"
   },
   "settings": {
     "title": "Paramètres",
@@ -1254,7 +1255,7 @@
     "entryTitle": "Titre",
     "text": "Que s'est-il passé au jardin aujourd'hui ?",
     "tags": "Mots-clés",
-    "tagsPlaceholder": "p. ex. semis, gel, récolte (séparés par des virgules)",
+    "tagsPlaceholder": "p. ex. semis, gel, récolte…",
     "animal": "Animal",
     "all": "Tous",
     "addPhotos": "Ajouter des photos (max. 3)",
@@ -1281,7 +1282,8 @@
     "suggestedTags": "Suggestions :",
     "noAnimal": "Aucun animal",
     "linkToggle": "Lier une plante, un carré ou un animal",
-    "photoHintShort": "Jusqu’à {{max}} photos, stockées uniquement sur cet appareil."
+    "photoHintShort": "Jusqu’à {{max}} photos, stockées uniquement sur cet appareil.",
+    "tagsHint": "Sépare plusieurs mots-clés par des virgules."
   },
   "pantry": {
     "title": "Réserves",
@@ -1296,7 +1298,7 @@
     "noConsumed": "Rien de consommé encore.",
     "method": "Méthode",
     "quantity": "Quantité",
-    "unitCount": "Nombre de bocaux/sachets",
+    "unitCount": "Bocaux/sachets",
     "label": "Étiquette",
     "labelPlaceholder": "ex. Sauce tomate août 2026",
     "supplyCost": "Coût des fournitures (€)",
@@ -1370,7 +1372,7 @@
     "unitLabel": "Unité",
     "unitLabelPlaceholder": "p. ex. seaux",
     "storedDate": "Stocké le",
-    "supplyCostHint": "Bocaux, couvercles, sachets",
+    "supplyCostHint": "Bocaux, couvercles, sachets. Compte dans le bilan sous Coûts.",
     "withinDays_many": "dans les {{count}} prochains jours",
     "daysLeft_many": "encore {{count}} jours",
     "monthsCount_many": "{{count}} mois",
@@ -1396,7 +1398,8 @@
       "pack_many": "paquets",
       "piece_many": "pièces"
     },
-    "totalItems": "Articles en stock"
+    "totalItems": "Articles en stock",
+    "notesPlaceholder": "p. ex. recette, lieu de stockage…"
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1583,7 +1586,8 @@
     "date": "Constaté le",
     "treatmentOrganic": "Traitement (bio)",
     "descriptionPlaceholder": "p. ex. feuilles enroulées, revers collant",
-    "treatmentPlaceholder": "p. ex. rincé au jet, purin d’ortie"
+    "treatmentPlaceholder": "p. ex. rincé au jet, purin d’ortie",
+    "kindLabel": "Type"
   },
   "livestock": {
     "title": "Animaux",
@@ -1618,7 +1622,7 @@
     "noHealth": "Notez vaccins, traitements et contrôles pour ne rien oublier.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "ex. vaccin Newcastle",
+    "healthDescPlaceholder": "p. ex. contrôle du poids, vermifuge…",
     "editAnimal": "Modifier l'animal",
     "updated": "Animal mis à jour",
     "since": "depuis",
@@ -1798,7 +1802,6 @@
     "healthUpdated": "Entrée de santé mise à jour",
     "healthDeleted": "Entrée de santé supprimée",
     "cost": "Coût (€)",
-    "costHint": "Compte dans le bilan sous Coûts.",
     "filterAnimal": "Animal",
     "filterProduct": "Produit",
     "emptyFilter": "Aucune entrée pour cette sélection.",
@@ -1839,7 +1842,8 @@
     "tabTreatments": "Soins",
     "costPerUnit": "Coût par unité",
     "noEggsToday": "Aucun œuf noté aujourd’hui",
-    "addYield": "Noter un rendement"
+    "addYield": "Noter un rendement",
+    "notesPlaceholder": "p. ex. comportement, marque d’aliment…"
   },
   "seeds": {
     "title": "Semences",
@@ -1908,7 +1912,8 @@
     "invalidNumber": "Saisissez un nombre valide",
     "invalidYear": "Saisissez une année entre 1950 et aujourd’hui",
     "years_many": "{{count}} ans",
-    "orOnionSets": "ou bulbilles"
+    "orOnionSets": "ou bulbilles",
+    "notesPlaceholder": "p. ex. taux de germination, origine…"
   },
   "soil": {
     "title": "Sol",
@@ -2019,7 +2024,9 @@
     "emptyNoBeds": "Les analyses et amendements se rattachent à une planche. Créez d’abord une planche dans le planificateur.",
     "moreMeasures_one": "{{count}} autre mesure",
     "moreMeasures_other": "{{count}} autres mesures",
-    "moreMeasures_many": "{{count}} autres mesures"
+    "moreMeasures_many": "{{count}} autres mesures",
+    "notesPlaceholder": "p. ex. météo, incorporé…",
+    "testNotesPlaceholder": "p. ex. prélèvement, laboratoire…"
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -2310,7 +2317,8 @@
     },
     "examplePlaceholder": "p. ex. {{value}}",
     "optionalMark": "(facultatif)",
-    "notesPlaceholder": "p. ex. observations, variété, météo…"
+    "notesPlaceholder": "p. ex. observations, variété, météo…",
+    "costHint": "Compte dans le bilan sous Coûts."
   },
   "companions": {
     "title": "Associations",
@@ -2402,7 +2410,8 @@
     "onlyWatering": "arrosage seul, sans pluie",
     "sparkLabel_one": "Arrosage de la dernière {{count}} semaine, {{amount}} cette semaine",
     "sparkLabel_other": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
-    "sparkLabel_many": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine"
+    "sparkLabel_many": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
+    "notesPlaceholder": "p. ex. sol encore humide, récupérateur vide…"
   },
   "storage": {
     "full": "Stockage plein — les modifications ne sont plus enregistrées. Exportez une sauvegarde et supprimez d'anciennes entrées.",
@@ -2429,7 +2438,8 @@
     "plantedNow": "Dans vos planches",
     "allPlants": "Toutes les plantes",
     "tomorrow": "Demain",
-    "inAWeek": "Dans 1 semaine"
+    "inAWeek": "Dans 1 semaine",
+    "otherDateShort": "Date…"
   },
   "importPage": {
     "title": "Importer un jardin",

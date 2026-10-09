@@ -490,7 +490,7 @@ export function GardenJournal() {
           </details>
 
           <div>
-            <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} />
+            <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} hint={t("journal.tagsHint")} />
             {suggestedTags.length > 0 && (
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 <span className="text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
