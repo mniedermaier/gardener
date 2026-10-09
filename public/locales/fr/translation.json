@@ -121,7 +121,7 @@
         "journal": "Journal"
       },
       "logHarvestFor": "{{name}} · Noter une récolte",
-      "plantInBed": "{{plant}} · {{bed}}",
+      "plantInBed": "{{plant}} dans la planche {{bed}}",
       "cellCount_one": "{{count}} case",
       "cellCount_many": "{{count}} cases",
       "cellCount_other": "{{count}} cases"

@@ -348,7 +348,8 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
           {t(bedsByPlant.size > 0 ? "companions.quickInGarden" : "companions.quickCommon")}
         </p>
         <div className="flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
-          {(bedsByPlant.size > 0 ? [...bedsByPlant.keys()] : QUICK_PICKS).filter((id) => names.has(id) && id !== selected.id).slice(0, 8).map((id) => (
+          {/* Every crop in the garden (a caption "Im Garten" must not silently drop some); common picks capped at 8. */}
+          {(bedsByPlant.size > 0 ? [...bedsByPlant.keys()] : QUICK_PICKS.slice(0, 8)).filter((id) => names.has(id) && id !== selected.id).map((id) => (
             <button
               key={id}
               type="button"

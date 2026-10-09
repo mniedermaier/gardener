@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Sun, ClipboardList, Apple, LayoutGrid, Menu } from "lucide-react";
+import { Sun, CalendarDays, Apple, LayoutGrid, Menu } from "lucide-react";
 import { bottomTabForPath, type BottomTab } from "./navigation";
 
 interface Props {
@@ -10,7 +10,8 @@ interface Props {
 
 const tabs: { id: BottomTab; to: string; icon: typeof Sun; labelKey: string }[] = [
   { id: "today", to: "/", icon: Sun, labelKey: "shell.nav.today" },
-  { id: "tasks", to: "/tasks", icon: ClipboardList, labelKey: "shell.tabs.tasks" },
+  // Named after its section (Kalender: season + tasks), like the top bar (DESIGN_SYSTEM §12).
+  { id: "tasks", to: "/calendar", icon: CalendarDays, labelKey: "shell.nav.calendar" },
   { id: "harvest", to: "/harvest", icon: Apple, labelKey: "shell.nav.harvest" },
   { id: "planner", to: "/planner", icon: LayoutGrid, labelKey: "shell.nav.planner" },
 ];

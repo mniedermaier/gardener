@@ -121,7 +121,7 @@
         "journal": "Tagebuch"
       },
       "logHarvestFor": "{{name}} · Ernte erfassen",
-      "plantInBed": "{{plant}} · {{bed}}",
+      "plantInBed": "{{plant}} im Beet {{bed}}",
       "cellCount_one": "{{count}} Feld",
       "cellCount_other": "{{count}} Felder"
     },

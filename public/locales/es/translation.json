@@ -121,7 +121,7 @@
         "journal": "Diario"
       },
       "logHarvestFor": "{{name}} · Registrar cosecha",
-      "plantInBed": "{{plant}} · {{bed}}",
+      "plantInBed": "{{plant}} en el bancal {{bed}}",
       "cellCount_one": "{{count}} casilla",
       "cellCount_many": "{{count}} casillas",
       "cellCount_other": "{{count}} casillas"

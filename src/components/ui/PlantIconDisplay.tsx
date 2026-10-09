@@ -15,7 +15,7 @@ interface Props {
  */
 // Dark mode: a faint light halo keeps deep fills (potato, beetroot, zucchini)
 // legible on gray-900 without touching the cached SVGs.
-const DARK_HALO = "dark:drop-shadow-[0_0_1.5px_rgb(255_255_255/0.45)]";
+const DARK_HALO = "dark:drop-shadow-[0_0_2px_rgb(255_255_255/0.6)]";
 
 export const PlantIconDisplay = memo(function PlantIconDisplay({ plantId, emoji, size = 24, className = "" }: Props) {
   if (hasPlantSvg(plantId)) {
