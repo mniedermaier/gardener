@@ -12,7 +12,8 @@ import type { Phase } from "@/lib/season";
  */
 export const PHASE_META: Record<Phase, { icon: LucideIcon; bar: string; text: string; hatched: boolean }> = {
   // Under glass: the cool info hue, so it never reads as the earth-coloured harvest at small sizes.
-  sowIndoors: { icon: House, bar: "bg-info/40 dark:bg-info/50", text: "text-info", hatched: true },
+  // Dark: a near-solid fill, so the hatch reads as texture and not as an empty bar.
+  sowIndoors: { icon: House, bar: "bg-info/40 dark:bg-info/80", text: "text-info", hatched: true },
   sowOutdoors: { icon: Sprout, bar: "bg-garden-300 dark:bg-garden-400/70", text: "text-garden-600 dark:text-garden-300", hatched: false },
   transplant: { icon: Shovel, bar: "bg-garden-600 dark:bg-garden-300", text: "text-garden-700 dark:text-garden-300", hatched: false },
   harvest: { icon: Apple, bar: "bg-earth-500 dark:bg-earth-400", text: "text-earth-600 dark:text-earth-300", hatched: false },

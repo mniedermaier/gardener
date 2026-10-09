@@ -1,7 +1,7 @@
 import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
+import { addYears, differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft, Check, TriangleAlert, Ruler, CalendarClock, Scale, Sun, LayoutGrid, Package, Apple, Pencil, Network, Leaf, Plus,
@@ -56,7 +56,7 @@ function PhaseIcon({ phase }: { phase: Phase["key"] }) {
 /** 12-month strip with one labelled row per phase and a today marker. */
 const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase[]; frost: Date }) {
   const { t } = useTranslation();
-  const { formatDate, locale } = useFormat();
+  const { formatDate, formatDateRange, locale } = useFormat();
   const yearStart = startOfYear(frost);
   const yearEnd = endOfYear(frost);
   const total = differenceInCalendarDays(yearEnd, yearStart) + 1;
@@ -121,7 +121,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
         {phases.map((p) => {
           const left = pos(p.start);
           const width = Math.max(1.5, pos(p.end) - left);
-          const range = t("plants.detail.window", { from: formatDate(p.start), to: formatDate(p.end) });
+          const range = formatDateRange(p.start, p.end);
           const label = t(`plants.details.${p.key}`);
           return (
             <li key={p.key} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
@@ -155,6 +155,13 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
           <span className="h-3 border-l border-dashed border-gray-500" aria-hidden="true" />
           {t("plants.detail.lastFrost", { date: formatDate(frost) })}
         </span>
+        {/* The hatch is the one non-colour cue in the bars: explain it where it occurs. */}
+        {phases.some((p) => PHASE_META[p.key].hatched) && (
+          <span className="inline-flex items-center gap-1.5">
+            <PhaseSwatch phase="sowIndoors" className="h-2.5 w-3.5" />
+            {t("plants.detail.hatchLegend")}
+          </span>
+        )}
       </div>
 
       {/* Exact dates as text, so the bars are never the only carrier of information */}
@@ -166,7 +173,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
               {t(`plants.details.${p.key}`)}
             </dt>
             <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">
-              {t("plants.detail.window", { from: formatDate(p.start), to: formatDate(p.end) })}
+              {formatDateRange(p.start, p.end)}
             </dd>
           </div>
         ))}
@@ -239,6 +246,21 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   const phases = useMemo(() => buildPhases(plant, frost, context.protection), [plant, frost, context.protection]);
   const contextLabel = (c: SeasonContext) => (c.protection > 0 ? t(`planner.environmentTypes.${c.env}`) : t("plants.detail.openField"));
 
+  // One line on where the season stands: a sowing open now, or the next one
+  // (next year once this year's windows have closed — then the planner CTA
+  // steps back, there is nothing to place in October).
+  const today = useToday();
+  const sowNote = useMemo(() => {
+    const SOW: Phase["key"][] = ["sowIndoors", "sowOutdoors", "transplant"];
+    const firstSow = (list: Phase[]) => list.filter((p) => SOW.includes(p.key)).sort((a, b) => a.start.getTime() - b.start.getTime());
+    const open = firstSow(phases).find((p) => p.start <= today && p.end >= today);
+    if (open) return { offSeason: false, text: t("plants.detail.sowNow", { date: formatDate(open.end) }) };
+    const ahead = firstSow(phases).find((p) => p.start > today)
+      ?? firstSow(buildPhases(plant, addYears(frost, 1), context.protection))[0];
+    if (!ahead) return null;
+    return { offSeason: ahead.start.getFullYear() > today.getFullYear(), text: t("plants.detail.nextSowing", { date: formatDate(ahead.start) }) };
+  }, [phases, today, plant, frost, context.protection, t, formatDate]);
+
   // Relations are symmetric, like in the companion matrix.
   const { good, bad } = useMemo(() => {
     const g = new Set(plant.companions);
@@ -297,7 +319,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         actions={
           // Phones: primary first, stacked at full width so no label breaks onto two lines.
           <>
-            <Button className="w-full sm:w-auto" onClick={goPlanner}>
+            <Button variant={sowNote?.offSeason ? "secondary" : "primary"} className="w-full sm:w-auto" onClick={goPlanner}>
               <LayoutGrid size={16} aria-hidden="true" />
               {hasBeds ? t("plants.placeInPlanner") : t("plants.createBedFirst")}
             </Button>
@@ -315,8 +337,14 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         }
       />
 
-      {(description || plant.caloriesPer100g) && (
+      {(description || plant.caloriesPer100g || sowNote) && (
         <div className="-mt-2 mb-6 max-w-3xl text-sm">
+          {sowNote && (
+            <p className="mb-2 inline-flex items-center gap-1.5 font-medium text-garden-700 dark:text-garden-300">
+              <CalendarClock size={14} aria-hidden="true" />
+              {sowNote.text}
+            </p>
+          )}
           {description && <p className="text-gray-700 dark:text-gray-300">{description}</p>}
           {plant.caloriesPer100g ? (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) })}</p>
@@ -448,7 +476,8 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                   harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : null,
                 ]
                 : t("plants.detail.noHarvests")}
-              actions={<IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} />}
+              // Nothing to harvest from while the crop stands in no bed (and none was harvested yet).
+              actions={locations.length > 0 || harvestStats.count > 0 ? <IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} /> : undefined}
             />
             {ownSeeds.length > 0 ? ownSeeds.map((s) => (
               <ListRow

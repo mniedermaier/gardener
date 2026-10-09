@@ -4,6 +4,7 @@ import {
   formatArea,
   formatCurrency,
   formatDate,
+  formatDateRange,
   formatNumber,
   formatPercent,
   roundShares,
@@ -71,6 +72,21 @@ describe("formatDate", () => {
     expect(inl("2026-10-02")).toBe("vor 3 Tagen");
     expect(inl("2026-10-04", "en")).toBe("yesterday");
     expect(inl("2026-09-01")).toBe("1.\u00a0Sept.");
+  });
+});
+
+describe("formatDateRange", () => {
+  it("writes a repeated month once, with a tight en dash", () => {
+    expect(n(formatDateRange("2026-10-05", "2026-10-11", { locale: "de", now: NOW }))).toBe("5.–11. Okt.");
+    expect(n(formatDateRange("2026-10-05", "2026-10-11", { locale: "en", now: NOW }))).toBe("5–11 Oct");
+  });
+
+  it("spans months without spaces around the dash", () => {
+    expect(n(formatDateRange("2026-10-10", "2026-11-15", { locale: "de", now: NOW }))).toBe("10. Okt.–15. Nov.");
+  });
+
+  it("orders the dates and adds the year outside the current one", () => {
+    expect(n(formatDateRange("2027-03-20", "2027-03-01", { locale: "de", now: NOW }))).toBe("1.–20. März 2027");
   });
 });
 

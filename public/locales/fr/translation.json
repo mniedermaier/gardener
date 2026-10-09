@@ -793,7 +793,6 @@
     },
     "detail": {
       "today": "Aujourd’hui",
-      "window": "{{from}} – {{to}}",
       "lastFrost": "Dernière gelée : {{date}}",
       "rowSpacing": "Entre rangs {{value}} cm",
       "harvestAfter": "Récoltable après",
@@ -831,9 +830,13 @@
       "seasonFor": "Dates pour",
       "seasonDescProtected_one": "Dates pour {{place}} : {{count}} semaine plus tôt qu’en plein champ.",
       "seasonDescProtected_other": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ.",
-      "seasonDescProtected_many": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ."
+      "seasonDescProtected_many": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ.",
+      "sowNow": "Semer maintenant, jusqu’au {{date}}",
+      "nextSowing": "Prochain semis dès le {{date}}",
+      "hatchLegend": "Hachuré : sous abri"
     },
-    "createBedFirst": "Créer d’abord une planche"
+    "createBedFirst": "Créer d’abord une planche",
+    "sowNowFilter": "À semer"
   },
   "weather": {
     "title": "Météo",
@@ -1003,10 +1006,9 @@
     },
     "reopenNamed": "Rouvrir « {{title}} »",
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
-    "untilRange": "jusqu’au {{first}}–{{last}}, selon la planche",
-    "fromRange": "dès le {{first}}–{{last}}, selon la planche",
-    "upNextFrom": "Ensuite · dès le {{date}}",
-    "alsoAction": "aussi : {{action}}"
+    "untilRange": "jusqu’au {{range}} selon la planche",
+    "fromRange": "à partir du {{range}} selon la planche",
+    "upNextFrom": "Ensuite · dès le {{date}}"
   },
   "settings": {
     "title": "Paramètres",
@@ -1130,8 +1132,7 @@
       "expenses_other": "{{count}} dépenses",
       "expenses_many": "{{count}} dépenses"
     },
-    "backupStale": "Plus de deux semaines – une nouvelle sauvegarde s’impose.",
-    "csvEmpty": "Dès que vous saisissez des récoltes ou des dépenses, vous pouvez les exporter ici en CSV."
+    "backupStale": "Plus de deux semaines – une nouvelle sauvegarde s’impose."
   },
   "alerts": {
     "frostTitle": "Alerte gel : {{temp}}",
@@ -1182,7 +1183,7 @@
     "frostHardNights_many": "Gel {{count}} nuits",
     "frostAdviceNoPlants": "Attendez la fin des nuits de gel pour repiquer.",
     "frostAdviceAutumn": "Rentrez les dernières récoltes et mettez les pots sensibles à l’abri.",
-    "frostAdviceAutumnNoPlants": "Gardez un voile d’hivernage prêt pour les légumes d’hiver."
+    "frostAdviceAutumnNoPlants": "Mets pots et outils de jardin à l’abri du gel."
   },
   "harvest": {
     "title": "Récolte",
@@ -2221,8 +2222,9 @@
     "sowings": "Semis",
     "sowing": "Semis",
     "generateTasks": "Ajouter au calendrier",
-    "nextSpring": "Les périodes de semis de cette année sont passées. Vous planifiez les semis échelonnés pour le printemps {{year}}.",
-    "pickNextSpring": "Choisir une culture pour le printemps prochain"
+    "nextSpring": "Il est trop tard pour des semis échelonnés cette année – les semis d’automne isolés figurent plus haut sous « Semer et planter maintenant ». Ici, vous planifiez pour le printemps {{year}}.",
+    "pickNextSpring": "Choisir une culture pour le printemps prochain",
+    "noBeds": "Planifiez des semis échelonnés dès qu’une planche existe."
   },
   "guilds": {
     "title": "Associations de plantes",
@@ -2487,7 +2489,6 @@
     "meterLegend": "Barre pleine = enregistré, hachurée = prévision.",
     "pricesEditable": "Vous pouvez ajuster le prix par œuf, kg ou litre dans Coûts.",
     "expectedToDate": "attendu à ce jour : {{value}}",
-    "actualVsToDateShort": "enregistré {{actual}} · attendu à ce jour {{expected}}",
     "howCap": "Les produits animaux ne comptent que jusqu’à la consommation habituelle (par personne et par an environ 240 œufs, 1 kg de miel, 52 kg de viande, 300 l de lait). Le miel est calorique mais n’est pas un aliment de base : deux ruches donnent environ 40 kg, un foyer en mange 1 à 2 kg. Le reste est un surplus à échanger ou vendre et ne te nourrit pas. Légumes et fruits comptent en entier.",
     "howToDate": "Attendu à ce jour : la part de la prévision annuelle qui devrait déjà être rentrée – pour chaque culture sa fenêtre de récolte depuis la dernière gelée, le miel de mai à août, les œufs répartis sur l’année. Si l’enregistré est bien en dessous, il manque souvent des entrées.",
     "howVsFoodPlan": "Le plan alimentaire mesure autre chose : des kilos face à un objectif de quantité pour 20 légumes et fruits, sans produits animaux. Son « objectif de quantité » diffère donc de cette valeur calorique.",

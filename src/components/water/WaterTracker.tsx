@@ -41,7 +41,7 @@ export function WaterTracker() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const confirmDelete = useConfirmDelete();
-  const { formatDate, formatVolume, locale } = useFormat();
+  const { formatDate, formatDateRange, formatVolume, locale } = useFormat();
   const { waterEntries, addWaterEntry, updateWaterEntry, deleteWaterEntry } = useStore(
     useShallow((s) => ({ waterEntries: s.waterEntries, addWaterEntry: s.addWaterEntry, updateWaterEntry: s.updateWaterEntry, deleteWaterEntry: s.deleteWaterEntry })),
   );
@@ -150,7 +150,7 @@ export function WaterTracker() {
   const [weeksShown, setWeeksShown] = useState(4);
   const monthName = new Intl.DateTimeFormat(locale, { month: "long" }).format(now);
   const editing = editingId ? waterEntries.find((e) => e.id === editingId) : undefined;
-  const weekRange = (ws: Date) => `${formatDate(ws)} – ${formatDate(endOfWeek(ws, { weekStartsOn: 1 }))}`;
+  const weekRange = (ws: Date) => formatDateRange(ws, endOfWeek(ws, { weekStartsOn: 1 }));
 
   return (
     <div>

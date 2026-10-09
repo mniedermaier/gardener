@@ -773,7 +773,6 @@
     },
     "detail": {
       "today": "Today",
-      "window": "{{from}} – {{to}}",
       "lastFrost": "Last frost: {{date}}",
       "rowSpacing": "Row spacing {{value}} cm",
       "harvestAfter": "Ready to harvest after",
@@ -807,9 +806,13 @@
       "openField": "Open field",
       "seasonFor": "Dates for",
       "seasonDescProtected_one": "Dates for {{place}}: {{count}} week earlier than in the open field.",
-      "seasonDescProtected_other": "Dates for {{place}}: {{count}} weeks earlier than in the open field."
+      "seasonDescProtected_other": "Dates for {{place}}: {{count}} weeks earlier than in the open field.",
+      "sowNow": "Sow now, until {{date}}",
+      "nextSowing": "Next sowing from {{date}}",
+      "hatchLegend": "Hatched: under glass"
     },
-    "createBedFirst": "Create a bed first"
+    "createBedFirst": "Create a bed first",
+    "sowNowFilter": "Sow now"
   },
   "weather": {
     "title": "Weather",
@@ -973,10 +976,9 @@
     },
     "reopenNamed": "Reopen “{{title}}”",
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
-    "untilRange": "until {{first}}–{{last}}, by bed",
-    "fromRange": "from {{first}}–{{last}}, by bed",
-    "upNextFrom": "Coming up next · from {{date}}",
-    "alsoAction": "also: {{action}}"
+    "untilRange": "until {{range}}, depending on the bed",
+    "fromRange": "from {{range}}, depending on the bed",
+    "upNextFrom": "Coming up next · from {{date}}"
   },
   "settings": {
     "title": "Settings",
@@ -1095,8 +1097,7 @@
       "expenses_one": "{{count}} expense",
       "expenses_other": "{{count}} expenses"
     },
-    "backupStale": "Older than two weeks – a fresh backup is worth it.",
-    "csvEmpty": "Once you log harvests or expenses, you can export them here as CSV."
+    "backupStale": "Older than two weeks – a fresh backup is worth it."
   },
   "alerts": {
     "frostTitle": "Frost warning: {{temp}}",
@@ -1142,7 +1143,7 @@
     "frostHardNights_other": "Frost on {{count}} nights",
     "frostAdviceNoPlants": "Hold off on planting out until the frost nights are over.",
     "frostAdviceAutumn": "Bring in the last harvests and move tender pots indoors.",
-    "frostAdviceAutumnNoPlants": "Keep fleece ready for winter vegetables."
+    "frostAdviceAutumnNoPlants": "Move pots and garden tools somewhere frost-free."
   },
   "harvest": {
     "title": "Harvest",
@@ -2121,8 +2122,9 @@
     "sowings": "Sowings",
     "sowing": "Sowing",
     "generateTasks": "Add to calendar",
-    "nextSpring": "This year's sowing windows have closed. You are planning the successions for spring {{year}}.",
-    "pickNextSpring": "Pick a crop for next spring"
+    "nextSpring": "It is too late for successions this year – single autumn sowings are listed above under “Sow & plant now”. Here you plan for spring {{year}}.",
+    "pickNextSpring": "Pick a crop for next spring",
+    "noBeds": "Plan successions once you have added a bed."
   },
   "guilds": {
     "title": "Plant guilds",
@@ -2376,7 +2378,6 @@
     "meterLegend": "Solid bar = recorded, hatched = forecast.",
     "pricesEditable": "You can adjust the price per egg, kg or litre on the Costs page.",
     "expectedToDate": "expected by today: {{value}}",
-    "actualVsToDateShort": "recorded {{actual}} · expected by today {{expected}}",
     "howCap": "Animal products count only up to typical consumption (per person and year about 240 eggs, 1 kg honey, 52 kg meat, 300 l milk). Honey is calorie-dense but not a staple: two colonies give about 40 kg, a household eats 1–2 kg of it. Anything above is surplus to swap or sell and does not feed you. Vegetables and fruit count in full.",
     "howToDate": "Expected by today: the part of the annual forecast that should be in by now – each crop's harvest window from the last frost, honey May to August, eggs evenly over the year. If “recorded so far” is well below it, entries are usually missing.",
     "howVsFoodPlan": "The food plan measures something else: kilograms against a quantity target for 20 vegetable and fruit crops, without animal products. Its “quantity target” therefore differs from this calorie figure.",

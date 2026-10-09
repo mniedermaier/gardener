@@ -773,7 +773,6 @@
     },
     "detail": {
       "today": "Heute",
-      "window": "{{from}} – {{to}}",
       "lastFrost": "Letzter Frost: {{date}}",
       "rowSpacing": "Reihenabstand {{value}} cm",
       "harvestAfter": "Erntereif nach",
@@ -807,9 +806,13 @@
       "openField": "Freiland",
       "seasonFor": "Termine für",
       "seasonDescProtected_one": "Termine für {{place}}: {{count}} Woche früher als im Freiland.",
-      "seasonDescProtected_other": "Termine für {{place}}: {{count}} Wochen früher als im Freiland."
+      "seasonDescProtected_other": "Termine für {{place}}: {{count}} Wochen früher als im Freiland.",
+      "sowNow": "Jetzt säen, bis {{date}}",
+      "nextSowing": "Nächste Aussaat ab {{date}}",
+      "hatchLegend": "Schraffiert: unter Glas"
     },
-    "createBedFirst": "Erst ein Beet anlegen"
+    "createBedFirst": "Erst ein Beet anlegen",
+    "sowNowFilter": "Jetzt säen"
   },
   "weather": {
     "title": "Wetter",
@@ -973,10 +976,9 @@
     },
     "reopenNamed": "„{{title}}“ wieder öffnen",
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
-    "untilRange": "bis {{first}}–{{last}}, je nach Beet",
-    "fromRange": "ab {{first}}–{{last}}, je nach Beet",
-    "upNextFrom": "Als Nächstes · ab {{date}}",
-    "alsoAction": "auch {{action}}"
+    "untilRange": "je nach Beet bis {{range}}",
+    "fromRange": "je nach Beet ab {{range}}",
+    "upNextFrom": "Als Nächstes · ab {{date}}"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1095,8 +1097,7 @@
       "expenses_one": "{{count}} Ausgabe",
       "expenses_other": "{{count}} Ausgaben"
     },
-    "backupStale": "Älter als zwei Wochen – ein neues Backup lohnt sich.",
-    "csvEmpty": "Sobald du Ernten oder Ausgaben erfasst, kannst du sie hier als CSV exportieren."
+    "backupStale": "Älter als zwei Wochen – ein neues Backup lohnt sich."
   },
   "alerts": {
     "frostTitle": "Frostwarnung: {{temp}}",
@@ -1142,7 +1143,7 @@
     "frostHardNights_other": "Frost in {{count}} Nächten",
     "frostAdviceNoPlants": "Mit dem Auspflanzen warten, bis die Frostnächte vorbei sind.",
     "frostAdviceAutumn": "Letzte Ernten einholen und frostempfindliche Kübel ins Haus holen.",
-    "frostAdviceAutumnNoPlants": "Für Wintergemüse jetzt Vlies bereithalten."
+    "frostAdviceAutumnNoPlants": "Kübel und Gartengeräte frostsicher unterbringen."
   },
   "harvest": {
     "title": "Ernte",
@@ -2121,8 +2122,9 @@
     "sowings": "Aussaaten",
     "sowing": "Aussaat",
     "generateTasks": "Zum Kalender hinzufügen",
-    "nextSpring": "Für dieses Jahr sind die Aussaatfenster vorbei. Du planst die Staffeln für das Frühjahr {{year}}.",
-    "pickNextSpring": "Kultur fürs nächste Frühjahr wählen"
+    "nextSpring": "Für Staffelsaaten ist es dieses Jahr zu spät – einzelne Herbstsaaten stehen oben unter „Jetzt säen & pflanzen“. Hier planst du für das Frühjahr {{year}}.",
+    "pickNextSpring": "Kultur fürs nächste Frühjahr wählen",
+    "noBeds": "Staffelsaaten planst du, sobald ein Beet angelegt ist."
   },
   "guilds": {
     "title": "Pflanzgilden",
@@ -2376,7 +2378,6 @@
     "meterLegend": "Voller Balken = erfasst, schraffiert = Prognose.",
     "pricesEditable": "Die Preise pro Ei, kg oder Liter kannst du unter Kosten anpassen.",
     "expectedToDate": "erwartet bis heute: {{value}}",
-    "actualVsToDateShort": "erfasst {{actual}} · erwartet bis heute {{expected}}",
     "howCap": "Tierprodukte zählen nur bis zum üblichen Verbrauch (pro Person und Jahr etwa 240 Eier, 1 kg Honig, 52 kg Fleisch, 300 l Milch). Honig ist kalorienreich, aber kein Grundnahrungsmittel: Zwei Völker liefern rund 40 kg, ein Haushalt isst davon 1–2 kg. Was darüber liegt, ist Überschuss zum Tauschen oder Verkaufen und macht dich nicht satter. Gemüse und Obst zählen voll.",
     "howToDate": "Erwartet bis heute: der Teil der Jahresprognose, der bis heute hereinkommen sollte – je Kultur ihr Erntefenster ab dem letzten Frost, Honig Mai bis August, Eier gleichmäßig übers Jahr. Liegt „bisher erfasst“ deutlich darunter, fehlen meist Einträge.",
     "howVsFoodPlan": "Der Ernährungsplan misst etwas anderes: Kilogramm gegen ein Mengenziel für 20 Gemüse- und Obstkulturen, ohne Tierprodukte. Sein „Mengenziel“ weicht deshalb von diesem Kalorienwert ab.",

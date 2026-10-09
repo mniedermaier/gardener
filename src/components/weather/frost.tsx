@@ -13,6 +13,23 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { PROTECTED_ENVIRONMENTS, frostAffectedPlants, frostRiskByBed, summarizeFrost, type BedFrostRisk, type FrostSummary } from "@/lib/weatherAlerts";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import type { Tone } from "@/components/ui/tone";
+
+/**
+ * One frost tone everywhere (DESIGN_SYSTEM: frost = `info`, the cold tone,
+ * always with a text badge): a night at or below 0 °C is "Frost" (info), a
+ * night only below the threshold is "Frostgefahr" (warning). Used by the
+ * weather page card and day rows and by the frost box on "Heute".
+ */
+export function frostTone(tempOrSummary: number | Pick<FrostSummary, "severity">): Tone {
+  const hard = typeof tempOrSummary === "number" ? tempOrSummary <= 0 : tempOrSummary.severity === "danger";
+  return hard ? "info" : "warning";
+}
+
+/** Badge text matching `frostTone`. */
+export function frostLabelKey(tempOrSummary: number | Pick<FrostSummary, "severity">): string {
+  return frostTone(tempOrSummary) === "info" ? "weather.frost" : "weather.frostRisk";
+}
 
 /**
  * "Heute", "Morgen", then the short weekday ("Mi") — the day names of the

@@ -91,12 +91,11 @@ export function DataManagement() {
         <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleFileSelect} aria-label={t("dataManagement.importBackup")} />
       </div>
 
-      <div>
-        <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
-        {/* Only exports that have rows; a disabled "… 0" button explains nothing. */}
-        {harvests.length === 0 && expenses.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t("dataManagement.csvEmpty")}</p>
-        ) : (
+      {/* Only exports that have rows: without harvests or expenses the whole
+          subsection waits (a heading over a sentence with no button reads as broken). */}
+      {(harvests.length > 0 || expenses.length > 0) && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
           <div className="flex flex-wrap gap-2">
             {harvests.length > 0 && (
               <Button variant="ghost" size="sm" onClick={exportHarvestsCsv}>
@@ -113,8 +112,8 @@ export function DataManagement() {
               </Button>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <Modal
         open={pending !== null}

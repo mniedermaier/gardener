@@ -23,7 +23,7 @@ import { TONE_SOFT } from "@/components/ui/tone";
 import { RangeBar } from "@/components/ui/charts";
 import { SunlightWidget } from "./SunlightWidget";
 import { DayArc } from "./DayArc";
-import { FrostTaskButton, useDayLabel, useFrostAffectedText, useFrostSummary } from "./frost";
+import { FrostTaskButton, frostLabelKey, frostTone, useDayLabel, useFrostAffectedText, useFrostSummary } from "./frost";
 import { ALERT_ICON, SEVERITY_TONE, useAlertText, useWeatherAlerts } from "./alerts";
 
 /** OpenWeatherMap icon code → Lucide. */
@@ -47,7 +47,9 @@ function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost
   const alertText = useAlertText();
   const affected = useFrostAffectedText(frost?.summary);
   const Icon = ALERT_ICON[group.type];
-  const tone = SEVERITY_TONE[group.severity];
+  // Frost has its own tone and badge text (frostTone), every other alert its severity.
+  const tone = group.type === "frost" && frost ? frostTone(frost.summary) : SEVERITY_TONE[group.severity];
+  const badge = group.type === "frost" && frost ? t(frostLabelKey(frost.summary)) : t(`alerts.severity.${group.severity}`);
 
   let title: string;
   let body: ReactNode;
@@ -76,7 +78,7 @@ function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost
           const text = alertText(g.alerts[0]);
           return (
             <span key={g.id} className="mt-2 block border-t border-gray-100 pt-2 dark:border-white/10">
-              <span className="font-medium text-gray-800 dark:text-gray-200">{text.title}:</span> {text.description}
+              <span className="block font-medium text-gray-800 dark:text-gray-200">{text.title}</span> {text.description}
             </span>
           );
         })}
@@ -95,7 +97,7 @@ function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
           {title}
-          <Badge tone={tone} dot>{t(`alerts.severity.${group.severity}`)}</Badge>
+          <Badge tone={tone} dot>{badge}</Badge>
         </p>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{body}</div>
       </div>
@@ -311,7 +313,7 @@ export function WeatherDashboard() {
                       <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs normal-case text-gray-500 dark:text-gray-400">
                         <Umbrella size={12} aria-hidden="true" />
                         {t("weather.rainChance", { percent: f.formatPercent(day.precipitation / 100) })}
-                        {frost && <Badge tone={day.tempMin <= 0 ? "danger" : "warning"} icon={Snowflake}>{day.tempMin <= 0 ? t("weather.frost") : t("weather.frostRisk")}</Badge>}
+                        {frost && <Badge tone={frostTone(day.tempMin)} icon={Snowflake}>{t(frostLabelKey(day.tempMin))}</Badge>}
                       </span>
                     </span>
                     <span className="col-start-3 flex items-center gap-2 sm:col-start-auto sm:contents">

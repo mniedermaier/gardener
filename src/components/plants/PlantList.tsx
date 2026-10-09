@@ -6,6 +6,7 @@ import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useSowingAgenda } from "@/hooks/useSowingAgenda";
 import { PlantCard } from "./PlantCard";
 import { PlantDetail } from "./PlantDetail";
 import { CustomPlantForm } from "./CustomPlantForm";
@@ -18,8 +19,8 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useScrollFade } from "@/components/ui/useScrollFade";
 import type { Plant, PlantCategory } from "@/types/plant";
 
-type CategoryFilter = PlantCategory | "all";
-const categories: CategoryFilter[] = ["all", "vegetable", "fruit", "berry", "herb"];
+type CategoryFilter = PlantCategory | "all" | "now";
+const categories: CategoryFilter[] = ["all", "now", "vegetable", "fruit", "berry", "herb"];
 
 export function PlantList() {
   const { t } = useTranslation();
@@ -55,21 +56,29 @@ export function PlantList() {
     return ids;
   }, [gardens]);
 
+  // "Jetzt säen": the same agenda as the calendar and "Heute", so a new user has
+  // a seasonal way into the 47 crops instead of an alphabetical wall.
+  const agenda = useSowingAgenda();
+  const sowNowIds = useMemo(() => new Set(agenda.now.map((n) => n.plantId)), [agenda]);
+
   const counts = useMemo(() => {
-    const c: Record<CategoryFilter, number> = { all: plants.length, vegetable: 0, fruit: 0, berry: 0, herb: 0 };
-    for (const p of plants) c[p.category]++;
+    const c: Record<CategoryFilter, number> = { all: plants.length, now: 0, vegetable: 0, fruit: 0, berry: 0, herb: 0 };
+    for (const p of plants) {
+      c[p.category]++;
+      if (sowNowIds.has(p.id)) c.now++;
+    }
     return c;
-  }, [plants]);
+  }, [plants, sowNowIds]);
 
   const filtered = useMemo(() => {
     return plants
       .filter((p) => {
-        if (category !== "all" && p.category !== category) return false;
+        if (category === "now" ? !sowNowIds.has(p.id) : category !== "all" && p.category !== category) return false;
         if (search && !getPlantName(p.id).toLowerCase().includes(search)) return false;
         return true;
       })
       .sort((a, b) => getPlantName(a.id).localeCompare(getPlantName(b.id)));
-  }, [plants, category, search, getPlantName]);
+  }, [plants, category, search, getPlantName, sowNowIds]);
 
   // Bumped on every open so the dialog starts from a fresh draft.
   const [formKey, setFormKey] = useState(0);
@@ -134,7 +143,7 @@ export function PlantList() {
             onChange={setCategory}
             options={categories.filter((c) => c === "all" || counts[c] > 0 || c === category).map((c) => ({
               value: c,
-              label: c === "all" ? t("common.all") : t(`plants.category.${c}`),
+              label: c === "all" ? t("common.all") : c === "now" ? t("plants.sowNowFilter") : t(`plants.category.${c}`),
               count: counts[c],
             }))}
           />

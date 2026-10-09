@@ -19,7 +19,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { List, ListRow } from "@/components/ui/List";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
-import { KeyFigures, Meter } from "@/components/ui/charts";
+import { HowCalculated, KeyFigures, Meter } from "@/components/ui/charts";
 import { ANNUAL_YIELD } from "@/types/animal";
 import { PlantingAdvisor } from "./PlantingAdvisor";
 import { HarvestReady } from "./HarvestReady";
@@ -188,9 +188,8 @@ export function Dashboard() {
                   {
                     label: t("metrics.selfSufficiencyForecast"),
                     value: share(m.selfSufficiency.forecastRatio),
-                    hint: m.selfSufficiency.forecastToDateRatio !== null
-                      ? t("metrics.actualVsToDateShort", { actual: share(m.selfSufficiency.actualRatio), expected: share(m.selfSufficiency.forecastToDateRatio) })
-                      : t("metrics.actualShort", { value: share(m.selfSufficiency.actualRatio) }),
+                    // One short hint here; "erwartet bis heute" and its reasoning live under "Wie berechnet?".
+                    hint: t("metrics.actualShort", { value: share(m.selfSufficiency.actualRatio) }),
                     to: "/sufficiency",
                   },
                   {
@@ -204,6 +203,12 @@ export function Dashboard() {
                     : { label: t("dashboard.plantings"), value: formatNumber(totalPlantings), hint: t("dashboard.typesInBeds", { types: formatNumber(uniquePlantIds.size), count: totalBeds }), to: "/planner" },
                 ]}
               />
+              {m.selfSufficiency.forecastToDateRatio !== null && (
+                <HowCalculated className="mt-2">
+                  <p>{t("metrics.expectedToDate", { value: share(m.selfSufficiency.forecastToDateRatio) })}</p>
+                  <p>{t("metrics.howToDate")}</p>
+                </HowCalculated>
+              )}
             </section>
           )}
 
