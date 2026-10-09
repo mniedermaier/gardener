@@ -1011,7 +1011,8 @@
     "bedUntil": "{{beds}} until {{date}}",
     "bedFrom": "{{beds}} from {{date}}",
     "bedRange": "{{beds}} {{range}}",
-    "afterFrostShort": "after the frost nights"
+    "afterFrostShort": "after the frost nights",
+    "pageSubtitleNoBeds": "What you can sow and plant now – add beds and it becomes your season plan."
   },
   "settings": {
     "title": "Settings",

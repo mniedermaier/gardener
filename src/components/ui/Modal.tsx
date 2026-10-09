@@ -40,7 +40,7 @@ const FIELD_SELECTOR = [
 /**
  * Where focus goes when a dialog opens — never the × button (showModal's default):
  * 1. an explicit marker `[data-autofocus]` ("Abbrechen" in a confirmation);
- * 2. with a mouse/trackpad, the first empty form field (a prefilled dialog
+ * 2. with a mouse/trackpad, a field marked `[data-autofocus-field]`, else the first empty form field (a prefilled dialog
  *    continues where input is still missing), else the first field that is
  *    not a combobox (focus would open its list) — React's autoFocus fires
  *    before the dialog is open and is lost;
@@ -52,6 +52,9 @@ function initialFocus(dialog: HTMLDialogElement): HTMLElement | null {
   if (marked) return marked;
   const fine = typeof window.matchMedia === "function" && window.matchMedia("(pointer: fine)").matches;
   if (fine) {
+    // A dialog may name its main field (the observation, not an optional title before it).
+    const preferred = dialog.querySelector<HTMLElement>("[data-autofocus-field]");
+    if (preferred && preferred.getClientRects().length > 0) return preferred;
     const fields = [...dialog.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(FIELD_SELECTOR)].filter((el) => el.getClientRects().length > 0);
     const field = fields.find((el) => el.value === "") ?? fields.find((el) => el.getAttribute("role") !== "combobox");
     if (field) return field;

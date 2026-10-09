@@ -1011,7 +1011,8 @@
     "bedUntil": "{{beds}} bis {{date}}",
     "bedFrom": "{{beds}} ab {{date}}",
     "bedRange": "{{beds}} {{range}}",
-    "afterFrostShort": "nach den Frostnächten"
+    "afterFrostShort": "nach den Frostnächten",
+    "pageSubtitleNoBeds": "Was du jetzt säen und pflanzen kannst – mit Beeten wird daraus dein Saisonplan."
   },
   "settings": {
     "title": "Einstellungen",

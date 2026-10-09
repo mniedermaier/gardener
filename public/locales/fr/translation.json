@@ -1043,7 +1043,8 @@
     "bedUntil": "{{beds}} jusqu’au {{date}}",
     "bedFrom": "{{beds}} à partir du {{date}}",
     "bedRange": "{{beds}} {{range}}",
-    "afterFrostShort": "après les nuits de gel"
+    "afterFrostShort": "après les nuits de gel",
+    "pageSubtitleNoBeds": "Ce que vous pouvez semer et planter maintenant – avec des planches, cela devient votre plan de saison."
   },
   "settings": {
     "title": "Paramètres",

@@ -227,7 +227,8 @@ export function PestTracker() {
                     actions={
                       <>
                       {!pest.resolved && (
-                        <IconButton icon={Check} label={t("pests.resolve")} onClick={() => handleResolve(pest)} className="hidden sm:inline-flex" />
+                        // Wrapped: IconButton's own inline-flex would beat a "hidden" passed in.
+                        <span className="hidden sm:inline-flex"><IconButton icon={Check} label={t("pests.resolve")} onClick={() => handleResolve(pest)} /></span>
                       )}
                       <Menu
                         label={t("common.moreActions")}

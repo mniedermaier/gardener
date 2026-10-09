@@ -1043,7 +1043,8 @@
     "bedUntil": "{{beds}} hasta el {{date}}",
     "bedFrom": "{{beds}} desde el {{date}}",
     "bedRange": "{{beds}} {{range}}",
-    "afterFrostShort": "tras las noches de helada"
+    "afterFrostShort": "tras las noches de helada",
+    "pageSubtitleNoBeds": "Lo que puedes sembrar y plantar ahora: con bancales se convierte en tu plan de temporada."
   },
   "settings": {
     "title": "Ajustes",

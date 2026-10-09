@@ -424,7 +424,7 @@ export function GardenJournal() {
         <div className="space-y-5">
           <Input label={t("journal.entryTitle")} optional value={draft.title} onChange={(e) => patch({ title: e.target.value })} placeholder={t("journal.titlePlaceholder")} />
           {/* The observation is the record (required unless a title is given). */}
-          <Textarea label={t("journal.bodyLabel")} autoFocus value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} error={contentError} />
+          <Textarea label={t("journal.bodyLabel")} data-autofocus-field="" value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} error={contentError} />
           {/* Datum right under the observation (when it happened), then tags. */}
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <div>

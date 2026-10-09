@@ -242,35 +242,36 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             </div>
           )}
         </div>
-        <div>
-          {/* Three short numbers in one row from sm; on phones the spacing gets its own row. */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            <Input
-              label={t("plants.form.harvestMin")}
-              inputMode="numeric"
-              placeholder={t("common.examplePlaceholder", { value: 60 })}
-              value={String(draft.harvestMin || "")}
-              onChange={(e) => patch({ harvestMin: Number(e.target.value.replace(/\D/g, "")) })}
-            />
-            <Input
-              label={t("plants.form.harvestMax")}
-              inputMode="numeric"
-              placeholder={t("common.examplePlaceholder", { value: 90 })}
-              value={String(draft.harvestMax || "")}
-              error={harvestError}
-              onChange={(e) => patch({ harvestMax: Number(e.target.value.replace(/\D/g, "")) })}
-            />
-            <Input
-              label={t("plants.form.spacingCm")}
-              inputMode="numeric"
-              wrapperClassName="col-span-2 sm:col-span-1"
-              placeholder={t("common.examplePlaceholder", { value: 30 })}
-              value={String(draft.spacingCm || "")}
-              onChange={(e) => patch({ spacingCm: Number(e.target.value.replace(/\D/g, "")) })}
-            />
+        {/* The two harvest days form a pair with their shared hint; the spacing is a
+            separate figure (own row on phones, third column from sm). */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="sm:col-span-2">
+            <div className="grid grid-cols-2 items-end gap-4">
+              <Input
+                label={t("plants.form.harvestMin")}
+                inputMode="numeric"
+                placeholder={t("common.examplePlaceholder", { value: 60 })}
+                value={String(draft.harvestMin || "")}
+                onChange={(e) => patch({ harvestMin: Number(e.target.value.replace(/\D/g, "")) })}
+              />
+              <Input
+                label={t("plants.form.harvestMax")}
+                inputMode="numeric"
+                placeholder={t("common.examplePlaceholder", { value: 90 })}
+                value={String(draft.harvestMax || "")}
+                error={harvestError}
+                onChange={(e) => patch({ harvestMax: Number(e.target.value.replace(/\D/g, "")) })}
+              />
+            </div>
+            {!harvestError && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.form.daysAfterSowing")}</p>}
           </div>
-          {/* One shared hint for both fields: what the days count from. */}
-          {!harvestError && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.form.daysAfterSowing")}</p>}
+          <Input
+            label={t("plants.form.spacingCm")}
+            inputMode="numeric"
+            placeholder={t("common.examplePlaceholder", { value: 30 })}
+            value={String(draft.spacingCm || "")}
+            onChange={(e) => patch({ spacingCm: Number(e.target.value.replace(/\D/g, "")) })}
+          />
         </div>
         <div>
           <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("plants.details.sun")}</p>

@@ -350,8 +350,8 @@ export function SeedInventory() {
               options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
             />
           </div>
-          {/* Source gets the wider column: the year needs four digits. */}
-          <div className="grid grid-cols-[3fr_2fr] gap-4">
+          {/* Same columns as the row above, so both gutters line up. */}
+          <div className="grid grid-cols-2 items-end gap-4">
             {/* Source first: the year means "bought" or "harvested" depending on it. */}
             <Select
               label={t("seeds.source")}
