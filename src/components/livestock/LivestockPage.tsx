@@ -10,14 +10,13 @@ import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO, toISODate } from "@/lib/format";
 import { getActualProducts, getFeedCostStats, type ProductTotals } from "@/lib/metrics";
 import { EGG_LAYERS, type Animal } from "@/types/animal";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { AnimalCard } from "./AnimalCard";
-import { ProductionChart } from "./ProductionChart";
 import { AnimalDialog, animalLabel, formatProductAmount, herdSummary } from "./shared";
 import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
@@ -157,20 +156,17 @@ export function LivestockPage() {
               hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
               to: "/livestock/production",
             } : { ...feedFigure, icon: Coins }}
+            // A short summary that links on: the year totals and the monthly
+            // chart live on "Produktion", so this page does not repeat them.
             items={[
-              ...herdTypes.map((ty) => ({
-                label: ty === "eggs" ? t("livestock.eggsThisYear") : t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
+              ...herdTypes.filter((ty) => ty !== "eggs").map((ty) => ({
+                label: t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
                 value: formatProductAmount(ty, stats.year[ty], f, t),
                 to: "/livestock/production",
               })),
               ...(eggAnimal ? [feedFigure] : []),
-            ].slice(-3)}
+            ].slice(-2)}
           />
-
-          <Card>
-            <CardHeader title={t("livestock.chartTitle")} description={t("livestock.chartDesc")} />
-            <ProductionChart animalProducts={animalProducts} />
-          </Card>
 
           <section aria-labelledby="herd-heading">
             <h2 id="herd-heading" className="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{t("livestock.herd")}</h2>

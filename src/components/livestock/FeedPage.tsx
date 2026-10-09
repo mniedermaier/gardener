@@ -17,7 +17,7 @@ import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { KeyFigures, Meter } from "@/components/ui/charts";
 import { ANIMAL_ICON } from "./icons";
-import { FeedDialog, IconTile, animalLabel, formatFeedAmount, useRecordActions } from "./shared";
+import { FeedDialog, IconTile, NoAnimalsYet, animalLabel, formatFeedAmount, useRecordActions } from "./shared";
 import { groupByMonth } from "./groupByMonth";
 
 export function FeedPage() {
@@ -44,6 +44,8 @@ export function FeedPage() {
     return {
       ...getFeedCostStats(feedEntries),
       totalKg: feedEntries.reduce((s, e) => s + (e.unit === "kg" ? e.quantity : e.unit === "g" ? e.quantity / 1000 : 0), 0),
+      // Litres (sugar water, milk replacer) cannot join the kilograms; named separately instead of dropped.
+      totalLiters: feedEntries.reduce((s, e) => s + (e.unit === "liters" ? e.quantity : 0), 0),
       perAnimal: [...perAnimal.entries()].filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]),
     };
   }, [feedEntries]);
@@ -61,9 +63,7 @@ export function FeedPage() {
       <PageHeader title={t("livestock.feed.title")} description={t("livestock.feed.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
       {animals.length === 0 ? (
-        <Card>
-          <EmptyState icon={Bird} title={t("livestock.emptyTitle")} description={t("livestock.emptyText")} action={<Button onClick={() => navigate("/livestock")}>{t("livestock.toHerd")}</Button>} />
-        </Card>
+        <NoAnimalsYet text={t("livestock.feed.emptyText")} />
       ) : feedEntries.length === 0 ? (
         <Card>
           <EmptyState icon={Wheat} title={t("livestock.noFeedTitle")} description={t("livestock.noFeed")} action={addButton} />
@@ -80,7 +80,11 @@ export function FeedPage() {
             items={[
               { label: t("livestock.feed.perMonth"), value: f.formatCurrency(stats.perMonth), hint: stats.since ? t("livestock.feed.perMonthSince", { date: f.formatDate(stats.since) }) : undefined },
               { label: t("livestock.feed.totalCost"), value: f.formatCurrency(stats.total) },
-              { label: t("livestock.feed.totalKg"), value: f.formatWeight(stats.totalKg * 1000) },
+              {
+                label: t("livestock.feed.totalKg"),
+                value: f.formatWeight(stats.totalKg * 1000),
+                hint: stats.totalLiters > 0 ? t("livestock.feed.plusLiquid", { volume: f.formatVolume(stats.totalLiters) }) : undefined,
+              },
             ]}
           />
 

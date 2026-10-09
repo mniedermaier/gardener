@@ -22,7 +22,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { CompareBars, HowCalculated, KeyFigures } from "@/components/ui/charts";
 import { ProductionChart } from "./ProductionChart";
 import { ProductWeekList } from "./ProductWeekList";
-import { HEALTH_ICON, HEALTH_TONE, PRODUCT_ICON } from "./icons";
+import { HEALTH_ICON, HEALTH_TONE } from "./icons";
 import {
   AnimalDialog, FeedDialog, HealthDialog, IconTile, ProductDialog,
   animalLabel, formatFeedAmount, formatProductAmount, useRecordActions,
@@ -174,16 +174,14 @@ export function AnimalDetail() {
               t("livestock.entriesHint", { count: products.length }),
             ].join(" · "),
           },
-          { label: t("livestock.productionValue"), value: f.formatCurrency(analytics.value) },
           { label: t("livestock.totalCosts"), value: f.formatCurrency(analytics.cost), hint: t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) }) },
+          // The production value already stands in the bars above; the cost per egg / kg is the new figure.
+          analytics.cost > 0 && analytics.perUnit
+            ? { label: t("livestock.costPerUnit"), value: t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) }) }
+            : { label: t("livestock.productionValue"), value: f.formatCurrency(analytics.value) },
         ]}
       />
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        {analytics.cost > 0 && analytics.perUnit && (
-          <Badge variant="outline" icon={PRODUCT_ICON[analytics.perUnit.type]}>
-            {t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) })}
-          </Badge>
-        )}
+      <div className="mb-6">
         <HowCalculated>
           <p>{t("livestock.howValue")}</p>
           <p>{t("metrics.pricesEditable")}</p>
@@ -202,9 +200,10 @@ export function AnimalDetail() {
         value={tab}
         onChange={setTab}
         items={[
-          { value: "production", label: t("livestock.productionTab"), count: products.length },
-          { value: "feed", label: t("livestock.feedTab"), count: feeds.length },
-          { value: "health", label: t("livestock.healthTab"), count: health.length },
+          // Not "Produktion/Futter/Gesundheit": those name the section tabs above, which leave this animal.
+          { value: "production", label: t("livestock.tabYields"), count: products.length },
+          { value: "feed", label: t("livestock.tabFeedings"), count: feeds.length },
+          { value: "health", label: t("livestock.tabTreatments"), count: health.length },
           { value: "journal", label: t("nav.journal"), count: journal.length },
         ]}
       >
@@ -224,7 +223,7 @@ export function AnimalDetail() {
           ))}
 
           {tab === "feed" && (feeds.length === 0 ? empty(Wheat, t("livestock.noFeedTitle"), t("livestock.noFeed")) : (
-            <List label={t("livestock.feedTab")}>
+            <List label={t("livestock.tabFeedings")}>
               {feeds.map((e) => (
                 <ListRow
                   key={e.id}
@@ -241,13 +240,13 @@ export function AnimalDetail() {
           ))}
 
           {tab === "health" && (health.length === 0 ? empty(HeartPulse, t("livestock.noHealthTitle"), t("livestock.noHealth")) : (
-            <List label={t("livestock.healthTab")}>
+            <List label={t("livestock.tabTreatments")}>
               {health.map((h) => (
                 <ListRow
                   key={h.id}
                   leading={<IconTile icon={HEALTH_ICON[h.type]} tone={HEALTH_TONE[h.type]} />}
                   title={h.description}
-                  badges={<Badge tone={HEALTH_TONE[h.type]}>{t(`livestock.healthTypes.${h.type}`)}</Badge>}
+                  badges={h.description.toLocaleLowerCase().includes(t(`livestock.healthTypes.${h.type}`).toLocaleLowerCase()) ? undefined : <Badge tone={HEALTH_TONE[h.type]}>{t(`livestock.healthTypes.${h.type}`)}</Badge>}
                   meta={<time dateTime={h.date}>{f.formatDate(h.date, "relative")}</time>}
                   description={h.notes}
                   trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : undefined}

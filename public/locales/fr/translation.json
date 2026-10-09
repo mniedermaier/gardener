@@ -1541,16 +1541,14 @@
     "totalAnimals": "Total animaux",
     "eggsThisWeek": "Œufs cette semaine",
     "animalsTab": "Animaux",
-    "productionTab": "Production",
     "noProducts": "Notez œufs, miel ou lait pour voir l’évolution et la valeur.",
     "animalName": "Nom (optionnel)",
     "namePlaceholder": "ex. Henriette, Ruche 1…",
     "count": "Nombre",
-    "selectAnimal": "Sélectionner un animal",
+    "selectAnimal": "Animal",
     "quantity": "Quantité",
     "pieces": "pcs",
     "year": "an",
-    "feedTab": "Nourriture",
     "addFeed": "Noter l’alimentation",
     "feedAdded": "Alimentation enregistrée",
     "noFeed": "Avec les quantités et coûts d’alimentation, vous voyez ce que coûtent vos animaux.",
@@ -1563,13 +1561,12 @@
     "productionEntries_one": "{{count}} entrée",
     "productionEntries_many": "{{count}} entrées",
     "productionEntries_other": "{{count}} entrées",
-    "healthTab": "Santé",
     "addHealth": "Noter un événement de santé",
     "healthAdded": "Entrée de santé enregistrée",
     "noHealth": "Notez vaccins, traitements et contrôles pour ne rien oublier.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "ex. Vaccination Newcastle, vermifuge avec…",
+    "healthDescPlaceholder": "ex. vaccin Newcastle",
     "editAnimal": "Modifier l'animal",
     "updated": "Animal mis à jour",
     "since": "depuis",
@@ -1588,7 +1585,9 @@
       "totalHoney": "Total miel",
       "totalMilk": "Total lait",
       "allProducts": "Tous les produits",
-      "subtitle": "Œufs, miel et autres productions de vos animaux."
+      "subtitle": "Œufs, miel et autres productions de vos animaux.",
+      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici œufs, miel ou lait, avec totaux hebdomadaires et évolution.",
+      "yearHint": "~{{amount}} attendus à ce jour"
     },
     "feed": {
       "title": "Alimentation",
@@ -1597,7 +1596,9 @@
       "perAnimal": "Coût par animal",
       "subtitle": "Quantités et coûts d’alimentation par animal.",
       "perMonth": "Moyenne par mois",
-      "perMonthSince": "depuis le {{date}}"
+      "perMonthSince": "depuis le {{date}}",
+      "plusLiquid": "plus {{volume}} d’aliment liquide",
+      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici la nourriture et verrez ce qu’elle coûte par mois."
     },
     "health": {
       "title": "Santé",
@@ -1627,7 +1628,8 @@
       "vaccCoverage": "Groupes d’animaux vaccinés",
       "vaccCoverageValue": "{{covered}} sur {{total}}",
       "nextDue": "Prochain rappel à partir du {{date}}",
-      "dueNames": "Vérifier la vaccination : {{names}}"
+      "dueNames": "Vérifier la vaccination : {{names}}",
+      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire."
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1661,7 +1663,6 @@
     "subtitle": "Cheptel, production, alimentation et santé de vos animaux.",
     "emptyTitle": "Pas encore d’animaux",
     "emptyText": "Ajoutez des poules, des abeilles ou d’autres animaux. Vous pourrez ensuite noter ici œufs, miel, aliments et visites vétérinaires.",
-    "toHerd": "Voir le cheptel",
     "backToHerd": "Retour au cheptel",
     "herd": "Cheptel",
     "deleted": "{{name}} supprimé",
@@ -1713,8 +1714,7 @@
     "feedEntriesCount_one": "{{count}} entrée d’alimentation",
     "feedEntriesCount_other": "{{count}} entrées d’alimentation",
     "feedEntriesCount_many": "{{count}} entrées d’alimentation",
-    "chartDesc": "6 derniers mois, un graphique par produit.",
-    "chartDesc12": "12 derniers mois, un graphique par produit.",
+    "chartDesc12": "Par mois depuis la première saisie, 12 mois au plus. Les récoltes ponctuelles comme le miel sont listées en dessous.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "pièces par mois",
@@ -1775,11 +1775,15 @@
     "weekShort": "Sem. {{week}}",
     "showEntries": "afficher les entrées",
     "hideEntries": "masquer les entrées",
-    "ofExpectedToDate": "sur ~{{amount}} attendus",
+    "ofExpectedToDate": "sur ~{{amount}} attendus à ce jour",
     "productThisYear": "{{product}} cette année",
     "eggWeeksLabel": "Œufs par semaine sur les 8 dernières semaines, moy. {{avg}}",
     "eggWeeksAvg": "Moy. {{avg}} par semaine sur les 8 dernières semaines",
-    "singleHarvests": "Saisies individuelles ({{months}} derniers mois)"
+    "singleHarvests": "Saisies individuelles ({{months}} derniers mois)",
+    "tabYields": "Rendements",
+    "tabFeedings": "Rations",
+    "tabTreatments": "Soins",
+    "costPerUnit": "Coût par unité"
   },
   "seeds": {
     "title": "Semences",

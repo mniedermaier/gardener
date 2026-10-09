@@ -62,7 +62,9 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
           // Same time basis as the recorded value: expected so far this year (since the animal arrived).
-          const expected = formatProductAmount(y.product, y.quantity * animal.count * expectedShareToDate(y.product, now, animal.acquiredDate), f, t);
+          const expectedQty = y.quantity * animal.count * expectedShareToDate(y.product, now, animal.acquiredDate);
+          // "225 Eier von ~1.019 bis heute erwartet": the unit is already in the value, count only.
+          const expected = y.product === "eggs" ? f.formatNumber(expectedQty, { maximumFractionDigits: 0 }) : formatProductAmount(y.product, expectedQty, f, t);
           return (
             <div key={y.product}>
               <dt className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -71,7 +73,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
               </dt>
               <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
-                <span className="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+                <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
                   {t("livestock.ofExpectedToDate", { amount: expected })}
                 </span>
               </dd>
