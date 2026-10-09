@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculatePlantYield, calculateSufficiency, estimatePlantArea } from "@/lib/sufficiency";
+import { calculatePlantYield, calculateSufficiency, estimatePlantArea, loggedKgByMonth } from "@/lib/sufficiency";
 import type { Plant } from "@/types/plant";
 import type { Garden } from "@/types/garden";
 
@@ -63,6 +63,36 @@ describe("Sufficiency calculator", () => {
     expect(result.totalYieldKg).toBeGreaterThan(0);
     expect(result.nutrition.calories.percent).toBeGreaterThanOrEqual(0);
     expect(result.nutrition.protein.percent).toBeGreaterThanOrEqual(0);
+  });
+
+  it("a real planting date sets the harvest months (autumn sowing → winter harvest)", () => {
+    const autumn: Garden = {
+      ...garden,
+      beds: [{ ...garden.beds[0], cells: [{ cellX: 0, cellY: 0, plantId: "bean", plantedDate: "2026-09-20" }] }],
+    };
+    const planted = calculateSufficiency([autumn], [tomato, bean], 1, 30).plantYields.find((y) => y.plantId === "bean");
+    // 20 Sept + 50…65 days = Nov
+    expect(planted?.harvestMonths).toEqual([10]);
+    // Without a date: the spring sowing from the frost date (June/July).
+    const spring = calculateSufficiency([garden], [tomato, bean], 1, 30).plantYields.find((y) => y.plantId === "bean");
+    expect(spring?.harvestMonths.every((m) => m >= 5 && m <= 7)).toBe(true);
+  });
+
+  it("monthly kg add up to the garden forecast: preserved surplus is not also counted fresh", () => {
+    const bigGarden: Garden = {
+      ...garden,
+      beds: [{ ...garden.beds[0], width: 20, height: 20, cells: Array.from({ length: 200 }, (_, i) => ({ cellX: i % 20, cellY: Math.floor(i / 20), plantId: "tomato" })) }],
+    };
+    // A very productive tomato, so the harvest exceeds fresh eating and a surplus is preserved.
+    const heavy: Plant = { ...tomato, expectedYieldKgPerM2: 200, caloriesPer100g: 300 };
+    const result = calculateSufficiency([bigGarden], [heavy, bean], 1, 30);
+    const gardenKg = result.plantYields.reduce((s, y) => s + y.estimatedKg, 0);
+    const fresh = result.monthlyFood.reduce((s, m) => s + m.freshKg, 0);
+    const stored = result.monthlyFood.reduce((s, m) => s + m.storedKg, 0);
+    expect(stored).toBeGreaterThan(0);
+    // Stored food loses weight in preservation, so fresh + stored stays at or below the harvest.
+    expect(fresh + stored).toBeLessThanOrEqual(gardenKg + 0.5);
+    expect(result.monthlyFood.every((m) => m.animalKg === 0)).toBe(true);
   });
 
   it("should have higher coverage for smaller families", () => {
@@ -131,5 +161,74 @@ describe("winter gap", () => {
     expect(result.winterGap).not.toBeNull();
     for (const m of result.winterGap!.months) expect(STORAGE_MONTHS).toContain(m);
     expect(result.winterGap!.months).not.toContain(6); // July
+  });
+});
+
+describe("pantry stock", () => {
+  const potato: Plant = { ...bean, id: "potato", caloriesPer100g: 77, preservationMethods: ["root_cellar"] };
+  const item = (kg: number, expires: string, consumed = false) => ({
+    id: `p${kg}`, plantId: "potato", method: "root_cellar" as const, quantityKg: kg,
+    date: "2026-09-20", expiresDate: expires, consumed,
+  });
+  const now = new Date(2026, 9, 9);
+
+  it("fills the stored series from now until it expires, evenly", () => {
+    // 6 kg on 9 Oct, good until end of March → Oct–Mar, 1 kg per month.
+    const result = calculateSufficiency([], [potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
+    for (const m of [9, 10, 11, 0, 1, 2]) expect(result.monthlyFood[m].storedKg).toBeCloseTo(1, 1);
+    for (const m of [3, 4, 5, 6, 7, 8]) expect(result.monthlyFood[m].storedKg).toBe(0);
+    // The stock counts towards the month's calories (coverage tiles).
+    expect(result.monthlyFood[0].calories).toBeGreaterThan(0);
+  });
+
+  it("ignores consumed items and keeps the annual forecast unchanged", () => {
+    const without = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [], now);
+    const consumed = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31", true)], now);
+    expect(consumed.monthlyFood.map((m) => m.storedKg)).toEqual(without.monthlyFood.map((m) => m.storedKg));
+    // The annual coverage stays a forecast: real stock is mostly this season's
+    // preserved surplus and must not be counted twice.
+    const withStock = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
+    expect(withStock.annualCoveragePercent).toBe(without.annualCoveragePercent);
+  });
+
+  it("keeps the typical-year calories free of today's pantry stock", () => {
+    const without = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [], now);
+    const withStock = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
+    // The month strip (typical year) must average to the annual forecast, so the stock stays out.
+    expect(withStock.monthlyFood.map((m) => m.typicalCalories)).toEqual(without.monthlyFood.map((m) => m.typicalCalories));
+    expect(withStock.monthlyFood[0].calories).toBeGreaterThan(withStock.monthlyFood[0].typicalCalories);
+  });
+});
+
+describe("loggedKgByMonth", () => {
+  it("sums logged grams per month of the given year only", () => {
+    const kg = loggedKgByMonth([
+      { date: "2026-06-03", weightGrams: 1000 },
+      { date: "2026-06-20", weightGrams: 500 },
+      { date: "2026-09-01", weightGrams: 8000 },
+      { date: "2025-06-01", weightGrams: 9999 },
+      { date: "2026-07-01" },
+    ], 2026);
+    expect(kg[5]).toBeCloseTo(1.5);
+    expect(kg[8]).toBeCloseTo(8);
+    expect(kg[6]).toBe(0);
+    expect(kg.reduce((a, b) => a + b, 0)).toBeCloseTo(9.5);
+  });
+});
+
+describe("recorded animal products per month", () => {
+  it("counts edible kg of food products per month and skips wax", async () => {
+    const { getActualProductKgByMonth } = await import("@/lib/metrics");
+    const animals = [{ id: "h", type: "chicken", count: 6, acquiredDate: "2026-01-01" }] as never[];
+    const products = [
+      { id: "1", animalId: "h", type: "eggs", date: "2026-08-03", quantity: 10, unit: "pieces" },
+      { id: "2", animalId: "h", type: "honey", date: "2026-07-20", quantity: 2, unit: "kg" },
+      { id: "3", animalId: "h", type: "wax", date: "2026-07-20", quantity: 0.4, unit: "kg" },
+      { id: "4", animalId: "h", type: "eggs", date: "2025-08-03", quantity: 99, unit: "pieces" },
+    ] as never[];
+    const m = getActualProductKgByMonth(products, animals, 2026);
+    expect(m[7]).toBeCloseTo(10 * 0.06);
+    expect(m[6]).toBeCloseTo(2);
+    expect(m.reduce((a, b) => a + b, 0)).toBeCloseTo(2.6);
   });
 });

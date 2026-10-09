@@ -21,8 +21,12 @@ function Fact({ icon: Icon, label, value }: { icon: LucideIcon; label: string; v
   );
 }
 
-/** Today's sun times and daylight hours per month (with a today marker). */
-export function SunlightWidget() {
+/**
+ * Today's sun times and daylight hours per month (with a today marker).
+ * `compact`: only the yearly chart, for the weather page's side column where
+ * the day arc already shows today's sun times.
+ */
+export function SunlightWidget({ compact = false, className }: { compact?: boolean; className?: string }) {
   const { t } = useTranslation();
   const f = useFormat();
   const { locationLat, locationLon } = useStore(useShallow((s) => ({ locationLat: s.locationLat, locationLon: s.locationLon })));
@@ -40,23 +44,30 @@ export function SunlightWidget() {
   const monthDate = (m: number) => new Date(now.getFullYear(), m - 1, 1);
 
   return (
-    <Card className="mt-6">
-      <CardHeader title={t("sunlight.title")} description={t("sunlight.desc")} />
-      <dl className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Fact icon={Sunrise} label={t("sunlight.sunrise")} value={today.sunrise} />
-        <Fact icon={Sunset} label={t("sunlight.sunset")} value={today.sunset} />
-        <Fact icon={Clock} label={t("sunlight.daylight")} value={hours(today.daylightHours)} />
-        <Fact icon={Sun} label={t("sunlight.maxAltitude")} value={`${f.formatNumber(today.maxAltitudeDeg, { maximumFractionDigits: 0 })}°`} />
-      </dl>
-      <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sunlight.yearlyDaylight")}</h3>
+    <Card className={className ?? (compact ? undefined : "mt-6")}>
+      {compact ? (
+        <CardHeader title={t("sunlight.yearlyDaylight")} description={t("sunlight.yearlyDesc")} />
+      ) : (
+        <>
+          <CardHeader title={t("sunlight.title")} description={t("sunlight.desc")} />
+          <dl className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Fact icon={Sunrise} label={t("sunlight.sunrise")} value={today.sunrise} />
+            <Fact icon={Sunset} label={t("sunlight.sunset")} value={today.sunset} />
+            <Fact icon={Clock} label={t("sunlight.daylight")} value={hours(today.daylightHours)} />
+            <Fact icon={Sun} label={t("sunlight.maxAltitude")} value={`${f.formatNumber(today.maxAltitudeDeg, { maximumFractionDigits: 0 })}°`} />
+          </dl>
+          <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sunlight.yearlyDaylight")}</h3>
+        </>
+      )}
       <BarChart
+        target={compact ? { value: 10, label: t("sunlight.growthLimit") } : undefined}
         data={yearly.map((d) => ({
           key: String(d.month),
           label: f.formatDate(monthDate(d.month), "month"),
           fullLabel: f.formatDate(monthDate(d.month), "monthYear"),
           values: [d.daylightHours],
         }))}
-        series={[{ label: t("sunlight.daylight"), color: "earth" }]}
+        series={[{ label: t("sunlight.daylight"), color: "brand" }]}
         formatValue={hours}
         formatTick={(v) => t("sunlight.hoursShort", { hours: f.formatNumber(v, { maximumFractionDigits: 0 }) })}
         marker={{ index: now.getMonth(), label: t("charts.today") }}
@@ -67,7 +78,7 @@ export function SunlightWidget() {
           shortestHours: hours(shortest.daylightHours),
         })}
         categoryLabel={t("charts.month")}
-        height={170}
+        height={compact ? 150 : 170}
       />
     </Card>
   );

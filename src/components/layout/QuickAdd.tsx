@@ -8,7 +8,8 @@ import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { QUICK_ACTIONS } from "./quickActions";
 
 // The planner has its own bottom sheet; a floating button would sit on top of it.
-const HIDDEN_ON = ["/planner"];
+// Settings, the companion matrix and the import page have nothing to add.
+const HIDDEN_ON = ["/planner", "/settings", "/companions", "/import"];
 
 interface QuickAddProps {
   /** Hide while the navigation drawer is open: the button would float above it. */
@@ -49,7 +50,7 @@ export function QuickAdd({ hidden = false }: QuickAddProps) {
         </button>
       )}
       <Modal open={open} onClose={() => setOpen(false)} title={t("quickAdd.title")}>
-        <ul className="-mx-1 grid gap-1">
+        <ul className="-mx-1 -mt-3 grid gap-1">
           {QUICK_ACTIONS.map(({ to, icon: Icon, labelKey, hintKey, tone }) => (
             <li key={to}>
               <button

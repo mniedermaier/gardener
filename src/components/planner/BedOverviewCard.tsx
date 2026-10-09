@@ -9,6 +9,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { Badge } from "@/components/ui/Badge";
 import { Menu } from "@/components/ui/Menu";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { PLOT_BACKDROP } from "@/components/ui/plot";
 import { EnvironmentChip } from "./environment";
 import { MiniBedGrid } from "./BedGrid";
 
@@ -39,14 +40,15 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
   }, [bed, plantMap]);
 
   const size = `${formatNumber((bed.width * gridCellSizeCm) / 100)} × ${formatNumber((bed.height * gridCellSizeCm) / 100)} m`;
-  const shown = species.slice(0, 6);
+  // Six icons, or five plus "+n" so the row never grows past six slots.
+  const shown = species.length > 6 ? species.slice(0, 5) : species;
 
   return (
     <article className="relative flex w-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-xs transition-colors hover:border-garden-400 dark:border-white/10 dark:bg-gray-900 dark:hover:border-garden-500/50">
       <div className="flex items-start gap-3">
         <EnvironmentChip type={envType} />
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
             <button
               type="button"
               onClick={() => onOpen(bed.id)}
@@ -54,7 +56,7 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
             >
               {bed.name}
             </button>
-          </h3>
+          </h2>
           <p className="truncate text-xs text-gray-500 dark:text-gray-400">
             {[size, t(`planner.environmentTypes.${envType}`), t("season.plants", { count: bed.cells.length })].join(" · ")}
           </p>
@@ -74,7 +76,7 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
         </div>
       </div>
 
-      <div className="mt-3 flex flex-1 items-center justify-center overflow-hidden rounded-lg py-1">
+      <div className={`mt-3 flex flex-1 items-center justify-center overflow-hidden rounded-lg p-3 ${PLOT_BACKDROP}`}>
         <MiniBedGrid bed={bed} plantMap={plantMap} conflicts={conflictMap} />
       </div>
 
@@ -89,12 +91,19 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
                 </span>
               ) : null;
             })}
+            {/* "7 Arten" next to 6 icons must not look like a miscount. */}
+            {species.length > shown.length && (
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-gray-100 px-1 text-overline font-semibold text-gray-600 tabular-nums ring-2 ring-white dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-900">
+                +{species.length - shown.length}
+              </span>
+            )}
           </span>
         ) : (
           <span className="text-xs text-gray-500 dark:text-gray-400">{t("planner.bedEmpty")}</span>
         )}
         {species.length > 0 && <span className="text-xs text-gray-500 dark:text-gray-400">{t("planner.speciesCount", { count: species.length })}</span>}
-        <span className="ml-auto flex flex-wrap gap-1.5">
+        {/* Phones: a wrapped badge row stays left-aligned; beside the counts from sm. */}
+        <span className="flex flex-wrap gap-1.5 sm:ml-auto">
           {frostWeeks > 0 && <Badge tone="info" icon={ShieldCheck}>{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge>}
           {conflicts.length > 0 && <Badge tone="warning" icon={TriangleAlert}>{t("bedStats.conflictPairs", { count: conflicts.length })}</Badge>}
         </span>

@@ -14,6 +14,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { IconButton } from "@/components/ui/IconButton";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
+import { ChoiceTiles, choiceColumns } from "@/components/ui/ChoiceTiles";
 
 describe("form primitives", () => {
   it("Select ties label, hint and error to the control", () => {
@@ -107,6 +108,19 @@ describe("List and ListRow", () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("region", { name: "Ernten" })).toBeInTheDocument();
   });
+
+  it("keeps meta parts unbroken with the separator at the end, never at a line start", () => {
+    const { container } = render(
+      <List label="Futter">
+        <ListRow title="Körner" meta={["2 kg", null, "Hühnerschar", false, "15. Sept."]} />
+        <ListRow title="Heu" meta="Beet · Heute" />
+      </List>,
+    );
+    const rows = container.querySelectorAll("li");
+    const parts = (li: Element) => [...li.querySelectorAll("span.inline-block")].map((s) => s.textContent);
+    expect(parts(rows[0])).toEqual(["2 kg ·", "Hühnerschar ·", "15. Sept."]);
+    expect(parts(rows[1])).toEqual(["Beet ·", "Heute"]);
+  });
 });
 
 describe("display primitives", () => {
@@ -137,5 +151,41 @@ describe("Toast", () => {
     await userEvent.click(screen.getByRole("button", { name: "Rückgängig" }));
     expect(onUndo).toHaveBeenCalled();
     expect(screen.queryByText("Gelöscht")).not.toBeInTheDocument();
+  });
+});
+
+describe("ChoiceTiles", () => {
+  it("picks columns so no row ends with a lone tile", () => {
+    expect([4, 5, 6, 7, 8, 9].map(choiceColumns)).toEqual([4, 3, 3, 4, 4, 3]);
+    for (let n = 2; n <= 12; n++) {
+      const cols = choiceColumns(n);
+      expect(n % cols === 1 && n > cols).toBe(false);
+    }
+  });
+
+  it("is a radiogroup: nothing chosen keeps one tab stop, arrows move and select", async () => {
+    function Harness() {
+      const [v, setV] = useState<"a" | "b" | "c" | "">("");
+      return (
+        <ChoiceTiles
+          label="Art"
+          value={v}
+          onChange={setV}
+          options={[{ value: "a", label: "Eins", icon: Pencil }, { value: "b", label: "Zwei", icon: Pencil }, { value: "c", label: "Drei", icon: Pencil }]}
+        />
+      );
+    }
+    render(<Harness />);
+    expect(screen.getByRole("radiogroup", { name: "Art" })).toBeInTheDocument();
+    const radios = screen.getAllByRole("radio");
+    expect(radios.map((r) => r.getAttribute("tabindex"))).toEqual(["0", "-1", "-1"]);
+    expect(radios.every((r) => r.getAttribute("aria-checked") === "false")).toBe(true);
+    await userEvent.click(radios[0]);
+    expect(radios[0]).toHaveAttribute("aria-checked", "true");
+    await userEvent.keyboard("{ArrowRight}");
+    expect(screen.getByRole("radio", { name: "Zwei" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: "Zwei" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+    expect(screen.getByRole("radio", { name: "Drei" })).toHaveAttribute("aria-checked", "true");
   });
 });

@@ -1,20 +1,16 @@
-import { createElement, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
+import { createElement, useState, useEffect, useCallback, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown, Cloud, CloudFog, CloudLightning, CloudOff, CloudRain, CloudSnow, CloudSun, Droplets, MapPin, Moon,
-  RefreshCw, Settings, Snowflake, Sprout, Sun, Thermometer, Umbrella, Wind, type LucideIcon,
+  Info, RefreshCw, Settings, Snowflake, Sun, Thermometer, Umbrella, Wind, type LucideIcon,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
-import { usePlantMap } from "@/hooks/usePlants";
-import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { toDate, todayISO } from "@/lib/format";
-import { differenceInCalendarDays } from "date-fns";
-import { getAllAlerts, groupAlerts, type AlertGroup, type WeatherAlert } from "@/lib/weatherAlerts";
+import { todayISO } from "@/lib/format";
+import type { AlertGroup, FrostSummary } from "@/lib/weatherAlerts";
 import { fetchWeather as fetchWeather_, getWeatherProvider, isWeatherConfigured, WeatherAuthError } from "@/lib/weather";
-import type { Plant } from "@/types/plant";
 import type { WeatherData } from "@/types/weather";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -23,20 +19,12 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { TONE_SOFT, type Tone } from "@/components/ui/tone";
-import { RangeBar } from "@/components/ui/charts";
+import { TONE_SOFT } from "@/components/ui/tone";
+import { HowCalculated, RangeBar } from "@/components/ui/charts";
 import { SunlightWidget } from "./SunlightWidget";
-
-const ALERT_ICON: Record<WeatherAlert["type"], LucideIcon> = {
-  frost: Snowflake,
-  heat: Sun,
-  greenhouse_hot: Thermometer,
-  greenhouse_cold: Snowflake,
-  watering: Droplets,
-  weekly: Sprout,
-};
-
-const SEVERITY_TONE: Record<WeatherAlert["severity"], Tone> = { danger: "danger", warning: "warning", info: "info" };
+import { DayArc } from "./DayArc";
+import { FrostTaskButton, frostLabelKey, frostTone, useDayLabel, useFrostAffectedText, useFrostSummary } from "./frost";
+import { ALERT_ICON, SEVERITY_TONE, useAlertText, useWeatherAlerts } from "./alerts";
 
 /** OpenWeatherMap icon code → Lucide. */
 function weatherIcon(code: string): LucideIcon {
@@ -52,59 +40,51 @@ function weatherIcon(code: string): LucideIcon {
 
 type FetchError = "auth" | "network";
 
-/** Same day names as the forecast list: "Heute", "Morgen", then "Mi." … */
-function dayLabel(date: string, f: ReturnType<typeof useFormat>): string {
-  const diff = differenceInCalendarDays(toDate(date) ?? new Date(), new Date());
-  return diff >= 0 && diff < 2 ? f.formatDate(date, "relative") : f.formatDate(date, "weekday");
-}
-
-/** "Mittwoch, 7. Okt." — the day inside an alert sentence. */
-function dayPhrase(date: string, locale: string): string {
-  const d = toDate(date);
-  return d ? new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "short" }).format(d) : date;
-}
-
-/** Frost-sensitive crops = planted crops normally set out only after the last frost. */
-function frostSensitive(plants: Plant[]): Plant[] {
-  return plants.filter((p) => p.transplantWeeks !== null && p.transplantWeeks >= 0 && p.harvestDaysMax < 365);
-}
-
-function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: string[] }) {
+function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost: { summary: FrostSummary; title: string } | null; related?: AlertGroup[] }) {
   const { t } = useTranslation();
   const f = useFormat();
+  const dayLabel = useDayLabel();
+  const alertText = useAlertText();
+  const affected = useFrostAffectedText(frost?.summary);
   const Icon = ALERT_ICON[group.type];
-  const tone = SEVERITY_TONE[group.severity];
-  const fmtParams = (p?: Record<string, string | number>) => {
-    if (!p) return p;
-    const out: Record<string, string | number> = { ...p };
-    if (typeof p.date === "string") out.date = dayPhrase(p.date, f.locale);
-    for (const k of ["temp", "max", "min", "outside", "buffer"] as const) if (typeof p[k] === "number") out[k] = f.formatTemperature(p[k] as number);
-    return out;
-  };
+  // Frost has its own tone and badge text (frostTone), every other alert its severity.
+  const tone = group.type === "frost" && frost ? frostTone(frost.summary) : SEVERITY_TONE[group.severity];
+  const badge = group.type === "frost" && frost ? t(frostLabelKey(frost.summary)) : t(`alerts.severity.${group.severity}`);
 
   let title: string;
   let body: ReactNode;
   if (group.type === "frost") {
-    const coldest = Math.min(...group.alerts.map((a) => Number(a.titleParams?.temp ?? 0)));
-    title = t("alerts.frostGroupTitle", { count: group.alerts.length, temp: f.formatTemperature(coldest) });
+    // Same sentence as on "Heute" (one source: summarizeFrost).
+    title = frost?.title ?? "";
+    // Every night of the headline in date order, in the same tones as
+    // "Nächste Tage": frost (≤ 0 °C) info, frost risk neutral, both with a snowflake.
+    const nights = group.alerts.map((a) => ({ a, temp: Number(a.titleParams?.temp ?? 0) }));
     body = (
       <>
         <span className="flex flex-wrap gap-1.5">
-          {group.alerts.map((a) => (
-            <Badge key={a.id} variant="outline" tone={a.severity === "danger" ? "danger" : "warning"}>
-              {dayLabel(a.date ?? "", f)} {f.formatTemperature(Number(a.titleParams?.temp ?? 0))}
+          {nights.map(({ a, temp }) => (
+            <Badge key={a.id} tone={frostTone(temp)} icon={Snowflake} size="sm" className="tabular-nums">
+              {dayLabel(a.date ?? "")} {f.formatTemperature(temp)}
             </Badge>
           ))}
         </span>
         <span className="mt-1.5 block">
-          {sensitive.length > 0 ? t("alerts.frostAffected", { plants: sensitive.slice(0, 4).join(", "), count: sensitive.length }) : t("alerts.frostAdvice")}
+          {affected}
         </span>
+        {/* The greenhouse cold warning belongs to the same nights: a line here, not a second "Akut" card. */}
+        {related.map((g) => {
+          const text = alertText(g.alerts[0]);
+          return (
+            <span key={g.id} className="mt-2 block border-t border-gray-100 pt-2 dark:border-white/10">
+              <span className="block font-medium text-gray-800 dark:text-gray-200">{text.title}</span> {text.description}
+            </span>
+          );
+        })}
+        {frost && <FrostTaskButton summary={frost.summary} className="mt-2.5" />}
       </>
     );
   } else {
-    const a = group.alerts[0];
-    title = t(a.titleKey, fmtParams(a.titleParams));
-    body = t(a.descriptionKey, fmtParams(a.descriptionParams));
+    ({ title, description: body } = alertText(group.alerts[0]));
   }
 
   return (
@@ -115,7 +95,8 @@ function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: stri
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
           {title}
-          <Badge tone={tone} dot>{t(`alerts.severity.${group.severity}`)}</Badge>
+          {/* The frost title already names "Frost"/"Frostgefahr": its badge would repeat it. */}
+          {group.type !== "frost" && <Badge tone={tone} dot>{badge}</Badge>}
         </p>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{body}</div>
       </div>
@@ -127,48 +108,51 @@ export function WeatherDashboard() {
   const { t, i18n } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, gardens: s.gardens, addWeatherHistory: s.addWeatherHistory })));
-  const plantMap = usePlantMap();
-  const plantName = usePlantName();
+  const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, addWeatherHistory: s.addWeatherHistory })));
   const [weather, setWeather] = useState<WeatherData | null>(() => {
     try {
       const cached = sessionStorage.getItem("gardener-weather");
       return cached ? JSON.parse(cached) : null;
     } catch { return null; }
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<FetchError | null>(null);
+  /** OpenWeatherMap failed and Open-Meteo stepped in (see lib/weather.ts). */
+  const [fallback, setFallback] = useState<"auth" | "unavailable" | null>(null);
+  const dayLabel = useDayLabel();
 
-  const allBeds = useMemo(() => gardens.flatMap((g) => g.beds), [gardens]);
-  const plantedPlants = useMemo(() => {
-    const ids = new Set<string>();
-    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) ids.add(c.plantId);
-    return Array.from(ids).map((id) => plantMap.get(id)).filter((p): p is Plant => !!p);
-  }, [gardens, plantMap]);
-
-  const allAlerts = useMemo(() => (weather ? getAllAlerts(weather.forecast.filter((d) => d.date >= todayISO()), allBeds, plantedPlants, alertConfig) : []), [weather, allBeds, plantedPlants, alertConfig]);
-  const groups = useMemo(() => groupAlerts(allAlerts), [allAlerts]);
+  // Same alerts as the weather card on "Heute".
+  const { alerts: allAlerts, groups } = useWeatherAlerts(weather?.forecast);
   const weekly = allAlerts.find((a) => a.type === "weekly");
-  const sensitive = useMemo(() => frostSensitive(plantedPlants).map((p) => plantName(p.id)), [plantedPlants, plantName]);
+  const frost = useFrostSummary(weather?.forecast);
 
-  const provider = getWeatherProvider(weatherApiKey);
-  const fetchWeather = useCallback(async () => {
-    if (!isWeatherConfigured(locationLat, locationLon)) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fetchWeather_({ lat: locationLat!, lon: locationLon!, apiKey: weatherApiKey, locale: i18n.language, locationName, t });
-      addWeatherHistory(result.today);
-      setWeather(result.data);
-      try { sessionStorage.setItem("gardener-weather", JSON.stringify(result.data)); } catch { /* private mode */ }
-    } catch (e) {
-      setError(e instanceof WeatherAuthError ? "auth" : "network");
-    } finally {
-      setLoading(false);
-    }
-  }, [weatherApiKey, locationLat, locationLon, locationName, addWeatherHistory, t, i18n.language]);
+  const provider = fallback ? "open-meteo" : getWeatherProvider(weatherApiKey);
+  // Each request has a key; `loading` is derived (no setState inside the effect body).
+  const [reload, setReload] = useState(0);
+  const configured = isWeatherConfigured(locationLat, locationLon);
+  const requestKey = `${weatherApiKey}|${locationLat}|${locationLon}|${i18n.language}|${reload}`;
+  const [doneKey, setDoneKey] = useState<string | null>(null);
+  const loading = configured && doneKey !== requestKey;
+  const fetchWeather = useCallback(() => setReload((n) => n + 1), []);
 
-  useEffect(() => { void fetchWeather(); }, [fetchWeather]);
+  useEffect(() => {
+    if (locationLat === null || locationLon === null) return;
+    const ctrl = new AbortController();
+    fetchWeather_({ lat: locationLat, lon: locationLon, apiKey: weatherApiKey, locale: i18n.language, locationName, t, signal: ctrl.signal })
+      .then((result) => {
+        addWeatherHistory(result.today);
+        setWeather(result.data);
+        setFallback(result.fallback ?? null);
+        setError(null);
+        try { sessionStorage.setItem("gardener-weather", JSON.stringify(result.data)); } catch { /* private mode */ }
+        setDoneKey(requestKey);
+      })
+      .catch((e: unknown) => {
+        if ((e as Error).name === "AbortError") return;
+        setError(e instanceof WeatherAuthError ? "auth" : "network");
+        setDoneKey(requestKey);
+      });
+    return () => ctrl.abort();
+  }, [requestKey, locationLat, locationLon, weatherApiKey, i18n.language, locationName, t, addWeatherHistory]);
 
   const toSettings = (
     <Button onClick={() => navigate("/settings")}>
@@ -177,7 +161,7 @@ export function WeatherDashboard() {
     </Button>
   );
 
-  if (!isWeatherConfigured(locationLat, locationLon)) {
+  if (!configured) {
     return (
       <div>
         <PageHeader title={t("weather.title")} description={t("weather.subtitle")} />
@@ -199,7 +183,10 @@ export function WeatherDashboard() {
     );
   }
 
-  const [primary, ...rest] = groups;
+  // With a frost card, the greenhouse cold warning becomes a line inside it.
+  const hasFrost = groups.some((g) => g.type === "frost");
+  const related = hasFrost ? groups.filter((g) => g.type === "greenhouse_cold") : [];
+  const [primary, ...rest] = groups.filter((g) => !related.includes(g));
   const visible = [primary, rest[0]].filter(Boolean) as AlertGroup[];
   const hidden = rest.slice(1);
   // The API's first day can be yesterday (UTC buckets) — only show today onwards.
@@ -212,9 +199,22 @@ export function WeatherDashboard() {
     <div>
       <PageHeader
         title={t("weather.title")}
-        description={weekly ? t(weekly.descriptionKey, { ...weekly.descriptionParams, minTemp: f.formatTemperature(Number(weekly.descriptionParams?.minTemp)), maxTemp: f.formatTemperature(Number(weekly.descriptionParams?.maxTemp)) }) : t("weather.subtitle")}
-        actions={<IconButton icon={RefreshCw} label={t("weather.refresh")} onClick={() => void fetchWeather()} disabled={loading} className={loading ? "[&_svg]:animate-spin" : ""} />}
+        // The frost card already says it: the subtitle then stays general instead of repeating it.
+        description={weekly && !groups.some((g) => g.type === "frost") ? t(weekly.descriptionKey, { ...weekly.descriptionParams, minTemp: f.formatTemperature(Number(weekly.descriptionParams?.minTemp)), maxTemp: f.formatTemperature(Number(weekly.descriptionParams?.maxTemp)) }) : t("weather.subtitle")}
       />
+
+      {fallback && weather && (
+        // Phones: the action sits under the text instead of squeezing it into a narrow column.
+        <div className="mb-4 flex items-start gap-2 rounded-lg bg-info/10 px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
+          <Info size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-info" />
+          <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between sm:gap-3">
+            <p>{t(fallback === "auth" ? "weather.fallbackAuth" : "weather.fallbackUnavailable")}</p>
+            <button type="button" onClick={() => navigate("/settings")} className="inline-flex min-h-11 shrink-0 items-center font-medium text-garden-700 underline-offset-2 hover:underline sm:min-h-0 dark:text-garden-300">
+              {t("weather.toSettings")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && (
         <Card className="mb-6">
@@ -231,7 +231,7 @@ export function WeatherDashboard() {
 
       {visible.length > 0 && (
         <section aria-label={t("weather.alertsLabel")} className="mb-6 space-y-2">
-          {visible.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} />)}
+          {visible.map((g) => <AlertCallout key={g.id} group={g} frost={frost} related={g.type === "frost" ? related : undefined} />)}
           {hidden.length > 0 && (
             <details className="group">
               <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-md px-1 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 [&::-webkit-details-marker]:hidden">
@@ -239,7 +239,7 @@ export function WeatherDashboard() {
                 {t("weather.moreAlerts", { count: hidden.length })}
               </summary>
               <div className="mt-2 space-y-2">
-                {hidden.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} />)}
+                {hidden.map((g) => <AlertCallout key={g.id} group={g} frost={frost} />)}
               </div>
             </details>
           )}
@@ -254,14 +254,18 @@ export function WeatherDashboard() {
       )}
 
       {weather && (
-        <div className="grid gap-6 lg:grid-cols-5 lg:items-start">
-          <Card className="lg:col-span-2">
-            <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-              <MapPin size={14} aria-hidden="true" />
-              {weather.locationName}
+        // Phones: now → forecast → daylight (order). Desktop: now and daylight stacked on
+        // the left, the daylight card stretching so both columns end on one line.
+        <div className="grid gap-6 lg:grid-cols-5 lg:items-stretch">
+          <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-6">
+          <Card className="order-1">
+            <div className="-mt-1 -mr-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+              <MapPin size={14} aria-hidden="true" className="shrink-0" />
+              <span className="min-w-0 truncate">{weather.locationName}</span>
               <span aria-hidden="true">·</span>
-              <time dateTime={weather.fetchedAt}>{t("weather.updatedAt", { time: new Intl.DateTimeFormat(f.locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(weather.fetchedAt)) })}</time>
-            </p>
+              <time dateTime={weather.fetchedAt} className="shrink-0">{t("weather.updatedAt", { time: new Intl.DateTimeFormat(f.locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(weather.fetchedAt)) })}</time>
+              <IconButton icon={RefreshCw} size="sm" label={t("weather.refresh")} onClick={() => void fetchWeather()} disabled={loading} className={`ml-auto ${loading ? "[&_svg]:animate-spin" : ""}`} />
+            </div>
             <div className="mt-4 flex items-center gap-4">
               {createElement(weatherIcon(weather.current.icon), { size: 48, strokeWidth: 1.5, "aria-hidden": true, className: "text-gray-700 dark:text-gray-300" })}
               <div>
@@ -283,11 +287,23 @@ export function WeatherDashboard() {
                 <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{t("weather.windValue", { speed: f.formatNumber(weather.current.windSpeed, { maximumFractionDigits: 0 }) })}</dd>
               </div>
             </dl>
+            {locationLat !== null && locationLon !== null && (
+              <div className="mt-4 border-t border-gray-100 pt-3 dark:border-white/5">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{t("weather.dayArcTitle")}</p>
+                <DayArc lat={locationLat} lon={locationLon} className="mx-auto mt-1 max-w-60" />
+              </div>
+            )}
           </Card>
+          <SunlightWidget compact className="order-3 lg:flex-1" />
+          </div>
 
-          <Card padding="none" className="lg:col-span-3">
+          <Card padding="none" className="order-2 lg:col-span-3">
             <div className="px-4 pt-4 sm:px-6 sm:pt-5">
-              <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })} />
+              <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc")} />
+              {/* Frost vs. Frostgefahr explained on demand: the list starts higher on a phone. */}
+              <HowCalculated className="-mt-2 mb-3">
+                <p>{t("weather.forecastHow", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })}</p>
+              </HowCalculated>
             </div>
             <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
               {days.map((day) => {
@@ -295,7 +311,7 @@ export function WeatherDashboard() {
                 return (
                   <li key={day.date} className="grid grid-cols-[4.5rem_1.5rem_1fr] items-center gap-x-3 gap-y-1 px-4 py-3 sm:grid-cols-[5.5rem_1.5rem_minmax(0,1fr)_3rem_minmax(6rem,10rem)_3rem] sm:px-6">
                     <time dateTime={day.date} className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {dayLabel(day.date, f)}
+                      {dayLabel(day.date)}
                       <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(day.date, "short")}</span>
                     </time>
                     {createElement(weatherIcon(day.icon), { size: 20, "aria-hidden": true, className: "text-gray-600 dark:text-gray-300" })}
@@ -304,7 +320,7 @@ export function WeatherDashboard() {
                       <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs normal-case text-gray-500 dark:text-gray-400">
                         <Umbrella size={12} aria-hidden="true" />
                         {t("weather.rainChance", { percent: f.formatPercent(day.precipitation / 100) })}
-                        {frost && <Badge tone={day.tempMin <= 0 ? "danger" : "warning"} icon={Snowflake}>{day.tempMin <= 0 ? t("weather.frost") : t("weather.frostRisk")}</Badge>}
+                        {frost && <Badge tone={frostTone(day.tempMin)} icon={Snowflake}>{t(frostLabelKey(day.tempMin))}</Badge>}
                       </span>
                     </span>
                     <span className="col-start-3 flex items-center gap-2 sm:col-start-auto sm:contents">
@@ -315,7 +331,7 @@ export function WeatherDashboard() {
                         max={day.tempMax}
                         domain={domain}
                         threshold={alertConfig.frostThresholdC}
-                        emphasis={frost}
+                        emphasis={day.tempMin <= 0}
                         label={t("weather.rangeLabel", { min: f.formatTemperature(day.tempMin), max: f.formatTemperature(day.tempMax) })}
                       />
                       <span className="w-12 text-sm font-medium tabular-nums text-gray-900 dark:text-gray-100 sm:w-auto">{f.formatTemperature(day.tempMax)}</span>
@@ -336,10 +352,11 @@ export function WeatherDashboard() {
               )}
             </p>
           </Card>
+
         </div>
       )}
 
-      <SunlightWidget />
+      {!weather && <SunlightWidget />}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useId, useMemo, useState, type KeyboardEvent } from "react";
-import { HatchPattern, Legend } from "./Legend";
-import { niceScale, SERIES_FILL, SERIES_TEXT, useElementWidth, type SeriesColor } from "./scale";
+import { DotPattern, HatchPattern, Legend } from "./Legend";
+import { axisLabelStep, niceScale, SERIES_FILL, SERIES_TEXT, useElementWidth, type SeriesColor } from "./scale";
 
 export interface BarDatum {
   key: string;
@@ -17,6 +17,10 @@ export interface BarSeries {
   color: SeriesColor;
   /** Hatched fill: use for forecasts/estimates so the meaning is not colour-only. */
   hatched?: boolean;
+  /** Dotted fill: a second measured series of the same family (rain beside watering). */
+  dotted?: boolean;
+  /** Drawn with less emphasis, so another series stays the hero (animal products beside the garden). */
+  muted?: boolean;
 }
 
 export interface BarChartProps {
@@ -70,7 +74,11 @@ export function BarChart({
   const band = plotW / Math.max(1, data.length);
   const barW = Math.max(4, Math.min(36, band * 0.62));
   const y = (v: number) => M.top + plotH - (Math.min(v, top) / top) * plotH;
-  const labelEvery = band < 30 ? 2 : 1;
+  // Thin the axis by the real label width ("KW 34" needs more room than "Okt.").
+  const labelEvery = axisLabelStep(data.map((d) => d.label), band);
+  // Labels start at the first bar (Jan, Mär, Mai …); the marker carries its own label.
+  const labelAnchor = 0;
+  const showLabel = (i: number) => (((i - labelAnchor) % labelEvery) + labelEvery) % labelEvery === 0;
 
   const onKey = (e: KeyboardEvent) => {
     if (e.key === "ArrowRight") setActive((a) => Math.min(data.length - 1, (a ?? -1) + 1));
@@ -80,7 +88,8 @@ export function BarChart({
     e.preventDefault();
   };
 
-  const showLegend = legend ?? series.length > 1;
+  // The target line is named in the legend (a label on the line would sit on the bars).
+  const showLegend = legend ?? (series.length > 1 || !!target);
   const activeDatum = active !== null ? data[active] : null;
 
   return (
@@ -102,7 +111,7 @@ export function BarChart({
         {width === 0 ? <div style={{ height }} aria-hidden="true" /> : (
         <svg width={width} height={height} aria-hidden="true" className="block max-w-full">
           <defs>
-            {series.map((s, i) => s.hatched && <HatchPattern key={i} id={`${uid}-h${i}`} />)}
+            {series.map((s, i) => (s.hatched ? <HatchPattern key={i} id={`${uid}-h${i}`} className={SERIES_TEXT[s.color]} /> : s.dotted ? <DotPattern key={i} id={`${uid}-h${i}`} className={SERIES_TEXT[s.color]} /> : null))}
           </defs>
           {/* grid + y ticks */}
           {ticks.map((t, i) => (
@@ -113,6 +122,22 @@ export function BarChart({
               </text>
             </g>
           ))}
+          {/* "today" marker behind the bars, so it never crosses a segment */}
+          {marker && marker.index >= 0 && marker.index < data.length && (
+            <g>
+              <line
+                x1={left + band * marker.index + band / 2}
+                x2={left + band * marker.index + band / 2}
+                y1={M.top - 4}
+                y2={M.top + plotH}
+                className="stroke-gray-900/40 dark:stroke-white/40"
+                strokeDasharray="2 2"
+              />
+              <text x={left + band * marker.index + band / 2} y={M.top - 7} textAnchor="middle" className="fill-gray-900 text-[11px] font-semibold dark:fill-gray-100">
+                {marker.label}
+              </text>
+            </g>
+          )}
           {/* bars */}
           {data.map((d, i) => {
             const cx = left + band * i + band / 2;
@@ -125,17 +150,19 @@ export function BarChart({
                   const y0 = y(acc);
                   acc += v;
                   const y1 = y(acc);
-                  const h = Math.max(1, y0 - y1 - (k < lastIdx ? 2 : 0));
+                  // A value above zero stays visible as a segment (≥ 3 px), never a hairline.
+                  const h = Math.max(3, y0 - y1 - (k < lastIdx ? 2 : 0));
                   const s = series[k];
-                  const fill = s.hatched ? `url(#${uid}-h${k})` : undefined;
-                  const cls = s.hatched ? SERIES_TEXT[s.color] : SERIES_FILL[s.color];
+                  const patterned = s.hatched || s.dotted;
+                  const fill = patterned ? `url(#${uid}-h${k})` : undefined;
+                  const cls = patterned ? SERIES_TEXT[s.color] : SERIES_FILL[s.color];
                   const r = k === lastIdx ? Math.min(4, barW / 2, h) : 0;
                   const x0 = cx - barW / 2;
                   const top0 = y0 - h;
                   const path = `M${x0},${y0} V${top0 + r} Q${x0},${top0} ${x0 + r},${top0} H${x0 + barW - r} Q${x0 + barW},${top0} ${x0 + barW},${top0 + r} V${y0} Z`;
-                  return <path key={k} d={path} className={cls} fill={fill} />;
+                  return <path key={k} d={path} className={s.muted ? `${cls} opacity-60` : cls} fill={fill} />;
                 })}
-                {(i % labelEvery === 0 || i === marker?.index) && (
+                {showLabel(i) && (
                   <text
                     x={cx}
                     y={height - 6}
@@ -153,24 +180,6 @@ export function BarChart({
           {target && target.value <= top && (
             <g>
               <line x1={left} x2={left + plotW} y1={y(target.value)} y2={y(target.value)} strokeDasharray="4 3" className="stroke-gray-700 dark:stroke-gray-300" strokeWidth={1.5} />
-              <text x={left + plotW} y={y(target.value) - 4} textAnchor="end" className="fill-gray-700 text-[11px] font-medium dark:fill-gray-300">
-                {target.label}
-              </text>
-            </g>
-          )}
-          {marker && marker.index >= 0 && marker.index < data.length && (
-            <g>
-              <line
-                x1={left + band * marker.index + band / 2}
-                x2={left + band * marker.index + band / 2}
-                y1={M.top - 4}
-                y2={M.top + plotH}
-                className="stroke-gray-900/40 dark:stroke-white/40"
-                strokeDasharray="2 2"
-              />
-              <text x={left + band * marker.index + band / 2} y={M.top - 7} textAnchor="middle" className="fill-gray-900 text-[11px] font-semibold dark:fill-gray-100">
-                {marker.label}
-              </text>
             </g>
           )}
         </svg>
@@ -196,7 +205,7 @@ export function BarChart({
         <Legend
           className="mt-2"
           items={[
-            ...series.map((s) => ({ label: s.label, color: s.color, swatch: s.hatched ? ("hatched" as const) : ("solid" as const) })),
+            ...series.map((s) => ({ label: s.label, color: s.color, muted: s.muted, swatch: s.hatched ? ("hatched" as const) : s.dotted ? ("dotted" as const) : ("solid" as const) })),
             ...(target ? [{ label: target.label, color: "muted" as const, swatch: "line" as const }] : []),
           ]}
         />

@@ -27,8 +27,13 @@ interface MeterProps {
 export const Meter = memo(function Meter({ actual, forecast, max, target, label, color = "brand", size = 8, className = "" }: MeterProps) {
   const pid = useId();
   const pct = (v: number | undefined) => (v === undefined || !(max > 0) ? 0 : Math.max(0, Math.min(100, (v / max) * 100)));
-  const a = pct(actual);
-  const f = pct(forecast);
+  // A non-zero value never shrinks below a sliver (~3 %), or 0,4 of 6 kg would vanish.
+  const sliver = (p: number) => (p > 0 ? Math.max(p, 3) : 0);
+  const a = sliver(pct(actual));
+  // A forecast just above the actual value would hide under the solid bar:
+  // keep at least a few percent of hatching visible beyond it.
+  const fRaw = sliver(pct(forecast));
+  const f = forecast !== undefined && actual !== undefined && forecast > actual && a > 0 ? Math.min(100, Math.max(fRaw, a + 3)) : fRaw;
   const t = target !== undefined ? pct(target) : null;
   return (
     <div
@@ -41,8 +46,11 @@ export const Meter = memo(function Meter({ actual, forecast, max, target, label,
       style={{ height: size }}
     >
       <svg width="100%" height={size} aria-hidden="true" className="block">
-        <defs><HatchPattern id={pid} /></defs>
+        <defs><HatchPattern id={pid} className={SERIES_TEXT[color]} /></defs>
         <rect width="100%" height={size} rx={size / 2} className="fill-gray-100 dark:fill-white/10" />
+        {/* Forecast: a light tint of the series colour under the hatch, so a few
+            percent stay visible on the track (dark mode especially). */}
+        {f > 0 && <rect width={`${f}%`} height={size} rx={size / 2} fill="currentColor" className={`${SERIES_TEXT[color]} [fill-opacity:0.3] dark:[fill-opacity:0.45]`} />}
         {f > 0 && <rect width={`${f}%`} height={size} rx={size / 2} fill={`url(#${pid})`} className={SERIES_TEXT[color]} />}
         {a > 0 && <rect width={`${a}%`} height={size} rx={size / 2} className={SERIES_FILL[color]} />}
       </svg>

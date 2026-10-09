@@ -1,10 +1,11 @@
 import { memo, useMemo } from "react";
+import { bedForecastKg } from "@/lib/metrics";
 import { useTranslation } from "react-i18next";
 import type { Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import { useFormat } from "@/hooks/useFormat";
 import { cn } from "@/lib/cn";
-import { X } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 
 interface Props {
@@ -24,15 +25,10 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
   const stats = useMemo(() => {
     const paths = new Set(bed.paths ?? []).size;
     const usable = Math.max(1, bed.width * bed.height - paths);
-    const cellAreaM2 = (gridCellSizeCm / 100) ** 2;
-    let yieldKg = 0;
+    // Same forecast as every other page (lib/metrics bedForecastKg).
+    const yieldKg = bedForecastKg(bed, plantMap, gridCellSizeCm);
     const species = new Set<string>();
-    for (const cell of bed.cells) {
-      const plant = plantMap.get(cell.plantId);
-      if (!plant) continue;
-      yieldKg += (plant.expectedYieldKgPerM2 ?? 0) * cellAreaM2;
-      species.add(cell.plantId);
-    }
+    for (const cell of bed.cells) if (plantMap.has(cell.plantId)) species.add(cell.plantId);
     return { occupancy: bed.cells.length / usable, species: species.size, yieldGrams: yieldKg * 1000 };
   }, [bed, plantMap, gridCellSizeCm]);
 
@@ -45,14 +41,16 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
       value: (
         <>
           <span>{t("bedStats.goodPairs", { count: companionPairs })}</span>
-          {conflictPairs > 0 && <Badge tone="danger" icon={X} className="ml-1.5 align-middle">{t("bedStats.conflictPairs", { count: conflictPairs })}</Badge>}
+          {conflictPairs > 0 && <Badge tone="warning" icon={TriangleAlert} className="ml-1.5 align-middle">{t("bedStats.conflictPairs", { count: conflictPairs })}</Badge>}
         </>
       ),
     },
   ];
 
   return (
-    <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4", className)}>
+    // Own container: four columns under the full-width grid, two in the narrow side pane next to a tall bed.
+    <div className="@container">
+    <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3 @md:grid-cols-4", className)}>
       {items.map((it) => (
         <div key={it.label} className="min-w-0">
           <dt className="text-xs text-gray-500 dark:text-gray-400">{it.label}</dt>
@@ -60,5 +58,6 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
         </div>
       ))}
     </dl>
+    </div>
   );
 });

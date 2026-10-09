@@ -48,13 +48,13 @@ describe("Modal", () => {
   it("gives the close button an accessible name", () => {
     render(<Modal open onClose={() => {}} title="Titel"><p>Inhalt</p></Modal>);
     const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByRole("button", { name: "common.close" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "common.closeDialog" })).toBeInTheDocument();
   });
 
   it("reports closing to the caller", async () => {
     const onClose = vi.fn();
     render(<Modal open onClose={onClose} title="Titel"><p>Inhalt</p></Modal>);
-    await userEvent.click(screen.getByRole("button", { name: "common.close" }));
+    await userEvent.click(screen.getByRole("button", { name: "common.closeDialog" }));
     expect(onClose).toHaveBeenCalled();
   });
 });

@@ -10,6 +10,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { applyTheme } from "@/lib/theme";
 import { exportAllData } from "@/lib/dataExport";
+import { todayISO } from "@/lib/format";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
@@ -34,6 +35,8 @@ interface Command {
   keywords?: string;
   icon?: LucideIcon;
   leading?: ReactNode;
+  /** Overdue tasks: the hint in the danger tone, as on "Heute". */
+  hintDanger?: boolean;
   run: () => void;
 }
 
@@ -41,6 +44,21 @@ const GROUP_ORDER: GroupKey[] = ["actions", "pages", "plants", "beds", "animals"
 
 // "Gemüse" matches "gemuse", "Tomate" matches "tomaten".
 const normalize = (s: string) => s.toLocaleLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+/** The typed text in bold inside a result label (case-insensitive; no match, plain text). */
+function Match({ text, query }: { text: string; query: string }) {
+  const at = query ? text.toLocaleLowerCase().indexOf(query.toLocaleLowerCase()) : -1;
+  if (at < 0) return <>{text}</>;
+  return <>{text.slice(0, at)}<span className="font-bold text-gray-900 dark:text-gray-50">{text.slice(at, at + query.length)}</span>{text.slice(at + query.length)}</>;
+}
+
+/** A few words around a match, cut at word boundaries: "… Die Tomaten abdecken …". */
+function snippet(text: string, at: number, len: number): string {
+  const from = at > 8 ? text.lastIndexOf(" ", at - 8) + 1 : 0;
+  const stop = text.indexOf(" ", at + len + 20);
+  const to = stop < 0 ? text.length : stop;
+  return `${from > 0 ? "… " : ""}${text.slice(from, to).trim()}${to < text.length ? " …" : ""}`;
+}
 
 // Legacy long page names stay searchable after the navigation was shortened.
 const LEGACY_LABELS: Record<string, string> = {
@@ -75,11 +93,18 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const getPlantName = usePlantName();
   const isDark = theme === "dark" || (theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
+  // Where focus goes back to after Esc or a click outside. Opened with Ctrl+K
+  // from nowhere (focus on <body>), that is the visible search button in the
+  // top bar. Choosing an item navigates instead and leaves focus to the page.
+  const returnFocus = useRef<HTMLElement | null>(null);
+
   // Open/close the native dialog; reset the query each time it opens.
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open && !dialog.open) {
+      const prev = document.activeElement;
+      returnFocus.current = prev instanceof HTMLElement && prev !== document.body ? prev : null;
       dialog.showModal();
       inputRef.current?.focus();
     } else if (!open && dialog.open) {
@@ -90,21 +115,33 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
+    let dismissed = false;
+    const handleCancel = () => { dismissed = true; };
     const handleClose = () => {
       setQuery("");
       setDebounced("");
       setActive(0);
       onClose();
+      if (dismissed) {
+        const fallback = [...document.querySelectorAll<HTMLElement>("[data-palette-trigger]")].find((el) => el.offsetParent !== null);
+        (returnFocus.current?.isConnected ? returnFocus.current : fallback)?.focus();
+      }
+      dismissed = false;
     };
     // A click on the backdrop lands on the <dialog> itself and closes it.
     const handleBackdrop = (e: MouseEvent) => {
       if (e.target !== dialog) return;
       const r = dialog.getBoundingClientRect();
-      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        dismissed = true;
+        onClose();
+      }
     };
+    dialog.addEventListener("cancel", handleCancel);
     dialog.addEventListener("close", handleClose);
     dialog.addEventListener("click", handleBackdrop);
     return () => {
+      dialog.removeEventListener("cancel", handleCancel);
       dialog.removeEventListener("close", handleClose);
       dialog.removeEventListener("click", handleBackdrop);
     };
@@ -188,9 +225,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             for (const b of g.beds) {
               const count = b.cells.filter((c) => c.plantId === p.id).length;
               if (!count || !cap("beds")) continue;
+              const cells = t("shell.command.cellCount", { count });
               out.push({
-                id: `bedplant:${b.id}:${p.id}`, group: "beds", label: t("shell.command.plantInBed", { plant: name, bed: b.name }),
-                hint: t("shell.command.cellCount", { count }), icon: LayoutGrid,
+                id: `bedplant:${b.id}:${p.id}`, group: "beds", // The bed leads (free text, never glued into a sentence, DS §14);
+                // the plant and its cell count are the hint.
+                label: b.name,
+                hint: t("shell.command.plantInBed", { plant: name, cells }), icon: LayoutGrid,
                 run: () => { setActiveGarden(g.id); go(`/planner?bed=${encodeURIComponent(b.id)}`); },
               });
             }
@@ -216,16 +256,25 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         out.push({ id: `animal:${a.id}`, group: "animals", label: name, hint: t(`livestock.types.${a.type}`), icon: Bird, run: () => go(`/livestock/${a.id}`) });
       }
     }
+    // Same wording as the task list: "Vor 6 Tagen fällig", "Morgen fällig".
+    const today = todayISO();
+    const dueHint = (due: string) => t(due < today ? "calendar.overdueSince" : "calendar.dueRelative", { date: formatDate(due, "relative"), dateInline: formatDate(due, "relativeInline") });
     for (const task of tasks) {
       if (!cap("tasks")) break;
       if (!task.completedDate && normalize(task.title).includes(q)) {
-        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: formatDate(task.dueDate, "relative"), icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
+        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: dueHint(task.dueDate), hintDanger: task.dueDate < today, icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
       }
     }
     for (const j of journalEntries) {
       if (!cap("journal")) break;
-      if (normalize(j.title).includes(q) || normalize(j.text).includes(q)) {
-        out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint: formatDate(j.date, "short"), icon: BookOpen, run: () => go(`/journal?entry=${encodeURIComponent(j.id)}`) });
+      const inTitle = normalize(j.title).includes(q);
+      if (inTitle || normalize(j.text).includes(q)) {
+        // A match only in the body shows where: a short snippet around it, so the row explains itself.
+        const at = normalize(j.text).indexOf(q);
+        const hint = inTitle || at < 0
+          ? formatDate(j.date, "short")
+          : snippet(j.text, at, q.length);
+        out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint, icon: BookOpen, run: () => go(`/journal?entry=${encodeURIComponent(j.id)}`) });
       }
     }
     return out;
@@ -322,11 +371,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   onKeyDown={(e) => { if (e.key === "Enter") c.run(); }}
                   className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${selected ? "bg-gray-100 dark:bg-white/10" : ""}`}
                 >
-                  <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${c.leading ? "" : c.group === "actions" ? TONE_SOFT.brand : TONE_SOFT.neutral}`} aria-hidden="true">
+                  {/* On the grey selected row the neutral tile turns white, or it would vanish. */}
+                  <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${c.group === "actions" ? TONE_SOFT.brand : selected ? "bg-white text-gray-600 ring-1 ring-gray-200 dark:bg-white/10 dark:text-gray-300 dark:ring-white/10" : TONE_SOFT.neutral}`} aria-hidden="true">
                     {c.leading ?? <Icon size={16} />}
                   </span>
-                  <span className="min-w-0 flex-1 truncate font-medium">{c.label}</span>
-                  {c.hint && <span className="shrink-0 truncate text-xs text-gray-500 dark:text-gray-400">{c.hint}</span>}
+                  <span className="min-w-0 flex-1 truncate font-medium"><Match text={c.label} query={debounced.trim()} /></span>
+                  {c.hint && <span className={`min-w-0 max-w-[45%] truncate text-xs ${c.hintDanger ? "font-medium text-danger" : "text-gray-500 dark:text-gray-400"}`}><Match text={c.hint} query={debounced.trim()} /></span>}
                   {selected && <CornerDownLeft size={14} aria-hidden="true" className="hidden shrink-0 text-gray-500 sm:block" />}
                 </div>
               </div>
@@ -335,8 +385,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         </div>
 
         <div className="hidden items-center gap-4 border-t border-gray-200 px-4 py-2 text-xs text-gray-500 sm:flex dark:border-white/10 dark:text-gray-400">
-          <span><kbd className="font-sans">↑↓</kbd> {t("shell.command.navigate")}</span>
-          <span><kbd className="font-sans">↵</kbd> {t("shell.command.open")}</span>
+          <span><kbd className="rounded border border-gray-200 px-1.5 py-0.5 font-sans text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">↑↓</kbd> {t("shell.command.navigate")}</span>
+          <span><kbd className="rounded border border-gray-200 px-1.5 py-0.5 font-sans text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">↵</kbd> {t("shell.command.open")}</span>
         </div>
       </div>
     </dialog>

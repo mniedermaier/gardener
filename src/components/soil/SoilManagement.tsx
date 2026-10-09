@@ -1,13 +1,14 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useAddBed } from "@/hooks/useAddBed";
 import {
-  Beaker, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
-} from "lucide-react";
+  Beaker, LayoutGrid, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon, CalendarClock } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { useFormat } from "@/hooks/useFormat";
 import { todayISO } from "@/lib/format";
-import { assessPh, bedPhTarget, NUTRIENT_RANGE, nutrientLevel, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
+import { assessPh, bedPhTarget, phStatus, NUTRIENT_RANGE, nutrientLevel, type Nutrient, type PhAdvice, type PhRange } from "@/lib/soil";
 import { usePlantName } from "@/hooks/usePlantName";
 import type { Amendment, AmendmentType, SoilTest } from "@/types/soil";
 import { Card } from "@/components/ui/Card";
@@ -22,9 +23,10 @@ import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Tabs } from "@/components/ui/Tabs";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Tone } from "@/components/ui/tone";
 import { DateField } from "@/components/ui/DateField";
+import { LABEL_CLASS, LabelText } from "@/components/ui/Field";
 import { useBeds } from "@/components/records/useBeds";
 
 const AMENDMENT_TYPES: AmendmentType[] = ["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"];
@@ -32,7 +34,7 @@ const AMENDMENT_ICONS: Record<AmendmentType, LucideIcon> = {
   compost: Recycle, manure: Tractor, lime: Mountain, sulfur: FlaskConical, fertilizer: Sprout, mulch: Leaf, other: Package,
 };
 const ADVICE_TONE: Record<PhAdvice, Tone> = {
-  limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "info", sulfur: "warning", limeVeto: "info", averseHigh: "warning", acidify: "danger",
+  limeStrong: "danger", limeLight: "warning", optimal: "positive", noLime: "warning", sulfur: "warning", limeVeto: "info", averseHigh: "warning", acidify: "danger",
 };
 const NUTRIENTS: Nutrient[] = ["nitrogen", "phosphorus", "potassium", "organicMatter"];
 
@@ -46,7 +48,7 @@ function Scale({ value, min, max, scaleMin, scaleMax, label }: { value: number; 
   const pct = (v: number) => `${Math.min(100, Math.max(0, ((v - scaleMin) / (scaleMax - scaleMin)) * 100))}%`;
   return (
     <div className="relative h-2 rounded-full bg-gray-100 dark:bg-white/10" role="img" aria-label={label}>
-      <div className="absolute inset-y-0 rounded-full bg-garden-200 dark:bg-garden-500/40" style={{ left: pct(min), right: `calc(100% - ${pct(max)})` }} />
+      <div className="absolute inset-y-0 rounded-full bg-garden-200 dark:bg-garden-400/55" style={{ left: pct(min), right: `calc(100% - ${pct(max)})` }} />
       <div className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-gray-900 shadow-xs dark:border-gray-900 dark:bg-gray-100" style={{ left: pct(value) }} />
     </div>
   );
@@ -58,9 +60,21 @@ interface AmendDraft { bedId: string; date: string; type: AmendmentType; materia
 const emptyTest = (bedId = ""): TestDraft => ({ bedId, date: todayISO(), ph: "", n: "", p: "", k: "", om: "", notes: "" });
 const emptyAmend = (bedId = ""): AmendDraft => ({ bedId, date: todayISO(), type: "compost", material: "", kg: "", cost: "", notes: "" });
 
+/** A soil test older than this many months should be repeated. */
+const STALE_MONTHS = 5;
+const staleTest = (date: string) => {
+  const d = new Date(`${date}T00:00:00`);
+  const limit = new Date();
+  limit.setMonth(limit.getMonth() - STALE_MONTHS);
+  return d < limit;
+};
+
 export function SoilManagement() {
+  const soilTasks = useStore(useShallow((st) => st.tasks.filter((tk) => tk.type === "soil_test")));
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate, formatNumber, formatWeight, formatCurrency, locale } = useFormat();
   const { soilTests, amendments, addSoilTest, updateSoilTest, deleteSoilTest, addAmendment, updateAmendment, deleteAmendment } = useStore(
     useShallow((s) => ({
@@ -70,7 +84,8 @@ export function SoilManagement() {
     })),
   );
   const beds = useBeds();
-  const [tab, setTab] = useState<"tests" | "amendments">("tests");
+  const [tabState, setTab] = useState<"tests" | "amendments">("tests");
+  const addBed = useAddBed();
 
   const bedTarget = useCallback((bedId: string): PhRange => bedPhTarget(beds.byId.get(bedId)?.plantIds ?? []), [beds]);
   const plantName = usePlantName();
@@ -102,6 +117,9 @@ export function SoilManagement() {
     om: testValues.om !== undefined && !(testValues.om >= 0 && testValues.om <= 100) ? t("soil.invalidNumber") : undefined,
   };
 
+  // Save stays disabled until the required fields hold (rule 9).
+  const testValid = !!test.bedId && testValues.ph >= 3 && testValues.ph <= 10 && !testErrors.n && !testErrors.p && !testErrors.k && !testErrors.om;
+
   const saveTest = () => {
     setTestSubmitted(true);
     if (!test.bedId || !(testValues.ph >= 3 && testValues.ph <= 10) || testErrors.n || testErrors.p || testErrors.k || testErrors.om) return;
@@ -115,7 +133,7 @@ export function SoilManagement() {
   };
 
   const removeTest = async (s: SoilTest) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("soilTest", [beds.label(s.bedId), formatDate(s.date)].filter(Boolean).join(" · ")))) return;
     deleteSoilTest(s.id);
     setTestOpen(false);
     const { id: _id, ...rest } = s;
@@ -147,6 +165,8 @@ export function SoilManagement() {
     cost: !(amendCost >= 0) ? t("soil.invalidNumber") : undefined,
   };
 
+  const amendValid = !!amend.bedId && !!amend.material.trim() && !amendErrors.kg && !amendErrors.cost;
+
   const saveAmend = () => {
     setAmendSubmitted(true);
     if (!amend.bedId || !amend.material.trim() || amendErrors.kg || amendErrors.cost) return;
@@ -160,7 +180,7 @@ export function SoilManagement() {
   };
 
   const removeAmend = async (a: Amendment) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("amendment", [a.material, beds.label(a.bedId), formatDate(a.date)].filter(Boolean).join(" · ")))) return;
     deleteAmendment(a.id);
     setAmendOpen(false);
     const { id: _id, ...rest } = a;
@@ -172,40 +192,52 @@ export function SoilManagement() {
   const sortedAmendments = useMemo(() => [...amendments].sort((a, b) => b.date.localeCompare(a.date)), [amendments]);
   const bedName = (id: string) => beds.label(id) ?? t("soil.unknownBed");
   const rangeText = (r: PhRange) => t("soil.phRange", { min: formatNumber(r.min, { minimumFractionDigits: 1 }), max: formatNumber(r.max, { minimumFractionDigits: 1 }) });
-  const nutrientValue = (n: Nutrient, v: number) => (n === "organicMatter" ? `${formatNumber(v)} %` : t("soil.ppm", { value: formatNumber(v, { maximumFractionDigits: 0 }) }));
+  const nutrientValue = (n: Nutrient, v: number) => (n === "organicMatter" ? `${formatNumber(v)}\u00a0%` : t("soil.ppm", { value: formatNumber(v, { maximumFractionDigits: 0 }) }));
 
   const testEditingItem = testEditing ? soilTests.find((s) => s.id === testEditing) : undefined;
   const amendEditingItem = amendEditing ? amendments.find((a) => a.id === amendEditing) : undefined;
   const draftTarget = test.bedId ? bedTarget(test.bedId) : undefined;
+  // Tests and amendments belong to a bed: without one the page is a single
+  // empty state (no tabs) whose action opens the add-bed dialog in the planner.
+  const noBeds = beds.beds.length === 0;
+  const blocked = noBeds && soilTests.length === 0 && amendments.length === 0;
+  const tab = blocked ? "tests" : tabState;
+  const toPlanner = <Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>;
 
+  const plannedTask = soilTasks.filter((tk) => !tk.completedDate).sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
+  const plannedTest = plannedTask?.dueDate.slice(0, 10);
+  // Name the bed when the task has one: "für Acker am 17. Okt." — not a promise for every old test.
+  const plannedBed = plannedTask?.bedId ? beds.label(plannedTask.bedId) : undefined;
   return (
     <div>
       <PageHeader
         title={t("soil.title")}
         description={t("soil.subtitle")}
+        // One action, the one for the open tab; none while that tab's empty state carries it.
         actions={
-          <>
-            <Button variant="secondary" onClick={openAddAmend}>
-              <Leaf size={16} aria-hidden="true" />
-              {t("soil.addAmendment")}
-            </Button>
+          tab === "tests" && sortedTests.length > 0 ? (
             <Button onClick={openAddTest}>
-              <Beaker size={16} aria-hidden="true" />
+              <Plus size={16} aria-hidden="true" />
               {t("soil.addTest")}
             </Button>
-          </>
+          ) : tab === "amendments" && sortedAmendments.length > 0 ? (
+            <Button onClick={openAddAmend}>
+              <Plus size={16} aria-hidden="true" />
+              {t("soil.addAmendment")}
+            </Button>
+          ) : undefined
         }
-        tabs={
+        tabs={blocked ? undefined : (
           <Tabs
             label={t("soil.title")}
             value={tab}
             onChange={setTab}
             items={[
-              { value: "tests", label: t("soil.tests"), count: soilTests.length },
-              { value: "amendments", label: t("soil.amendments"), count: amendments.length },
+              { value: "tests", label: t("soil.tests"), count: soilTests.length || undefined },
+              { value: "amendments", label: t("soil.amendments"), count: amendments.length || undefined },
             ]}
           />
-        }
+        )}
       />
 
       {tab === "tests" && (
@@ -214,12 +246,24 @@ export function SoilManagement() {
             <EmptyState
               icon={Beaker}
               title={t("soil.emptyTestsTitle")}
-              description={t("soil.emptyTestsText")}
-              action={<Button onClick={openAddTest}><Plus size={16} aria-hidden="true" />{t("soil.addTest")}</Button>}
+              description={noBeds ? t("soil.emptyNoBeds") : t("soil.emptyTestsText")}
+              action={noBeds ? toPlanner : <Button onClick={openAddTest}><Plus size={16} aria-hidden="true" />{t("soil.addTest")}</Button>}
             />
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          // One full-width card per bed (N/P/K side by side on wide screens): a two-column
+          // grid of cards with different heights left ragged gaps.
+          <div className="space-y-4">
+            {sortedTests.some((s) => staleTest(s.date)) && (
+              // Old tests are said once for the page, not as a badge on every card.
+              <p className="flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
+                <CalendarClock size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+                {/* An open soil-test task already answers "neu beproben": name its date instead of "im Frühjahr". */}
+                {plannedTest
+                  ? t(plannedBed ? "soil.staleHintPlannedBed" : "soil.staleHintPlanned", { count: sortedTests.filter((s) => staleTest(s.date)).length, date: formatDate(plannedTest, "short"), bed: plannedBed })
+                  : t("soil.staleHint", { count: sortedTests.filter((s) => staleTest(s.date)).length })}
+              </p>
+            )}
             {sortedTests.map((s) => {
               const assessment = assessPh(s.ph, beds.byId.get(s.bedId)?.plantIds ?? []);
               const { advice, target } = assessment;
@@ -235,18 +279,21 @@ export function SoilManagement() {
                 <article key={s.id} className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                         <button type="button" onClick={() => openEditTest(s)} className="text-left after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-xl focus-visible:after:outline-2 focus-visible:after:outline-focus">
                           {bedName(s.bedId)}
                         </button>
-                      </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400"><time dateTime={s.date}>{formatDate(s.date)}</time></p>
+                      </h2>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <time dateTime={s.date}>{formatDate(s.date)}</time>
+                      </p>
                     </div>
                     <div className="relative z-10 -mt-1 -mr-2">
                       <Menu
                         label={t("common.moreActions")}
                         items={[
                           { label: t("common.edit"), icon: Pencil, onSelect: () => openEditTest(s) },
+                          ...(beds.byId.has(s.bedId) ? [{ label: t("soil.openInPlanner"), icon: LayoutGrid, onSelect: () => navigate(`/planner?bed=${encodeURIComponent(s.bedId)}`) }] : []),
                           "separator",
                           { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void removeTest(s) },
                         ]}
@@ -259,14 +306,20 @@ export function SoilManagement() {
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("soil.ph")}</span>
                       <span className="flex items-baseline gap-2">
                         <span className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-50">{formatNumber(s.ph)}</span>
-                        <Badge tone={ADVICE_TONE[advice]} dot>{t(`soil.phStatus.${advice}`)}</Badge>
+                        <Badge tone={ADVICE_TONE[phStatus(advice)]} dot>{t(`soil.phStatus.${phStatus(advice)}`)}</Badge>
                       </span>
                     </div>
                     <Scale value={s.ph} min={target.min} max={target.max} scaleMin={4} scaleMax={9} label={`${t("soil.ph")} ${formatNumber(s.ph)}, ${t("soil.target")} ${rangeText(target)}`} />
-                    <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
-                      <span>{formatNumber(4)}</span>
-                      <span>{t("soil.target")} {rangeText(target)}</span>
-                      <span>{formatNumber(9)}</span>
+                    {/* The target caption sits under the middle of the green band, not the scale. */}
+                    <div className="relative mt-1 h-4 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
+                      <span className="absolute left-0">{formatNumber(4)}</span>
+                      <span
+                        className="absolute -translate-x-1/2 whitespace-nowrap"
+                        style={{ left: `${Math.min(80, Math.max(20, (((target.min + target.max) / 2 - 4) / 5) * 100))}%` }}
+                      >
+                        {t("soil.target")} {rangeText(target)}
+                      </span>
+                      <span className="absolute right-0">{formatNumber(9)}</span>
                     </div>
                   </div>
 
@@ -278,7 +331,7 @@ export function SoilManagement() {
                     </span>
                   </p>
 
-                  <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3">
+                  <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-4">
                     {NUTRIENTS.map((n) => {
                       const value = n === "nitrogen" ? s.nitrogen : n === "phosphorus" ? s.phosphorus : n === "potassium" ? s.potassium : s.organicMatter;
                       // 0 ppm means "not measured" (the fields are optional).
@@ -287,9 +340,10 @@ export function SoilManagement() {
                       const level = nutrientLevel(n, value);
                       return (
                         <div key={n}>
-                          <dt className="flex items-baseline justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+                          <dt className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>{t(`soil.nutrients.${n}`)}</span>
-                            <span className={level === "optimal" ? "" : "font-medium text-warning"}>{t(`soil.levels.${level}`)}</span>
+                            {/* Off target either way needs action: warning; only the optimum is positive. */}
+                            <Badge size="sm" dot tone={level === "optimal" ? "positive" : "warning"}>{t(`soil.levels.${level}`)}</Badge>
                           </dt>
                           <dd className="mt-0.5">
                             <span className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{nutrientValue(n, value)}</span>
@@ -301,12 +355,28 @@ export function SoilManagement() {
                       );
                     })}
                   </dl>
+                  {/* One measure up front, the rest one tap away, so a card stays scannable. */}
                   {nutrientHints.length > 0 && (
                     <ul className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
-                      {nutrientHints.map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                      {nutrientHints.slice(0, 1).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
                     </ul>
                   )}
-                  {s.notes && <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">{s.notes}</p>}
+                  {nutrientHints.length > 1 && (
+                    <details className="relative z-10 mt-1 text-sm text-gray-700 dark:text-gray-300">
+                      <summary className="inline-flex min-h-11 cursor-pointer items-center font-medium text-garden-700 hover:underline sm:min-h-0 sm:py-1 dark:text-garden-300">
+                        {t("soil.moreMeasures", { count: nutrientHints.length - 1 })}
+                      </summary>
+                      <ul className="mt-1 space-y-1">
+                        {nutrientHints.slice(1).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                      </ul>
+                    </details>
+                  )}
+                  {/* The user's own words, labelled "Notiz:" like notes elsewhere — no quote styling. */}
+                  {s.notes && (
+                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">{t("soil.yourNote")}</span> {s.notes}
+                    </p>
+                  )}
                 </article>
               );
             })}
@@ -320,8 +390,8 @@ export function SoilManagement() {
             <EmptyState
               icon={Layers}
               title={t("soil.emptyAmendmentsTitle")}
-              description={t("soil.emptyAmendmentsText")}
-              action={<Button onClick={openAddAmend}><Plus size={16} aria-hidden="true" />{t("soil.addAmendment")}</Button>}
+              description={noBeds ? t("soil.emptyNoBeds") : t("soil.emptyAmendmentsText")}
+              action={noBeds ? toPlanner : <Button onClick={openAddAmend}><Plus size={16} aria-hidden="true" />{t("soil.addAmendment")}</Button>}
             />
           </Card>
         ) : (
@@ -335,7 +405,7 @@ export function SoilManagement() {
                   leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-earth-100 text-earth-700 dark:bg-earth-500/15 dark:text-earth-300"><Icon size={16} aria-hidden="true" /></span>}
                   title={a.material}
                   badges={<Badge variant="outline">{t(`soil.types.${a.type}`)}</Badge>}
-                  meta={<>{bedName(a.bedId)} · <time dateTime={a.date}>{formatDate(a.date, "relative")}</time></>}
+                  meta={[bedName(a.bedId), <time key="d" dateTime={a.date}>{formatDate(a.date)}</time>]}
                   description={a.notes}
                   trailing={
                     <span className="flex flex-col items-end">
@@ -348,6 +418,7 @@ export function SoilManagement() {
                       label={t("common.moreActions")}
                       items={[
                         { label: t("common.edit"), icon: Pencil, onSelect: () => openEditAmend(a) },
+                        ...(beds.byId.has(a.bedId) ? [{ label: t("soil.openInPlanner"), icon: LayoutGrid, onSelect: () => navigate(`/planner?bed=${encodeURIComponent(a.bedId)}`) }] : []),
                         "separator",
                         { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void removeAmend(a) },
                       ]}
@@ -373,7 +444,7 @@ export function SoilManagement() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setTestOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={saveTest}>{testEditing ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={saveTest} disabled={!testValid}>{t("common.save")}</Button>
           </>
         }
       >
@@ -387,18 +458,23 @@ export function SoilManagement() {
             error={testErrors.bed}
             hint={draftTarget ? t("soil.targetHint", { range: rangeText(draftTarget) }) : undefined}
           />
+          {/* Rule 9: subject, details, Datum, Notizen. pH is the one required value. */}
+          <div className="grid grid-cols-2 items-end gap-4">
+            <Input label={t("soil.ph")} inputMode="decimal" value={test.ph} onChange={(e) => patchTest({ ph: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(6.5) })} error={testErrors.ph} />
+            <Input label={`${t("soil.nutrients.organicMatter")} (%)`} optional inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4.5) })} error={testErrors.om} />
+          </div>
+          {/* One caption carries unit and optional marker; the fields are just N, P, K (rule 9). */}
+          <div>
+          <p className={LABEL_CLASS}><LabelText label={t("soil.nutrientsPpm")} optional /></p>
+          <div className="grid grid-cols-3 items-end gap-3">
+            <Input aria-label={`${t("soil.nutrientsPpm")} N`} label="N" inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
+            <Input aria-label={`${t("soil.nutrientsPpm")} P`} label="P" inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />
+            <Input aria-label={`${t("soil.nutrientsPpm")} K`} label="K" inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(150) })} error={testErrors.k} />
+          </div>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
+          </div>
           <DateField label={t("harvest.date")} value={test.date} onChange={(date) => patchTest({ date })} />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("soil.ph")} inputMode="decimal" value={test.ph} onChange={(e) => patchTest({ ph: e.target.value })} placeholder={formatNumber(6.5)} error={testErrors.ph} />
-            <Input label={`${t("soil.nutrients.organicMatter")} (%)`} inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={formatNumber(4.5)} error={testErrors.om} />
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Input label={t("soil.nShort")} inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder="40" error={testErrors.n} />
-            <Input label={t("soil.pShort")} inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder="30" error={testErrors.p} />
-            <Input label={t("soil.kShort")} inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder="150" error={testErrors.k} />
-          </div>
-          <p className="-mt-2 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
-          <Textarea label={t("harvest.notes")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("soil.testNotesPlaceholder")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
         </div>
       </Modal>
 
@@ -415,7 +491,7 @@ export function SoilManagement() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setAmendOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={saveAmend}>{amendEditing ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={saveAmend} disabled={!amendValid}>{t("common.save")}</Button>
           </>
         }
       >
@@ -430,12 +506,12 @@ export function SoilManagement() {
             />
           </div>
           <Input label={t("soil.material")} value={amend.material} onChange={(e) => patchAmend({ material: e.target.value })} placeholder={t("soil.materialPlaceholder")} error={amendErrors.material} />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("soil.quantityKg")} inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder="10" error={amendErrors.kg} />
-            <Input label={t("soil.cost")} inputMode="decimal" value={amend.cost} onChange={(e) => patchAmend({ cost: e.target.value })} placeholder={formatCurrency(12.5)} hint={t("common.optional")} error={amendErrors.cost} />
+          <div className="grid grid-cols-2 items-end gap-4">
+            <Input label={t("soil.quantityKg")} optional inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(10) })} error={amendErrors.kg} />
+            <Input label={t("soil.cost")} optional inputMode="decimal" value={amend.cost} onChange={(e) => patchAmend({ cost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(12.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("common.costHint")} error={amendErrors.cost} />
           </div>
           <DateField label={t("harvest.date")} value={amend.date} onChange={(date) => patchAmend({ date })} />
-          <Textarea label={t("harvest.notes")} rows={2} value={amend.notes} onChange={(e) => patchAmend({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("soil.notesPlaceholder")} rows={2} value={amend.notes} onChange={(e) => patchAmend({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

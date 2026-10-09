@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getDaysInMonth } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { Apple, Beef, Citrus, LayoutGrid, Lightbulb, Scale, Sprout, Target, Wheat, Archive } from "lucide-react";
+import { Beef, Citrus, Lightbulb, Sprout, Target, Wheat, Archive, Plus } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -9,32 +10,35 @@ import { usePlantMap, usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
-import { calculateSufficiency, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
-import { annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
+import { calculateSufficiency, loggedKgByMonth, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
+import { getActualProductKgByMonth, annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getCropPlan, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
 import type { ProductType } from "@/types/animal";
 import { PRODUCT_NUTRITION } from "@/types/animal";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { Select } from "@/components/ui/Select";
+import { Tabs } from "@/components/ui/Tabs";
 import { List, ListRow } from "@/components/ui/List";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
-import { BarChart, HowCalculated, Meter, MonthStrip } from "@/components/ui/charts";
+import { BarChart, HowCalculated, KeyFigures, Meter, MonthStrip } from "@/components/ui/charts";
 import { PRODUCT_ICON } from "@/components/livestock/icons";
 import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { HouseholdSizeField } from "./HouseholdSizeField";
 import { PreservationGuide } from "./PreservationGuide";
 import { useToday } from "@/hooks/useToday";
+import { useAddBed } from "@/hooks/useAddBed";
+import { roundShares } from "@/lib/format";
 
 type View = "overview" | "crops" | "animals" | "preserve";
-const NUTRIENTS = ["calories", "protein", "vitaminC", "fiber"] as const;
-const NUTRIENT_ICON = { calories: Apple, protein: Beef, vitaminC: Citrus, fiber: Wheat };
+// Calories are the page's headline (with the logged-harvest floor); the card lists the other nutrients only,
+// so one figure never shows two values.
+const NUTRIENTS = ["protein", "vitaminC", "fiber"] as const;
+const NUTRIENT_ICON = { protein: Beef, vitaminC: Citrus, fiber: Wheat };
 /** Calorie-dense staples considered as levers ("+5 m² → +x %"). */
-const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "squash", "pea"];
+// One entry per kind: pumpkin stands for all squashes (Butternut would repeat it).
+const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "pea"];
 const LEVER_AREA_M2 = 5;
 
 export function SufficiencyDashboard() {
@@ -42,8 +46,9 @@ export function SufficiencyDashboard() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { gardens, gridCellSizeCm, lastFrostDate, animals } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals })),
+  const addBed = useAddBed();
+  const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems, harvests, animalProducts } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems, harvests: s.harvests, animalProducts: s.animalProducts })),
   );
   const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const plants = usePlants();
@@ -56,8 +61,9 @@ export function SufficiencyDashboard() {
   const result = useMemo(() => {
     const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
     if (!hasPlantings && animals.length === 0) return null;
-    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals);
-  }, [gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals]);
+    // The real pantry stock fills the "aus dem Vorrat" series (see lib/sufficiency).
+    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals, pantryItems, now);
+  }, [gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals, pantryItems, now]);
 
   const months = useMemo(() => Array.from({ length: 12 }, (_, i) => new Date(2026, i, 1)), []);
   const monthShort = months.map((d) => f.formatDate(d, "month"));
@@ -68,12 +74,15 @@ export function SufficiencyDashboard() {
 
   const levers = useMemo(() => {
     const need = annualCalorieNeed(householdSize);
-    return LEVER_CROPS.map((id) => plantMap.get(id))
+    // A crop the food plan already counts as covered is no lever ("Gedeckt" there, "+5 m²" here would contradict).
+    const plan = getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: now.getFullYear() });
+    const covered = new Set(plan.rows.filter((r) => r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg).map((r) => r.plantId));
+    return LEVER_CROPS.filter((id) => !covered.has(id)).map((id) => plantMap.get(id))
       .filter((p): p is NonNullable<typeof p> => !!p && !!p.expectedYieldKgPerM2 && !!p.caloriesPer100g)
       .map((p) => ({ plantId: p.id, gain: (LEVER_AREA_M2 * p.expectedYieldKgPerM2! * 10 * p.caloriesPer100g!) / need }))
       .sort((a, b) => b.gain - a.gain)
       .slice(0, 3);
-  }, [plantMap, householdSize]);
+  }, [plantMap, householdSize, gardens, gridCellSizeCm, harvests, now]);
 
   const viewOptions: { value: View; label: string; count?: number }[] = [
     { value: "overview", label: t("sufficiency.tabs.overview") },
@@ -87,8 +96,15 @@ export function SufficiencyDashboard() {
       title={t("sufficiency.title")}
       description={t("sufficiency.subtitle")}
       actions={<HouseholdSizeField />}
-      tabs={result ? <ViewSwitch value={view} onChange={setView} options={viewOptions} label={t("sufficiency.views")} /> : undefined}
+      tabs={result ? <Tabs items={viewOptions} value={view} onChange={setView} label={t("sufficiency.views")} /> : undefined}
     />
+  );
+
+  // The need is known before anything grows (the food plan computes it): the
+  // empty state shows it instead of "nothing to calculate".
+  const need = useMemo(
+    () => (result ? null : getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: now.getFullYear() })),
+    [result, gardens, plantMap, gridCellSizeCm, harvests, householdSize, now],
   );
 
   if (!result) {
@@ -99,9 +115,11 @@ export function SufficiencyDashboard() {
           <EmptyState
             icon={Target}
             title={t("sufficiency.emptyTitle")}
-            description={t("sufficiency.emptyText")}
-            action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
-            secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock")}>{t("sufficiency.toLivestock")}</Button>}
+            // Two short lines: the need in kg (the food plan tab has the details) and what is missing.
+            description={need ? t("sufficiency.emptyNeedShort", { count: householdSize, kg: f.formatWeight(need.targetKg * 1000, "kg") }) : t("sufficiency.emptyMissing")}
+            // Same first step as every page without beds: "Beet hinzufügen" opens the planner's dialog.
+            action={<Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
+            secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock", { state: { openAdd: true } })}>{t("livestock.addAnimal")}</Button>}
           />
         </Card>
       </div>
@@ -110,7 +128,22 @@ export function SufficiencyDashboard() {
 
   const lowCount = result.lowMonths.length;
   const gap = result.winterGap;
-  const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
+  const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
+  // The running month: logged so far plus the forecast for the days still ahead.
+  const restOfMonth = 1 - (now.getDate() - 1) / getDaysInMonth(now);
+  const ahead = (m: { month: number }, kg: number) => (m.month > currentMonth ? kg : m.month === currentMonth ? kg * restOfMonth : 0);
+  const hasForecast = result.monthlyFood.some((m) => m.month >= currentMonth && m.freshKg > 0);
+  const hasAnimals = result.monthlyFood.some((m) => m.animalKg > 0);
+  // Small shares get a decimal, so "erwartet bis heute" late in the year does not
+  // read as the same 4 % as the annual forecast.
+  const pct = (r: number) => f.formatPercent(r, r < 0.1 ? 1 : 0);
+  // Past and running months: what was logged; later months: the forecast.
+  const logged = loggedKgByMonth(harvests, now.getFullYear());
+  // Recorded eggs, honey … per month (same source as Produktion): the past months' animal part.
+  const loggedAnimal = getActualProductKgByMonth(animalProducts, animals, now.getFullYear());
+  const hasLoggedAnimal = loggedAnimal.some((v) => v > 0);
+  // Typical year (forecast basis, without today's pantry stock): matches the annual figure.
+  const coverage = result.monthlyFood.map((m) => m.typicalCalories / Math.max(1, m.caloriesNeeded));
 
   return (
     <div>
@@ -118,44 +151,51 @@ export function SufficiencyDashboard() {
 
       {view === "overview" && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              label={t("metrics.selfSufficiencyForecast")}
-              value={f.formatPercent(ss.forecastRatio)}
-              icon={Target}
-              tone="brand"
-              hint={t("metrics.caloriesFor", { count: householdSize })}
+          {/* The disclosure explains the figures: attached below them, not a section of its own. */}
+          <div>
+            <KeyFigures
+              hero={{
+                label: t("metrics.selfSufficiencyForecast"),
+                value: pct(ss.forecastRatio),
+                icon: Target,
+                tone: "brand",
+                hint: t("metrics.caloriesFor", { count: householdSize }),
+              }}
+              items={[
+                {
+                  label: t("metrics.selfSufficiencyActual"),
+                  value: pct(ss.actualRatio),
+                  hint: ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: pct(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year }),
+                },
+                { label: t("metrics.yieldForecast"), value: f.formatWeight(metrics.harvest.forecast.totalGrams), hint: t("metrics.plantsOnly") },
+                { label: t("metrics.yieldActual"), value: f.formatWeight(metrics.harvest.actual.totalGrams), hint: t("metrics.harvestEntries", { count: metrics.harvest.entryCount }), to: "/harvest" },
+              ]}
             />
-            <StatCard
-              label={t("metrics.selfSufficiencyActual")}
-              value={f.formatPercent(ss.actualRatio)}
-              icon={Target}
-              tone="neutral"
-              hint={ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: f.formatPercent(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year })}
-            />
-            <StatCard label={t("metrics.yieldForecast")} value={f.formatWeight(metrics.harvest.forecast.totalGrams)} icon={Sprout} tone="neutral" hint={t("metrics.plantsOnly")} />
-            <StatCard label={t("metrics.yieldActual")} value={f.formatWeight(metrics.harvest.actual.totalGrams)} icon={Scale} tone="neutral" hint={t("metrics.harvestEntries", { count: metrics.harvest.entryCount })} />
+            <HowCalculated className="mt-1">
+              <p>{t("metrics.howNeed", { kcal: f.formatNumber(DAILY_KCAL_PER_PERSON, { maximumFractionDigits: 0 }) })}</p>
+              <p>{t("metrics.howForecast")}</p>
+              <p>{t("metrics.howCap")}</p>
+              <p>{t("metrics.howActual")}</p>
+              <p>{t("metrics.howToDate")}</p>
+              <p>{t("metrics.howVsFoodPlan")}</p>
+            </HowCalculated>
           </div>
-          <HowCalculated>
-            <p>{t("metrics.howNeed", { kcal: f.formatNumber(DAILY_KCAL_PER_PERSON, { maximumFractionDigits: 0 }) })}</p>
-            <p>{t("metrics.howForecast")}</p>
-            <p>{t("metrics.howCap")}</p>
-            <p>{t("metrics.howActual")}</p>
-            <p>{t("metrics.howToDate")}</p>
-            <p>{t("metrics.howVsFoodPlan")}</p>
-          </HowCalculated>
 
           <Composition />
 
           <Card>
-            <CardHeader title={t("sufficiency.monthlyTitle")} description={t("sufficiency.monthlyDesc", { count: householdSize })} />
+            <CardHeader title={t("sufficiency.monthlyTitle")} description={t(hasStored ? "sufficiency.monthlyDesc" : "sufficiency.monthlyDescFresh", { count: householdSize })} />
+            <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.typicalYearTitle")}</h3>
             <MonthStrip
               values={coverage}
               monthLabels={monthShort}
               monthNames={monthLong}
               formatValue={(r) => f.formatPercent(Math.min(1, r))}
               current={currentMonth}
-              caption={t("sufficiency.monthlyCaption")}
+              currentLabel={t("charts.today")}
+              threshold={LOW_COVERAGE_PERCENT / 100}
+              neutral={coverage.every((c) => c < LOW_COVERAGE_PERCENT / 100)}
+              caption={t("sufficiency.monthlyCaptionTypical")}
             />
             <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
               {lowCount >= 11 ? (
@@ -173,22 +213,44 @@ export function SufficiencyDashboard() {
                 <p>{t("sufficiency.noWinterGap", { from: monthLong[STORAGE_MONTHS[0]], to: monthLong[STORAGE_MONTHS[STORAGE_MONTHS.length - 1]] })}</p>
               )}
             </div>
-            <div className="mt-6">
-              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.monthlyKgTitle")}</h3>
+          </Card>
+
+          {/* Kilograms get their own card: the card above is about calories (DS: one unit per card). */}
+          <Card>
+            <CardHeader title={t("sufficiency.seasonKgTitle", { year: now.getFullYear() })} description={t("sufficiency.seasonKgDesc")} />
               <BarChart
-                data={result.monthlyFood.map((m) => ({ key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month], values: [m.freshKg, m.storedKg] }))}
+                // Garden: logged harvest up to today (solid), forecast for the rest of
+                // this month and after it (hatched) — past months match the harvest log. Stored food and
+                // animal products are their own parts.
+                data={result.monthlyFood.map((m) => ({
+                  key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month],
+                  values: [
+                    m.month <= currentMonth ? logged[m.month] : 0,
+                    ...(hasForecast ? [ahead(m, m.freshKg)] : []),
+                    // Series order brand → earth → sky (DESIGN_SYSTEM charts). Stored food
+                    // and animal products are forecasts: drawn from this month on only, so
+                    // past months show exactly what was logged.
+                    // Animal products: recorded up to this month (solid), forecast after (hatched).
+                    ...(hasAnimals || hasLoggedAnimal ? [m.month <= currentMonth ? loggedAnimal[m.month] : 0] : []),
+                    ...(hasAnimals ? [ahead(m, m.animalKg)] : []),
+                    // Stored food is a forecast from this month on: hatched.
+                    ...(hasStored ? [m.month >= currentMonth ? m.storedKg : 0] : []),
+                  ],
+                }))}
                 series={[
-                  { label: t("sufficiency.fresh"), color: "brand" },
-                  { label: t("sufficiency.stored"), color: "earth", hatched: true },
+                  { label: t("sufficiency.harvested"), color: "brand" },
+                  // Legend only for a series that is actually drawn.
+                  ...(hasForecast ? [{ label: t("sufficiency.freshForecast"), color: "brand" as const, hatched: true }] : []),
+                  ...(hasAnimals || hasLoggedAnimal ? [{ label: t("sufficiency.animalLogged"), color: "earth" as const }] : []),
+                  ...(hasAnimals ? [{ label: t("sufficiency.animalForecast"), color: "earth" as const, hatched: true }] : []),
+                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const, hatched: true }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
-                formatTick={(v) => f.formatNumber(v, { maximumFractionDigits: 0 })}
+                formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}
                 marker={{ index: currentMonth, label: t("charts.today") }}
-                caption={t("sufficiency.monthlyKgCaption")}
+                caption={t("sufficiency.monthlyKgCaptionLogged")}
                 categoryLabel={t("charts.month")}
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("sufficiency.axisKg")}</p>
-            </div>
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-2">
@@ -198,7 +260,10 @@ export function SufficiencyDashboard() {
                 {NUTRIENTS.map((key) => {
                   const data = result.nutrition[key];
                   const Icon = NUTRIENT_ICON[key];
-                  const unit = key === "calories" ? "kcal" : key === "vitaminC" ? "mg" : "g";
+                  // Grams via formatWeight (kg from 1000 g); vitamin C in mg below 1 g, else in g.
+                  const amount = (v: number) => key === "vitaminC"
+                    ? (v < 1000 ? `${f.formatNumber(v, { maximumFractionDigits: 0 })} mg` : `${f.formatNumber(v / 1000, { maximumFractionDigits: v < 10_000 ? 1 : 0 })} g`)
+                    : f.formatWeight(v);
                   const label = t(`sufficiency.nutrients.${key}`);
                   return (
                     <li key={key}>
@@ -207,11 +272,12 @@ export function SufficiencyDashboard() {
                           <Icon size={14} aria-hidden="true" className="text-gray-500" />
                           {label}
                         </span>
-                        <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(data.percent / 100)}</span>
+                        <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}</span>
                       </div>
-                      <Meter forecast={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100)}`} />
+                      {/* Solid: the card header already says "Prognose"; a hatch vanished on the short bars. */}
+                      <Meter actual={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}`} />
                       <p className="mt-1 text-xs tabular-nums text-gray-500 dark:text-gray-400">
-                        {t("sufficiency.ofNeed", { produced: `${f.formatNumber(data.produced, { maximumFractionDigits: 0 })} ${unit}`, needed: `${f.formatNumber(data.needed, { maximumFractionDigits: 0 })} ${unit}` })}
+                        {t("sufficiency.ofNeed", { produced: amount(data.produced), needed: amount(data.needed) })}
                       </p>
                     </li>
                   );
@@ -233,14 +299,14 @@ export function SufficiencyDashboard() {
                   );
                 })}
               </ul>
-              {result.gaps.length > 0 && (
+              {result.gaps.some((g) => g.nutrient !== "calories") && (
                 <div className="mt-4 border-t border-gray-100 pt-3 dark:border-white/5">
                   <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("sufficiency.gaps")}</p>
                   <ul className="space-y-1.5 text-sm">
-                    {result.gaps.map((g) => (
+                    {result.gaps.filter((g) => g.nutrient !== "calories").map((g) => (
                       <li key={g.nutrient} className="text-gray-700 dark:text-gray-300">
-                        <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100)}</span>
-                        {" — "}
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100, g.percent < 10 ? 1 : 0)}</span>
+                        {" – "}
                         {g.suggestion.split(",").filter((id) => plantMap.has(id)).map((id) => plantName(id)).join(", ")}
                       </li>
                     ))}
@@ -269,7 +335,7 @@ export function SufficiencyDashboard() {
                     key={y.plantId}
                     leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
                     title={plantName(p.id)}
-                    meta={[f.formatArea(y.areaM2), t("sufficiency.kcalValue", { kcal: f.formatNumber(y.calories, { maximumFractionDigits: 0 }) }), t("metrics.actualShort", { value: f.formatWeight(actualG) })].join(" · ")}
+                    meta={[f.formatArea(y.areaM2), t("sufficiency.kcalValue", { kcal: f.formatNumber(y.calories, { maximumFractionDigits: 0 }) }), t("metrics.actualShort", { value: f.formatWeight(actualG) })]}
                     description={<Meter actual={actualG} forecast={forecastG} max={Math.max(actualG, forecastG, 1)} label={t("metrics.actualVsForecast", { actual: f.formatWeight(actualG), forecast: f.formatWeight(forecastG) })} className="mt-1.5 max-w-xs" size={6} />}
                     trailing={<span title={t("metrics.forecast")}>{f.formatWeight(forecastG)}</span>}
                   />
@@ -327,24 +393,6 @@ function LegendNote() {
   return <p className="text-xs text-gray-500 dark:text-gray-400">{t("metrics.meterLegend")}</p>;
 }
 
-/** Second-level view switch: a segmented control, a native select on phones (never cut off). */
-function ViewSwitch<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; count?: number }[]; label: string }) {
-  return (
-    <>
-      <Select
-        wrapperClassName="sm:hidden"
-        aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        options={options.map((o) => ({ value: o.value, label: o.count !== undefined ? `${o.label} (${o.count})` : o.label }))}
-      />
-      <div className="hidden sm:block">
-        <SegmentedControl label={label} value={value} onChange={onChange} options={options} />
-      </div>
-    </>
-  );
-}
-
 /** Edible kg → amount in the product's recording unit (eggs as hen's eggs). */
 const kgToUnits = (type: ProductType, kg: number) => (type === "eggs" ? kg / EGG_WEIGHT_KG : kg);
 
@@ -357,29 +405,41 @@ function Composition() {
   const { t } = useTranslation();
   const f = useFormat();
   const { selfSufficiency: ss } = useGardenMetrics();
+  const householdSize = useAnalysisPrefs((s) => s.householdSize);
   if (ss.forecastKcal <= 0) return null;
-  const garden = ss.forecastPlantKcal / ss.needKcal;
-  const animals = ss.forecastAnimalKcal / ss.needKcal;
-  const scale = Math.max(garden + animals, 0.0001);
+  // Same precision as the hero (a decimal below 10 %), and parts rounded so
+  // they add up to it: "Garten + Tierprodukte" must equal the forecast above.
+  const digits = ss.forecastKcal / ss.needKcal < 0.1 ? 1 : 0;
+  const [garden, animals] = roundShares([ss.forecastPlantKcal / ss.needKcal, ss.forecastAnimalKcal / ss.needKcal], digits);
+  // On the scale of the whole year's need (100 %), so 4 % looks like 4 % – not like a full bar.
+  const scale = Math.max(garden + animals, 1);
+  const open = Math.max(0, 1 - garden - animals);
   const surplus = surplusItems(ss.forecastSurplusKg, f, t);
   return (
     <Card>
       <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-white/10" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, 1), animals: f.formatPercent(animals, 1) })}>
-        <span className="h-full bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />
-        <span className="h-full bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/20" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, digits), animals: f.formatPercent(animals, digits) })}>
+        {/* min-w: a share under 1 % still shows as a sliver next to its legend swatch. */}
+        {garden > 0 && <span className={`h-full min-w-3 bg-garden-600 dark:bg-garden-400 ${garden >= 0.02 ? "border-r-2 border-white dark:border-gray-900" : ""}`} style={{ width: `${(garden / scale) * 100}%` }} />}
+        {animals > 0 && <span className="h-full min-w-2 bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />}
       </div>
-      <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+      <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-garden-600 dark:bg-garden-400" />{t("metrics.fromGarden")}</dt>
-          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(garden, 1)}</dd>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(garden, digits)}</dd>
         </div>
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-earth-400 dark:bg-earth-300" />{t("metrics.fromAnimals")}</dt>
-          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, 1)}</dd>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, digits)}</dd>
+        </div>
+        <div>
+          <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-gray-200 ring-1 ring-gray-300 ring-inset dark:bg-white/20 dark:ring-white/25" />{t("metrics.notCovered")}</dt>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(open, digits)}</dd>
         </div>
       </dl>
-      {surplus.length > 0 && <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { items: surplus.join(", ") })}</p>}
+      {/* Why the garden share is small: vegetables are low in calories (see "Größte Hebel"). */}
+      <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">{t("metrics.compositionHint")}</p>
+      {surplus.length > 0 && <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t("metrics.surplusNote", { count: householdSize, items: surplus.join(", ") })}</p>}
     </Card>
   );
 }
@@ -411,7 +471,7 @@ function AnimalYields() {
                 t("metrics.actualShort", { value: formatProductAmount(ty, actual, f, t) }),
                 kcal > 0 ? t("sufficiency.kcalCounted", { kcal: f.formatNumber(kcal, { maximumFractionDigits: 0 }) }) : t("sufficiency.nonFood"),
                 surplus > 0.05 ? t("sufficiency.surplus", { amount: formatProductAmount(ty, kgToUnits(ty, surplus), f, t) }) : null,
-              ].filter(Boolean).join(" · ")}
+              ]}
               description={<Meter actual={actual} forecast={forecast[ty]} max={Math.max(actual, forecast[ty], 1)} size={6} className="mt-1.5 max-w-xs" label={t("metrics.actualVsForecast", { actual: formatProductAmount(ty, actual, f, t), forecast: formatProductAmount(ty, forecast[ty], f, t) })} />}
               trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, forecast[ty], f, t) })}
             />

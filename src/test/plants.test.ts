@@ -15,7 +15,7 @@ describe("Plant database", () => {
   });
 
   it("every plant should have valid category", () => {
-    const valid = ["vegetable", "fruit", "berry", "herb"];
+    const valid = ["vegetable", "fruit", "berry", "herb", "flower"];
     for (const p of plants) {
       expect(valid).toContain(p.category);
     }

@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
-import { useNavigate } from "react-router-dom";
+import { useAddBed } from "@/hooks/useAddBed";
 import { CloudRain, Droplets, Pencil, Plus, Trash2 } from "lucide-react";
 import { addWeeks, endOfWeek, getISOWeek, startOfMonth, startOfWeek, subWeeks } from "date-fns";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { toDate, toISODate, todayISO } from "@/lib/format";
 import type { WaterEntry } from "@/types/water";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -19,10 +19,9 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatCard } from "@/components/ui/StatCard";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
-import { BarChart } from "@/components/ui/charts";
+import { BarChart, KeyFigures, Sparkline } from "@/components/ui/charts";
 import { useBeds } from "@/components/records/useBeds";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 import { useToday } from "@/hooks/useToday";
@@ -40,13 +39,14 @@ const weekStart = (d: Date) => startOfWeek(d, { weekStartsOn: 1 });
 export function WaterTracker() {
   const now = useToday();
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
-  const { formatDate, formatVolume, formatNumber, locale } = useFormat();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
+  const { formatDate, formatDateRange, formatVolume, locale } = useFormat();
   const { waterEntries, addWaterEntry, updateWaterEntry, deleteWaterEntry } = useStore(
     useShallow((s) => ({ waterEntries: s.waterEntries, addWaterEntry: s.addWaterEntry, updateWaterEntry: s.updateWaterEntry, deleteWaterEntry: s.deleteWaterEntry })),
   );
   const beds = useBeds();
-  const navigate = useNavigate();
+  const addBed = useAddBed();
 
   // ---------------------------------------------------------------- dialog
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -58,14 +58,20 @@ export function WaterTracker() {
   const lastEntry = useMemo(() => [...waterEntries].sort((a, b) => b.date.localeCompare(a.date))[0], [waterEntries]);
 
   const openAdd = useCallback((params: AddParams = {}) => {
+    // No bed yet (quick add from anywhere): the first step is a bed, not a dialog that cannot be saved.
+    if (beds.beds.length === 0) { addBed(); return; }
     setEditingId(null);
     setSubmitted(false);
-    const bedId = params.bed && beds.byId.has(params.bed) ? params.bed : lastEntry && beds.byId.has(lastEntry.bedId) ? lastEntry.bedId : beds.beds[0]?.id ?? "";
+    // Prefill only an unambiguous bed (deep link, last used, or the only one);
+    // otherwise "Beet wählen …" and Save stays disabled until one is chosen.
+    const bedId = params.bed && beds.byId.has(params.bed) ? params.bed
+      : lastEntry && beds.byId.has(lastEntry.bedId) ? lastEntry.bedId
+        : beds.beds.length === 1 ? beds.beds[0].id : "";
     setDraft({ bedId, liters: "", method: lastEntry && lastEntry.method !== "rain" ? lastEntry.method : "manual", duration: "", date: params.date ?? todayISO(), notes: "" });
     setDialogOpen(true);
-  }, [beds, lastEntry]);
+  }, [beds, lastEntry, addBed]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const openEdit = (e: WaterEntry) => {
@@ -85,6 +91,9 @@ export function WaterTracker() {
     liters: (submitted || draft.liters.trim()) && !(litersNum > 0) ? t("water.needLiters") : undefined,
     duration: !(durationNum >= 0) ? t("water.invalidNumber") : undefined,
   };
+
+  // Same rule as every add dialog: "Speichern" stays disabled until the entry is valid.
+  const canSave = Boolean(beds.byId.get(draft.bedId)) && litersNum > 0 && !errors.duration;
 
   const handleSave = () => {
     setSubmitted(true);
@@ -108,7 +117,8 @@ export function WaterTracker() {
   };
 
   const handleDelete = async (e: WaterEntry) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [beds.label(e.bedId), formatVolume(e.liters), formatDate(e.date)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("water", what))) return;
     deleteWaterEntry(e.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = e;
@@ -119,7 +129,7 @@ export function WaterTracker() {
   const data = useMemo(() => {
     const thisWeek = weekStart(now);
     const thisMonth = startOfMonth(now);
-    let week = 0, weekRain = 0, month = 0;
+    let week = 0, weekRain = 0, month = 0, monthRain = 0;
     const firstChartWeek = subWeeks(thisWeek, CHART_WEEKS - 1);
     const perWeek = new Map<number, { water: number; rain: number }>();
     for (let i = 0; i < CHART_WEEKS; i++) perWeek.set(addWeeks(firstChartWeek, i).getTime(), { water: 0, rain: 0 });
@@ -130,34 +140,41 @@ export function WaterTracker() {
       const ws = weekStart(d).getTime();
       const rain = e.method === "rain";
       if (ws === thisWeek.getTime()) { if (rain) weekRain += e.liters; else week += e.liters; }
-      if (d >= thisMonth && !rain) month += e.liters;
+      if (d >= thisMonth) { if (rain) monthRain += e.liters; else month += e.liters; }
       const bucket = perWeek.get(ws);
       if (bucket) { if (rain) bucket.rain += e.liters; else bucket.water += e.liters; }
       groups.set(ws, [...(groups.get(ws) ?? []), e]);
     }
     const chart = [...perWeek.entries()].map(([ws, v]) => ({ ws: new Date(ws), ...v }));
-    const avg = chart.reduce((s, w) => s + w.water, 0) / CHART_WEEKS;
+    // Average only over weeks since the first record: weeks before logging
+    // started are not "0 l watered", they are unknown.
+    const firstWeek = Math.min(...groups.keys(), thisWeek.getTime());
+    const avgWeeks = chart.filter((w) => w.ws.getTime() >= firstWeek);
+    const avg = avgWeeks.reduce((s, w) => s + w.water, 0) / Math.max(1, avgWeeks.length);
+    const avgWeekCount = Math.max(1, avgWeeks.length);
     const weeks = [...groups.entries()]
       .sort((a, b) => b[0] - a[0])
       .map(([ws, entries]) => [new Date(ws), entries.sort((a, b) => b.date.localeCompare(a.date))] as const);
-    return { week, weekRain, month, avg, chart, weeks };
+    return { week, weekRain, month, monthRain, avg, avgWeekCount, chart, weeks };
   }, [now, waterEntries]);
 
   const [weeksShown, setWeeksShown] = useState(4);
+  const monthName = new Intl.DateTimeFormat(locale, { month: "long" }).format(now);
   const editing = editingId ? waterEntries.find((e) => e.id === editingId) : undefined;
-  const weekRange = (ws: Date) => `${formatDate(ws)} – ${formatDate(endOfWeek(ws, { weekStartsOn: 1 }))}`;
+  const weekRange = (ws: Date) => formatDateRange(ws, endOfWeek(ws, { weekStartsOn: 1 }));
 
   return (
     <div>
       <PageHeader
         title={t("water.title")}
         description={t("water.subtitle")}
-        actions={
-          <Button onClick={openAddPlain} disabled={beds.beds.length === 0}>
+        // While the empty state shows, its own button is the one way in (no disabled duplicate up here).
+        actions={waterEntries.length > 0 && beds.beds.length > 0 ? (
+          <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("water.add")}
           </Button>
-        }
+        ) : undefined}
       />
 
       {waterEntries.length === 0 ? (
@@ -168,17 +185,37 @@ export function WaterTracker() {
             description={beds.beds.length ? t("water.emptyText") : t("water.emptyNoBeds")}
             action={beds.beds.length
               ? <Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("water.add")}</Button>
-              : <Button onClick={() => navigate("/planner")}>{t("importPage.toPlanner")}</Button>}
+              : <Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
           />
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("water.thisWeek")} value={formatVolume(data.week)} icon={Droplets} tone="info" hint={data.weekRain ? t("water.plusRain", { amount: formatVolume(data.weekRain) }) : undefined} />
-            <StatCard label={t("water.thisMonth")} value={formatVolume(data.month)} />
-            <StatCard label={t("water.avgPerWeek")} value={formatVolume(data.avg)} hint={t("water.lastWeeks", { count: CHART_WEEKS })} />
-            <StatCard label={t("water.entriesStat")} value={formatNumber(waterEntries.length)} />
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("water.wateredThisWeek"),
+              value: formatVolume(data.week),
+              icon: Droplets,
+              tone: "info",
+              visual: (
+                <Sparkline
+                  values={data.chart.map((w) => w.water)}
+                  color="sky"
+                  width={160}
+                  height={32}
+                  label={t("water.sparkLabel", { count: CHART_WEEKS, amount: formatVolume(data.week) })}
+                />
+              ),
+              hint: data.weekRain ? t("water.plusRain", { amount: formatVolume(data.weekRain) }) : t("water.onlyWatering"),
+            }}
+            items={[
+              {
+                label: t("water.wateredInMonth", { month: monthName }),
+                value: formatVolume(data.month),
+                hint: data.monthRain ? t("water.plusRain", { amount: formatVolume(data.monthRain) }) : t("water.onlyWatering"),
+              },
+              { label: t("water.avgPerWeek"), value: formatVolume(data.avg), hint: t("water.lastWeeks", { count: data.avgWeekCount }) },
+            ]}
+          />
 
           <Card>
             <CardHeader title={t("water.perWeek")} description={t("water.perWeekHint", { count: CHART_WEEKS })} />
@@ -187,7 +224,7 @@ export function WaterTracker() {
               categoryLabel={t("water.week")}
               series={[
                 { label: t("water.irrigation"), color: "sky" },
-                { label: t("water.methods.rain"), color: "muted" },
+                { label: t("water.methods.rain"), color: "rain", dotted: true },
               ]}
               data={data.chart.map((w) => ({
                 key: String(w.ws.getTime()),
@@ -196,6 +233,8 @@ export function WaterTracker() {
                 values: [w.water, w.rain],
               }))}
               formatValue={formatVolume}
+              // The last bar is the current week, marked like every other time chart.
+              marker={data.chart.length > 0 ? { index: data.chart.length - 1, label: t("charts.today") } : undefined}
             />
           </Card>
 
@@ -203,13 +242,18 @@ export function WaterTracker() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("water.log")}</h2>
             {data.weeks.slice(0, weeksShown).map(([ws, entries]) => {
               const total = entries.filter((e) => e.method !== "rain").reduce((s, e) => s + e.liters, 0);
+              const rain = entries.filter((e) => e.method === "rain").reduce((s, e) => s + e.liters, 0);
               return (
                 <List
                   key={ws.getTime()}
                   header={
                     <span className="flex items-center justify-between gap-2">
                       <span>{t("water.weekShort", { week: getISOWeek(ws) })} · {weekRange(ws)}</span>
-                      <span className="font-medium tabular-nums">{formatVolume(total)}</span>
+                      {/* Watered and rain apart, like the key figures: the total alone would hide the rain rows below. */}
+                      <span className="font-medium tabular-nums">
+                        {formatVolume(total)}
+                        {rain > 0 && <span className="font-normal"> {t("water.plusRain", { amount: formatVolume(rain) })}</span>}
+                      </span>
                     </span>
                   }
                 >
@@ -221,15 +265,13 @@ export function WaterTracker() {
                         key={e.id}
                         onClick={() => openEdit(e)}
                         leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-info/10 text-info"><Icon size={16} aria-hidden="true" /></span>}
-                        title={beds.label(e.bedId) ?? t("water.unknownBed")}
-                        meta={
-                          <>
-                            {t(`water.methods.${e.method}`)}
-                            {e.duration ? ` · ${t("water.minutesCount", { count: e.duration })}` : ""}
-                            {" · "}
-                            <time dateTime={toISODate(e.date)}>{formatDate(e.date, "relative")}</time>
-                          </>
-                        }
+                        // Rain falls on the whole garden, whatever bed it was logged against.
+                        title={rain ? t("water.wholeGarden") : beds.label(e.bedId) ?? t("water.unknownBed")}
+                        meta={[
+                          t(`water.methods.${e.method}`),
+                          e.duration ? t("water.minutesCount", { count: e.duration }) : null,
+                          <time key="d" dateTime={toISODate(e.date)}>{formatDate(e.date)}</time>,
+                        ]}
                         description={e.notes}
                         trailing={formatVolume(e.liters)}
                         actions={
@@ -267,33 +309,43 @@ export function WaterTracker() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave} disabled={!canSave}>{t("common.save")}</Button>
           </>
         }
       >
         <div className="space-y-5">
-          <Select label={t("planner.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} options={beds.options} error={errors.bed} />
+          <Select label={t("planner.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("water.chooseBed")} options={beds.options} error={errors.bed} />
           <div>
-            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} placeholder="10" error={errors.liters} autoFocus />
+            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} placeholder={t("common.examplePlaceholder", { value: 10 })} error={errors.liters} autoFocus />
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {QUICK_LITERS.map((l) => (
-                <button
-                  key={l}
-                  type="button"
-                  onClick={() => patch({ liters: String(l) })}
-                  className="inline-flex min-h-9 items-center rounded-full bg-gray-100 px-3 text-sm font-medium text-gray-700 hover:bg-gray-200 sm:min-h-8 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
-                >
-                  {formatVolume(l)}
-                </button>
-              ))}
+              {QUICK_LITERS.map((l) => {
+                const active = litersNum === l;
+                return (
+                  <button
+                    key={l}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => patch({ liters: String(l) })}
+                    className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 text-sm font-medium sm:min-h-8 sm:min-w-0 ${
+                      active
+                        ? "bg-garden-100 text-garden-800 ring-1 ring-garden-600/40 dark:bg-garden-500/20 dark:text-garden-200 dark:ring-garden-400/40"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                    }`}
+                  >
+                    {/* The unit is in the field label: plain numbers (rule 9). */}
+                    {l}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          {/* A short pair: side by side on phones too (design system rule 9). */}
+          <div className="grid grid-cols-2 items-end gap-4">
             <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
-            <Input label={t("water.durationLabel")} inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder="15" hint={t("common.optional")} error={errors.duration} />
+            <Input label={t("water.durationLabel")} optional inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder={t("common.examplePlaceholder", { value: 15 })} error={errors.duration} />
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
-          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("water.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

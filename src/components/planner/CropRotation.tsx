@@ -1,8 +1,7 @@
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, RefreshCw } from "lucide-react";
 import type { Garden } from "@/types/garden";
-import { plantFamilyMap, familyColors, rotationGroups, type PlantFamily } from "@/data/plantFamilies";
+import { familyOf, familyColors, rotationGroups, type PlantFamily } from "@/data/plantFamilies";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { usePlantMap } from "@/hooks/usePlants";
 import { isPerennial } from "@/lib/season";
@@ -28,7 +27,7 @@ export const CropRotation = memo(function CropRotation({ garden }: { garden: Gar
         .map((bed) => {
           const families = new Map<PlantFamily, number>();
           for (const cell of bed.cells) {
-            const f = plantFamilyMap[cell.plantId] ?? "other";
+            const f = familyOf(cell.plantId, plantMap.get(cell.plantId));
             families.set(f, (families.get(f) ?? 0) + 1);
           }
           const sorted = [...families].sort((a, b) => b[1] - a[1]);
@@ -55,18 +54,19 @@ export const CropRotation = memo(function CropRotation({ garden }: { garden: Gar
         description={t("planner.rotation.description")}
       />
 
-      <ol className="mb-5 flex flex-wrap items-center gap-x-1.5 gap-y-2 text-sm" aria-label={t("planner.rotation.order")}>
+      {/* A read-only sequence: numbered steps on a flat tint (no borders, so nothing looks like a button), equal width. */}
+      <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("planner.rotation.order")}</p>
+      <ol className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("planner.rotation.order")}>
         {rotationGroups.map((g, i) => (
-          <li key={GROUP_KEYS[i]} className="flex items-center gap-1.5">
-            <span className="rounded-lg border border-gray-200 px-2.5 py-1 dark:border-white/10" title={g.families.map(family).join(", ")}>
-              <span className="font-medium text-gray-900 dark:text-gray-100">{group(i)}</span>
-              <span className="ml-1.5 text-xs text-gray-500 dark:text-gray-400">{g.families.map(family).join(", ")}</span>
+          <li key={GROUP_KEYS[i]} className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2 dark:bg-white/5">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-gray-700 tabular-nums ring-1 ring-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:ring-white/10" aria-hidden="true">
+              {i + 1}
             </span>
-            {i < rotationGroups.length - 1 ? (
-              <ArrowRight size={14} aria-hidden="true" className="text-gray-400" />
-            ) : (
-              <RefreshCw size={14} aria-hidden="true" className="text-gray-400" />
-            )}
+            {/* Long compounds ("Nachtschattengewächse") must wrap inside the tile, never run past its edge. */}
+            <span className="min-w-0 break-words hyphens-auto">
+              <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">{group(i)}</span>
+              <span className="block text-xs text-gray-500 dark:text-gray-400">{g.families.map(family).join(", ")}</span>
+            </span>
           </li>
         ))}
       </ol>

@@ -1,13 +1,15 @@
-import { useRef, useState } from "react";
+import { daysSince } from "@/lib/format";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace } from "lucide-react";
+import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace, TriangleAlert } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { useFormat } from "@/hooks/useFormat";
-import { exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExport } from "@/lib/dataExport";
+import { useToday } from "@/hooks/useToday";
+import { buildCostsCsv, exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExport } from "@/lib/dataExport";
 import { importAllData, validateExportFile, type ImportMode, type ImportResult } from "@/lib/dataImport";
 
 const STAT_KEYS = ["gardens", "tasks", "harvests", "journalEntries", "expenses"] as const;
@@ -16,7 +18,14 @@ const STAT_KEYS = ["gardens", "tasks", "harvests", "journalEntries", "expenses"]
 export function DataManagement() {
   const { t } = useTranslation();
   const { formatDate } = useFormat();
-  const { lastBackupDate, harvests, expenses } = useStore(useShallow((s) => ({ lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses })));
+  const today = useToday();
+  const { lastBackupDate, harvests, expenses, feedEntries, healthEvents, hasData } = useStore(useShallow((s) => ({
+    lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses, feedEntries: s.feedEntries, healthEvents: s.healthEvents,
+    // Anything worth keeping: a bed or any record. Before that a backup is no urgent matter.
+    hasData: s.gardens.some((g) => g.beds.length > 0) || s.harvests.length > 0 || s.journalEntries.length > 0 || s.expenses.length > 0 || s.animals.length > 0 || s.tasks.length > 0,
+  })));
+  // Same rows as the Kosten page (manual expenses + counted feed/health costs).
+  const costRows = useMemo(() => buildCostsCsv({ expenses, feedEntries, healthEvents }).rows, [expenses, feedEntries, healthEvents]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<GardenerExport | null>(null);
@@ -53,21 +62,34 @@ export function DataManagement() {
     else toast(t("dataManagement.importError"), "error");
   };
 
+  // Same threshold as the hint on "Heute" (BackupHint): two weeks old = time for a new one.
+  const stale = lastBackupDate !== null && daysSince(lastBackupDate, today) >= 14;
+
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2.5 dark:bg-white/5">
-        {lastBackupDate
-          ? <ShieldCheck size={18} aria-hidden="true" className="shrink-0 text-positive" />
-          : <HardDrive size={18} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />}
+      <div className={`flex items-start gap-3 rounded-lg px-3 py-2.5 ${stale ? "bg-warning/10 dark:bg-warning/15" : "bg-gray-50 dark:bg-white/5"}`}>
+        {!lastBackupDate
+          ? <HardDrive size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
+          : stale
+            ? <TriangleAlert size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+            : <ShieldCheck size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-positive" />}
         <p className="text-sm text-gray-700 dark:text-gray-300">
           {lastBackupDate
-            ? <>{t("dataManagement.lastBackup")}: <time dateTime={lastBackupDate} className="font-medium">{formatDate(lastBackupDate, "relative")}</time></>
-            : t("dataManagement.noBackup")}
+            ? (
+              <>
+                {/* Same phrase as the reminder on "Heute"; the exact date on hover. */}
+                <time dateTime={lastBackupDate} title={formatDate(lastBackupDate, "date")} className="font-medium">
+                  {t("dashboard.backup.old", { count: daysSince(lastBackupDate, today) })}
+                </time>
+                {stale && <span className="block text-xs text-gray-600 dark:text-gray-300">{t("dataManagement.backupStale")}</span>}
+              </>
+            )
+            : t(hasData ? "dataManagement.noBackup" : "dataManagement.nothingYet")}
         </p>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <Button onClick={handleExportAll}>
+        <Button variant={hasData ? "primary" : "secondary"} onClick={handleExportAll}>
           <Download size={16} aria-hidden="true" />
           {t("dataManagement.exportAll")}
         </Button>
@@ -78,21 +100,32 @@ export function DataManagement() {
         <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleFileSelect} aria-label={t("dataManagement.importBackup")} />
       </div>
 
-      <div>
-        <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="ghost" size="sm" onClick={exportHarvestsCsv} disabled={harvests.length === 0}>
-            <FileSpreadsheet size={14} aria-hidden="true" />
-            {t("dataManagement.exportHarvestsCsv")}
-            <span className="text-gray-500 tabular-nums dark:text-gray-400">{harvests.length}</span>
-          </Button>
-          <Button variant="ghost" size="sm" onClick={exportExpensesCsv} disabled={expenses.length === 0}>
-            <FileSpreadsheet size={14} aria-hidden="true" />
-            {t("dataManagement.exportExpensesCsv")}
-            <span className="text-gray-500 tabular-nums dark:text-gray-400">{expenses.length}</span>
-          </Button>
+      {/* Only exports that have rows: without harvests or expenses the whole
+          subsection waits (a heading over a sentence with no button reads as broken). */}
+      {(harvests.length > 0 || costRows > 0) && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
+          {/* Secondary buttons with a download icon: they read as actions, not as text. */}
+          <div className="flex flex-wrap gap-2">
+            {harvests.length > 0 && (
+              <Button variant="secondary" size="sm" onClick={exportHarvestsCsv}>
+                <FileSpreadsheet size={14} aria-hidden="true" />
+                {t("dataManagement.exportHarvestsCsv")}
+                <span className="text-gray-500 tabular-nums dark:text-gray-400">{harvests.length}</span>
+                <Download size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
+              </Button>
+            )}
+            {costRows > 0 && (
+              <Button variant="secondary" size="sm" onClick={exportExpensesCsv}>
+                <FileSpreadsheet size={14} aria-hidden="true" />
+                {t("dataManagement.exportExpensesCsv")}
+                <span className="text-gray-500 tabular-nums dark:text-gray-400">{costRows}</span>
+                <Download size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <Modal
         open={pending !== null}

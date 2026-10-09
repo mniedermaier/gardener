@@ -1,4 +1,5 @@
 import type { StateCreator } from "zustand";
+import { deviceLocale } from "@/lib/deviceLocale";
 
 export interface AlertConfig {
   frostAlertEnabled: boolean;
@@ -14,6 +15,8 @@ export interface SettingsSlice {
   locationLat: number | null;
   locationLon: number | null;
   locationName: string;
+  /** "Bayern, Deutschland" from the place search; empty for device position or typed coordinates. */
+  locationRegion: string;
   lastFrostDate: string;
   gridCellSizeCm: number;
   backendUrl: string | null;
@@ -24,7 +27,7 @@ export interface SettingsSlice {
   lastSyncedAt: string | null;
   setLocale: (locale: "de" | "en" | "es" | "fr") => void;
   setWeatherApiKey: (key: string) => void;
-  setLocation: (lat: number, lon: number, name: string) => void;
+  setLocation: (lat: number, lon: number, name: string, region?: string) => void;
   setLastFrostDate: (date: string) => void;
   setTheme: (theme: "light" | "dark" | "system") => void;
   setBackendUrl: (url: string | null) => void;
@@ -35,11 +38,12 @@ export interface SettingsSlice {
 }
 
 export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
-  locale: "de",
+  locale: deviceLocale(),
   weatherApiKey: "",
   locationLat: null,
   locationLon: null,
   locationName: "",
+  locationRegion: "",
   lastFrostDate: "2026-05-15",
   gridCellSizeCm: 30,
   backendUrl: null,
@@ -55,8 +59,8 @@ export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
   lastBackupDate: null,
   setLocale: (locale) => set({ locale }),
   setWeatherApiKey: (weatherApiKey) => set({ weatherApiKey }),
-  setLocation: (locationLat, locationLon, locationName) =>
-    set({ locationLat, locationLon, locationName }),
+  setLocation: (locationLat, locationLon, locationName, locationRegion = "") =>
+    set({ locationLat, locationLon, locationName, locationRegion }),
   setLastFrostDate: (lastFrostDate) => set({ lastFrostDate }),
   setTheme: (theme) => set({ theme }),
   setBackendUrl: (backendUrl) => set({ backendUrl }),

@@ -98,10 +98,9 @@ export function getPhaseWindows(plant: Plant, frost: Date, opts: { frostProtecti
   if (base && plant.harvestDaysMax < 200) {
     const start = addDays(base, plant.harvestDaysMin);
     let end = addDays(addWeeks(base, transplant ? PHASE_WEEKS.transplant : PHASE_WEEKS.sowOutdoors), plant.harvestDaysMax);
-    if (isContinuousCropper(plant)) {
-      const autumn = addWeeks(estimateFirstFrost(frost), protection);
-      if (isAfter(autumn, end)) end = autumn;
-    }
+    // Continuous croppers bear until the autumn frost — not shorter, and not
+    // longer either (rosemary's 180 days would otherwise outlast its bed mates).
+    if (isContinuousCropper(plant)) end = addWeeks(estimateFirstFrost(frost), protection);
     windows.push({ phase: "harvest", start, end });
   }
   return windows;
@@ -118,6 +117,36 @@ export interface HarvestReadyItem {
   cells: number;
   /** Past the expected window: harvest soon or it gets woody. */
   late: boolean;
+  /** Earliest end of the window among the cells (sort key: what closes first). */
+  end: Date;
+}
+
+/** Days a harvest stays listed after its window closed (then marked late). */
+export const HARVEST_GRACE_DAYS = 21;
+
+/**
+ * Harvest window from real planting dates: earliest planting + min days to
+ * the latest + max days. Continuous croppers (tomato, chard …) stay open
+ * until the autumn frost, shifted by the bed's frost protection — the same
+ * rule as getHarvestReady, so "Heute", calendar and bed list agree. Null
+ * without dates or for perennials — callers then fall back to the season
+ * windows from the frost date.
+ */
+export function plantedHarvestWindow(
+  plant: Plant,
+  plantedDates: string[],
+  season?: { lastFrostDate: string; now: Date; protectionWeeks: number },
+): { start: Date; end: Date } | null {
+  if (plant.harvestDaysMax >= 365) return null;
+  const times = plantedDates.flatMap((d) => toDate(d)?.getTime() ?? []);
+  if (times.length === 0) return null;
+  const start = addDays(Math.min(...times), plant.harvestDaysMin);
+  let end = addDays(Math.max(...times), plant.harvestDaysMax);
+  if (season && isContinuousCropper(plant)) {
+    const seasonEnd = addWeeks(estimateFirstFrost(seasonFrost(season.lastFrostDate, season.now)), season.protectionWeeks);
+    end = seasonEnd; // bears until the frost — not shorter, not longer (same rule as getPhaseWindows)
+  }
+  return { start, end };
 }
 
 /**
@@ -144,20 +173,22 @@ export function getHarvestReady(
         if (!planted || !plant || plant.harvestDaysMax >= 365) continue;
         const from = addDays(planted, plant.harvestDaysMin);
         let to = addDays(planted, plant.harvestDaysMax);
-        let grace = 21;
+        let grace = HARVEST_GRACE_DAYS;
         if (isContinuousCropper(plant)) {
           const seasonEnd = addWeeks(autumnFrost, protection);
-          if (isAfter(seasonEnd, to)) { to = seasonEnd; grace = 0; }
+          to = seasonEnd; grace = 0; // until the frost, never past it
         }
         // Window open, and at most three weeks past its end.
         if (isBefore(day, from) || isAfter(day, addDays(to, grace))) continue;
         const key = `${b.id}:${c.plantId}`;
-        const entry = byKey.get(key) ?? { key, plantId: c.plantId, bedId: b.id, gardenId: g.id, bedName: b.name, cells: 0, late: false };
+        const entry = byKey.get(key) ?? { key, plantId: c.plantId, bedId: b.id, gardenId: g.id, bedName: b.name, cells: 0, late: false, end: to };
         entry.cells += 1;
+        if (to < entry.end) entry.end = to;
         entry.late = entry.late || isAfter(day, to);
         byKey.set(key, entry);
       }
     }
   }
-  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || b.cells - a.cells);
+  // Late first, then what closes first — the same order as the calendar's "Jetzt dran".
+  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || a.end.getTime() - b.end.getTime() || a.plantId.localeCompare(b.plantId));
 }

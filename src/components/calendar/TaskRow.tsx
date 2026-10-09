@@ -1,6 +1,6 @@
 import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, ClipboardList, Repeat } from "lucide-react";
+import { Check, Repeat } from "lucide-react";
 import type { Task } from "@/types/task";
 import type { Plant } from "@/types/plant";
 import type { TaskGroup } from "@/lib/tasks";
@@ -8,8 +8,6 @@ import { useFormat } from "@/hooks/useFormat";
 import { usePlantName } from "@/hooks/usePlantName";
 import { ListRow } from "@/components/ui/List";
 import { Badge } from "@/components/ui/Badge";
-import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { TASK_TYPE_ICONS } from "./taskTypeIcons";
 
 interface Props {
   task: Task;
@@ -27,7 +25,7 @@ interface Props {
 /**
  * One task row for the dashboard and the task page: round checkbox on the
  * left (tap to complete, tap again to reopen), title with overdue/recurring
- * badges, "Typ · Beet · Pflanze · Datum" meta, plant or type icon on the right.
+ * badges, "Typ · Beet · Pflanze · Datum" meta.
  */
 export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onComplete, onReopen, onOpen, actions }: Props) {
   const { t } = useTranslation();
@@ -35,17 +33,21 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
   const getPlantName = usePlantName();
   const done = !!task.completedDate;
   const due = task.dueDate.slice(0, 10);
-  const TypeIcon = TASK_TYPE_ICONS[task.type] ?? ClipboardList;
   const plantName = plant ? getPlantName(plant.id) : null;
 
   const meta = [
     task.type === "custom" ? null : t(`calendar.taskTypes.${task.type}`),
-    bedName ?? null,
+    // Glossary order: plant · bed.
     plantName && !task.title.includes(plantName) ? plantName : null,
+    bedName ?? null,
+    // The group header already says "Heute"/"Morgen"; within a group every row
+    // uses the same date format.
     done
-      ? t("calendar.doneOn", { date: formatDate(task.completedDate!.slice(0, 10), "relative") })
-      : group === "overdue" || group === "today" ? null : formatDate(due, group === "later" ? "short" : "relative"),
-  ].filter(Boolean).join(" · ");
+      ? t("calendar.doneOn", { date: formatDate(task.completedDate!.slice(0, 10), "relativeInline") })
+      : group === "overdue" || group === "today" || group === "tomorrow" ? null
+        // Short dates use non-breaking spaces: "Di., 13. Okt." wraps as a whole.
+        : formatDate(due, group === "later" ? "short" : "weekdayDate"),
+  ];
 
   return (
     <ListRow
@@ -75,21 +77,14 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
       title={<span className={done ? "line-through" : undefined}>{task.title}</span>}
       badges={
         <>
-          {group === "overdue" && <Badge tone="danger" dot>{t("calendar.overdueSince", { date: formatDate(due, "relative") })}</Badge>}
+          {group === "overdue" && <Badge tone="danger" dot>{t("calendar.overdueSince", { date: formatDate(due, "relative"), dateInline: formatDate(due, "relativeInline") })}</Badge>}
           {task.recurring && <Badge icon={Repeat} title={t("calendar.recurrence")}>{t(`calendar.recurring.${task.recurring.interval}`)}</Badge>}
         </>
       }
-      meta={meta || undefined}
+      meta={meta}
       description={task.description}
-      trailing={
-        plant ? (
-          <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={24} />
-        ) : (
-          <span className="inline-flex size-7 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
-            <TypeIcon size={15} />
-          </span>
-        )
-      }
+      // No trailing icon: it appeared on some rows only and read as a control.
+      // Type, bed and plant are all named in the meta line.
       actions={actions}
     />
   );

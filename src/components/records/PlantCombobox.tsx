@@ -2,7 +2,7 @@ import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Search, X } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { CONTROL_CLASS, LABEL_CLASS } from "@/components/ui/Field";
+import { CONTROL_CLASS, LABEL_CLASS, LabelText } from "@/components/ui/Field";
 import { usePlantName } from "@/hooks/usePlantName";
 import type { Plant } from "@/types/plant";
 import type { BedInfo } from "./useBeds";
@@ -34,6 +34,8 @@ interface PlantComboboxProps {
   optional?: boolean;
   hint?: string;
   autoFocus?: boolean;
+  /** Marks the field invalid (aria-invalid) so a failed save can focus it. */
+  invalid?: boolean;
 }
 
 /**
@@ -42,7 +44,7 @@ interface PlantComboboxProps {
  * bed in one go. Typing filters by plant or bed name. WAI-ARIA combobox with
  * an inline listbox (no popover clipping inside dialogs and bottom sheets).
  */
-export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange, optional, hint, autoFocus }: PlantComboboxProps) {
+export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange, optional, hint, autoFocus, invalid }: PlantComboboxProps) {
   const { t } = useTranslation();
   const getPlantName = usePlantName();
   const id = useId();
@@ -122,7 +124,7 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
 
   return (
     <div>
-      <label htmlFor={id} className={LABEL_CLASS}>{label}</label>
+      <label htmlFor={id} className={LABEL_CLASS}><LabelText label={label} optional={optional} /></label>
       <div className="relative">
         <span className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 items-center text-gray-500" aria-hidden="true">
           {selectedPlant && !open ? <PlantIconDisplay plantId={selectedPlant.id} emoji={selectedPlant.icon} size={20} /> : <Search size={16} />}
@@ -135,12 +137,15 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={activeId}
+          aria-invalid={invalid || undefined}
           aria-describedby={hint ? `${id}-hint` : undefined}
           autoComplete="off"
           autoFocus={autoFocus}
           placeholder={t("records.plantSearch")}
           value={display}
-          onFocus={openList}
+          // Focus alone does not open the list: a dialog focuses this field on
+          // open, and an unrequested list would push the rest of the form down.
+          // A click, typing or ↓ opens it.
           onClick={() => !open && openList()}
           onBlur={() => setOpen(false)}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); setActive(0); }}
@@ -153,7 +158,7 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
               type="button"
               aria-label={t("records.clearPlant")}
               onClick={() => onChange({ plantId: "" })}
-              className="inline-flex size-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+              className="inline-flex size-11 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 sm:size-8 dark:hover:bg-white/10"
             >
               <X size={16} aria-hidden="true" />
             </button>

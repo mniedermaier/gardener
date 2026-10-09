@@ -1,18 +1,18 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlaskConical, Package, Pencil, Plus, ShoppingCart, Sprout, Trash2, Wallet } from "lucide-react";
+import { FlaskConical, Package, Pencil, Plus, Sprout, Trash2 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { needsNewStock, propagation, seedViability, type Viability } from "@/lib/seedViability";
 import type { SeedItem, SeedSource, SeedUnit } from "@/types/seed";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
+import { Modal, focusFirstInvalid } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -21,11 +21,12 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures } from "@/components/ui/charts";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
+import { varietyPlaceholder } from "@/data/varietyExamples";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const UNITS: SeedUnit[] = ["packets", "grams", "seeds"];
@@ -39,21 +40,23 @@ interface Draft {
   quantity: string;
   unit: SeedUnit;
   year: string;
-  source: SeedSource;
+  /** "" = not chosen yet: where seed came from is never guessed (rule 9). */
+  source: SeedSource | "";
   shopName: string;
   cost: string;
   notes: string;
 }
 
 const emptyDraft = (plantId = ""): Draft => ({
-  plantId, variety: "", quantity: "1", unit: "packets", year: String(CURRENT_YEAR), source: "shop", shopName: "", cost: "", notes: "",
+  plantId, variety: "", quantity: "1", unit: "packets", year: String(CURRENT_YEAR), source: "", shopName: "", cost: "", notes: "",
 });
 
 const num = (s: string) => Number(s.trim().replace(",", "."));
 
 export function SeedInventory() {
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatCurrency, formatNumber, locale } = useFormat();
   const { seeds, gardens, addSeed, updateSeed, deleteSeed } = useStore(
     useShallow((s) => ({ seeds: s.seeds, gardens: s.gardens, addSeed: s.addSeed, updateSeed: s.updateSeed, deleteSeed: s.deleteSeed })),
@@ -77,7 +80,7 @@ export function SeedInventory() {
     setDialogOpen(true);
   }, [plantMap]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const openEdit = (s: SeedItem) => {
@@ -108,6 +111,9 @@ export function SeedInventory() {
     [seeds, plantMap, getPlantName],
   );
   const testCount = rows.filter((r) => r.viability.status === "testRecommended").length;
+  // "6 Posten · 6 Kulturen" repeats itself: name the crops only when they differ.
+  const cropCount = new Set(seeds.map((x) => x.plantId)).size;
+  const itemsHint = cropCount !== seeds.length ? t("seeds.itemsCrops", { count: cropCount }) : undefined;
   const shown = filter === "test" ? rows.filter((r) => r.viability.status === "testRecommended") : rows;
   const totalCost = seeds.reduce((s, seed) => s + (seed.cost ?? 0), 0);
 
@@ -118,21 +124,21 @@ export function SeedInventory() {
     plant: submitted && !draft.plantId ? t("seeds.needPlant") : undefined,
     quantity: !Number.isFinite(quantityNum) || quantityNum < 0 ? t("seeds.invalidNumber") : undefined,
     year: !Number.isFinite(yearNum) || yearNum < 1950 || yearNum > CURRENT_YEAR + 1 ? t("seeds.invalidYear") : undefined,
-    cost: !Number.isFinite(costNum) || costNum < 0 ? t("seeds.invalidNumber") : undefined,
+    cost: draft.source === "shop" && (!Number.isFinite(costNum) || costNum < 0) ? t("seeds.invalidNumber") : undefined,
   };
 
   const handleSave = () => {
     setSubmitted(true);
-    if (!draft.plantId || errors.quantity || errors.year || errors.cost) return;
+    if (!draft.plantId || !draft.source || errors.quantity || errors.year || errors.cost) { focusFirstInvalid(); return; }
     const fields = {
       plantId: draft.plantId,
       variety: draft.variety.trim() || undefined,
       quantity: quantityNum,
       unit: draft.unit,
       yearAcquired: yearNum,
-      source: draft.source,
+      source: draft.source as SeedSource,
       shopName: draft.source === "shop" ? draft.shopName.trim() || undefined : undefined,
-      cost: costNum || undefined,
+      cost: draft.source === "shop" ? costNum || undefined : undefined,
       notes: draft.notes.trim() || undefined,
     };
     if (editingId) {
@@ -146,7 +152,8 @@ export function SeedInventory() {
   };
 
   const handleDelete = async (seed: SeedItem) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [getPlantName(seed.plantId), seed.variety?.trim(), String(seed.yearAcquired)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("seed", what))) return;
     deleteSeed(seed.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = seed;
@@ -176,21 +183,26 @@ export function SeedInventory() {
       <PageHeader
         title={t("seeds.title")}
         description={t("seeds.subtitle")}
-        actions={
+        // The empty state carries the only "Saatgut hinzufügen" until there is a stock.
+        actions={seeds.length === 0 ? undefined : (
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("seeds.add")}
           </Button>
-        }
+        )}
       />
 
       {seeds.length > 0 && (
-        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label={t("seeds.items")} value={formatNumber(seeds.length)} icon={Package} />
-          <StatCard label={t("seeds.testRecommended")} value={formatNumber(testCount)} icon={FlaskConical} tone={testCount ? "warning" : "neutral"} hint={t("seeds.testHintShort")} />
-          <StatCard label={t("seeds.missingStat")} value={formatNumber(missing.length)} icon={ShoppingCart} tone="info" hint={t("seeds.missingStatHint")} />
-          <StatCard label={t("seeds.totalCost")} value={formatCurrency(totalCost)} icon={Wallet} tone="neutral" />
-        </div>
+        <KeyFigures
+          className="mb-6"
+          // The stock leads; what is missing for the beds has its own card right
+          // below, so it is not repeated as a figure. Zero counts are left out.
+          hero={{ label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand", hint: itemsHint }}
+          items={[
+            ...(testCount > 0 ? [{ label: t("seeds.testRecommended"), value: formatNumber(testCount), hint: t("seeds.testHintShort") }] : []),
+            ...(totalCost > 0 ? [{ label: t("seeds.totalCost"), value: formatCurrency(totalCost) }] : []),
+          ]}
+        />
       )}
 
       {missing.length > 0 && (
@@ -207,11 +219,12 @@ export function SeedInventory() {
                   type="button"
                   onClick={() => openAdd({ plant: id })}
                   aria-label={t("seeds.addFor", { name: getPlantName(id) })}
-                  className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-gray-200 bg-white py-1 pr-3 pl-1.5 text-sm font-medium text-gray-800 hover:border-garden-500 hover:bg-garden-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-garden-500/15"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-gray-200 sm:min-h-10 bg-white py-1 pr-3 pl-1.5 text-sm font-medium text-gray-800 hover:border-garden-500 hover:bg-garden-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-garden-500/15"
                 >
                   <PlantIconDisplay plantId={id} emoji={plant.icon} size={22} />
                   {getPlantName(id)}
-                  {vegetative && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">· {t("seeds.plantingStock")}</span>}
+                  {vegetative && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{t("seeds.plantingStock")}</span>}
+                  {id === "onion" && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{t("seeds.onionSets")}</span>}
                   <Plus size={14} aria-hidden="true" className="text-gray-500" />
                 </button>
               );
@@ -265,13 +278,16 @@ export function SeedInventory() {
                     t(`seeds.unitCount.${seed.unit}`, { count: seed.quantity, n: formatNumber(seed.quantity) }),
                     sourceText,
                     t("seeds.acquired", { year: seed.yearAcquired }),
-                  ].join(" · ")}
+                  ]}
+                  // Advice reads as meta (small, grey), so it does not compete with the title.
                   description={
-                    viability.status === "testRecommended"
-                      ? t("seeds.testExplain", { name, years: yearsText(viability.viabilityYears) })
-                      : viability.status === "notApplicable"
-                        ? t("seeds.plantingStockExplain")
-                        : seed.notes
+                    viability.status === "testRecommended" || viability.status === "notApplicable" ? (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {viability.status === "testRecommended"
+                          ? t("seeds.testExplain", { name, years: yearsText(viability.viabilityYears) })
+                          : t("seeds.plantingStockExplain")}
+                      </span>
+                    ) : seed.notes
                   }
                   trailing={seed.cost ? formatCurrency(seed.cost) : undefined}
                   actions={
@@ -304,7 +320,7 @@ export function SeedInventory() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave} disabled={!draft.plantId || !draft.source}>{t("common.save")}</Button>
           </>
         }
       >
@@ -315,49 +331,55 @@ export function SeedInventory() {
               plants={plants}
               value={draft.plantId}
               autoFocus={!draft.plantId}
+              invalid={Boolean(errors.plant)}
               onChange={({ plantId }) => patch({ plantId, ...(propagation(plantMap.get(plantId)) === "vegetative" && draft.unit !== "grams" ? { unit: "grams" as const } : {}) })}
               hint={draftVegetative ? t("seeds.vegetativeHint", { name: getPlantName(draft.plantId) }) : undefined}
             />
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
-          <Input label={t("planner.variety")} value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={t("planner.varietyPlaceholder")} />
-          <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
-            <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
-            <div>
-              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300" aria-hidden="true">{t("seeds.unit")}</p>
-              <SegmentedControl
-                fullWidth
-                label={t("seeds.unit")}
-                value={draft.unit}
-                onChange={(unit) => patch({ unit })}
-                options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
-              />
-            </div>
+          <Input label={t("planner.variety")} optional value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
+          {/* Short pairs stay side by side on phones too. The unit is named once, by the
+              select beside the field: its words are too long for an inline toggle (rule 9). */}
+          <div className="grid grid-cols-[3fr_2fr] items-end gap-4">
+            <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(draft.unit === "grams" ? 5 : draft.unit === "packets" ? 1 : 50) })} error={errors.quantity} />
+            {/* A select, not a segmented toggle: three units do not fit a half-width column. */}
+            <Select
+              label={t("seeds.unit")}
+              value={draft.unit}
+              onChange={(e) => patch({ unit: e.target.value as typeof draft.unit })}
+              options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
+            />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input label={t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
+          {/* Same columns as the row above, so both gutters line up; the wide one
+              keeps "Quelle wählen …" whole on phones. */}
+          <div className="grid grid-cols-[3fr_2fr] items-end gap-4">
+            {/* Source first: the year means "bought" or "harvested" depending on it. */}
             <Select
               label={t("seeds.source")}
               value={draft.source}
+              placeholder={t("seeds.sourceChoose")}
               onChange={(e) => patch({ source: e.target.value as SeedSource })}
               options={SOURCES.map((s) => ({ value: s, label: t(`seeds.sources.${s}`) }))}
             />
+            <Input label={draft.source === "saved" ? t("seeds.yearHarvested") : t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {draft.source === "shop" && (
-              <Input label={t("seeds.shopName")} value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
-            )}
+          {/* Shop and price only matter for bought seed. */}
+          {draft.source === "shop" && (
+          <>
+            <Input label={t("seeds.shopName")} optional value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
+            {/* Rule 9: an optional cost field gets its own full-width row with the shared hint. */}
             <Input
-              label={t("seeds.cost")}
+              label={t("seeds.cost")} optional
               inputMode="decimal"
               value={draft.cost}
               onChange={(e) => patch({ cost: e.target.value })}
-              placeholder={formatCurrency(3.5)}
-              hint={t("common.optional")}
+              placeholder={t("common.examplePlaceholder", { value: formatNumber(3.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
+              hint={t("common.costHint")}
               error={errors.cost}
             />
-          </div>
-          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+          </>
+          )}
+          <Textarea label={t("harvest.notes")} optional placeholder={t("seeds.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>

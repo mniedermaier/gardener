@@ -43,6 +43,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "planner", to: "/planner", icon: LayoutGrid, labelKey: "shell.nav.planner" },
       { id: "plants", to: "/plants", icon: Sprout, labelKey: "shell.nav.plants" },
       { id: "calendar", to: "/calendar", icon: CalendarDays, labelKey: "shell.nav.calendar" },
+      { id: "seeds", to: "/seeds", icon: Bean, labelKey: "shell.nav.seeds" },
     ],
   },
   {
@@ -50,19 +51,18 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: "shell.group.record",
     items: [
       { id: "harvest", to: "/harvest", icon: Apple, labelKey: "shell.nav.harvest" },
-      { id: "journal", to: "/journal", icon: BookOpen, labelKey: "shell.nav.journal" },
-      { id: "livestock", to: "/livestock", icon: Bird, labelKey: "shell.nav.livestock" },
       { id: "pantry", to: "/pantry", icon: Archive, labelKey: "shell.nav.pantry" },
+      { id: "livestock", to: "/livestock", icon: Bird, labelKey: "shell.nav.livestock" },
     ],
   },
   {
     id: "care",
     labelKey: "shell.group.care",
     items: [
-      { id: "seeds", to: "/seeds", icon: Bean, labelKey: "shell.nav.seeds" },
       { id: "soil", to: "/soil", icon: FlaskConical, labelKey: "shell.nav.soil" },
       { id: "pests", to: "/pests", icon: Bug, labelKey: "shell.nav.pests" },
       { id: "water", to: "/water-log", icon: Droplets, labelKey: "shell.nav.water" },
+      { id: "journal", to: "/journal", icon: BookOpen, labelKey: "shell.nav.journal" },
     ],
   },
   {
@@ -115,6 +115,8 @@ export const SECTIONS: Record<string, SectionTab[]> = {
 export function sectionIdForPath(pathname: string): string | null {
   const p = pathname.replace(/\/+$/, "") || "/";
   if (p === "/" || p === "/weather") return "today";
+  // Importing a shared garden ends in the planner: the sidebar keeps "Planer"
+  // active (the top bar still says "Import", see TopBar).
   if (p.startsWith("/planner") || p.startsWith("/import")) return "planner";
   if (p.startsWith("/plants") || p === "/companions") return "plants";
   if (p === "/calendar" || p === "/tasks") return "calendar";
@@ -123,6 +125,23 @@ export function sectionIdForPath(pathname: string): string | null {
   if (p === "/settings") return "settings";
   for (const g of NAV_GROUPS) for (const item of g.items) if (item.to === p) return item.id;
   return null;
+}
+
+export type BottomTab = "today" | "tasks" | "harvest" | "planner" | "more";
+
+/**
+ * Which bottom-nav tab a path belongs to, by section: "/calendar" lights
+ * "Aufgaben" (same section), "/weather" lights "Heute", and every page without
+ * a tab of its own lights "Mehr" — the bar always says where you are.
+ */
+export function bottomTabForPath(pathname: string): BottomTab {
+  switch (sectionIdForPath(pathname)) {
+    case "today": return "today";
+    case "calendar": return "tasks";
+    case "harvest": return "harvest";
+    case "planner": return "planner";
+    default: return "more";
+  }
 }
 
 /** The active tab within a section; animal detail pages count as "Tiere". */

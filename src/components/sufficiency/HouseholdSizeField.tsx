@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Minus, Plus } from "lucide-react";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -13,7 +13,12 @@ export function HouseholdSizeField() {
   const size = useAnalysisPrefs((s) => s.householdSize);
   const setSize = useAnalysisPrefs((s) => s.setHouseholdSize);
   const [text, setText] = useState(String(size));
-  useEffect(() => setText(String(size)), [size]);
+  // Follow outside changes (the other page's stepper) without an effect.
+  const [shown, setShown] = useState(size);
+  if (shown !== size) {
+    setShown(size);
+    setText(String(size));
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -33,7 +38,7 @@ export function HouseholdSizeField() {
             if (e.target.value !== "" && Number.isFinite(n)) setSize(n);
           }}
           onBlur={() => setText(String(size))}
-          className="w-10 appearance-none bg-transparent text-center text-sm font-semibold tabular-nums text-gray-900 [-moz-appearance:textfield] focus-visible:outline-2 focus-visible:outline-focus dark:text-gray-100 [&::-webkit-inner-spin-button]:appearance-none"
+          className="min-h-11 w-10 appearance-none bg-transparent text-center sm:min-h-0 text-sm font-semibold tabular-nums text-gray-900 [-moz-appearance:textfield] focus-visible:outline-2 focus-visible:outline-focus dark:text-gray-100 [&::-webkit-inner-spin-button]:appearance-none"
         />
         <IconButton icon={Plus} size="sm" label={t("sufficiency.morePeople")} onClick={() => setSize(size + 1)} disabled={size >= 20} />
       </div>

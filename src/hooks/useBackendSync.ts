@@ -29,7 +29,7 @@ const COLLECTION_KEYS = [
 
 const SETTINGS_KEYS = [
   "locale", "lastFrostDate", "gridCellSizeCm", "locationLat", "locationLon",
-  "locationName", "theme", "alerts",
+  "locationName", "locationRegion", "theme", "alerts",
 ] as const;
 
 export type SyncOutcome =
@@ -80,7 +80,9 @@ function applySnapshot(data: Record<string, unknown>, mode: "adopt" | "merge") {
 
 export function useBackendSync() {
   const backendUrl = useStore((s) => s.backendUrl);
-  const [connected, setConnected] = useState(false);
+  // Health per URL, so clearing or changing the URL needs no reset in the effect.
+  const [health, setHealth] = useState<{ url: string; ok: boolean } | null>(null);
+  const connected = !!backendUrl && health?.url === backendUrl && health.ok;
   const [syncing, setSyncing] = useState(false);
   const [outcome, setOutcome] = useState<SyncOutcome>({ kind: "idle" });
   const lastPushedRef = useRef<string | null>(null);
@@ -88,19 +90,15 @@ export function useBackendSync() {
   const pulledForRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!backendUrl) {
-      // Guarded so the effect does not re-render on every run.
-      setConnected((wasConnected) => (wasConnected ? false : wasConnected));
-      return;
-    }
+    if (!backendUrl) return;
 
     let cancelled = false;
     const checkHealth = async () => {
       try {
         const res = await fetch(`${backendUrl}/api/health`, { signal: AbortSignal.timeout(3000) });
-        if (!cancelled) setConnected(res.ok);
+        if (!cancelled) setHealth({ url: backendUrl, ok: res.ok });
       } catch {
-        if (!cancelled) setConnected(false);
+        if (!cancelled) setHealth({ url: backendUrl, ok: false });
       }
     };
 

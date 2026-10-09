@@ -1,27 +1,28 @@
 import { useCallback, useMemo, useState } from "react";
+import { EggWeekHint } from "./EggWeekHint";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Bird, Droplet, Egg, Milk, Pencil, Plus, Trash2 } from "lucide-react";
-import { endOfWeek, startOfWeek } from "date-fns";
+import { Bird, Egg, Pencil, Plus, Trash2 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
+import { daysSince } from "@/lib/format";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { toISODate } from "@/lib/format";
-import { getActualProducts } from "@/lib/metrics";
-import type { AnimalProduct, ProductType } from "@/types/animal";
+import { expectationBasisDate, expectationStart, expectedShareToDate, getActualProducts } from "@/lib/metrics";
+import { ANNUAL_YIELD, EGG_LAYERS, type AnimalProduct, type ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { Select } from "@/components/ui/Select";
-import { List, ListRow } from "@/components/ui/List";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductionChart } from "./ProductionChart";
 import { PRODUCT_ICON } from "./icons";
-import { IconTile, ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
-import { groupByMonth } from "./groupByMonth";
+import { NoAnimalsYet, ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
+import { ProductWeekList } from "./ProductWeekList";
+import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
 
 export function ProductionPage() {
@@ -35,7 +36,11 @@ export function ProductionPage() {
   const [filterAnimalId, setFilterAnimalId] = useState("");
   const [filterType, setFilterType] = useState("");
   const [dialog, setDialog] = useState<{ open: boolean; entry?: AnimalProduct }>({ open: false });
-  const openAdd = useCallback(() => setDialog({ open: true }), []);
+  // No animal yet (quick add from anywhere): add one first instead of an unsavable dialog.
+  const openAdd = useCallback(() => {
+    if (animals.length === 0) { navigate("/livestock", { state: { openAdd: true } }); return; }
+    setDialog({ open: true });
+  }, [animals.length, navigate]);
   useOpenAddOnNavigate(openAdd);
 
   const animalMap = useMemo(() => new Map(animals.map((a) => [a.id, a])), [animals]);
@@ -48,16 +53,80 @@ export function ProductionPage() {
 
   const year = now.getFullYear();
   const stats = useMemo(() => {
-    const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
-    const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
+    const eggWeeks = weeklyEggs(animalProducts, now);
     return {
-      eggsWeek: animalProducts.filter((p) => p.type === "eggs" && p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
+      // Last 7 days (the newest rolling window), not the calendar week.
+      eggsWeek: eggWeeks[eggWeeks.length - 1],
       year: getActualProducts(animalProducts, year),
+      eggWeeks,
     };
   }, [now, animalProducts, year]);
 
+  // Only products this herd yields (or that were recorded): no "Milch 0 l" without goats.
+  const herdTypes = herdProductTypes(animals, stats.year);
+  const hasLayers = animals.some((a) => EGG_LAYERS.includes(a.type));
+  const yearFigure = (ty: ProductType) => ({
+    label: ty === "eggs" ? t("livestock.eggsThisYear") : t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
+    value: formatProductAmount(ty, stats.year[ty], f, t),
+  });
+  const eggWeeks = stats.eggWeeks;
+  const eggAvg = eggWeeks.reduce((s, n) => s + n, 0) / eggWeeks.length;
+  const lastEggEntry = animalProducts.reduce<string | null>((max, p) => (p.type === "eggs" && (max === null || p.date > max) ? p.date : max), null);
+  // A log gap is not a drop: the sparkline stops at the last logged week, like the hint.
+  const sparkWeeks = lastEggEntry && daysSince(lastEggEntry) >= 3 ? eggWeeks.slice(0, -1) : eggWeeks;
+  // Same basis as the herd cards on "Tiere": expected up to today since arrival or the first entry.
+  const expectedToDate = (ty: ProductType) => animals.reduce((sum, a) => {
+    const y = ANNUAL_YIELD[a.type]?.find((x) => x.product === ty);
+    return y ? sum + y.quantity * a.count * expectedShareToDate(ty, now, expectationStart(a, animalProducts)) : sum;
+  }, 0);
+  // "Tiere" leads with this week; this page is the record: the year so far
+  // against what the herd should have yielded by now, then the week.
+  const heroType = herdTypes[0];
+  const heroExpected = heroType ? expectedToDate(heroType) : 0;
+  const heroAmount = heroType === "eggs" ? f.formatNumber(heroExpected, { maximumFractionDigits: 0 }) : heroType ? formatProductAmount(heroType, heroExpected, f, t) : "";
+  // Name the basis when it is not 1 January (earliest arrival/first entry of the producing animals).
+  const basisFor = (ty: ProductType) => animals
+    .filter((a) => ANNUAL_YIELD[a.type]?.some((x) => x.product === ty))
+    .map((a) => expectationBasisDate(expectationStart(a, animalProducts), now))
+    .reduce<string | null>((min, d) => (d === null ? min : min === null || d < min ? d : min), null);
+  const heroBasis = heroType ? basisFor(heroType) : null;
+  // One wording for every expectation (as on the herd cards): "erwartet ~… seit 27. Juli".
+  const expectedHint = (amount: string, basis: string | null) =>
+    basis ? t("livestock.ofExpectedSince", { amount, date: f.formatDate(basis, "monthYearShort") }) : t("livestock.ofExpectedToDate", { amount });
+  const heroFigure = heroType
+    ? {
+        ...yearFigure(heroType),
+        icon: PRODUCT_ICON[heroType],
+        hint: heroExpected > 0
+          ? (heroBasis
+            ? t("livestock.ofExpectedSince", { amount: heroAmount, date: f.formatDate(heroBasis, "monthYearShort") })
+            : t("livestock.production.yearHint", { amount: heroAmount }))
+          : undefined,
+      }
+    : null;
+  const weekFigure = hasLayers
+    ? [{
+        label: t("livestock.eggsThisWeek"),
+        value: (
+          <span className="inline-flex items-end gap-3">
+            {f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })}
+            <Sparkline values={sparkWeeks} color="brand" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
+          </span>
+        ),
+        hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} lastEntry={lastEggEntry} />,
+      }]
+    : [];
+  // Wax and wool are listed as single entries under the chart: no second figure for them.
+  // Every secondary figure has a sub-line like its neighbours: the expectation so far.
+  const yearFigures = [...weekFigure, ...herdTypes.slice(1).filter((ty) => ty !== "wax" && ty !== "wool").map((ty) => {
+    const expected = expectedToDate(ty);
+    return {
+      ...yearFigure(ty),
+      hint: expected > 0 ? expectedHint(formatProductAmount(ty, expected, f, t), basisFor(ty)) : undefined,
+    };
+  })];
+
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
-  const groups = groupByMonth(filtered);
 
   const addButton = (
     <Button onClick={openAdd} disabled={animals.length === 0}>
@@ -71,17 +140,10 @@ export function ProductionPage() {
       <PageHeader title={t("livestock.production.title")} description={t("livestock.production.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
       {animals.length === 0 ? (
-        <Card>
-          <EmptyState icon={Bird} title={t("livestock.emptyTitle")} description={t("livestock.emptyText")} action={<Button onClick={() => navigate("/livestock")}>{t("livestock.toHerd")}</Button>} />
-        </Card>
+        <NoAnimalsYet icon={Egg} title={t("livestock.production.emptyTitle")} text={t("livestock.production.emptyText")} />
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("livestock.eggsThisWeek")} value={f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.eggsThisYear")} value={f.formatNumber(stats.year.eggs, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.honeyThisYear")} value={f.formatWeight(stats.year.honey * 1000)} icon={Droplet} tone="neutral" />
-            <StatCard label={t("livestock.milkThisYear")} value={f.formatVolume(stats.year.milk)} icon={Milk} tone="neutral" />
-          </div>
+          {heroFigure && <KeyFigures hero={heroFigure} items={yearFigures.slice(0, 3)} />}
 
           {animalProducts.length > 0 && (
             <Card>
@@ -96,47 +158,52 @@ export function ProductionPage() {
             </Card>
           ) : (
             <section className="space-y-3">
-              {(animals.length > 1 || productTypes.length > 1) && (
-                <div className="grid gap-3 sm:max-w-lg sm:grid-cols-2">
-                  {animals.length > 1 && (
-                    <Select label={t("livestock.filterAnimal")} value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
-                  )}
-                  {productTypes.length > 1 && (
-                    <Select label={t("livestock.filterProduct")} value={filterType} onChange={(e) => setFilterType(e.target.value)} placeholder={t("livestock.production.allProducts")} options={productTypes.map((ty) => ({ value: ty, label: t(`livestock.products.${ty}`) }))} />
-                  )}
-                </div>
-              )}
-              {groups.length === 0 ? (
+              {/* Filters sit in the list header instead of a row of their own. */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("livestock.production.entries")}</h2>
+                {(animals.length > 1 || productTypes.length > 1) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {productTypes.length > 1 && (
+                      // Full width on phones like every other list filter; hugs its content from sm.
+                      <SegmentedControl
+                        fullWidth
+                        className="sm:w-auto"
+                        label={t("livestock.filterProduct")}
+                        value={filterType}
+                        onChange={setFilterType}
+                        options={[{ value: "", label: t("common.all") }, ...productTypes.map((ty) => ({ value: ty as string, label: t(`livestock.products.${ty}`) }))]}
+                      />
+                    )}
+                    {animals.length > 1 && (
+                      <Select aria-label={t("livestock.filterAnimal")} wrapperClassName="w-full sm:w-48" value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
+                    )}
+                  </div>
+                )}
+              </div>
+              {filtered.length === 0 ? (
                 <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
-              ) : groups.map((g) => (
-                <List key={g.key} header={`${f.formatDate(g.date, "monthYear")} · ${t("livestock.entriesHint", { count: g.items.length })}`}>
-                  {g.items.map((p) => {
+              ) : (
+                <ProductWeekList
+                  products={filtered}
+                  initialWeeks={4}
+                  entryMeta={(p) => { const animal = animalMap.get(p.animalId); return animal && animals.length > 1 ? animalLabel(animal, t) : null; }}
+                  onOpen={(p) => setDialog({ open: true, entry: p })}
+                  renderActions={(p) => {
                     const animal = animalMap.get(p.animalId);
                     return (
-                      <ListRow
-                        key={p.id}
-                        leading={<IconTile icon={PRODUCT_ICON[p.type]} />}
-                        title={t(`livestock.products.${p.type}`)}
-                        meta={[animal ? animalLabel(animal, t) : null, f.formatDate(p.date, "relative")].filter(Boolean).join(" · ")}
-                        description={p.notes}
-                        trailing={formatProductAmount(p.type, p.unit === "g" ? p.quantity / 1000 : p.quantity, f, t)}
-                        onClick={() => setDialog({ open: true, entry: p })}
-                        actions={
-                          <Menu
-                            label={t("common.moreActions")}
-                            items={[
-                              { label: t("common.edit"), icon: Pencil, onSelect: () => setDialog({ open: true, entry: p }) },
-                              ...(animal ? [{ label: t("livestock.openAnimal"), icon: Bird, onSelect: () => navigate(`/livestock/${animal.id}`) }] : []),
-                              "separator" as const,
-                              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void deleteProduct(p) },
-                            ]}
-                          />
-                        }
+                      <Menu
+                        label={t("common.moreActions")}
+                        items={[
+                          { label: t("common.edit"), icon: Pencil, onSelect: () => setDialog({ open: true, entry: p }) },
+                          ...(animal ? [{ label: t("livestock.openAnimal"), icon: Bird, onSelect: () => navigate(`/livestock/${animal.id}`) }] : []),
+                          "separator" as const,
+                          { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void deleteProduct(p) },
+                        ]}
                       />
                     );
-                  })}
-                </List>
-              ))}
+                  }}
+                />
+              )}
             </section>
           )}
         </div>

@@ -39,7 +39,10 @@ export function AppShell() {
   return (
     // h-dvh instead of h-screen: on mobile browsers the address bar shrinks
     // the visible viewport, and h-screen would leave the bottom nav off-screen.
-    <div className="flex h-dvh overflow-hidden bg-gray-50 dark:bg-gray-950">
+    // overflow-clip (not hidden): a clipped box cannot be scrolled, so an
+    // Element.scrollIntoView inside <main> can never shift the shell and push
+    // the top bar out of view.
+    <div className="flex h-dvh overflow-clip bg-gray-50 dark:bg-gray-950">
       {/* Skip link: first tab stop, jumps past sidebar, top bar and section tabs.
           A hash link would fight the HashRouter, so it moves focus directly. */}
       <a
@@ -53,10 +56,10 @@ export function AppShell() {
         {t("shell.skipToContent")}
       </a>
       <Sidebar open={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-clip">
         <TopBar onMenuClick={() => setSidebarOpen(true)} onSearchClick={() => setPaletteOpen(true)} />
         <SectionTabs />
-        <main ref={mainRef} id="main" tabIndex={-1} className="flex-1 focus-visible:outline-none overflow-y-auto bg-gray-50 p-4 pb-safe-nav sm:pb-6 md:p-6 lg:px-8 dark:bg-gray-950">
+        <main ref={mainRef} id="main" tabIndex={-1} className="relative flex-1 focus-visible:outline-none overflow-y-auto bg-gray-50 p-4 pb-safe-nav sm:pb-6 md:p-6 lg:px-8 dark:bg-gray-950">
           <Outlet />
         </main>
       </div>

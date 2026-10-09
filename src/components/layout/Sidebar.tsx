@@ -70,7 +70,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           open ? "translate-x-0 shadow-lg" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
+        <div className="flex h-13 shrink-0 items-center justify-between gap-2 px-4 lg:h-16">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">
               <Sprout size={18} />
@@ -88,15 +88,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav aria-label={t("shell.mainNavigation")} className="flex-1 overflow-y-auto px-3 pb-4">
+        <nav aria-label={t("shell.mainNavigation")} className="scroll-shadow-y flex-1 overflow-y-auto px-3 pb-1 lg:pb-6">
           {NAV_GROUPS.map((group) => (
-            <div key={group.id} className={group.labelKey ? "mt-5" : "mt-1"}>
+            <div key={group.id} className={group.labelKey ? "mt-2.5 lg:mt-4" : "mt-1"}>
               {group.labelKey && (
                 <h2 className="mb-1 px-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                   {t(group.labelKey)}
                 </h2>
               )}
-              <ul className="space-y-0.5">
+              <ul className="lg:space-y-0.5">
                 {group.items.map((item) => (
                   <li key={item.id}>
                     <NavItem item={item} active={activeId === item.id} onNavigate={onClose} />
@@ -107,7 +107,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="shrink-0 border-t border-gray-200 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-white/10">
+        {/* Settings as a labelled row at the foot on every size (phones too: an
+            unlabelled gear beside the close button was easy to mistake). */}
+        <div className="shrink-0 border-t border-gray-200 px-3 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] lg:pt-3 lg:pb-3 dark:border-white/10">
           <NavItem item={SETTINGS_ENTRY} active={activeId === "settings"} onNavigate={onClose} />
         </div>
       </aside>

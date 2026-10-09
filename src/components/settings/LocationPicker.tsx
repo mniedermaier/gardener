@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, LocateFixed, Search, Loader2, Pencil } from "lucide-react";
+import { MapPin, LocateFixed, Search, Loader2, Pencil, Keyboard } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -9,6 +9,8 @@ import { searchPlaces, roundCoord, type Place } from "@/lib/location";
 
 export interface PickedLocation {
   name: string;
+  /** "Bayern, Deutschland" when the place came from the search; cleared for the device position or typed values. */
+  region?: string;
   lat: number | null;
   lon: number | null;
   /** Metres above sea level, when the geocoder knows it (improves the frost estimate). */
@@ -18,6 +20,8 @@ export interface PickedLocation {
 interface LocationPickerProps {
   value: PickedLocation;
   onChange: (value: PickedLocation) => void;
+  /** First run: the device position is the main way forward (primary, full width on phones). */
+  prominent?: boolean;
 }
 
 /**
@@ -25,7 +29,7 @@ interface LocationPickerProps {
  * position, or type coordinates by hand. Works offline too: the manual
  * fields never depend on the network.
  */
-export function LocationPicker({ value, onChange }: LocationPickerProps) {
+export function LocationPicker({ value, onChange, prominent = false }: LocationPickerProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { formatNumber } = useFormat();
@@ -64,7 +68,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
   }, [query, i18n.resolvedLanguage]);
 
   const pick = (p: Place) => {
-    onChange({ name: p.name, lat: roundCoord(p.latitude), lon: roundCoord(p.longitude), elevation: p.elevation });
+    onChange({ name: p.name, region: p.region, lat: roundCoord(p.latitude), lon: roundCoord(p.longitude), elevation: p.elevation });
     setQuery("");
     setResults([]);
     setEditing(false);
@@ -79,7 +83,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
-        onChange({ name: value.name, lat: roundCoord(pos.coords.latitude), lon: roundCoord(pos.coords.longitude), elevation: pos.coords.altitude ?? undefined });
+        onChange({ name: value.name, region: "", lat: roundCoord(pos.coords.latitude), lon: roundCoord(pos.coords.longitude), elevation: pos.coords.altitude ?? undefined });
         setEditing(false);
         toast(t("location.geoSuccess"), "success");
       },
@@ -108,7 +112,11 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{value.name || t("location.unnamed")}</p>
-          <p className="text-xs text-gray-500 tabular-nums dark:text-gray-400">{coordLabel}</p>
+          {/* Region first: it tells apart places with the same name (Neustadt …); the coordinates confirm it. */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {value.region && <span>{value.region} · </span>}
+            <span className="tabular-nums">{coordLabel}</span>
+          </p>
         </div>
         <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
           <Pencil size={14} aria-hidden="true" />
@@ -161,12 +169,14 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         </ul>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="secondary" onClick={locate} disabled={locating}>
+      <div className={prominent ? "flex flex-col items-start gap-1" : "flex flex-wrap items-center gap-2"}>
+        <Button variant={prominent ? "primary" : "secondary"} className={prominent ? "w-full" : undefined} onClick={locate} disabled={locating}>
           {locating ? <Loader2 size={16} aria-hidden="true" className="animate-spin" /> : <LocateFixed size={16} aria-hidden="true" />}
           {t("location.useDevice")}
         </Button>
-        <Button variant="ghost" onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+        {/* First run: coordinates are the expert path, so a quiet link under the main action. */}
+        <Button variant="ghost" size={prominent ? "sm" : undefined} className={prominent ? "-ml-2 min-h-11 text-garden-700! dark:text-garden-300!" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+          {prominent && <Keyboard size={14} aria-hidden="true" />}
           {t("location.manual")}
         </Button>
         {hasCoords && (
@@ -181,7 +191,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           <Input
             label={t("settings.locationName")}
             value={value.name}
-            onChange={(e) => onChange({ ...value, name: e.target.value })}
+            onChange={(e) => onChange({ ...value, name: e.target.value, region: "" })}
             wrapperClassName="sm:col-span-3"
           />
           <Input
@@ -191,7 +201,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             min={-90}
             max={90}
             value={value.lat ?? ""}
-            onChange={(e) => onChange({ ...value, lat: e.target.value === "" ? null : Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, region: "", lat: e.target.value === "" ? null : Number(e.target.value) })}
           />
           <Input
             label={t("settings.longitude")}
@@ -200,7 +210,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             min={-180}
             max={180}
             value={value.lon ?? ""}
-            onChange={(e) => onChange({ ...value, lon: e.target.value === "" ? null : Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, region: "", lon: e.target.value === "" ? null : Number(e.target.value) })}
           />
         </div>
       )}

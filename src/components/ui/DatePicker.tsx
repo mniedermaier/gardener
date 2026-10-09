@@ -7,11 +7,15 @@ import { CONTROL_CLASS, Field, describedBy } from "./Field";
 
 interface DatePickerProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value"> {
   label?: string;
+  /** Marks the field optional: "(optional)" after the label. */
+  optional?: boolean;
   hint?: ReactNode;
   error?: ReactNode;
   wrapperClassName?: string;
   /** ISO yyyy-MM-dd, or "" for no date. */
   value: string;
+  /** Visible format: "date" (default, "9. Oktober 2026") or "dayMonth" for dates that recur every year. */
+  display?: "date" | "dayMonth";
 }
 
 /** Opens the native calendar; showPicker() throws outside a user gesture or in some iframes. */
@@ -25,7 +29,7 @@ function openPicker(el: HTMLInputElement) {
 
 /**
  * Date field whose visible text is always formatted in the app language
- * ("Montag, 5. Oktober 2026"). Native date inputs follow the browser locale
+ * ("5. Oktober 2026"). Native date inputs follow the browser locale
  * ("10/05/2026"), so the real `<input type="date">` lies transparently on top
  * of a formatted display: a click or Enter/Space opens the native calendar via
  * showPicker(), typing still edits the date, and screen readers get the native
@@ -33,6 +37,7 @@ function openPicker(el: HTMLInputElement) {
  */
 export function DatePicker({
   label,
+  optional,
   hint,
   error,
   wrapperClassName,
@@ -40,6 +45,7 @@ export function DatePicker({
   id,
   value,
   placeholder,
+  display = "date",
   disabled,
   onClick,
   onKeyDown,
@@ -64,7 +70,7 @@ export function DatePicker({
   };
 
   return (
-    <Field id={inputId} label={label} hint={hint} error={error} className={wrapperClassName}>
+    <Field id={inputId} label={label} optional={optional} hint={hint} error={error} className={wrapperClassName}>
       <div className="relative">
         <input
           id={inputId}
@@ -87,7 +93,7 @@ export function DatePicker({
             className,
           )}
         >
-          <span className={cn("truncate", !value && "text-gray-500 dark:text-gray-400")}>{value ? formatDate(value, "long") : (placeholder ?? "–")}</span>
+          <span className={cn("truncate", !value && "text-gray-500 dark:text-gray-400")}>{value ? formatDate(value, display) : (placeholder ?? "–")}</span>
           <CalendarDays size={16} className="shrink-0 text-gray-500 dark:text-gray-400" />
         </div>
       </div>

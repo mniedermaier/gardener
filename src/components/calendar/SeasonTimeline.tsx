@@ -1,8 +1,9 @@
 import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { CalendarRange, LayoutGrid } from "lucide-react";
-import { addWeeks, addYears, differenceInCalendarDays, endOfYear, startOfDay, startOfYear } from "date-fns";
+import { CalendarRange, Plus } from "lucide-react";
+import { useAddBed } from "@/hooks/useAddBed";
+import { addDays, addWeeks, addYears, differenceInCalendarDays, endOfYear, startOfDay, startOfYear } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
@@ -13,14 +14,14 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { List, ListRow } from "@/components/ui/List";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
-import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
+import { HARVEST_GRACE_DAYS, PHASES, getPhaseWindows, plantedHarvestWindow, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
-import { PlantableNowRows } from "./PlantableNowList";
+import { PlantableNowRows, useVisibleAgendaRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
+import { autumnPhaseWindows } from "@/lib/advisor";
 import { useToday } from "@/hooks/useToday";
 
 interface Range {
@@ -34,19 +35,28 @@ interface PlantTimeline {
   bedName: string;
   envType: EnvironmentType;
   phases: Partial<Record<Phase, Range>>;
+  /** Autumn sowing/planting windows, drawn in the lane of their phase. */
+  autumn: Array<{ phase: Phase; range: Range }>;
+  /** A phase that already happened (real planting date): drawn, never "due". */
+  done?: Phase;
 }
+
+/** Rows of "Jetzt dran" before "n weitere anzeigen" — the same cap as the sowing list. */
+const NOW_LIMIT = 8;
 
 export function SeasonTimeline() {
   const now = useToday();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { formatDate } = useFormat();
+  const addBed = useAddBed();
+  const { formatDate, formatDateRange } = useFormat();
   const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [filter, setFilter] = useState<string>("all");
+  const [nowExpanded, setNowExpanded] = useState(false);
   const sowing = useSowingAgenda();
-  const plantableCount = sowing.now.length;
+  const plantableCount = useVisibleAgendaRows(sowing.now).length;
 
   const todayKey = todayISO();
   const today = useMemo(() => startOfDay(toDate(todayKey) ?? now), [todayKey, now]);
@@ -83,12 +93,34 @@ export function SeasonTimeline() {
           if (!plant) continue;
           const phases: PlantTimeline["phases"] = {};
           for (const w of getPhaseWindows(plant, frostDate, { frostProtectionWeeks: protection })) phases[w.phase] = { start: w.start, end: w.end };
-          result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases });
+          // Planted this season: the planting and harvest bars follow the real
+          // planting dates (as the bed list and the harvest log do), not the
+          // frost-date estimate; autumn "possible" windows then drop out.
+          const year = frostDate.getFullYear();
+          const plantedDates = bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!);
+          let autumn = autumnPhaseWindows(plantId, year, protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
+          const times = plantedDates.flatMap((d) => toDate(d)?.getTime() ?? []);
+          let done: Phase | undefined;
+          if (times.length > 0) {
+            const first = new Date(Math.min(...times));
+            // Sown in place unless the crop is planted out (or has no sowing at all, like garlic cloves).
+            const phase: Phase = plant.transplantWeeks === null && plant.sowOutdoorsWeeks !== null ? "sowOutdoors" : "transplant";
+            for (const p of ["sowOutdoors", "transplant"] as const) delete phases[p];
+            if (phases.sowIndoors && phases.sowIndoors.end > first) delete phases.sowIndoors;
+            if (phase === "sowOutdoors") delete phases.sowIndoors;
+            phases[phase] = { start: first, end: addDays(new Date(Math.max(...times)), 7) };
+            done = phase;
+            delete phases.harvest;
+            const planted = plantedHarvestWindow(plant, plantedDates, { lastFrostDate, now: today, protectionWeeks: protection });
+            if (planted) phases.harvest = planted;
+            autumn = [];
+          }
+          result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn, done });
         }
       }
     }
     return result;
-  }, [gardens, plantMap, frostDate, filter]);
+  }, [gardens, plantMap, frostDate, filter, lastFrostDate, today]);
 
   // Mobile list: what is running now, and what starts within the next 4 weeks.
   const agenda = useMemo(() => {
@@ -98,12 +130,17 @@ export function SeasonTimeline() {
     for (const tl of timelines) {
       for (const phase of PHASES) {
         const range = tl.phases[phase];
-        if (!range) continue;
-        if (range.start <= today && range.end >= today) now.push({ tl, phase, range });
+        // A planting that already happened is history, not something to do.
+        if (!range || phase === tl.done) continue;
+        // A harvest stays "now" three weeks past its window, as on "Heute" (getHarvestReady).
+        const openUntil = phase === "harvest" ? addDays(range.end, HARVEST_GRACE_DAYS) : range.end;
+        if (range.start <= today && openUntil >= today) now.push({ tl, phase, range });
         else if (range.start > today && range.start <= soon) next.push({ tl, phase, range });
       }
     }
-    now.sort((a, b) => a.range.end.getTime() - b.range.end.getTime());
+    // Late first, then what closes first, then by crop — the same order as "Heute".
+    const late = (x: { phase: Phase; range: Range }) => Number(x.phase === "harvest" && x.range.end < today);
+    now.sort((a, b) => late(b) - late(a) || a.range.end.getTime() - b.range.end.getTime() || a.tl.plantId.localeCompare(b.tl.plantId));
     next.sort((a, b) => a.range.start.getTime() - b.range.start.getTime());
     // Nothing starts soon (e.g. in autumn): preview the next windows, rolled into next season.
     const later: typeof next = [];
@@ -111,6 +148,7 @@ export function SeasonTimeline() {
       for (const tl of timelines) {
         for (const phase of PHASES) {
           const r = tl.phases[phase];
+          if (phase === tl.done) continue;
           if (!r || r.start <= today) {
             if (r && r.end < today) later.push({ tl, phase, range: { start: addYears(r.start, 1), end: addYears(r.end, 1) } });
             continue;
@@ -126,23 +164,26 @@ export function SeasonTimeline() {
 
   // Same agenda as the dashboard: what can be sown or planted, planted or not.
   const sowingList = sowing.now.length + sowing.soon.length > 0 && (
-    <List header={`${t("advisor.title")} · ${sowing.now.length}`}>
+    <List header={`${t("advisor.title")} · ${plantableCount}`}>
       <PlantableNowRows now={sowing.now} soon={sowing.soon} limit={8} />
     </List>
   );
 
   if (plantedBeds.length === 0) {
+    // Without beds the next step comes first (one compact hint card), then the
+    // sowing list as context — every row there would lead to "first add a bed".
     return (
-      <div className="space-y-6">
-      <Card>
-        <EmptyState
-          icon={CalendarRange}
-          title={t("calendar.timelineEmptyTitle")}
-          description={t("calendar.timelineEmptyText")}
-          action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("calendar.toPlanner")}</Button>}
-        />
-      </Card>
-      {sowingList}
+      <div className="space-y-4">
+        {/* One line, not a card: the sowing list below is the useful part. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
+          <CalendarRange size={16} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />
+          <span className="min-w-0 flex-1">{t("calendar.timelineEmptyLine")}</span>
+          <Button variant="ghost" size="sm" className="-mr-2" onClick={addBed}>
+            <Plus size={16} aria-hidden="true" />
+            {t("planner.addBed")}
+          </Button>
+        </div>
+        {sowingList}
       </div>
     );
   }
@@ -150,7 +191,7 @@ export function SeasonTimeline() {
   const pct = (d: Date) => Math.min(100, Math.max(0, (differenceInCalendarDays(d, yearStart) / yearDays) * 100));
   const todayPct = pct(today);
   const frostPct = pct(frostDate);
-  const rangeLabel = (r: Range) => `${formatDate(r.start, "short")} – ${formatDate(r.end, "short")}`;
+  const rangeLabel = (r: Range) => formatDateRange(r.start, r.end);
   const phaseLabel = (p: Phase) => t(`plants.details.${p}`);
 
   const filterSelect = plantedBeds.length > 1 && (
@@ -166,20 +207,26 @@ export function SeasonTimeline() {
     />
   );
 
-  const agendaRow = ({ tl, phase, range }: { tl: PlantTimeline; phase: Phase; range: Range }, kind: "now" | "next") => {
+  // A phase badge only where a list mixes phases; one phase moves into the header ("Jetzt dran · Ernte · 11").
+  const onePhase = (items: { phase: Phase }[]) => (items.length > 0 && new Set(items.map((a) => a.phase)).size === 1 ? items[0].phase : null);
+  const nowPhase = onePhase(agenda.now);
+  const nextPhase = onePhase(agenda.next);
+  const agendaRow = ({ tl, phase, range }: { tl: PlantTimeline; phase: Phase; range: Range }, kind: "now" | "next", showPhase = true) => {
     const plant = plantMap.get(tl.plantId);
     return (
       <ListRow
         key={`${tl.bedId}-${tl.plantId}-${phase}`}
         leading={plant ? <PlantIconDisplay plantId={tl.plantId} emoji={plant.icon} size={28} /> : undefined}
         title={getPlantName(tl.plantId)}
-        badges={<PhaseBadge phase={phase} />}
+        badges={showPhase ? <PhaseBadge phase={phase} /> : undefined}
         meta={[
           tl.bedName,
           kind === "now"
-            ? t("calendar.until", { date: formatDate(range.end, "short") })
+            ? (range.end < today ? t("dashboard.harvestSoon") : t("calendar.until", { date: formatDate(range.end, "short") }))
             : t("calendar.from", { date: formatDate(range.start, "short") }),
-        ].join(" · ")}
+        ]}
+        // Same behaviour as the sowing rows below: every agenda row opens its plant.
+        onClick={() => navigate(`/plants?plant=${encodeURIComponent(tl.plantId)}`)}
       />
     );
   };
@@ -189,21 +236,38 @@ export function SeasonTimeline() {
       {/* Mobile: agenda list instead of an unreadable Gantt */}
       <div className="space-y-4 sm:hidden">
         {filterSelect}
-        <List header={`${t("calendar.nowDue")} · ${agenda.now.length}`}>
+        <List headingLevel={2} header={[t("calendar.nowDue"), nowPhase && phaseLabel(nowPhase), agenda.now.length].filter((x) => x !== null).join(" · ")}>
           {agenda.now.length > 0
-            ? agenda.now.map((a) => agendaRow(a, "now"))
+            ? (nowExpanded ? agenda.now : agenda.now.slice(0, NOW_LIMIT)).map((a) => agendaRow(a, "now", nowPhase === null))
             : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNow")}</li>}
+          {/* Same cap as the sowing list below. */}
+          {!nowExpanded && agenda.now.length > NOW_LIMIT && (
+            <li>
+              <button
+                type="button"
+                onClick={() => setNowExpanded(true)}
+                className="flex min-h-11 w-full items-center px-4 text-left text-sm font-medium text-garden-700 hover:underline dark:text-garden-300"
+              >
+                {t("advisor.showMore", { count: agenda.now.length - NOW_LIMIT })}
+              </button>
+            </li>
+          )}
         </List>
-        <List header={`${t("calendar.next4Weeks")} · ${agenda.next.length}`}>
-          {agenda.next.length > 0
-            ? agenda.next.map((a) => agendaRow(a, "next"))
-            : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{plantableCount > 0 ? t("calendar.nothingNextPlanted", { count: plantableCount }) : t("calendar.nothingNext")}</li>}
-        </List>
+        {agenda.next.length > 0 && (
+          <List headingLevel={2} header={[t("calendar.next4Weeks"), nextPhase && phaseLabel(nextPhase), agenda.next.length].filter((x) => x !== null).join(" · ")}>
+            {agenda.next.map((a) => agendaRow(a, "next", nextPhase === null))}
+          </List>
+        )}
         {sowingList}
+        {/* Nothing starts in the next 4 weeks: the header says when the next window opens,
+            instead of a separate "nothing new" line above a list of things to sow. */}
         {agenda.later.length > 0 && (
-          <List header={t("calendar.upNext")}>
+          <List headingLevel={2} header={t("calendar.upNextFrom", { date: formatDate(agenda.later[0].range.start, "short") })}>
             {agenda.later.map((a) => agendaRow(a, "next"))}
           </List>
+        )}
+        {agenda.next.length === 0 && agenda.later.length === 0 && !sowingList && (
+          <p className="px-1 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNextLine")}</p>
         )}
       </div>
 
@@ -249,6 +313,7 @@ export function SeasonTimeline() {
                   todayPct={todayPct}
                   frostPct={frostPct}
                   describe={(p, r) => `${phaseLabel(p)}: ${rangeLabel(r)}`}
+                  possibleLabel={t("calendar.autumnPossible")}
                 />
               ))}
             </ul>
@@ -259,6 +324,13 @@ export function SeasonTimeline() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-600 dark:text-gray-300">
           <PhaseLegend phases={PHASES} />
+          {/* Only when such a bar is drawn. */}
+          {timelines.some((tl) => tl.autumn.length > 0) && (
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-4 rounded-sm bg-garden-600 opacity-35 dark:bg-garden-400" aria-hidden="true" />
+              {t("calendar.autumnPossibleLegend")}
+            </span>
+          )}
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-0.5 bg-garden-600 dark:bg-garden-400" aria-hidden="true" />
             {t("calendar.today")}
@@ -275,7 +347,7 @@ export function SeasonTimeline() {
 }
 
 const TimelineRow = memo(function TimelineRow({
-  tl, name, icon, showBed, pct, todayPct, frostPct, describe,
+  tl, name, icon, showBed, pct, todayPct, frostPct, describe, possibleLabel,
 }: {
   tl: PlantTimeline;
   name: string;
@@ -285,10 +357,17 @@ const TimelineRow = memo(function TimelineRow({
   todayPct: number;
   frostPct: number;
   describe: (p: Phase, r: Range) => string;
+  possibleLabel: string;
 }) {
-  const summary = PHASES.filter((p) => tl.phases[p]).map((p) => describe(p, tl.phases[p]!)).join("; ");
+  // Autumn windows are a possibility, not a planting: drawn faint and named so.
+  const bars = [
+    ...PHASES.filter((p) => tl.phases[p]).map((p) => ({ phase: p, range: tl.phases[p]!, possible: false })),
+    ...tl.autumn.map((a) => ({ ...a, possible: true })),
+  ];
+  const label = (b: (typeof bars)[number]) => (b.possible ? `${describe(b.phase, b.range)} (${possibleLabel})` : describe(b.phase, b.range));
+  const summary = bars.map(label).join("; ");
   return (
-    <li className="flex items-center gap-3 py-1.5">
+    <li className="flex items-center gap-3 py-1">
       <div className="flex w-44 shrink-0 items-center gap-2">
         <PlantIconDisplay plantId={tl.plantId} emoji={icon} size={20} />
         <div className="min-w-0">
@@ -301,19 +380,19 @@ const TimelineRow = memo(function TimelineRow({
           )}
         </div>
       </div>
-      <div className="relative h-9 flex-1 rounded-md bg-gray-50 dark:bg-white/[0.03]" role="img" aria-label={`${name}: ${summary}`}>
-        {PHASES.map((p, i) => {
-          const r = tl.phases[p];
-          if (!r) return null;
+      <div className="relative h-8 flex-1 rounded-md bg-gray-50 dark:bg-white/[0.03]" role="img" aria-label={`${name}: ${summary}`}>
+        {/* One lane per phase; autumn windows share the lane of their phase. */}
+        {bars.map((b) => {
+          const { phase: p, range: r } = b;
           const left = pct(r.start);
           const width = Math.max(pct(r.end) - left, 1);
           const fill = phaseFill(p);
           return (
             <div
-              key={p}
-              className={`absolute h-[7px] rounded-sm ${fill.className}`}
-              style={{ ...fill.style, left: `${left}%`, width: `${width}%`, top: `${2 + i * 8}px` }}
-              title={describe(p, r)}
+              key={`${p}-${r.start.getTime()}`}
+              className={`absolute h-1.5 rounded-sm ${fill.className} ${b.possible ? "opacity-35" : ""}`}
+              style={{ ...fill.style, left: `${left}%`, width: `${width}%`, top: `${2 + PHASES.indexOf(p) * 7}px` }}
+              title={label(b)}
             />
           );
         })}

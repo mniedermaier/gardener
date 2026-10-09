@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, ChevronRight, Coffee, ExternalLink, MapPin, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
+import { Check, ChevronRight, CloudOff, Coffee, ExternalLink, Loader2, MapPin, RefreshCw, Sun, Moon, Monitor, Trash2, Sparkles, TriangleAlert } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
 import { estimateLastFrost } from "@/lib/location";
-import { getWeatherProvider, isWeatherConfigured } from "@/lib/weather";
+import { fetchWeather, getOwmKeyStatus, getWeatherFetchStatus, getWeatherProvider, isWeatherConfigured, subscribeOwmKeyStatus, subscribeWeatherFetchStatus } from "@/lib/weather";
 import { clearAllData } from "@/lib/dataImport";
 import { useFormat } from "@/hooks/useFormat";
 import { Card } from "@/components/ui/Card";
@@ -16,9 +17,13 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
+import { Link } from "react-router-dom";
+import { HouseholdSizeField } from "@/components/sufficiency/HouseholdSizeField";
 import { DataManagement } from "./DataManagement";
 import { LocationPicker, type PickedLocation } from "./LocationPicker";
 import { useToday } from "@/hooks/useToday";
+import { useBackendAvailable } from "@/hooks/useBackendAvailable";
+import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 
 type Locale = "de" | "en" | "es" | "fr";
 type Theme = "light" | "dark" | "system";
@@ -31,7 +36,7 @@ const LANGUAGES: Array<{ value: Locale; label: string }> = [
 ];
 
 const SETTING_KEYS = [
-  "locale", "theme", "weatherApiKey", "locationLat", "locationLon", "locationName",
+  "locale", "theme", "weatherApiKey", "locationLat", "locationLon", "locationName", "locationRegion",
   "lastFrostDate", "gridCellSizeCm", "backendUrl", "alerts",
 ] as const;
 
@@ -40,7 +45,7 @@ function Section({ id, title, description, children, tone }: { id: string; title
   return (
     <section aria-labelledby={id} className="grid gap-3 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-8">
       <div className="md:pt-1">
-        <h2 id={id} className={`text-base font-semibold ${tone === "danger" ? "text-danger" : "text-gray-900 dark:text-gray-100"}`}>{title}</h2>
+        <h2 id={id} className={`text-xl font-semibold ${tone === "danger" ? "text-danger" : "text-gray-900 dark:text-gray-100"}`}>{title}</h2>
         {description && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
       </div>
       <Card className={tone === "danger" ? "border-danger/30 dark:border-danger/30" : ""}>{children}</Card>
@@ -66,6 +71,7 @@ export function SettingsPage() {
       locationLat: s.locationLat,
       locationLon: s.locationLon,
       locationName: s.locationName,
+      locationRegion: s.locationRegion,
       lastFrostDate: s.lastFrostDate,
       gridCellSizeCm: s.gridCellSizeCm,
       backendUrl: s.backendUrl,
@@ -81,6 +87,15 @@ export function SettingsPage() {
     })),
   );
   const [elevation, setElevation] = useState<number | undefined>(undefined);
+
+  // Deep link to a section (`#/settings?section=data`, e.g. "Backup wiederherstellen" on the import page).
+  useOpenFromParam("section", (id) => {
+    const heading = document.getElementById(`settings-${id}`);
+    if (!heading) return false;
+    heading.scrollIntoView({ block: "start" });
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  });
 
   // "Gespeichert" flash whenever one of the settings changes.
   const [savedFlash, setSavedFlash] = useState(false);
@@ -110,19 +125,61 @@ export function SettingsPage() {
 
   const handleLocation = (v: PickedLocation) => {
     setElevation(v.elevation);
-    if (v.lat !== null && v.lon !== null) store.setLocation(v.lat, v.lon, v.name);
-    else useStore.setState({ locationLat: v.lat, locationLon: v.lon, locationName: v.name });
+    if (v.lat !== null && v.lon !== null) store.setLocation(v.lat, v.lon, v.name, v.region);
+    else useStore.setState({ locationLat: v.lat, locationLon: v.lon, locationName: v.name, locationRegion: v.region ?? "" });
   };
 
   const handleClearAll = async () => {
-    const ok = await confirm(t("settings.danger.confirm"), { confirmLabel: t("settings.danger.action") });
+    const ok = await confirm({ title: t("settings.danger.confirmTitle"), message: t("settings.danger.confirm"), confirmLabel: t("settings.danger.action") });
     if (ok) clearAllData();
   };
 
   const frostYear = Number(store.lastFrostDate.slice(0, 4)) || now.getFullYear();
   const frostEstimate = store.locationLat !== null && elevation !== undefined ? estimateLastFrost(store.locationLat, elevation, frostYear) : null;
   const hasLocation = isWeatherConfigured(store.locationLat, store.locationLon);
-  const provider = getWeatherProvider(store.weatherApiKey);
+  const configuredProvider = getWeatherProvider(store.weatherApiKey);
+  // The provider that actually delivers: a rejected or unreachable key falls
+  // back to Open-Meteo (lib/weather.ts), and Settings must say so.
+  const keyStatus = useSyncExternalStore(subscribeOwmKeyStatus, () => getOwmKeyStatus(store.weatherApiKey));
+  const provider = configuredProvider === "openweathermap" && (keyStatus === "auth" || keyStatus === "unavailable") ? "open-meteo" : configuredProvider;
+  // What the last request for this location really found (same fetch as the weather page and "Heute").
+  const fetchStatus = useSyncExternalStore(subscribeWeatherFetchStatus, () => getWeatherFetchStatus(store.locationLat, store.locationLon));
+  // Nothing fetched yet this session, a key nobody has used yet, or "Erneut versuchen": check once per
+  // location/key/retry, after typing stops. fetchWeather gives up after a timeout, so "checking" always ends.
+  const [retry, setRetry] = useState(0);
+  const attempt = `${store.locationLat}|${store.locationLon}|${store.weatherApiKey}|${retry}`;
+  const [doneAttempt, setDoneAttempt] = useState<string | null>(null);
+  const wanted = fetchStatus === undefined || (configuredProvider === "openweathermap" && keyStatus === undefined) || retry > 0;
+  const checking = hasLocation && wanted && doneAttempt !== attempt;
+  useEffect(() => {
+    if (!checking || store.locationLat === null || store.locationLon === null) return;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => {
+      fetchWeather({ lat: store.locationLat!, lon: store.locationLon!, apiKey: store.weatherApiKey, locale: store.locale, t, signal: ctrl.signal })
+        .catch(() => {})
+        .finally(() => { if (!ctrl.signal.aborted) setDoneAttempt(attempt); });
+    }, 800);
+    return () => { clearTimeout(timer); ctrl.abort(); };
+  }, [checking, attempt, store.locationLat, store.locationLon, store.weatherApiKey, store.locale, t]);
+  const weatherState: "needsLocation" | "checking" | "error" | "ok" =
+    !hasLocation ? "needsLocation" : fetchStatus === "error" && !checking ? "error" : fetchStatus === "ok" ? "ok" : "checking";
+  const place = store.locationName || t("settings.weatherYourLocation");
+  const providerStatus =
+    configuredProvider !== "openweathermap" ? t("settings.weatherProviderActive", { provider: "Open-Meteo" })
+    : keyStatus === "auth" ? t("settings.weatherKeyRejected")
+    : keyStatus === "unavailable" ? t("settings.weatherOwmUnavailable")
+    : keyStatus === "ok" ? t("settings.weatherProviderActive", { provider: "OpenWeatherMap" })
+    : !hasLocation ? t("settings.weatherProviderActive", { provider: "OpenWeatherMap" })
+    : fetchStatus === "error" && !checking ? t("settings.weatherKeyUnchecked")
+    : t("settings.weatherKeyChecking");
+
+  const showSync = useBackendAvailable(store.backendUrl);
+  // App Store rule 3.1.1: no external tip links in the iOS app.
+  // External tips are not allowed in the store apps (App Store 3.1.1, Play payments
+  // policy): the coffee link only shows on the web.
+  const showCoffee = !Capacitor.isNativePlatform();
+  // A rejected or unreachable key needs the user; otherwise the key field stays folded away.
+  const keyProblem = configuredProvider === "openweathermap" && (keyStatus === "auth" || keyStatus === "unavailable");
 
   return (
     <div className="pb-8">
@@ -146,7 +203,9 @@ export function SettingsPage() {
           <div className="space-y-5">
             <div>
               <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("settings.language")}</p>
-              <SegmentedControl label={t("settings.language")} value={store.locale} onChange={handleLocaleChange} options={LANGUAGES} className="max-w-full overflow-x-auto" />
+              <div className="max-w-full overflow-x-auto">
+                <SegmentedControl label={t("settings.language")} value={store.locale} onChange={handleLocaleChange} options={LANGUAGES} />
+              </div>
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("settings.theme")}</p>
@@ -167,7 +226,7 @@ export function SettingsPage() {
         <Section id="settings-location" title={t("settings.locationClimate")} description={t("settings.locationClimateDesc")}>
           <div className="space-y-5">
             <LocationPicker
-              value={{ name: store.locationName, lat: store.locationLat, lon: store.locationLon, elevation }}
+              value={{ name: store.locationName, region: store.locationRegion, lat: store.locationLat, lon: store.locationLon, elevation }}
               onChange={handleLocation}
             />
             <div className="grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 dark:border-white/10">
@@ -175,6 +234,7 @@ export function SettingsPage() {
                 <DatePicker
                   label={t("settings.lastFrostDate")}
                   value={store.lastFrostDate}
+                  display="dayMonth"
                   onChange={(e) => e.target.value && store.setLastFrostDate(e.target.value)}
                   hint={frostEstimate ? t("settings.frostEstimate", { date: formatDate(frostEstimate, "short") }) : t("settings.frostHint")}
                 />
@@ -201,13 +261,30 @@ export function SettingsPage() {
         <Section id="settings-weather" title={t("settings.weather")} description={t("settings.weatherDesc")}>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <span className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${hasLocation ? "bg-positive/10 text-positive" : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"}`} aria-hidden="true">
-                {hasLocation ? <Check size={16} /> : <MapPin size={16} />}
+              <span
+                className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
+                  weatherState === "ok" ? "bg-positive/10 text-positive" : weatherState === "error" ? "bg-warning/10 text-warning" : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+                }`}
+                aria-hidden="true"
+              >
+                {weatherState === "ok" ? <Check size={16} /> : weatherState === "error" ? <CloudOff size={16} /> : weatherState === "checking" ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
               </span>
-              <div className="min-w-0 text-sm">
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                  {hasLocation ? t("settings.weatherReady", { place: store.locationName || t("settings.weatherYourLocation") }) : t("settings.weatherNeedsLocation")}
+              <div className="min-w-0 flex-1 text-sm">
+                <p role="status" className="font-medium text-gray-900 dark:text-gray-100">
+                  {weatherState === "ok" ? t("settings.weatherReady", { place })
+                    : weatherState === "error" ? t("settings.weatherUnavailable", { place })
+                    : weatherState === "checking" ? t("settings.weatherChecking", { place })
+                    : t("settings.weatherNeedsLocation")}
                 </p>
+                {weatherState === "error" && (
+                  <>
+                    <p className="mt-0.5 text-gray-600 dark:text-gray-300">{t("settings.weatherUnavailableHint")}</p>
+                    <Button variant="secondary" size="sm" className="my-2" onClick={() => setRetry((n) => n + 1)}>
+                      <RefreshCw size={14} aria-hidden="true" />
+                      {t("weather.retry")}
+                    </Button>
+                  </>
+                )}
                 <p className="mt-0.5 text-gray-500 dark:text-gray-400">
                   {t("settings.weatherSource")}{" "}
                   {provider === "openweathermap" ? (
@@ -223,15 +300,19 @@ export function SettingsPage() {
                 </p>
               </div>
             </div>
-            <details className="group border-t border-gray-100 pt-3 dark:border-white/10" open={Boolean(store.weatherApiKey) || undefined}>
+            {keyProblem && (
+              <p role="status" className="flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2.5 text-sm font-medium text-warning dark:bg-warning/15">
+                <TriangleAlert size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+                {providerStatus}
+              </p>
+            )}
+            <details className="group border-t border-gray-100 pt-3 dark:border-white/10" open={keyProblem || undefined}>
               <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 [&::-webkit-details-marker]:hidden">
                 <ChevronRight size={16} aria-hidden="true" className="text-gray-500 transition-transform group-open:rotate-90 dark:text-gray-400" />
                 {t("settings.weatherAdvanced")}
               </summary>
               <div className="space-y-3 pt-2 pl-6">
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {t("settings.weatherProviderActive", { provider: provider === "openweathermap" ? "OpenWeatherMap" : "Open-Meteo" })}
-                </p>
+                {!keyProblem && <p role="status" className="text-sm text-gray-600 dark:text-gray-300">{providerStatus}</p>}
                 <Input
                   label={t("settings.apiKey")}
                   type="password"
@@ -242,7 +323,7 @@ export function SettingsPage() {
                   hint={
                     <>
                       {t("settings.apiKeyHint")}{" "}
-                      <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
+                      <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="relative inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 after:absolute after:-inset-y-3.5 after:inset-x-0 after:content-[''] hover:underline dark:text-garden-300">
                         openweathermap.org <ExternalLink size={12} aria-hidden="true" />
                       </a>
                     </>
@@ -286,7 +367,7 @@ export function SettingsPage() {
           </div>
         </Section>
 
-        <Section id="settings-sync" title={t("settings.backend")} description={t("settings.backendDesc")}>
+        {showSync && <Section id="settings-sync" title={t("settings.backend")} description={t("settings.backendDesc")}>
           <Input
             label={t("settings.backendUrl")}
             type="url"
@@ -296,13 +377,23 @@ export function SettingsPage() {
             placeholder="http://localhost:3001"
             hint={t("settings.backendHint")}
           />
+        </Section>}
+
+        <Section id="settings-analysis" title={t("settings.analysisTitle")} description={t("settings.analysisDesc")}>
+          <div className="space-y-3">
+            <HouseholdSizeField />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("settings.pricesHint")}{" "}
+              <Link to="/expenses" className="font-medium text-garden-700 hover:underline dark:text-garden-300">{t("settings.pricesLink")}</Link>
+            </p>
+          </div>
         </Section>
 
         <Section id="settings-data" title={t("dataManagement.title")} description={t("settings.dataDesc")}>
           <DataManagement />
         </Section>
 
-        <Section id="settings-support" title={t("settings.coffeeTitle")} description={t("settings.coffeeDesc")}>
+        {showCoffee && <Section id="settings-support" title={t("settings.coffeeTitle")} description={t("settings.coffeeDesc")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-gray-600 dark:text-gray-400">{t("settings.coffeeText")}</p>
             <a
@@ -316,6 +407,27 @@ export function SettingsPage() {
               <ExternalLink size={14} aria-hidden="true" className="text-gray-500" />
             </a>
           </div>
+        </Section>}
+
+        <Section id="settings-about" title={t("settings.aboutTitle")} description={t("settings.aboutDesc")}>
+          <dl className="divide-y divide-gray-100 text-sm dark:divide-white/5">
+            <div className="flex items-center justify-between gap-3 pb-3">
+              <dt className="text-gray-600 dark:text-gray-400">{t("settings.version")}</dt>
+              <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">{__APP_VERSION__}</dd>
+            </div>
+            {[
+              { href: `${import.meta.env.BASE_URL}privacy.html`, label: t("settings.privacyPolicy") },
+              { href: "https://github.com/mniedermaier/gardener", label: t("settings.sourceCode") },
+              { href: "https://github.com/mniedermaier/gardener/blob/main/LICENSE", label: t("settings.license") },
+            ].map((l) => (
+              <div key={l.href} className="py-1 last:pb-0">
+                <a href={l.href} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-between gap-3 font-medium text-gray-900 hover:text-garden-700 dark:text-gray-100 dark:hover:text-garden-300">
+                  {l.label}
+                  <ExternalLink size={14} aria-hidden="true" className="text-gray-500" />
+                </a>
+              </div>
+            ))}
+          </dl>
         </Section>
 
         <Section id="settings-danger" title={t("settings.danger.title")} description={t("settings.danger.desc")} tone="danger">

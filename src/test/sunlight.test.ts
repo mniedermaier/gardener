@@ -52,3 +52,13 @@ describe("Sunlight calculations", () => {
     expect(info.sunset).toBe("--:--");
   });
 });
+
+describe("getDaylightInfo just after midnight", () => {
+  it("returns today's sun, not yesterday's", () => {
+    // Munich, 00:05 vs. 12:00 on the same local day: same sunrise and sunset.
+    const night = getDaylightInfo(new Date(2026, 9, 10, 0, 5), 48.14, 11.58);
+    const noon = getDaylightInfo(new Date(2026, 9, 10, 12, 0), 48.14, 11.58);
+    expect(night.sunrise).toBe(noon.sunrise);
+    expect(night.sunset).toBe(noon.sunset);
+  });
+});

@@ -14,6 +14,7 @@ import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useUndo } from "@/hooks/useUndo";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Modal } from "@/components/ui/Modal";
@@ -25,13 +26,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { List, ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Bed, CellPlanting, Garden } from "@/types/garden";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import { generateShareUrl } from "@/lib/sharing";
 import { toISODate } from "@/lib/format";
-import { getPlantableNow } from "@/lib/advisor";
+import { getGardenSowingAgenda, getPlantableNow } from "@/lib/advisor";
+import { usePointerFine } from "./usePointerFine";
 import { validatePlacement, analyzeNeighbours, getCellConflicts, getPlacementHints } from "@/lib/placementValidation";
 import { recommendBedPlanting, getRecommendedPlants, type PlantingStrategy, type PlantingDirection } from "@/lib/bedRecommendation";
 import { CropRotation } from "./CropRotation";
@@ -44,17 +46,9 @@ import { AutoFillDialog, BedDialog, draftToBed, type BedDraft } from "./PlannerD
 
 type BedDialogState = { open: false } | { open: true; bedId?: string };
 
-/** Initial zoom so a bed fits its column without horizontal scrolling. */
-function fitZoom(bed: Bed): number {
-  if (typeof window === "undefined") return 1;
-  const w = window.innerWidth;
-  const available = w >= 768 ? w - (w >= 1024 ? 256 : 0) - 340 - 96 : w - 48;
-  const zoom = available / (bed.width * 52 + 12);
-  return Math.max(0.6, Math.min(1, Math.round(zoom * 10) / 10));
-}
-
 export function GardenPlanner() {
   const { t } = useTranslation();
+  const pointerFine = usePointerFine();
   const { formatDate } = useFormat();
   const location = useLocation();
   const navigate = useNavigate();
@@ -74,6 +68,7 @@ export function GardenPlanner() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const { toast, confirm } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { pushUndo, undo, canUndo } = useUndo();
 
   // Fall back to the first garden: a stale selection must not hide the beds.
@@ -95,19 +90,23 @@ export function GardenPlanner() {
     const id = (location.state as { placePlantId?: string } | null)?.placePlantId;
     return (id && plantMap.get(id)) || null;
   });
-  const singleBed = (activeGarden?.beds.length ?? 0) === 1;
+  // One bed, or a deep link into a bed (?bed=… from "Jetzt säen"): place right away; else pick the bed first.
+  const singleBed = (activeGarden?.beds.length ?? 0) === 1 || !!openBed;
   const [placingPlant, setPlacingPlant] = useState<Plant | null>(singleBed ? initialPlant : null);
   const [pathMode, setPathMode] = useState(false);
   const [inspectKey, setInspectKey] = useState<string | null>(null);
   const [pendingPlant, setPendingPlant] = useState<Plant | null>(singleBed ? null : initialPlant);
   const [activeDragPlant, setActiveDragPlant] = useState<Plant | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  // 1 = the bed fits its column (BedGrid measures); zoom scales from there.
   const [zoom, setZoom] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
   // Mobile sheet height: "peek" keeps the bed visible (actions only), "full" shows everything.
   const [sheetFull, setSheetFull] = useState(false);
 
   const [bedDialog, setBedDialog] = useState<BedDialogState>({ open: false });
+  // "Beet hinzufügen" from other pages (useAddBed) lands here with the dialog open.
+  useOpenAddOnNavigate(useCallback(() => setBedDialog({ open: true }), []));
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
   const [newGardenOpen, setNewGardenOpen] = useState(false);
   const [gardenName, setGardenName] = useState("");
@@ -115,21 +114,24 @@ export function GardenPlanner() {
   const [showPrint, setShowPrint] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Leaving or switching the bed via the URL (browser back) resets the per-bed modes.
+  // Leaving or switching the bed (also via the URL / browser back) resets the
+  // per-bed modes. The plant being placed belongs to the bed it was picked in:
+  // it only survives the step from the overview into a bed (a plant chosen
+  // there, or a deep link), never a switch to another bed.
   const [prevBedParam, setPrevBedParam] = useState(bedParam);
   if (prevBedParam !== bedParam) {
     setPrevBedParam(bedParam);
     setInspectKey(null);
     setPathMode(false);
     setSheetOpen(false);
-    if (!bedParam) setPlacingPlant(null);
+    if (!bedParam || prevBedParam) setPlacingPlant(null);
+    setZoom(1);
   }
 
   const mode = pathMode ? "path" : placingPlant ? "place" : "inspect";
 
   const openBedById = useCallback((bedId: string) => {
-    const bed = activeGarden?.beds.find((b) => b.id === bedId);
-    if (bed) setZoom(fitZoom(bed));
+    setZoom(1);
     setInspectKey(null);
     setPathMode(false);
     setFeedback(null);
@@ -138,7 +140,7 @@ export function GardenPlanner() {
       setPendingPlant(null);
     }
     setSearchParams({ bed: bedId });
-  }, [activeGarden, pendingPlant, setSearchParams, setZoom, setInspectKey, setPathMode, setFeedback, setPlacingPlant, setPendingPlant]);
+  }, [pendingPlant, setSearchParams, setZoom, setInspectKey, setPathMode, setFeedback, setPlacingPlant, setPendingPlant]);
 
   const closeBed = useCallback(() => {
     setPlacingPlant(null);
@@ -199,9 +201,17 @@ export function GardenPlanner() {
     () => (openBed && placingPlant ? getPlacementHints(placingPlant.id, openBed, plantMap) : undefined),
     [openBed, placingPlant, plantMap],
   );
+  // In a bed: that bed's type and protection. On the overview: the union of all beds of the
+  // garden (the same agenda as "Heute" and the calendar), so it never says less than a bed would.
   const plantableNow = useMemo(
-    () => getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks, environmentType: openBed?.environmentType }),
-    [plants, lastFrostDate, frostWeeks, openBed?.environmentType],
+    () => openBed
+      ? getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks, environmentType: openBed.environmentType })
+      : getGardenSowingAgenda(plants, lastFrostDate, (activeGarden?.beds ?? []).map((b) => ({
+          id: b.id, name: b.name, environmentType: b.environmentType ?? "outdoor_bed", frostProtectionWeeks: getFrostProtectionWeeks(b),
+          freeCells: b.width * b.height - new Set(b.paths ?? []).size - b.cells.length,
+          plantIds: [...new Set(b.cells.map((c) => c.plantId))],
+        }))).now.filter((r) => r.action !== "sow_indoors"),
+    [plants, lastFrostDate, frostWeeks, openBed, activeGarden?.beds],
   );
   const bedFitIds = useMemo(
     () => (openBed ? getRecommendedPlants(openBed, plants, { gridCellSizeCm, lastFrostDate }).map((r) => r.plant.id) : []),
@@ -276,7 +286,13 @@ export function GardenPlanner() {
   /** Mobile: after picking a plant, show the bed (the sheet collapses). */
   const revealGrid = useCallback(() => {
     if (window.innerWidth >= 768) return;
-    requestAnimationFrame(() => document.querySelector("[data-bed-grid]")?.scrollIntoView({ block: "start", behavior: "smooth" }));
+    // Scroll <main> only, and keep the bed header (name, mode) in view above the grid.
+    requestAnimationFrame(() => {
+      const main = document.getElementById("main");
+      const anchor = document.querySelector("[data-bed-header]") ?? document.querySelector("[data-bed-grid]");
+      if (!main || !anchor) return;
+      main.scrollBy({ top: anchor.getBoundingClientRect().top - main.getBoundingClientRect().top - 8, behavior: "smooth" });
+    });
   }, []);
 
   // One handler for every cell tap; what it does depends on the mode.
@@ -468,7 +484,7 @@ export function GardenPlanner() {
   const handleDeleteGarden = async () => {
     const garden = activeGarden;
     if (!garden) return;
-    if (!(await confirm(t("planner.confirmDeleteGarden"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("garden", garden.name, t("planner.confirmDeleteGarden")))) return;
     const index = gardens.findIndex((g) => g.id === garden.id);
     deleteGarden(garden.id);
     closeBed();
@@ -551,7 +567,8 @@ export function GardenPlanner() {
   const gardenMenu = activeGarden ? (
     <Menu
       label={t("planner.gardenMenu")}
-      trigger={<><span className="max-w-40 truncate">{t("planner.gardenMenuLabel")}</span><ChevronDown size={16} aria-hidden="true" /></>}
+      // One garden: a compact "…" (no dropdown that looks like a choice between gardens).
+      trigger={gardens.length > 1 ? <><span className="max-w-40 truncate">{t("planner.gardenMenuLabel")}</span><ChevronDown size={16} aria-hidden="true" /></> : undefined}
       items={[
         { label: t("planner.newGarden"), icon: Plus, onSelect: () => setNewGardenOpen(true) },
         { label: t("planner.duplicateGarden"), icon: Copy, onSelect: () => { duplicateGarden(activeGarden.id); closeBed(); toast(t("planner.gardenDuplicated"), "success"); } },
@@ -571,9 +588,14 @@ export function GardenPlanner() {
     ? [
         gardens.length > 1 ? null : activeGarden.name,
         t("season.current", { year: activeGarden.season }),
-        t("season.beds", { count: activeGarden.beds.length }),
-        t("season.plants", { count: totalPlants }),
-      ].filter(Boolean).join(" · ")
+        // No "0 Beete · 0 Pflanzen": the empty state already says so.
+        activeGarden.beds.length > 0 ? t("season.beds", { count: activeGarden.beds.length }) : null,
+        totalPlants > 0 ? t("season.plants", { count: totalPlants }) : null,
+      ]
+        .filter((part): part is string => !!part)
+        // Each part wraps as a whole ("90 Pflanzen" never splits across lines).
+        .map((part) => part.replace(/ /g, " "))
+        .join(" · ")
     : t("planner.subtitle");
 
   const paletteOrInspector = (variant: "desktop" | "sheet") =>
@@ -598,7 +620,7 @@ export function GardenPlanner() {
         {variant === "desktop" && (
           <div className="mb-3">
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("planner.paletteTitle")}</h2>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t("planner.dragPlant")}</p>
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{pointerFine ? t("planner.dragPlantClick") : t("planner.dragPlant")}</p>
           </div>
         )}
         <PlantPalette
@@ -621,13 +643,16 @@ export function GardenPlanner() {
           actions={
             <>
               {canUndo && <IconButton icon={Undo2} label={t("planner.undo")} onClick={undo} />}
-              {gardenMenu}
-              {activeGarden ? (
+              {/* Primary first, overflow after it (same order as Aufgaben).
+                  Not while a bed is open (it would add a sibling, not edit this one) or while the empty state offers the same button. */}
+              {activeGarden && !openBed && activeGarden.beds.length > 0 ? (
                 <Button onClick={() => setBedDialog({ open: true })}>
                   <Plus size={16} aria-hidden="true" />
-                  {t("planner.newBed")}
+                  {t("planner.addBed")}
                 </Button>
               ) : null}
+              {/* A brand-new garden: no lone "…" row; the empty state offers its two useful items. */}
+              {(activeGarden?.beds.length || gardens.length > 1) ? gardenMenu : null}
             </>
           }
           tabs={
@@ -691,14 +716,16 @@ export function GardenPlanner() {
               </aside>
             </div>
 
-            {/* Mobile: palette / inspector in a bottom sheet. Inspecting opens it as a
+            {/* Mobile: palette / inspector in a bottom sheet that reaches down behind the
+                bottom nav (no strip of page content between them). Inspecting opens it as a
                 peek (actions only, ~30 % height) so the bed and the selected cell stay
                 visible; "Details" pulls it up. The spacer lets the last rows scroll above it. */}
-            <div className={sheetOpen && (sheetFull || !inspectedCell) ? "h-[72dvh] md:hidden" : "h-[40dvh] md:hidden"} aria-hidden="true" />
+            {/* Room for the sheet below the bed. Closed, it is only its handle row, which main's bottom padding already covers. */}
+            <div className={!sheetOpen ? "hidden" : sheetFull || !inspectedCell ? "h-[72dvh] md:hidden" : "h-[40dvh] md:hidden"} aria-hidden="true" />
             <section
               data-planner-sheet
               aria-label={inspectedCell ? t("planner.inspectorLabel", { name: inspectedPlant ? getPlantName(inspectedPlant.id) : "" }) : t("planner.paletteTitle")}
-              className="fixed inset-x-0 bottom-safe-nav z-30 rounded-t-2xl border-t border-gray-200 bg-white shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] sm:bottom-0 md:hidden dark:border-white/10 dark:bg-gray-900"
+              className="fixed inset-x-0 bottom-0 z-30 rounded-t-2xl border-t border-gray-200 bg-white pb-[calc(3.5rem+1px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] sm:pb-0 md:hidden dark:border-white/10 dark:bg-gray-900"
             >
               {sheetOpen && inspectedCell && (
                 <button
@@ -739,7 +766,7 @@ export function GardenPlanner() {
                   </span>
                   {sheetOpen ? <ChevronDown size={20} aria-hidden="true" className="shrink-0 text-gray-500" /> : <ChevronUp size={20} aria-hidden="true" className="shrink-0 text-gray-500" />}
                 </button>
-                {inspectedCell && <IconButton icon={X} label={t("common.close")} onClick={() => { setInspectKey(null); setSheetOpen(false); }} />}
+                {inspectedCell && <IconButton icon={X} label={t("planner.closeInspector")} onClick={() => { setInspectKey(null); setSheetOpen(false); }} />}
               </div>
               {sheetOpen && (
                 <div className={`${sheetFull || !inspectedCell ? "max-h-[62dvh]" : "max-h-[34dvh]"} overflow-y-auto overscroll-contain border-t border-gray-100 px-4 pt-3 pb-4 dark:border-white/5`}>
@@ -764,8 +791,12 @@ export function GardenPlanner() {
                 <EmptyState
                   icon={Fence}
                   title={t("planner.emptyBedsTitle")}
-                  description={t("planner.emptyBedsText")}
-                  action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.newBed")}</Button>}
+                  description={pointerFine ? t("planner.emptyBedsTextClick") : t("planner.emptyBedsText")}
+                  action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
+                  // A second garden right after creating the first only distracts; importing a shared bed plan stays.
+                  secondaryAction={gardens.length > 1 ? undefined : (
+                    <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}><Upload size={16} aria-hidden="true" />{t("planner.importFile")}</Button>
+                  )}
                 />
               </Card>
             ) : (
@@ -787,7 +818,8 @@ export function GardenPlanner() {
                       </div>
                     </li>
                   ))}
-                  <li className="flex">
+                  {/* Phones already have "Beet hinzufügen" in the header; the tile is the wide-screen affordance. */}
+                  <li className="hidden sm:flex">
                     <button
                       type="button"
                       onClick={() => setBedDialog({ open: true })}
@@ -810,7 +842,7 @@ export function GardenPlanner() {
                     key={`${a.gardenId}-${a.season}`}
                     leading={<Archive size={18} aria-hidden="true" className="text-gray-500" />}
                     title={t("season.current", { year: a.season })}
-                    meta={[t("season.beds", { count: a.beds.length }), t("season.plants", { count: a.beds.reduce((s, b) => s + b.cells.length, 0) })].join(" · ")}
+                    meta={[t("season.beds", { count: a.beds.length }), t("season.plants", { count: a.beds.reduce((s, b) => s + b.cells.length, 0) })]}
                     trailing={<time dateTime={a.archivedAt} className="text-xs font-normal text-gray-500 dark:text-gray-400">{formatDate(a.archivedAt, "short")}</time>}
                   />
                 ))}
@@ -835,7 +867,7 @@ export function GardenPlanner() {
           footer={
             <>
               <Button variant="secondary" onClick={() => setNewGardenOpen(false)}>{t("common.cancel")}</Button>
-              <Button onClick={handleCreateGarden} disabled={!gardenName.trim()}>{t("common.add")}</Button>
+              <Button onClick={handleCreateGarden} disabled={!gardenName.trim()}>{t("common.save")}</Button>
             </>
           }
         >

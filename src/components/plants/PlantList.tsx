@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { Search, Plus, SearchX } from "lucide-react";
+import { Search, Plus, SearchX, ChevronRight } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useSowingAgenda } from "@/hooks/useSowingAgenda";
+import { useVisibleAgendaRows } from "@/components/calendar/PlantableNowList";
 import { PlantCard } from "./PlantCard";
 import { PlantDetail } from "./PlantDetail";
 import { CustomPlantForm } from "./CustomPlantForm";
@@ -15,10 +17,11 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 import type { Plant, PlantCategory } from "@/types/plant";
 
-type CategoryFilter = PlantCategory | "all";
-const categories: CategoryFilter[] = ["all", "vegetable", "fruit", "berry", "herb"];
+type CategoryFilter = PlantCategory | "all" | "now";
+const categories: CategoryFilter[] = ["all", "now", "vegetable", "fruit", "berry", "herb", "flower"];
 
 export function PlantList() {
   const { t } = useTranslation();
@@ -30,6 +33,7 @@ export function PlantList() {
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
+  const { ref: filterRef, fadeClass: filterFade, moreEnd: filterMore } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', category);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Plant | undefined>(undefined);
 
@@ -53,21 +57,31 @@ export function PlantList() {
     return ids;
   }, [gardens]);
 
+  // "Jetzt säen": the same agenda as the calendar and "Heute", so a new user has
+  // a seasonal way into the 47 crops instead of an alphabetical wall.
+  const agenda = useSowingAgenda();
+  // Same rows as the calendar's "Jetzt säen & pflanzen" (frost-dropped windows excluded).
+  const visibleNow = useVisibleAgendaRows(agenda.now);
+  const sowNowIds = useMemo(() => new Set(visibleNow.map((n) => n.plantId)), [visibleNow]);
+
   const counts = useMemo(() => {
-    const c: Record<CategoryFilter, number> = { all: plants.length, vegetable: 0, fruit: 0, berry: 0, herb: 0 };
-    for (const p of plants) c[p.category]++;
+    const c: Record<CategoryFilter, number> = { all: plants.length, now: 0, vegetable: 0, fruit: 0, berry: 0, herb: 0, flower: 0 };
+    for (const p of plants) {
+      c[p.category]++;
+      if (sowNowIds.has(p.id)) c.now++;
+    }
     return c;
-  }, [plants]);
+  }, [plants, sowNowIds]);
 
   const filtered = useMemo(() => {
     return plants
       .filter((p) => {
-        if (category !== "all" && p.category !== category) return false;
+        if (category === "now" ? !sowNowIds.has(p.id) : category !== "all" && p.category !== category) return false;
         if (search && !getPlantName(p.id).toLowerCase().includes(search)) return false;
         return true;
       })
       .sort((a, b) => getPlantName(a.id).localeCompare(getPlantName(b.id)));
-  }, [plants, category, search, getPlantName]);
+  }, [plants, category, search, getPlantName, sowNowIds]);
 
   // Bumped on every open so the dialog starts from a fresh draft.
   const [formKey, setFormKey] = useState(0);
@@ -104,7 +118,8 @@ export function PlantList() {
         title={t("plants.title")}
         description={t("plants.subtitle", { count: plants.length })}
         actions={
-          <Button onClick={openCreate}>
+          // Secondary: the catalogue is the point of the page, a custom plant the exception.
+          <Button variant="secondary" onClick={openCreate}>
             <Plus size={16} aria-hidden="true" />
             {t("plants.addCustom")}
           </Button>
@@ -123,17 +138,32 @@ export function PlantList() {
             className="pl-9"
           />
         </div>
-        <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0 lg:pb-0">
+        {/* Phones: the row scrolls with a faded edge plus a chevron button, so a
+            cut-off "Kräuter 7" reads as "more" even where the fade is faint. */}
+        <div className="relative">
+        <div ref={filterRef} className={`-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:px-0 lg:pb-0 ${filterFade}`}>
           <SegmentedControl
             label={t("plants.categoryFilter")}
             value={category}
             onChange={setCategory}
             options={categories.filter((c) => c === "all" || counts[c] > 0 || c === category).map((c) => ({
               value: c,
-              label: c === "all" ? t("common.all") : t(`plants.category.${c}`),
+              label: c === "all" ? t("common.all") : c === "now" ? t("plants.sowNowFilter") : t(`plants.category.${c}`),
               count: counts[c],
             }))}
           />
+        </div>
+        {filterMore && (
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={() => filterRef.current?.scrollBy({ left: 160, behavior: "smooth" })}
+            className="absolute top-1/2 -right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow-sm ring-1 ring-gray-200 lg:-right-1 dark:bg-gray-800 dark:text-gray-300 dark:ring-white/10"
+          >
+            <ChevronRight size={16} />
+          </button>
+        )}
         </div>
       </div>
 
@@ -157,9 +187,10 @@ export function PlantList() {
           />
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        // Phones: one surface with hairlines (DESIGN_SYSTEM §4, no card per row); wider screens: a tile grid.
+        <div className="divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs sm:grid sm:grid-cols-2 sm:gap-3 sm:divide-y-0 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none lg:grid-cols-3 2xl:grid-cols-4 dark:divide-white/5 dark:border-white/10 dark:bg-gray-900 sm:dark:bg-transparent">
           {filtered.map((plant) => (
-            <PlantCard key={plant.id} plant={plant} planted={plantedIds.has(plant.id)} custom={customPlants.some((p) => p.id === plant.id)} onOpen={openPlant} />
+            <PlantCard key={plant.id} plant={plant} planted={plantedIds.has(plant.id)} custom={customPlants.some((p) => p.id === plant.id)} onOpen={openPlant} hideCategory={category !== "all" && category !== "now"} />
           ))}
         </div>
       )}
