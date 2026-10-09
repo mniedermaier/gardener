@@ -1203,7 +1203,8 @@
     "summary_many": "{{count}} cosechas · {{weight}} en total",
     "pieces_many": "{{count}} piezas",
     "harvestsCount_many": "{{count}} cosechas",
-    "showAll_many": "Mostrar los {{count}}"
+    "showAll_many": "Mostrar los {{count}}",
+    "showOlder": "Mostrar meses anteriores"
   },
   "journal": {
     "title": "Diario",
@@ -1246,7 +1247,6 @@
     "add": "Registrar conserva",
     "added": "Existencia guardada",
     "totalStored": "Almacenado",
-    "totalUnits": "Unidades",
     "expiringSoon": "Por vencer",
     "expired": "Vencido",
     "stockTab": "Stock",
@@ -1255,8 +1255,8 @@
     "noConsumed": "Nada consumido aún.",
     "method": "Método",
     "quantity": "Cantidad",
-    "unitCount": "Unidades (tarros, bolsas …)",
-    "unitCountPlaceholder": "ej. 12",
+    "unitCount": "Unidades",
+    "unitCountPlaceholder": "tarros, bolsas …",
     "label": "Etiqueta",
     "labelPlaceholder": "ej. Salsa de tomate agosto 2026",
     "supplyCost": "Costo de insumos",
@@ -1356,7 +1356,8 @@
       "can_many": "latas",
       "pack_many": "paquetes",
       "piece_many": "unidades"
-    }
+    },
+    "totalItems": "Artículos en stock"
   },
   "season": {
     "current": "Temporada {{year}}",
@@ -1840,7 +1841,7 @@
     "acquired": "de {{year}}",
     "shopName": "Proveedor",
     "shopPlaceholder": "p. ej. Vivero local",
-    "cost": "Coste",
+    "cost": "Coste (€)",
     "needPlant": "Elige una planta",
     "invalidNumber": "Introduce un número válido",
     "invalidYear": "Introduce un año entre 1950 y hoy",
@@ -2240,7 +2241,8 @@
       "health": "¿Eliminar el registro de salud «{{name}}»?",
       "animal": "¿Eliminar el animal «{{name}}»?",
       "garden": "¿Eliminar el huerto «{{name}}»?"
-    }
+    },
+    "examplePlaceholder": "p. ej. {{value}}"
   },
   "companions": {
     "title": "Asociaciones",

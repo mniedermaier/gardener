@@ -1160,7 +1160,8 @@
     "showAll_one": "Show all {{count}}",
     "showAll_other": "Show all {{count}}",
     "showLess": "Show less",
-    "log": "Log"
+    "log": "Log",
+    "showOlder": "Show older months"
   },
   "journal": {
     "title": "Journal",
@@ -1203,7 +1204,6 @@
     "add": "Log preserves",
     "added": "Item saved",
     "totalStored": "Stored",
-    "totalUnits": "Units",
     "expiringSoon": "Expiring soon",
     "expired": "Expired",
     "stockTab": "Stock",
@@ -1212,8 +1212,8 @@
     "noConsumed": "Nothing consumed yet.",
     "method": "Method",
     "quantity": "Quantity",
-    "unitCount": "Units (jars, bags …)",
-    "unitCountPlaceholder": "e.g. 12",
+    "unitCount": "Units",
+    "unitCountPlaceholder": "jars, bags …",
     "label": "Label",
     "labelPlaceholder": "e.g. Tomato Sauce August 2026",
     "supplyCost": "Supply cost",
@@ -1303,7 +1303,8 @@
       "pack_other": "packs",
       "piece_one": "piece",
       "piece_other": "pieces"
-    }
+    },
+    "totalItems": "Items in stock"
   },
   "season": {
     "current": "Season {{year}}",
@@ -1758,7 +1759,7 @@
     "acquired": "from {{year}}",
     "shopName": "Supplier",
     "shopPlaceholder": "e.g. Real Seeds",
-    "cost": "Cost",
+    "cost": "Cost (€)",
     "needPlant": "Choose a plant",
     "invalidNumber": "Enter a valid number",
     "invalidYear": "Enter a year between 1950 and today",
@@ -2146,7 +2147,8 @@
       "health": "Delete health record “{{name}}”?",
       "animal": "Delete animal “{{name}}”?",
       "garden": "Delete garden “{{name}}”?"
-    }
+    },
+    "examplePlaceholder": "e.g. {{value}}"
   },
   "companions": {
     "title": "Companions",

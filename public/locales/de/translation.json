@@ -1160,7 +1160,8 @@
     "showAll_one": "Alle {{count}} anzeigen",
     "showAll_other": "Alle {{count}} anzeigen",
     "showLess": "Weniger anzeigen",
-    "log": "Protokoll"
+    "log": "Protokoll",
+    "showOlder": "Ältere Monate anzeigen"
   },
   "journal": {
     "title": "Tagebuch",
@@ -1203,7 +1204,6 @@
     "add": "Vorrat erfassen",
     "added": "Vorrat gespeichert",
     "totalStored": "Eingelagert",
-    "totalUnits": "Einheiten",
     "expiringSoon": "Bald ablaufend",
     "expired": "Abgelaufen",
     "stockTab": "Bestand",
@@ -1212,8 +1212,8 @@
     "noConsumed": "Noch nichts verbraucht.",
     "method": "Methode",
     "quantity": "Menge",
-    "unitCount": "Einheiten (Gläser, Beutel …)",
-    "unitCountPlaceholder": "z. B. 12",
+    "unitCount": "Einheiten",
+    "unitCountPlaceholder": "Gläser, Beutel …",
     "label": "Bezeichnung",
     "labelPlaceholder": "z. B. Tomatensauce August 2026",
     "supplyCost": "Zubehörkosten",
@@ -1303,7 +1303,8 @@
       "pack_other": "Packungen",
       "piece_one": "Stück",
       "piece_other": "Stück"
-    }
+    },
+    "totalItems": "Posten im Vorrat"
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1758,7 +1759,7 @@
     "acquired": "aus {{year}}",
     "shopName": "Händler",
     "shopPlaceholder": "z. B. Bingenheimer",
-    "cost": "Kosten",
+    "cost": "Kosten (€)",
     "needPlant": "Bitte eine Pflanze wählen",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben",
@@ -2146,7 +2147,8 @@
       "health": "Gesundheitseintrag „{{name}}“ löschen?",
       "animal": "Tier „{{name}}“ löschen?",
       "garden": "Garten „{{name}}“ löschen?"
-    }
+    },
+    "examplePlaceholder": "z. B. {{value}}"
   },
   "companions": {
     "title": "Pflanzpartner",

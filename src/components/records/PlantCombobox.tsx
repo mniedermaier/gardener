@@ -143,7 +143,9 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
           autoFocus={autoFocus}
           placeholder={t("records.plantSearch")}
           value={display}
-          onFocus={openList}
+          // Focus alone does not open the list: a dialog focuses this field on
+          // open, and an unrequested list would push the rest of the form down.
+          // A click, typing or ↓ opens it.
           onClick={() => !open && openList()}
           onBlur={() => setOpen(false)}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); setActive(0); }}

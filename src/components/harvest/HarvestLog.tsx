@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Apple, Pencil, Plus, Trash2, Hash } from "lucide-react";
-import { startOfMonth, subMonths, addMonths, differenceInCalendarDays } from "date-fns";
+import { startOfMonth, subMonths, addMonths, differenceInCalendarDays, differenceInCalendarMonths } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -136,6 +136,9 @@ export function HarvestLog() {
   const amountError = Number.isNaN(grams) || grams < 0 ? t("harvest.invalidAmount") : submitted && !grams && !countNum ? t("harvest.needAmount") : undefined;
   const plantError = submitted && !draft.plantId ? t("harvest.needPlant") : undefined;
 
+  // Same rule as Expenses: "Speichern" stays disabled until the entry is complete.
+  const canSave = Boolean(draft.plantId) && !Number.isNaN(grams) && grams >= 0 && (grams > 0 || countNum > 0);
+
   const amountText = (g?: number, c?: number) =>
     [g ? formatWeight(g) : null, c ? t("harvest.pieces", { count: c }) : null].filter(Boolean).join(" · ");
 
@@ -195,9 +198,13 @@ export function HarvestLog() {
       byPlant.set(h.plantId, p);
     }
     const ranking = [...byPlant.entries()].sort((a, b) => b[1].grams - a[1].grams || b[1].entries - a[1].entries);
-    // Last 12 months, oldest first.
-    const first = subMonths(startOfMonth(now), 11);
-    const months = Array.from({ length: 12 }, (_, i) => addMonths(first, i));
+    // From the first month with a harvest (at most 12, at least 3 months back),
+    // oldest first: a spring start would otherwise leave half the chart empty.
+    const earliest = harvests.reduce<string | null>((min, h) => (min === null || h.date < min ? h.date : min), null);
+    const earliestMonth = startOfMonth((earliest && toDate(earliest)) || now);
+    const span = Math.min(12, Math.max(3, differenceInCalendarMonths(startOfMonth(now), earliestMonth) + 1));
+    const first = subMonths(startOfMonth(now), span - 1);
+    const months = Array.from({ length: span }, (_, i) => addMonths(first, i));
     const perMonth = new Map(months.map((m) => [toISODate(m).slice(0, 7), 0]));
     for (const h of harvests) {
       const key = h.date.slice(0, 7);
@@ -214,7 +221,6 @@ export function HarvestLog() {
   }, [now, harvests]);
 
   const [showAllPlants, setShowAllPlants] = useState(false);
-  const top = stats.ranking[0];
   const maxPlantGrams = Math.max(1, ...stats.ranking.map(([, s]) => s.grams));
   const rankingShown = showAllPlants ? stats.ranking : stats.ranking.slice(0, 6);
 
@@ -228,6 +234,8 @@ export function HarvestLog() {
     return [...map.entries()];
   }, [harvests]);
 
+  // The two most recent months open; older ones on request (like the water log's weeks).
+  const [monthsShown, setMonthsShown] = useState(2);
   const editing = editingId ? harvests.find((h) => h.id === editingId) : undefined;
   const kgTick = (kg: number) => formatWeight(kg * 1000, "kg");
 
@@ -235,7 +243,7 @@ export function HarvestLog() {
     <div>
       <PageHeader
         title={t("harvest.title")}
-        description={harvests.length ? t("harvest.summary", { count: harvests.length, weight: formatWeight(stats.total) }) : t("harvest.subtitle")}
+        description={t("harvest.subtitle")}
         actions={
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
@@ -270,11 +278,6 @@ export function HarvestLog() {
                 value: <>{formatNumber(stats.avgQuality)} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{t("harvest.outOfFive")}</span></>,
                 hint: <QualityStars value={Math.round(stats.avgQuality)} />,
               },
-              ...(top ? [{
-                label: t("harvest.topCrop"),
-                value: <span className="block truncate">{getPlantName(top[0])}</span>,
-                hint: top[1].grams ? formatWeight(top[1].grams) : t("harvest.pieces", { count: top[1].count }),
-              }] : []),
             ]}
           />
 
@@ -328,7 +331,7 @@ export function HarvestLog() {
 
           <section aria-label={t("harvest.log")} className="space-y-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("harvest.log")}</h2>
-            {groups.map(([month, entries]) => {
+            {groups.slice(0, monthsShown).map(([month, entries]) => {
               const monthGrams = entries.reduce((s, h) => s + (h.weightGrams ?? 0), 0);
               return (
                 <List
@@ -349,11 +352,9 @@ export function HarvestLog() {
                         onClick={() => openEdit(h)}
                         leading={plant ? <PlantIconDisplay plantId={h.plantId} emoji={plant.icon} size={28} /> : <Apple size={20} aria-hidden="true" className="text-gray-500" />}
                         title={getPlantName(h.plantId)}
-                        meta={[
-                          bedLabel,
-                          <time key="d" dateTime={h.date}>{formatDate(h.date, "relative")}</time>,
-                          <QualityStars key="q" value={h.quality} />,
-                        ]}
+                        // One date format per list group (DESIGN_SYSTEM): the short date, never "vor 5 Tagen" next to "2. Okt.".
+                        meta={[bedLabel, <time key="d" dateTime={h.date}>{formatDate(h.date)}</time>]}
+                        badges={<QualityStars value={h.quality} />}
                         description={h.notes}
                         trailing={amountText(h.weightGrams, h.count) || "–"}
                         actions={
@@ -372,6 +373,9 @@ export function HarvestLog() {
                 </List>
               );
             })}
+            {groups.length > monthsShown && (
+              <Button variant="secondary" onClick={() => setMonthsShown((n) => n + 3)}>{t("harvest.showOlder")}</Button>
+            )}
           </section>
         </div>
       )}
@@ -389,7 +393,7 @@ export function HarvestLog() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{editingId ? t("common.save") : t("harvest.saveAction")}</Button>
+            <Button onClick={handleSave} disabled={!canSave}>{t("common.save")}</Button>
           </>
         }
       >
@@ -434,7 +438,7 @@ export function HarvestLog() {
                 autoComplete="off"
                 value={draft.amount}
                 onChange={(e) => patch({ amount: e.target.value })}
-                placeholder={draft.unit === "kg" ? formatNumber(1.5) : "250"}
+                placeholder={t("common.examplePlaceholder", { value: draft.unit === "kg" ? formatNumber(1.5) : formatNumber(250) })}
                 error={amountError}
               />
               <SegmentedControl
@@ -452,7 +456,7 @@ export function HarvestLog() {
                 inputMode="numeric"
                 value={draft.count}
                 onChange={(e) => patch({ count: e.target.value })}
-                placeholder="12"
+                placeholder={t("common.examplePlaceholder", { value: formatNumber(12) })}
               />
             ) : (
               <Button variant="ghost" size="sm" className="mt-1 -ml-3" onClick={() => patch({ showCount: true })}>

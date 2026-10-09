@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { LABEL_CLASS } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { KeyFigures } from "@/components/ui/charts";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -179,12 +180,13 @@ export function SeedInventory() {
       <PageHeader
         title={t("seeds.title")}
         description={t("seeds.subtitle")}
-        actions={
+        // The empty state carries the only "Saatgut hinzufügen" until there is a stock.
+        actions={seeds.length === 0 ? undefined : (
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("seeds.add")}
           </Button>
-        }
+        )}
       />
 
       {seeds.length > 0 && (
@@ -277,12 +279,15 @@ export function SeedInventory() {
                     sourceText,
                     t("seeds.acquired", { year: seed.yearAcquired }),
                   ]}
+                  // Advice reads as meta (small, grey), so it does not compete with the title.
                   description={
-                    viability.status === "testRecommended"
-                      ? t("seeds.testExplain", { name, years: yearsText(viability.viabilityYears) })
-                      : viability.status === "notApplicable"
-                        ? t("seeds.plantingStockExplain")
-                        : seed.notes
+                    viability.status === "testRecommended" || viability.status === "notApplicable" ? (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {viability.status === "testRecommended"
+                          ? t("seeds.testExplain", { name, years: yearsText(viability.viabilityYears) })
+                          : t("seeds.plantingStockExplain")}
+                      </span>
+                    ) : seed.notes
                   }
                   trailing={seed.cost ? formatCurrency(seed.cost) : undefined}
                   actions={
@@ -315,7 +320,7 @@ export function SeedInventory() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{t("common.save")}</Button>
+            <Button onClick={handleSave} disabled={!draft.plantId}>{t("common.save")}</Button>
           </>
         }
       >
@@ -333,10 +338,11 @@ export function SeedInventory() {
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
           <Input label={t("planner.variety")} value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
-          <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+          {/* One two-column grid for every row, so the fields line up. */}
+          <div className="grid gap-4 sm:grid-cols-2">
             <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300" aria-hidden="true">{t("seeds.unit")}</p>
+              <p className={LABEL_CLASS} aria-hidden="true">{t("seeds.unit")}</p>
               <SegmentedControl
                 fullWidth
                 label={t("seeds.unit")}
@@ -364,7 +370,7 @@ export function SeedInventory() {
               inputMode="decimal"
               value={draft.cost}
               onChange={(e) => patch({ cost: e.target.value })}
-              placeholder={formatCurrency(3.5)}
+              placeholder={t("common.examplePlaceholder", { value: formatNumber(3.5) })}
               hint={t("common.optional")}
               error={errors.cost}
             />

@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle, Archive, Check, CookingPot, FlaskRound, Lightbulb, Package, Pencil, Plus, RotateCcw, Snowflake, Sun, Trash2, Warehouse, type LucideIcon,
@@ -190,6 +190,8 @@ export function PantryPage() {
     cost: !(costNum >= 0) ? t("pantry.invalidNumber") : undefined,
   };
 
+  const canSave = Boolean(draft.plantId) && quantityNum > 0 && !errors.units && !errors.cost;
+
   const handleSave = () => {
     setSubmitted(true);
     if (!draft.plantId || !(quantityNum > 0) || errors.units || errors.cost) { focusFirstInvalid(); return; }
@@ -237,16 +239,16 @@ export function PantryPage() {
   );
   const stats = useMemo(() => {
     const kg = active.reduce((s, p) => s + p.quantityKg, 0);
-    const units = active.reduce((s, p) => s + (p.units ?? 0), 0);
     const soon = active.filter((p) => { const d = daysLeft(p); return d >= 0 && d <= SOON_DAYS; }).length;
     const expired = active.filter((p) => daysLeft(p) < 0).length;
-    return { kg, units, soon, expired };
+    return { kg, soon, expired };
   }, [active, daysLeft]);
   const stock = useMemo(
     () => active.filter((p) => !filterMethod || p.method === filterMethod).sort((a, b) => a.expiresDate.localeCompare(b.expiresDate)),
     [active, filterMethod],
   );
 
+  const stockEmpty = tab === "stock" && active.length === 0;
   const editing = editingId ? pantryItems.find((p) => p.id === editingId) : undefined;
   const draftMethods = methodsFor(draft.plantId);
   const shelfText = t("pantry.monthsCount", { count: SHELF_LIFE_MONTHS[draft.method] });
@@ -258,20 +260,22 @@ export function PantryPage() {
       <PageHeader
         title={t("pantry.title")}
         description={t("pantry.subtitle")}
-        actions={
+        // While the empty state offers "Vorrat hinzufügen", the header does not repeat it.
+        actions={stockEmpty ? undefined : (
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("pantry.add")}
           </Button>
-        }
+        )}
         tabs={
           <Tabs
             label={t("pantry.title")}
             value={tab}
             onChange={setTab}
             items={[
-              { value: "stock", label: t("pantry.stockTab"), count: active.length },
-              { value: "consumed", label: t("pantry.consumed"), count: consumed.length },
+              // No "0" counters: a count only where there is something.
+              { value: "stock", label: t("pantry.stockTab"), count: active.length || undefined },
+              { value: "consumed", label: t("pantry.consumed"), count: consumed.length || undefined },
               { value: "guides", label: t("pantry.guidesTab") },
             ]}
           />
@@ -295,7 +299,8 @@ export function PantryPage() {
               hero={{ label: t("pantry.totalStored"), value: formatWeight(stats.kg * 1000), icon: Archive, tone: "brand" }}
               // Only figures that say something: no "Abgelaufen 0".
               items={[
-                ...(stats.units > 0 ? [{ label: t("pantry.totalUnits"), value: formatNumber(stats.units) }] : []),
+                // Items, not a sum of jars + bags + pieces (which would mean nothing).
+                { label: t("pantry.totalItems"), value: formatNumber(active.length) },
                 ...(stats.soon > 0 ? [{ label: t("pantry.expiringSoon"), value: formatNumber(stats.soon), hint: t("pantry.withinDays", { count: SOON_DAYS }) }] : []),
                 ...(stats.expired > 0 ? [{ label: t("pantry.expired"), value: formatNumber(stats.expired) }] : []),
               ]}
@@ -311,7 +316,7 @@ export function PantryPage() {
             <div>
               {active.length > 3 && (
                 <Select
-                  wrapperClassName="mb-4 max-w-xs"
+                  wrapperClassName="mb-4 sm:max-w-xs"
                   label={t("pantry.method")}
                   value={filterMethod}
                   onChange={(e) => setFilterMethod(e.target.value)}
@@ -343,23 +348,21 @@ export function PantryPage() {
                             {t(`preservation.methods.${item.method}`)}
                           </span>,
                           item.units ? unitText(item.units, item) : null,
-                          <Fragment key="e">{t("pantry.expiresOn")} <time dateTime={item.expiresDate}>{formatDate(item.expiresDate)}</time></Fragment>,
+                          <span key="e" className="whitespace-nowrap">{t("pantry.expiresOn")} <time dateTime={item.expiresDate}>{formatDate(item.expiresDate)}</time></span>,
                         ]}
                         description={item.notes}
                         trailing={formatWeight(item.quantityKg * 1000)}
+                        // Only the weight trails; "Verbraucht" lives in the menu so the meta keeps its width.
                         actions={
-                          <>
-                            <IconButton icon={Check} tone="brand" label={t("pantry.markConsumed")} onClick={() => handleConsume(item)} />
-                            <Menu
-                              label={t("common.moreActions")}
-                              items={[
-                                { label: t("pantry.markConsumed"), icon: Check, onSelect: () => handleConsume(item) },
-                                { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(item) },
-                                "separator",
-                                { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(item) },
-                              ]}
-                            />
-                          </>
+                          <Menu
+                            label={t("common.moreActions")}
+                            items={[
+                              { label: t("pantry.markConsumed"), icon: Check, onSelect: () => handleConsume(item) },
+                              { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(item) },
+                              "separator",
+                              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(item) },
+                            ]}
+                          />
                         }
                       />
                     );
@@ -475,7 +478,7 @@ export function PantryPage() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{t("common.save")}</Button>
+            <Button onClick={handleSave} disabled={!canSave}>{t("common.save")}</Button>
           </>
         }
       >
@@ -501,7 +504,7 @@ export function PantryPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input label={t("pantry.quantityKg")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={formatNumber(1.5)} error={errors.quantity} />
+            <Input label={t("pantry.quantityKg")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(1.5) })} error={errors.quantity} />
             <Input label={t("pantry.unitCount")} inputMode="numeric" value={draft.units} onChange={(e) => patch({ units: e.target.value })} placeholder={t("pantry.unitCountPlaceholder")} error={errors.units} />
           </div>
           {unitsNum > 0 && (
@@ -523,9 +526,9 @@ export function PantryPage() {
           <Input label={t("pantry.label")} value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
           <div>
             <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
-            <p className="mt-1 text-xs font-medium text-gray-700 dark:text-gray-300">{t("pantry.bestBefore", { date: formatDate(expiresDate, "long") })}</p>
+            <p className="mt-1 text-xs font-medium text-gray-700 dark:text-gray-300">{t("pantry.bestBefore", { date: formatDate(expiresDate, "date") })}</p>
           </div>
-          <Input label={t("pantry.supplyCost")} inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={formatCurrency(4)} hint={t("pantry.supplyCostHint")} error={errors.cost} />
+          <Input label={t("pantry.supplyCost")} inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatCurrency(4) })} hint={t("pantry.supplyCostHint")} error={errors.cost} />
           <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>

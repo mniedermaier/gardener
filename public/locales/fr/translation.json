@@ -1203,7 +1203,8 @@
     "summary_many": "{{count}} récoltes · {{weight}} au total",
     "pieces_many": "{{count}} pièces",
     "harvestsCount_many": "{{count}} récoltes",
-    "showAll_many": "Afficher les {{count}}"
+    "showAll_many": "Afficher les {{count}}",
+    "showOlder": "Afficher les mois précédents"
   },
   "journal": {
     "title": "Journal",
@@ -1246,7 +1247,6 @@
     "add": "Noter des conserves",
     "added": "Stock enregistré",
     "totalStored": "Stocké",
-    "totalUnits": "Unités",
     "expiringSoon": "Bientôt périmé",
     "expired": "Périmé",
     "stockTab": "Stock",
@@ -1255,8 +1255,8 @@
     "noConsumed": "Rien de consommé encore.",
     "method": "Méthode",
     "quantity": "Quantité",
-    "unitCount": "Unités (bocaux, sachets …)",
-    "unitCountPlaceholder": "ex. 12",
+    "unitCount": "Unités",
+    "unitCountPlaceholder": "bocaux, sachets …",
     "label": "Étiquette",
     "labelPlaceholder": "ex. Sauce tomate août 2026",
     "supplyCost": "Coût des fournitures",
@@ -1356,7 +1356,8 @@
       "can_many": "boîtes",
       "pack_many": "paquets",
       "piece_many": "pièces"
-    }
+    },
+    "totalItems": "Articles en stock"
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1840,7 +1841,7 @@
     "acquired": "de {{year}}",
     "shopName": "Fournisseur",
     "shopPlaceholder": "p. ex. Kokopelli",
-    "cost": "Coût",
+    "cost": "Coût (€)",
     "needPlant": "Choisissez une plante",
     "invalidNumber": "Saisissez un nombre valide",
     "invalidYear": "Saisissez une année entre 1950 et aujourd’hui",
@@ -2240,7 +2241,8 @@
       "health": "Supprimer l’entrée de santé « {{name}} » ?",
       "animal": "Supprimer l’animal « {{name}} » ?",
       "garden": "Supprimer le jardin « {{name}} » ?"
-    }
+    },
+    "examplePlaceholder": "p. ex. {{value}}"
   },
   "companions": {
     "title": "Associations",
