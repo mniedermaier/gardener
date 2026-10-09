@@ -130,7 +130,7 @@ export const CellInspector = memo(function CellInspector({
           value={cell.plantedDate ?? ""}
           onChange={(e) => onUpdate({ plantedDate: e.target.value || undefined })}
         />
-        <Textarea label={t("harvest.notes")} rows={2} value={cell.notes ?? ""} onChange={(e) => onUpdate({ notes: e.target.value || undefined })} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={cell.notes ?? ""} onChange={(e) => onUpdate({ notes: e.target.value || undefined })} />
       </div>
 
       <details className="group rounded-lg border border-gray-200 dark:border-white/10">

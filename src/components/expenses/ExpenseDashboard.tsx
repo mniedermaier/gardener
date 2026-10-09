@@ -91,7 +91,7 @@ export function ExpenseDashboard() {
 
   const openEdit = (e: Expense) => {
     setEditingId(e.id);
-    setDraft({ description: e.description, amount: String(e.amountCents / 100), category: e.category, date: e.date });
+    setDraft({ description: e.description, amount: (e.amountCents / 100).toLocaleString(f.locale, { useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2 }), category: e.category, date: e.date });
     setDialogOpen(true);
   };
 
@@ -331,8 +331,9 @@ export function ExpenseDashboard() {
       >
         <div className="space-y-4">
           <Input label={t("expenses.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} placeholder={t("expenses.descriptionPlaceholder")} autoFocus />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input label={t("expenses.amount")} type="number" inputMode="decimal" step="0.01" min={0} value={draft.amount} onChange={(e) => patch({ amount: e.target.value })} />
+          {/* Amount and category stay side by side on phones; a text field with a decimal keypad accepts "12,50". */}
+          <div className="grid grid-cols-2 gap-4">
+            <Input label={t("expenses.amount")} inputMode="decimal" value={draft.amount} onChange={(e) => patch({ amount: e.target.value })} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(12.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} />
             <Select
               label={t("expenses.category")}
               value={draft.category}

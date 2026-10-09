@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 /** Shared look of every text-like form control (Input, Select, Textarea). */
 export const CONTROL_CLASS =
@@ -9,6 +10,8 @@ export const LABEL_CLASS = "mb-1 block text-sm font-medium text-gray-700 dark:te
 interface FieldProps {
   id: string;
   label?: ReactNode;
+  /** Appends a muted "(optional)" to the label — the one way to mark optional fields. */
+  optional?: boolean;
   hint?: ReactNode;
   error?: ReactNode;
   className?: string;
@@ -29,13 +32,24 @@ export function describedBy(id: string, hint?: ReactNode, error?: ReactNode, ext
   return ids.length ? ids.join(" ") : undefined;
 }
 
+/** Label text with the shared optional marker: "Notizen (optional)". */
+export function LabelText({ label, optional }: { label: ReactNode; optional?: boolean }) {
+  const { t } = useTranslation();
+  return (
+    <>
+      {label}
+      {optional && <span className="font-normal text-gray-500 dark:text-gray-400"> {t("common.optionalMark")}</span>}
+    </>
+  );
+}
+
 /** Label + control + hint/error, all tied together by id. */
-export function Field({ id, label, hint, error, className, children }: FieldProps) {
+export function Field({ id, label, optional, hint, error, className, children }: FieldProps) {
   return (
     <div className={className}>
       {label && (
         <label htmlFor={id} className={LABEL_CLASS}>
-          {label}
+          <LabelText label={label} optional={optional} />
         </label>
       )}
       {children}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Camera, ImagePlus, LayoutGrid, PawPrint, Pencil, Plus, Trash2, X } from "lucide-react";
+import { BookOpen, Camera, ChevronDown, ImagePlus, LayoutGrid, PawPrint, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -106,6 +106,8 @@ export function GardenJournal() {
   const [uploading, setUploading] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [originalPhotos, setOriginalPhotos] = useState<string[]>([]);
+  // "Pflanze, Beet oder Tier verknüpfen" starts closed unless the entry already has a link.
+  const [linksOpen, setLinksOpen] = useState(false);
   const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
   const openAdd = useCallback((params: AddParams = {}) => {
@@ -119,6 +121,7 @@ export function GardenJournal() {
       animalId: params.animal ?? "",
       date: params.date ?? todayISO(),
     });
+    setLinksOpen(Boolean(params.plant || params.bed || params.animal));
     setDialogOpen(true);
   }, []);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
@@ -152,6 +155,7 @@ export function GardenJournal() {
       title: e.title, text: e.text, date: e.date, tags: (e.tags ?? []).join(", "),
       plantId: e.plantId ?? "", bedId: e.bedId ?? "", animalId: e.animalId ?? "", photos: e.photos ?? [],
     });
+    setLinksOpen(Boolean(e.plantId || e.bedId || e.animalId));
     setDialogOpen(true);
   };
 
@@ -417,7 +421,7 @@ export function GardenJournal() {
       >
         <div className="space-y-5">
           <Input label={t("journal.entryTitle")} value={draft.title} onChange={(e) => patch({ title: e.target.value })} placeholder={t("journal.titlePlaceholder")} error={titleError} autoFocus />
-          <Textarea label={t("harvest.notes")} value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
+          <Textarea label={t("harvest.notes")} optional value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
 
           {/* Photos */}
@@ -444,12 +448,20 @@ export function GardenJournal() {
                 </label>
               )}
             </div>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHint", { max: MAX_PHOTOS })}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHintShort", { max: MAX_PHOTOS })}</p>
           </div>
 
-          {/* A plain section, not a framed card inside the dialog card. */}
-          <fieldset className="space-y-4 border-t border-gray-100 pt-5 dark:border-white/10">
-            <legend className="float-left mb-1 w-full text-sm font-semibold text-gray-900 dark:text-gray-100">{t("journal.linkedTo")}</legend>
+          {/* Links are optional: a disclosure keeps the dialog short (open when the entry already has one). */}
+          <details
+            open={linksOpen}
+            onToggle={(e) => setLinksOpen(e.currentTarget.open)}
+            className="group border-t border-gray-100 pt-4 dark:border-white/10"
+          >
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold text-gray-900 [&::-webkit-details-marker]:hidden dark:text-gray-100">
+              {t("journal.linkToggle")}
+              <ChevronDown size={16} aria-hidden="true" className="shrink-0 text-gray-500 transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="mt-3 space-y-4">
             <PlantCombobox
               label={t("harvest.plant")}
               plants={plants}
@@ -461,11 +473,12 @@ export function GardenJournal() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {beds.beds.length > 0 && (
-                <Select label={t("harvest.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("harvest.noBed")} options={beds.options} />
+                <Select label={t("harvest.bed")} optional value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("harvest.noBed")} options={beds.options} />
               )}
               {animals.length > 0 && (
                 <Select
                   label={t("journal.animal")}
+                  optional
                   value={draft.animalId}
                   onChange={(e) => patch({ animalId: e.target.value })}
                   placeholder={t("journal.noAnimal")}
@@ -473,10 +486,11 @@ export function GardenJournal() {
                 />
               )}
             </div>
-          </fieldset>
+            </div>
+          </details>
 
           <div>
-            <Input label={t("journal.tags")} value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} />
+            <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} />
             {suggestedTags.length > 0 && (
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 <span className="text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>

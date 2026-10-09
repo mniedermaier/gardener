@@ -29,7 +29,24 @@ covered here, copy the pattern from the reference page
 8. **No hover-only actions.** Row actions are always visible. Use at least
    `text-gray-500` and an `IconButton` with a `label`.
 9. **Forms use primitives only:** `Input`, `Select`, `Textarea`, `Checkbox`,
-   `SegmentedControl`. Each one gets a label (lint: `label-has-associated-control`).
+   `SegmentedControl`. Each one gets a label (lint: `label-has-associated-control`);
+   a `SegmentedControl` gets a visible `LABEL_CLASS` caption above it. Dialog rules:
+   - **Optional fields** pass `optional` to the primitive (`Input`, `Select`,
+     `Textarea`, `DatePicker`, `PlantCombobox`), which appends a muted
+     "(optional)". Never write "(optional)" or "optional" into a label or hint;
+     required fields stay unmarked.
+   - **Units** sit in the label in parentheses: "Kosten (€)", "Menge (l)",
+     "Dauer (Min.)", "Ernte ab (Tage)". Placeholders are plain example numbers
+     ("z. B. 4,00"), never a currency string.
+   - **Numbers** use a text field with `inputMode="decimal"`/`"numeric"`, not
+     `type="number"` (no spin arrows, the decimal comma works). Short pairs
+     (amount + unit, year + source, amount + category) stay side by side on phones.
+   - **Dates:** `DateField` — Heute/Gestern/Anderes Datum for records,
+     `mode="future"` (Heute/Morgen/In 1 Woche) for tasks. A native
+     `DatePicker` only for one-off dates such as "Im Bestand seit".
+   - **Notizen** is always an optional `Textarea` with `common.notesPlaceholder`.
+   - Placeholders end in a typographic ellipsis "…" (German with a space before it).
+   - Save stays disabled until the required fields are valid.
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation
     marks and uses active phrasing ("3 Aufgaben überfällig").

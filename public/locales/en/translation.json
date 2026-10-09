@@ -766,11 +766,11 @@
     "form": {
       "category": "Category",
       "spacingCm": "Plant spacing (cm)",
-      "harvestMin": "Earliest harvest",
-      "harvestMax": "Latest harvest",
+      "harvestMin": "Harvest from (days)",
+      "harvestMax": "Harvest until (days)",
       "harvestError": "Must not be less than the earliest value.",
       "namePlaceholder": "e.g. Ginger",
-      "daysAfterSowing": "Days after sowing"
+      "daysAfterSowing": "Both counted from sowing."
     },
     "detail": {
       "today": "Today",
@@ -970,7 +970,7 @@
       "scout": "Inspect",
       "preserve": "Preserve",
       "soil_test": "Soil test",
-      "custom": "Custom"
+      "custom": "Other"
     },
     "reopenNamed": "Reopen “{{title}}”",
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
@@ -1183,7 +1183,6 @@
       "4": "Very good",
       "5": "Excellent"
     },
-    "notesPlaceholder": "e.g. taste, storability, anything unusual",
     "saveAction": "Save harvest",
     "saved": "{{name}} · {{amount}} saved",
     "updated": "Changes saved",
@@ -1212,7 +1211,6 @@
     "text": "What happened in the garden today?",
     "tags": "Tags",
     "tagsPlaceholder": "e.g. sowing, frost, harvest (comma-separated)",
-    "linkedTo": "Related to",
     "animal": "Animal",
     "all": "All",
     "addPhotos": "Add photos (max. 3)",
@@ -1236,9 +1234,10 @@
     "photoN": "Photo {{n}}",
     "removePhoto": "Remove photo {{n}}",
     "addPhoto": "Add photo",
-    "photoHint": "Up to {{max}} photos. They are resized and stored on this device only.",
     "suggestedTags": "Suggestions:",
-    "noAnimal": "No animal"
+    "noAnimal": "No animal",
+    "linkToggle": "Link a plant, bed or animal",
+    "photoHintShort": "Up to {{max}} photos, stored on this device only."
   },
   "pantry": {
     "title": "Pantry",
@@ -1256,7 +1255,7 @@
     "unitCount": "Number of jars/bags",
     "label": "Label",
     "labelPlaceholder": "e.g. Tomato Sauce August 2026",
-    "supplyCost": "Supply cost",
+    "supplyCost": "Supply cost (€)",
     "storedOn": "stored",
     "expiresOn": "best before",
     "consumedOn": "used up",
@@ -1321,12 +1320,11 @@
     "needPlant": "Choose a plant",
     "needQuantity": "Enter a quantity in kg",
     "invalidNumber": "Enter a valid number",
-    "methodSummary": "Keeps {{shelf}} · yield approx. {{yield}}",
+    "methodSummary": "Keeps {{shelf}} (until {{date}}) · yield approx. {{yield}}",
     "quantityKg": "Quantity (kg)",
     "unitLabel": "Unit",
     "unitLabelPlaceholder": "e.g. buckets",
     "storedDate": "Stored on",
-    "bestBefore": "Best before {{date}}",
     "supplyCostHint": "Jars, lids, bags",
     "unitOther": "Other …",
     "unitOtherLabel": "Custom unit",
@@ -1565,7 +1563,6 @@
     "perEgg": "egg",
     "deleteAnimal": "Delete animal",
     "noJournal": "Link journal entries to this animal and they'll show up here.",
-    "notesPlaceholder": "e.g. breed, special notes…",
     "production": {
       "title": "Production",
       "totalEggs": "Total eggs",
@@ -1719,7 +1716,7 @@
     "editHealth": "Edit health entry",
     "healthUpdated": "Health entry updated",
     "healthDeleted": "Health entry deleted",
-    "cost": "Cost in €",
+    "cost": "Cost (€)",
     "costHint": "Counts towards the balance under Costs.",
     "filterAnimal": "Animal",
     "filterProduct": "Product",
@@ -1820,7 +1817,7 @@
     "acquired": "from {{year}}",
     "shopName": "Supplier",
     "shopPlaceholder": "e.g. Real Seeds",
-    "cost": "Cost in €",
+    "cost": "Cost (€)",
     "needPlant": "Choose a plant",
     "invalidNumber": "Enter a valid number",
     "invalidYear": "Enter a year between 1950 and today",
@@ -1903,7 +1900,7 @@
     "invalidPh": "Enter a pH between 3 and 10",
     "invalidNumber": "Enter a valid number",
     "quantityKg": "Quantity (kg)",
-    "cost": "Cost",
+    "cost": "Cost (€)",
     "unknownBed": "Deleted bed",
     "limeReason": {
       "potato": "Lime encourages potato scab.",
@@ -2213,7 +2210,8 @@
       "garden": "Delete garden “{{name}}”?"
     },
     "examplePlaceholder": "e.g. {{value}}",
-    "optionalLabel": "{{label}} (optional)"
+    "optionalMark": "(optional)",
+    "notesPlaceholder": "e.g. observations, variety, weather…"
   },
   "companions": {
     "title": "Companions",
@@ -2287,8 +2285,8 @@
     "minutesCount_one": "{{count}} minute",
     "minutesCount_other": "{{count}} minutes",
     "showOlder": "Show older weeks",
-    "litersLabel": "Amount (litres)",
-    "durationLabel": "Duration in minutes",
+    "litersLabel": "Amount (l)",
+    "durationLabel": "Duration (min)",
     "needBed": "Choose a bed",
     "needLiters": "Enter an amount in litres",
     "invalidNumber": "Enter a valid number",
@@ -2323,7 +2321,9 @@
     "plantSearch": "Search plants …",
     "clearPlant": "Clear plant",
     "plantedNow": "In your beds",
-    "allPlants": "All plants"
+    "allPlants": "All plants",
+    "tomorrow": "Tomorrow",
+    "inAWeek": "In 1 week"
   },
   "importPage": {
     "title": "Import garden",

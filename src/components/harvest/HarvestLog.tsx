@@ -244,12 +244,13 @@ export function HarvestLog() {
       <PageHeader
         title={t("harvest.title")}
         description={t("harvest.subtitle")}
-        actions={
+        // While empty, the empty state carries the one "Ernte erfassen" button.
+        actions={harvests.length > 0 ? (
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("harvest.add")}
           </Button>
-        }
+        ) : undefined}
       />
 
       {harvests.length === 0 ? (
@@ -424,6 +425,7 @@ export function HarvestLog() {
           {beds.beds.length > 0 && (
             <Select
               label={t("harvest.bed")}
+              optional
               value={draft.bedId}
               onChange={(e) => patch({ bedId: e.target.value })}
               placeholder={t("harvest.noBed")}
@@ -471,7 +473,7 @@ export function HarvestLog() {
 
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <QualityInput label={t("harvest.quality")} value={draft.quality} onChange={(quality) => patch({ quality })} />
-          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} placeholder={t("harvest.notesPlaceholder")} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
           <button type="submit" hidden aria-hidden="true" tabIndex={-1} />
         </form>
       </Modal>

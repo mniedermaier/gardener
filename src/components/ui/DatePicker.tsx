@@ -7,6 +7,8 @@ import { CONTROL_CLASS, Field, describedBy } from "./Field";
 
 interface DatePickerProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value"> {
   label?: string;
+  /** Marks the field optional: "(optional)" after the label. */
+  optional?: boolean;
   hint?: ReactNode;
   error?: ReactNode;
   wrapperClassName?: string;
@@ -35,6 +37,7 @@ function openPicker(el: HTMLInputElement) {
  */
 export function DatePicker({
   label,
+  optional,
   hint,
   error,
   wrapperClassName,
@@ -67,7 +70,7 @@ export function DatePicker({
   };
 
   return (
-    <Field id={inputId} label={label} hint={hint} error={error} className={wrapperClassName}>
+    <Field id={inputId} label={label} optional={optional} hint={hint} error={error} className={wrapperClassName}>
       <div className="relative">
         <input
           id={inputId}

@@ -120,7 +120,7 @@ export function SeedInventory() {
     plant: submitted && !draft.plantId ? t("seeds.needPlant") : undefined,
     quantity: !Number.isFinite(quantityNum) || quantityNum < 0 ? t("seeds.invalidNumber") : undefined,
     year: !Number.isFinite(yearNum) || yearNum < 1950 || yearNum > CURRENT_YEAR + 1 ? t("seeds.invalidYear") : undefined,
-    cost: !Number.isFinite(costNum) || costNum < 0 ? t("seeds.invalidNumber") : undefined,
+    cost: draft.source === "shop" && (!Number.isFinite(costNum) || costNum < 0) ? t("seeds.invalidNumber") : undefined,
   };
 
   const handleSave = () => {
@@ -134,7 +134,7 @@ export function SeedInventory() {
       yearAcquired: yearNum,
       source: draft.source,
       shopName: draft.source === "shop" ? draft.shopName.trim() || undefined : undefined,
-      cost: costNum || undefined,
+      cost: draft.source === "shop" ? costNum || undefined : undefined,
       notes: draft.notes.trim() || undefined,
     };
     if (editingId) {
@@ -336,9 +336,9 @@ export function SeedInventory() {
             />
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
-          <Input label={t("planner.variety")} value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
-          {/* One two-column grid for every row, so the fields line up. */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <Input label={t("planner.variety")} optional value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
+          {/* Short pairs stay side by side on phones too; one grid per row so the fields line up. */}
+          <div className="grid grid-cols-2 gap-4">
             <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
             {/* A select, not a segmented toggle: three units do not fit a half-width column. */}
             <Select
@@ -348,7 +348,7 @@ export function SeedInventory() {
               options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-4">
             <Input label={t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
             <Select
               label={t("seeds.source")}
@@ -357,12 +357,12 @@ export function SeedInventory() {
               options={SOURCES.map((s) => ({ value: s, label: t(`seeds.sources.${s}`) }))}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {draft.source === "shop" && (
-              <Input label={t("seeds.shopName")} value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
-            )}
+          {/* Shop and price only matter for bought seed. */}
+          {draft.source === "shop" && (
+          <div className="grid grid-cols-2 gap-4">
+              <Input label={t("seeds.shopName")} optional value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
             <Input
-              label={t("common.optionalLabel", { label: t("seeds.cost") })}
+              label={t("seeds.cost")} optional
               inputMode="decimal"
               value={draft.cost}
               onChange={(e) => patch({ cost: e.target.value })}
@@ -370,7 +370,8 @@ export function SeedInventory() {
               error={errors.cost}
             />
           </div>
-          <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
+          )}
+          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>
     </div>
