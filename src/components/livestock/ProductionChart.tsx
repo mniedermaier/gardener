@@ -154,7 +154,7 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
               <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.bestMonth")}</dt>
               <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
                 {formatProductAmount(type, values[best], f, t)}
-                <span className="ml-1.5 text-sm font-normal text-gray-500 dark:text-gray-400">{f.formatDate(buckets[best].date, "monthYear")}</span>
+                <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(buckets[best].date, "monthYear")}</span>
               </dd>
             </div>
           </dl>

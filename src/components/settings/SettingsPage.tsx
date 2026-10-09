@@ -175,7 +175,9 @@ export function SettingsPage() {
 
   const showSync = useBackendAvailable(store.backendUrl);
   // App Store rule 3.1.1: no external tip links in the iOS app.
-  const showCoffee = !(Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios");
+  // External tips are not allowed in the store apps (App Store 3.1.1, Play payments
+  // policy): the coffee link only shows on the web.
+  const showCoffee = !Capacitor.isNativePlatform();
   // A rejected or unreachable key needs the user; otherwise the key field stays folded away.
   const keyProblem = configuredProvider === "openweathermap" && (keyStatus === "auth" || keyStatus === "unavailable");
 

@@ -136,7 +136,6 @@ export function ProductionPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     {productTypes.length > 1 && (
                       <SegmentedControl
-                        size="sm"
                         inline
                         label={t("livestock.filterProduct")}
                         value={filterType}
@@ -145,7 +144,7 @@ export function ProductionPage() {
                       />
                     )}
                     {animals.length > 1 && (
-                      <Select aria-label={t("livestock.filterAnimal")} wrapperClassName="w-48" value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
+                      <Select aria-label={t("livestock.filterAnimal")} wrapperClassName="w-full sm:w-48" value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
                     )}
                   </div>
                 )}
