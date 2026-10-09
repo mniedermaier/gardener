@@ -274,10 +274,12 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   const frostSummary = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
   const frostHarvest = useMemo(() => {
     const first = frostSummary?.summary.nights.find((n) => n.tempMin <= 0);
-    if (!first || context.protection > 0 || !isFrostSensitive(plant)) return null;
+    // Only for a crop that actually stands in a bed: no "jetzt abernten" without plants.
+    const planted = gardens.some((g) => g.beds.some((bd) => bd.cells.some((c) => c.plantId === plant.id)));
+    if (!first || !planted || context.protection > 0 || !isFrostSensitive(plant)) return null;
     const inHarvest = phases.some((p) => p.key === "harvest" && p.start <= today && p.end >= today);
     return inHarvest ? toDate(first.date) : null;
-  }, [frostSummary, context.protection, plant, phases, today]);
+  }, [frostSummary, context.protection, plant, phases, today, gardens]);
 
   // Relations are symmetric, like in the companion matrix.
   const { good, bad } = useMemo(() => {

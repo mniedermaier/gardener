@@ -35,11 +35,12 @@ const PLANT_SVGS: Record<string, string> = {
     <path d="M13 3C14 1.5 15.5 1 15 2.5S13 4 13 3" fill="#16a34a"/>`,
 
   lettuce: `
-    <ellipse cx="12" cy="14" rx="9" ry="7" fill="#65a30d"/>
-    <ellipse cx="12" cy="13.5" rx="7.5" ry="6" fill="#84cc16"/>
-    <ellipse cx="12" cy="13" rx="5.5" ry="4.5" fill="#a3e635"/>
-    <ellipse cx="12" cy="12.5" rx="3.5" ry="3" fill="#bef264"/>
-    <path d="M7 11Q12 8 17 11" stroke="#4d7c0f" stroke-width="0.4" fill="none" opacity="0.4"/>`,
+    <ellipse cx="12" cy="13" rx="8.4" ry="7.2" fill="#4d7c0f"/>
+    <circle cx="20.2" cy="13.0" r="3.4" fill="#4d7c0f"/><circle cx="18.6" cy="17.1" r="3.4" fill="#4d7c0f"/><circle cx="14.5" cy="19.7" r="3.4" fill="#4d7c0f"/><circle cx="9.5" cy="19.7" r="3.4" fill="#4d7c0f"/><circle cx="5.4" cy="17.1" r="3.4" fill="#4d7c0f"/><circle cx="3.8" cy="13.0" r="3.4" fill="#4d7c0f"/><circle cx="5.4" cy="8.9" r="3.4" fill="#4d7c0f"/><circle cx="9.5" cy="6.3" r="3.4" fill="#4d7c0f"/><circle cx="14.5" cy="6.3" r="3.4" fill="#4d7c0f"/><circle cx="18.6" cy="8.9" r="3.4" fill="#4d7c0f"/>
+    <ellipse cx="12" cy="12.6" rx="6.2" ry="5.2" fill="#84cc16"/>
+    <circle cx="16.8" cy="13.7" r="3" fill="#84cc16"/><circle cx="14.3" cy="16.2" r="3" fill="#84cc16"/><circle cx="10.5" cy="16.5" r="3" fill="#84cc16"/><circle cx="7.6" cy="14.5" r="3" fill="#84cc16"/><circle cx="7.2" cy="11.3" r="3" fill="#84cc16"/><circle cx="9.7" cy="8.8" r="3" fill="#84cc16"/><circle cx="13.5" cy="8.5" r="3" fill="#84cc16"/><circle cx="16.4" cy="10.5" r="3" fill="#84cc16"/>
+    <ellipse cx="12" cy="12.4" rx="3.6" ry="3" fill="#bef264"/>
+    <path d="M12 19.5C12 16 12 14 12 10.5M12 17C9.5 15.5 8 14 7 11.5M12 17C14.5 15.5 16 14 17 11.5" stroke="#3f6212" stroke-width="0.7" stroke-linecap="round" fill="none" opacity="0.7"/>`,
 
   bean: `
     <path d="M8 20C8 12 10 6 12 4C14 6 16 12 16 20Q12 22 8 20Z" fill="#15803d"/>
