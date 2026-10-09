@@ -529,9 +529,10 @@
     "inspectHintShort": "Touchez une plante pour l’examiner.",
     "inspectHintShortClick": "Cliquez sur une plante pour l’examiner.",
     "cropListTitle": "Dans la planche",
-    "cropListMeta_one": "{{count}} plante · récolte {{start}} – {{end}}",
-    "cropListMeta_other": "{{count}} plantes · récolte {{start}} – {{end}}",
-    "cropListMeta_many": "{{count}} plantes · récolte {{start}} – {{end}}"
+    "cropListCount_one": "{{count}} plante",
+    "cropListCount_other": "{{count}} plantes",
+    "cropListCount_many": "{{count}} plantes",
+    "cropListHarvest": "récolte {{range}}"
   },
   "plants": {
     "title": "Plantes",
@@ -2343,7 +2344,8 @@
     "scopeGarden": "Au jardin",
     "scopeAll": "Toutes",
     "scrollLeft": "Défiler vers la gauche",
-    "scrollRight": "Défiler vers la droite"
+    "scrollRight": "Défiler vers la droite",
+    "quickPick": "Cultures courantes"
   },
   "water": {
     "title": "Arrosage",

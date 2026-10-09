@@ -440,9 +440,14 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               muted={harvestStats.count === 0}
               leading={<StockTile icon={Apple} />}
               title={t("plants.detail.yourHarvests")}
-              meta={harvestStats.count > 0 ? t("plants.detail.harvestEntries", { count: harvestStats.count }) : t("plants.detail.noHarvests")}
-              description={harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : undefined}
-              trailing={harvestStats.count > 0 ? formatWeight(harvestStats.grams) : undefined}
+              // Weight, count and last date as meta parts of one size; only the "+" on the right, so the title keeps its width.
+              meta={harvestStats.count > 0
+                ? [
+                  formatWeight(harvestStats.grams),
+                  t("plants.detail.harvestEntries", { count: harvestStats.count }),
+                  harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : null,
+                ]
+                : t("plants.detail.noHarvests")}
               actions={<IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} />}
             />
             {ownSeeds.length > 0 ? ownSeeds.map((s) => (
@@ -450,8 +455,8 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                 key={s.id}
                 leading={<StockTile icon={Package} />}
                 title={s.variety || t("plants.detail.seedStock")}
-                meta={String(s.yearAcquired)}
-                trailing={`${formatNumber(s.quantity)} ${t(`seeds.units.${s.unit}`)}`}
+                meta={[t(`seeds.unitCount.${s.unit}`, { count: s.quantity, n: formatNumber(s.quantity) }), String(s.yearAcquired)]}
+                onClick={() => navigate("/seeds")}
               />
             )) : (
               <ListRow muted leading={<StockTile icon={Package} />} title={t("plants.detail.seedStock")} meta={t("plants.detail.noSeeds")} />

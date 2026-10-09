@@ -511,8 +511,9 @@
     "inspectHintShort": "Tap a plant to inspect it.",
     "inspectHintShortClick": "Click a plant to inspect it.",
     "cropListTitle": "In this bed",
-    "cropListMeta_one": "{{count}} plant · harvest {{start}} – {{end}}",
-    "cropListMeta_other": "{{count}} plants · harvest {{start}} – {{end}}"
+    "cropListCount_one": "{{count}} plant",
+    "cropListCount_other": "{{count}} plants",
+    "cropListHarvest": "harvest {{range}}"
   },
   "plants": {
     "title": "Plants",
@@ -2240,7 +2241,8 @@
     "scopeGarden": "In the garden",
     "scopeAll": "All",
     "scrollLeft": "Scroll left",
-    "scrollRight": "Scroll right"
+    "scrollRight": "Scroll right",
+    "quickPick": "Common crops"
   },
   "water": {
     "title": "Watering",

@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Droplets, Ruler } from "lucide-react";
+import { Sun, Droplets, Ruler, ChevronRight } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Badge } from "@/components/ui/Badge";
 import { usePlantName } from "@/hooks/usePlantName";
@@ -52,6 +52,8 @@ export const PlantCard = memo(function PlantCard({ plant, planted, custom, onOpe
           </span>
         </span>
       </span>
+      {/* Row affordance: the whole tile opens the plant. */}
+      <ChevronRight size={18} aria-hidden="true" className="shrink-0 self-center text-gray-400 dark:text-gray-500" />
     </button>
   );
 });

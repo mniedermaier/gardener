@@ -1,4 +1,4 @@
-import { memo, useMemo, type ReactNode } from "react";
+import { memo, useMemo, type CSSProperties, type ReactNode } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { ArrowLeft, Copy, Eraser, Footprints, Pencil, Trash2, Wand2, ZoomIn, ZoomOut, Check, MousePointerClick, ShieldCheck, TriangleAlert } from "lucide-react";
 import type { Bed } from "@/types/garden";
@@ -13,7 +13,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Menu } from "@/components/ui/Menu";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { EnvironmentChip } from "./environment";
-import { EditableBedGrid, type GridMode } from "./BedGrid";
+import { EditableBedGrid, heightBoundBedWidth, type GridMode } from "./BedGrid";
 import { BedStats } from "./BedStats";
 import { BedCropList } from "./BedCropList";
 import { GuildPicker } from "./GuildPicker";
@@ -183,7 +183,11 @@ export const BedEditor = memo(function BedEditor(props: Props) {
 
       {/* Tall beds on a wide card: grid left, figures right, instead of a narrow grid above empty space. */}
       <div className="@container">
-      <div className={sideBySide ? "@2xl:grid @2xl:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)] @2xl:items-start" : undefined}>
+      {/* The grid column is as wide as the height-bound grid (+ its padding), so the side pane gets the rest instead of empty space around the bed. */}
+      <div
+        className={sideBySide ? "@2xl:grid @2xl:grid-cols-[minmax(0,min(var(--bed-col),60%))_minmax(16rem,1fr)] @2xl:items-start" : undefined}
+        style={sideBySide ? ({ "--bed-col": `${heightBoundBedWidth(bed.width, bed.height) + 32}px` } as CSSProperties) : undefined}
+      >
       <div className="px-3 py-4 sm:px-4">
         <EditableBedGrid
           bed={bed}

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useToday } from "@/hooks/useToday";
-import { harvestWindow } from "@/lib/metrics";
+import { getPhaseWindows, seasonFrost } from "@/lib/season";
 import { getFrostProtectionWeeks, type Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
@@ -18,14 +18,15 @@ interface Props {
 
 /**
  * What stands in the bed, one row per crop: count and this season's harvest
- * window (same `harvestWindow` as the forecasts). Fills the side pane next to
- * a tall bed on wide screens.
+ * window — the same season windows as the calendar (`getPhaseWindows` with
+ * the bed's frost protection). Fills the side pane next to a tall bed on wide
+ * screens.
  */
 export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantName, onSelectCell }: Props) {
   const { t } = useTranslation();
   const { formatDate } = useFormat();
   const lastFrostDate = useStore((s) => s.lastFrostDate);
-  const year = useToday().getFullYear();
+  const today = useToday();
 
   const rows = useMemo(() => {
     const byPlant = new Map<string, { plant: Plant; count: number; x: number; y: number }>();
@@ -36,11 +37,20 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
       if (row) row.count++;
       else byPlant.set(plant.id, { plant, count: 1, x: cell.cellX, y: cell.cellY });
     }
-    const protection = getFrostProtectionWeeks(bed);
+    const frostProtectionWeeks = getFrostProtectionWeeks(bed);
+    const frost = seasonFrost(lastFrostDate, today);
     return [...byPlant.values()]
-      .map((r) => ({ ...r, window: harvestWindow(r.plant, lastFrostDate, protection, year) }))
-      .sort((a, b) => a.window[0].getTime() - b.window[0].getTime());
-  }, [bed, plantMap, lastFrostDate, year]);
+      .map((r) => ({ ...r, window: getPhaseWindows(r.plant, frost, { frostProtectionWeeks }).find((w) => w.phase === "harvest") ?? null }))
+      // Crops without a seasonal window (perennials) go last.
+      .sort((a, b) => (a.window?.start.getTime() ?? Infinity) - (b.window?.start.getTime() ?? Infinity));
+  }, [bed, plantMap, lastFrostDate, today]);
+
+  // "Mai" for a single month, "Jun–Nov" otherwise (unspaced en dash, DESIGN_SYSTEM §13).
+  const range = (start: Date, end: Date) => {
+    const a = formatDate(start, "month");
+    const b = formatDate(end, "month");
+    return a === b ? a : `${a}–${b}`;
+  };
 
   if (rows.length === 0) return null;
 
@@ -48,7 +58,7 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
     <section className="border-t border-gray-100 px-3 py-4 sm:px-4 dark:border-white/5" aria-labelledby={`crops-${bed.id}`}>
       <h3 id={`crops-${bed.id}`} className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("planner.cropListTitle")}</h3>
       <ul className="divide-y divide-gray-100 dark:divide-white/5">
-        {rows.map(({ plant, count, x, y, window: [start, end] }) => (
+        {rows.map(({ plant, count, x, y, window }) => (
           <li key={plant.id}>
             <button
               type="button"
@@ -59,7 +69,8 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium text-gray-900 dark:text-gray-100">{getPlantName(plant.id)}</span>
                 <span className="block text-xs text-gray-500 dark:text-gray-400">
-                  {t("planner.cropListMeta", { count, start: formatDate(start, "month"), end: formatDate(end, "month") })}
+                  {t("planner.cropListCount", { count })}
+                  {window && <> · {t("planner.cropListHarvest", { range: range(window.start, window.end) })}</>}
                 </span>
               </span>
             </button>

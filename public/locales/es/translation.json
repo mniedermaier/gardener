@@ -529,9 +529,10 @@
     "inspectHintShort": "Toca una planta para verla.",
     "inspectHintShortClick": "Haz clic en una planta para verla.",
     "cropListTitle": "En el bancal",
-    "cropListMeta_one": "{{count}} planta · cosecha {{start}} – {{end}}",
-    "cropListMeta_other": "{{count}} plantas · cosecha {{start}} – {{end}}",
-    "cropListMeta_many": "{{count}} plantas · cosecha {{start}} – {{end}}"
+    "cropListCount_one": "{{count}} planta",
+    "cropListCount_other": "{{count}} plantas",
+    "cropListCount_many": "{{count}} plantas",
+    "cropListHarvest": "cosecha {{range}}"
   },
   "plants": {
     "title": "Plantas",
@@ -2343,7 +2344,8 @@
     "scopeGarden": "En el huerto",
     "scopeAll": "Todos",
     "scrollLeft": "Desplazar a la izquierda",
-    "scrollRight": "Desplazar a la derecha"
+    "scrollRight": "Desplazar a la derecha",
+    "quickPick": "Cultivos habituales"
   },
   "water": {
     "title": "Riego",
