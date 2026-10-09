@@ -933,14 +933,11 @@
     "allBeds": "All beds",
     "today": "Today",
     "lastFrost": "Last frost",
-    "upNext": "Coming up next",
     "nowDue": "Happening now",
     "next4Weeks": "Next 4 weeks",
     "nothingNow": "No sowing, planting or harvest window is open right now.",
     "until": "until {{date}}",
     "from": "from {{date}}",
-    "bedsUntil": "{{beds}} until {{date}}",
-    "bedsFrom": "{{beds}} from {{date}}",
     "title": "Calendar",
     "noTasks": "No tasks yet. Plan your garden to generate tasks automatically.",
     "thisWeek": "This week",
@@ -973,7 +970,10 @@
       "custom": "Custom"
     },
     "reopenNamed": "Reopen “{{title}}”",
-    "nothingNextLine": "Next 4 weeks: nothing new for your beds."
+    "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
+    "untilRange": "until {{first}} – {{last}}, by bed",
+    "fromRange": "from {{first}} – {{last}}, by bed",
+    "upNextFrom": "Coming up next · from {{date}}"
   },
   "settings": {
     "title": "Settings",
@@ -1048,7 +1048,17 @@
     "weatherProviderActive": "Active provider: {{provider}}. With a key Gardener uses OpenWeatherMap, without one Open-Meteo.",
     "weatherKeyRejected": "Key rejected – Open-Meteo is used instead. Check the OpenWeatherMap key or remove it.",
     "weatherOwmUnavailable": "OpenWeatherMap is unreachable right now – Open-Meteo is used instead.",
-    "weatherKeyChecking": "Checking key …"
+    "weatherKeyChecking": "Checking key …",
+    "analysisTitle": "Insights",
+    "analysisDesc": "The basis for self-sufficiency and the food plan.",
+    "pricesHint": "Prices for eggs, honey and other animal products are set under costs.",
+    "pricesLink": "Go to costs",
+    "aboutTitle": "About Gardener",
+    "aboutDesc": "Version, privacy and source code.",
+    "version": "Version",
+    "privacyPolicy": "Privacy policy",
+    "sourceCode": "Source code on GitHub",
+    "license": "License (MIT)"
   },
   "dataManagement": {
     "title": "Data & backup",
@@ -1126,7 +1136,8 @@
     "frostGroupTitleMixed_one": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
     "frostGroupTitleMixed_other": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
     "frostHardNights_one": "Frost on {{count}} night",
-    "frostHardNights_other": "Frost on {{count}} nights"
+    "frostHardNights_other": "Frost on {{count}} nights",
+    "frostAdviceNoPlants": "Hold off on planting out until the frost nights are over."
   },
   "harvest": {
     "title": "Harvest",
@@ -1901,7 +1912,9 @@
     },
     "openInPlanner": "Open in planner",
     "yourNote": "Note:",
-    "emptyNoBeds": "Soil tests and amendments belong to a bed. Create a bed in the planner first."
+    "emptyNoBeds": "Soil tests and amendments belong to a bed. Create a bed in the planner first.",
+    "moreMeasures_one": "{{count}} more measure",
+    "moreMeasures_other": "{{count}} more measures"
   },
   "preservation": {
     "title": "Preservation guide",
@@ -2290,7 +2303,7 @@
     "allPlants": "All plants"
   },
   "importPage": {
-    "title": "Import shared garden",
+    "title": "Import garden",
     "subtitle": "Someone shared a garden plan with you. Check the preview and add it as a new garden.",
     "invalidTitle": "This link does not work",
     "invalidText": "The share link is incomplete or damaged. Ask the sender to send it again.",
@@ -2306,7 +2319,10 @@
     "bedsHeader": "Beds in this template",
     "size": "{{w}} × {{h}} cells",
     "importAction": "Add as new garden",
-    "done": "“{{name}}” was created"
+    "done": "“{{name}}” was created",
+    "noLinkSubtitle": "Take over garden plans from a share link.",
+    "noLinkTitle": "Take over a garden from a link",
+    "noLinkText": "Has someone shared a garden plan with you? Open the link and the preview appears here. Your own data comes back from a backup."
   },
   "charts": {
     "month": "Month",

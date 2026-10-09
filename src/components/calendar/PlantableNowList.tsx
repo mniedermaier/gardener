@@ -26,17 +26,21 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
   /**
-   * One date for all beds: "bis 17. Okt. · Hochbeet Süd". Different dates: each
-   * group names its beds with its own date ("Kartoffelacker, Kräuterkübel bis
-   * 10. Okt. · Hochbeet Süd bis 17. Okt."), so no date stands without its beds.
+   * Always two short parts: the date and the beds. One date for all beds:
+   * "bis 17. Okt. · Hochbeet Süd". Dates that differ per bed (glass closes
+   * later): the span, "bis 10. Okt. – 31. Okt. je nach Beet · 4 Beete".
    */
   const meta = (item: AgendaPlantRow): string[] => {
     const key = item.kind === "now" ? "until" : "from";
     const groups = groupAgendaBedsByDate(item);
+    const beds = bedLabel(groups.flatMap((g) => g.beds));
     if (groups.length === 1) {
-      return [t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") }), bedLabel(groups[0].beds)].filter((x): x is string => !!x);
+      return [t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") }), beds].filter((x): x is string => !!x);
     }
-    return groups.map((g) => t(`calendar.${key === "until" ? "bedsUntil" : "bedsFrom"}`, { beds: bedLabel(g.beds), date: formatDate(g.date, "short") }));
+    const dates = groups.map((g) => g.date.getTime());
+    const first = formatDate(new Date(Math.min(...dates)), "short");
+    const last = formatDate(new Date(Math.max(...dates)), "short");
+    return [t(`calendar.${key}Range`, { first, last }), beds].filter((x): x is string => !!x);
   };
 
   const items = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);

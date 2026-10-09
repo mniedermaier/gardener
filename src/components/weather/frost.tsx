@@ -82,7 +82,11 @@ export function useFrostAffectedText(summary: FrostSummary | null | undefined): 
   const gardens = useStore((s) => s.gardens);
   const { byBed, plantIds } = useFrostRisk(summary);
   return useMemo(() => {
-    if (plantIds.length === 0) return t("alerts.frostAdvice");
+    if (plantIds.length === 0) {
+      // Nothing planted yet: no fleece advice for plants that do not exist.
+      const planted = gardens.some((g) => g.beds.some((b) => b.cells.some((c) => c.plantId)));
+      return t(planted ? "alerts.frostAdvice" : "alerts.frostAdviceNoPlants");
+    }
     // Open beds first: they get the full frost, a greenhouse only part of it.
     const beds = gardens.flatMap((g) => g.beds).filter((b) => byBed.has(b.id))
       .sort((a, b) => Number(PROTECTED_ENVIRONMENTS.includes(a.environmentType)) - Number(PROTECTED_ENVIRONMENTS.includes(b.environmentType)));

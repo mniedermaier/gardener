@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Download, LayoutGrid, Link2Off } from "lucide-react";
+import { Download, LayoutGrid, Link2Off, Share2, Upload } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { decodeGardenFromUrl, importTemplateToStore } from "@/lib/sharing";
@@ -37,10 +37,27 @@ export function ImportPage() {
   const template = useMemo(() => (encoded ? decodeGardenFromUrl(encoded) : null), [encoded]);
   const [name, setName] = useState(template?.name ?? "");
 
+  // Opened without a link (e.g. from the menu): explain the page instead of reporting a broken link.
+  if (!encoded) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <PageHeader title={t("importPage.title")} description={t("importPage.noLinkSubtitle")} />
+        <Card>
+          <EmptyState
+            icon={Share2}
+            title={t("importPage.noLinkTitle")}
+            description={t("importPage.noLinkText")}
+            action={<Button onClick={() => navigate("/settings")}><Upload size={16} aria-hidden="true" />{t("importPage.restoreBackup")}</Button>}
+          />
+        </Card>
+      </div>
+    );
+  }
+
   if (!template) {
     return (
-      <div>
-        <PageHeader title={t("importPage.title")} />
+      <div className="mx-auto max-w-2xl">
+        <PageHeader title={t("importPage.title")} description={t("importPage.noLinkSubtitle")} />
         <Card>
           <EmptyState
             icon={Link2Off}
