@@ -155,7 +155,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
   const { t } = useTranslation();
   const f = useFormat();
   const { toast } = useToast();
-  const { animals, addProduct, updateProduct } = useStore(useShallow((s) => ({ animals: s.animals, addProduct: s.addProduct, updateProduct: s.updateProduct })));
+  const { animals, animalProducts, addProduct, updateProduct } = useStore(useShallow((s) => ({ animals: s.animals, animalProducts: s.animalProducts, addProduct: s.addProduct, updateProduct: s.updateProduct })));
   const { deleteProduct } = useRecordActions();
   const [aid, setAid] = useState("");
   const [type, setType] = useState<ProductType>("eggs");
@@ -170,7 +170,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      const first = animalId ?? entry?.animalId ?? defaultAnimalId(animals, useStore.getState().animalProducts);
+      const first = animalId ?? entry?.animalId ?? defaultAnimalId(animals, animalProducts);
       const a = animals.find((x) => x.id === first);
       setAid(first);
       setType(entry?.type ?? (a ? PRODUCT_TYPES_BY_ANIMAL[a.type][0] : "eggs"));
@@ -253,7 +253,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
   const { t } = useTranslation();
   const f = useFormat();
   const { toast } = useToast();
-  const { animals, addFeedEntry, updateFeedEntry } = useStore(useShallow((s) => ({ animals: s.animals, addFeedEntry: s.addFeedEntry, updateFeedEntry: s.updateFeedEntry })));
+  const { animals, feedEntries, addFeedEntry, updateFeedEntry } = useStore(useShallow((s) => ({ animals: s.animals, feedEntries: s.feedEntries, addFeedEntry: s.addFeedEntry, updateFeedEntry: s.updateFeedEntry })));
   const { deleteFeed } = useRecordActions();
   const [aid, setAid] = useState("");
   const [feedType, setFeedType] = useState("");
@@ -270,7 +270,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      setAid(animalId ?? entry?.animalId ?? defaultAnimalId(animals, useStore.getState().feedEntries));
+      setAid(animalId ?? entry?.animalId ?? defaultAnimalId(animals, feedEntries));
       setFeedType(entry?.feedType ?? "");
       setQty(toField(entry?.quantity, f));
       setUnit(entry?.unit ?? "kg");
@@ -342,7 +342,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
   const { t } = useTranslation();
   const f = useFormat();
   const { toast } = useToast();
-  const { animals, addHealthEvent, updateHealthEvent } = useStore(useShallow((s) => ({ animals: s.animals, addHealthEvent: s.addHealthEvent, updateHealthEvent: s.updateHealthEvent })));
+  const { animals, healthEvents, addHealthEvent, updateHealthEvent } = useStore(useShallow((s) => ({ animals: s.animals, healthEvents: s.healthEvents, addHealthEvent: s.addHealthEvent, updateHealthEvent: s.updateHealthEvent })));
   const { deleteHealth } = useRecordActions();
   const [aid, setAid] = useState("");
   const [type, setType] = useState<HealthEventType>("checkup");
@@ -358,7 +358,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? defaultAnimalId(animals, useStore.getState().healthEvents));
+      setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? defaultAnimalId(animals, healthEvents));
       setType(entry?.type ?? presetType ?? "checkup");
       setDesc(entry?.description ?? "");
       setCost(toField(entry?.cost, f));
