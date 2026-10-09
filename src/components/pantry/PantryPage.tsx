@@ -501,11 +501,13 @@ export function PantryPage() {
             <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method, unitKind: draft.unitKind === DEFAULT_UNIT[draft.method] ? DEFAULT_UNIT[method] : draft.unitKind })} />
             <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
               {t("pantry.methodSummary", { shelf: shelfText, yield: formatPercent(PRESERVATION_YIELD[draft.method]) })}
+              {" · "}
+              {t("pantry.bestBefore", { date: formatDate(expiresDate, "date") })}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label={t("pantry.quantityKg")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(1.5) })} error={errors.quantity} />
-            <Input label={t("pantry.unitCount")} inputMode="numeric" value={draft.units} onChange={(e) => patch({ units: e.target.value })} placeholder={t("pantry.unitCountPlaceholder")} error={errors.units} />
+            <Input label={t("pantry.unitCount")} inputMode="numeric" value={draft.units} onChange={(e) => patch({ units: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(5, { maximumFractionDigits: 0 }) })} error={errors.units} />
           </div>
           {unitsNum > 0 && (
             <div className="grid grid-cols-2 gap-4">
@@ -523,12 +525,9 @@ export function PantryPage() {
               )}
             </div>
           )}
-          <Input label={t("pantry.label")} value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
-          <div>
-            <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
-            <p className="mt-1 text-xs font-medium text-gray-700 dark:text-gray-300">{t("pantry.bestBefore", { date: formatDate(expiresDate, "date") })}</p>
-          </div>
-          <Input label={t("pantry.supplyCost")} inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatCurrency(4) })} hint={t("pantry.supplyCostHint")} error={errors.cost} />
+          <Input label={t("common.optionalLabel", { label: t("pantry.label") })} value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
+          <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
+          <Input label={t("common.optionalLabel", { label: t("pantry.supplyCost") })} inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatCurrency(4) })} hint={t("pantry.supplyCostHint")} error={errors.cost} />
           <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>

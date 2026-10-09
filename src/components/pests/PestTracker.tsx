@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Bug, Check, Leaf, Pencil, RotateCcw, Trash2, Microscope } from "lucide-react";
+import { Plus, Bug, Check, Pencil, RotateCcw, Trash2, Microscope } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -19,9 +19,9 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
+import { DateField } from "@/components/ui/DateField";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Badge } from "@/components/ui/Badge";
-import { IconButton } from "@/components/ui/IconButton";
 import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -45,10 +45,12 @@ interface Draft {
   description: string;
   treatment: string;
   organic: boolean;
+  /** When the problem was noticed (often reported a day or two later). */
+  date: string;
 }
 
 const emptyDraft = (plantId: string): Draft => ({
-  type: "pest", name: "", plantId, bedId: "", severity: 3, description: "", treatment: "", organic: true,
+  type: "pest", name: "", plantId, bedId: "", severity: 3, description: "", treatment: "", organic: false, date: todayISO(),
 });
 
 export function PestTracker() {
@@ -93,7 +95,7 @@ export function PestTracker() {
     setEditingId(pest.id);
     setDraft({
       type: pest.type, name: pest.name, plantId: pest.plantId, bedId: pest.bedId, severity: pest.severity,
-      description: pest.description ?? "", treatment: pest.treatment ?? "", organic: pest.organic,
+      description: pest.description ?? "", treatment: pest.treatment ?? "", organic: pest.organic, date: pest.date,
     });
     setDialogOpen(true);
   };
@@ -102,8 +104,11 @@ export function PestTracker() {
     if (!draft.name.trim()) return;
     const fields = {
       type: draft.type, name: draft.name.trim(), plantId: draft.plantId, bedId: draft.bedId, severity: draft.severity,
-      description: draft.description.trim() || undefined, organic: draft.organic,
+      description: draft.description.trim() || undefined,
       treatment: draft.treatment.trim() || undefined,
+      // "Biologisch behandelt" describes a treatment; without one it means nothing.
+      organic: draft.treatment.trim() ? draft.organic : false,
+      date: draft.date,
     };
     if (editingId) {
       const before = pests.find((p) => p.id === editingId);
@@ -111,7 +116,7 @@ export function PestTracker() {
       updatePest(editingId, { ...fields, ...(treatmentChanged && fields.treatment ? { treatmentDate: todayISO() } : {}) });
       toast(t("pests.updated"), "success");
     } else {
-      addPest({ ...fields, resolved: false, date: todayISO(), ...(fields.treatment ? { treatmentDate: todayISO() } : {}) });
+      addPest({ ...fields, resolved: false, ...(fields.treatment ? { treatmentDate: todayISO() } : {}) });
       toast(t("pests.added"), "success");
     }
     setDialogOpen(false);
@@ -190,41 +195,38 @@ export function PestTracker() {
                       <>
                         <Badge tone={SEVERITY_TONE[pest.severity]} dot>{t(`pests.severityLevel.${pest.severity}`)}</Badge>
                         <Badge variant="outline" icon={pest.type === "pest" ? Bug : Microscope}>{t(`pests.types.${pest.type}`)}</Badge>
-                        {pest.organic && <Badge tone="brand" icon={Leaf}>{t("pests.organic")}</Badge>}
                         {pest.resolved && <Badge tone="positive" icon={Check}>{t("pests.resolvedLabel")}</Badge>}
                       </>
                     }
                     meta={[plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")]}
+                    // One running text (ListRow clamps it to 2 lines); "bio" is part of the
+                    // treatment label instead of a badge that wraps onto its own line.
                     description={
                       pest.treatment || pest.description ? (
                         <>
-                          {pest.description && <span className="block">{pest.description}</span>}
+                          {pest.description}
+                          {pest.description && pest.treatment && " "}
                           {pest.treatment && (
-                            <span className="block">
-                              <span className="font-medium">{t("pests.treatment")}:</span> {pest.treatment}
-                              {pest.treatmentDate && <span className="text-gray-500 dark:text-gray-400"> · {formatDate(pest.treatmentDate)}</span>}
-                            </span>
+                            <>
+                              <span className="text-gray-500 dark:text-gray-400">{pest.organic ? t("pests.treatmentOrganic") : t("pests.treatment")}:</span> {pest.treatment}
+                            </>
                           )}
                         </>
                       ) : undefined
                     }
+                    // All actions in one menu, so the text keeps the row's width.
                     actions={
-                      <>
-                        {!pest.resolved && (
-                          <IconButton icon={Check} tone="brand" label={t("pests.resolve")} onClick={() => handleResolve(pest)} />
-                        )}
-                        <Menu
-                          label={t("common.moreActions")}
-                          items={[
-                            { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(pest) },
-                            ...(pest.resolved
-                              ? [{ label: t("pests.reopen"), icon: RotateCcw, onSelect: () => updatePest(pest.id, { resolved: false, resolvedDate: undefined }) }]
-                              : []),
-                            "separator" as const,
-                            { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(pest) },
-                          ]}
-                        />
-                      </>
+                      <Menu
+                        label={t("common.moreActions")}
+                        items={[
+                          pest.resolved
+                            ? { label: t("pests.reopen"), icon: RotateCcw, onSelect: () => updatePest(pest.id, { resolved: false, resolvedDate: undefined }) }
+                            : { label: t("pests.resolve"), icon: Check, onSelect: () => handleResolve(pest) },
+                          { label: t("common.edit"), icon: Pencil, onSelect: () => openEdit(pest) },
+                          "separator" as const,
+                          { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(pest) },
+                        ]}
+                      />
                     }
                   />
                 );
@@ -278,10 +280,11 @@ export function PestTracker() {
               label={t("harvest.bed")}
               value={draft.bedId}
               onChange={(e) => patch({ bedId: e.target.value })}
-              placeholder={t("journal.none")}
+              placeholder={t("harvest.noBed")}
               options={beds.options}
             />
           )}
+          <DateField label={t("pests.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("pests.severity")}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span>
@@ -293,10 +296,16 @@ export function PestTracker() {
               onChange={(v) => patch({ severity: Number(v) as Severity })}
               options={SEVERITIES.map((s) => ({ value: String(s), label: String(s) }))}
             />
+            <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
+              <span>{t("pests.severityLevel.1")}</span>
+              <span>{t("pests.severityLevel.5")}</span>
+            </div>
           </div>
-          <Textarea label={t("pests.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
-          <Textarea label={t("pests.treatment")} hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} />
-          <Checkbox label={t("pests.organicOnly")} checked={draft.organic} onChange={(e) => patch({ organic: e.target.checked })} />
+          <Textarea label={t("pests.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
+          <Textarea label={t("pests.treatment")} hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
+          {draft.treatment.trim() && (
+            <Checkbox label={t("pests.organicOnly")} checked={draft.organic} onChange={(e) => patch({ organic: e.target.checked })} />
+          )}
         </div>
       </Modal>
     </div>

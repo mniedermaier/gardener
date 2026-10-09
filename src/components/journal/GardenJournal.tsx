@@ -411,13 +411,13 @@ export function GardenJournal() {
               </Button>
             )}
             <Button variant="secondary" onClick={closeDialog}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={uploading}>{t("common.save")}</Button>
+            <Button onClick={handleSave} disabled={uploading || !draft.title.trim()}>{t("common.save")}</Button>
           </>
         }
       >
         <div className="space-y-5">
           <Input label={t("journal.entryTitle")} value={draft.title} onChange={(e) => patch({ title: e.target.value })} placeholder={t("journal.titlePlaceholder")} error={titleError} autoFocus />
-          <Textarea label={t("journal.textLabel")} value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
+          <Textarea label={t("harvest.notes")} value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
 
           {/* Photos */}
@@ -461,14 +461,14 @@ export function GardenJournal() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {beds.beds.length > 0 && (
-                <Select label={t("harvest.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("journal.none")} options={beds.options} />
+                <Select label={t("harvest.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("harvest.noBed")} options={beds.options} />
               )}
               {animals.length > 0 && (
                 <Select
                   label={t("journal.animal")}
                   value={draft.animalId}
                   onChange={(e) => patch({ animalId: e.target.value })}
-                  placeholder={t("journal.none")}
+                  placeholder={t("journal.noAnimal")}
                   options={animals.map((a) => ({ value: a.id, label: a.name || t(`livestock.types.${a.type}`) }))}
                 />
               )}

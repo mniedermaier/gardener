@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { usePlantMap } from "@/hooks/usePlants";
-import { usePlantName, usePlantOptions } from "@/hooks/usePlantName";
+import { usePlantMap, usePlants } from "@/hooks/usePlants";
+import { usePlantName } from "@/hooks/usePlantName";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useOpenAddOnNavigate, type AddPrefill } from "@/hooks/useOpenAddOnNavigate";
 import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 import { toISODate, todayISO } from "@/lib/format";
@@ -58,7 +59,7 @@ export function TaskCalendar() {
       addTask: s.addTask, updateTask: s.updateTask, deleteTask: s.deleteTask, generateTasks: s.generateTasks,
     }))
   );
-  const plantOptions = usePlantOptions();
+  const plants = usePlants();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
@@ -378,18 +379,19 @@ export function TaskCalendar() {
                 label={t("harvest.bed")}
                 value={draft.bedId}
                 onChange={(e) => patch({ bedId: e.target.value })}
-                placeholder="–"
+                placeholder={t("harvest.noBed")}
                 options={bedOptions}
               />
             )}
-            <Select
-              label={t("harvest.plant")}
-              value={draft.plantId}
-              onChange={(e) => patch({ plantId: e.target.value })}
-              placeholder="–"
-              options={plantOptions}
-            />
           </div>
+          {/* The searchable plant field of every other dialog, not a 47-entry select. */}
+          <PlantCombobox
+            label={t("harvest.plant")}
+            plants={plants}
+            optional
+            value={draft.plantId}
+            onChange={({ plantId }) => patch({ plantId })}
+          />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.recurrence")}</p>
             <SegmentedControl
@@ -400,7 +402,7 @@ export function TaskCalendar() {
               options={(["none", "daily", "weekly", "biweekly"] as const).map((r) => ({ value: r, label: t(`calendar.recurring.${r}`) }))}
             />
           </div>
-          <Textarea label={t("calendar.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
+          <Textarea label={t("harvest.notes")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>

@@ -432,7 +432,7 @@ export function HarvestLog() {
           <div>
             <div className="flex items-end gap-2">
               <Input
-                wrapperClassName="flex-1"
+                wrapperClassName="min-w-0 flex-1"
                 label={t("harvest.weight")}
                 inputMode="decimal"
                 autoComplete="off"
@@ -442,6 +442,7 @@ export function HarvestLog() {
                 error={amountError}
               />
               <SegmentedControl
+                inline
                 className={amountError ? "mb-5" : ""}
                 label={t("harvest.unit")}
                 value={draft.unit}
