@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/Badge";
 import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { LABEL_CLASS } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { KeyFigures } from "@/components/ui/charts";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -341,16 +340,13 @@ export function SeedInventory() {
           {/* One two-column grid for every row, so the fields line up. */}
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
-            <div>
-              <p className={LABEL_CLASS} aria-hidden="true">{t("seeds.unit")}</p>
-              <SegmentedControl
-                fullWidth
-                label={t("seeds.unit")}
-                value={draft.unit}
-                onChange={(unit) => patch({ unit })}
-                options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
-              />
-            </div>
+            {/* A select, not a segmented toggle: three units do not fit a half-width column. */}
+            <Select
+              label={t("seeds.unit")}
+              value={draft.unit}
+              onChange={(e) => patch({ unit: e.target.value as typeof draft.unit })}
+              options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
+            />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label={t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
@@ -366,12 +362,11 @@ export function SeedInventory() {
               <Input label={t("seeds.shopName")} value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
             )}
             <Input
-              label={t("seeds.cost")}
+              label={t("common.optionalLabel", { label: t("seeds.cost") })}
               inputMode="decimal"
               value={draft.cost}
               onChange={(e) => patch({ cost: e.target.value })}
-              placeholder={t("common.examplePlaceholder", { value: formatNumber(3.5) })}
-              hint={t("common.optional")}
+              placeholder={t("common.examplePlaceholder", { value: formatNumber(3.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
               error={errors.cost}
             />
           </div>

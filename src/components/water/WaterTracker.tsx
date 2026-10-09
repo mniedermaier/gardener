@@ -86,6 +86,9 @@ export function WaterTracker() {
     duration: !(durationNum >= 0) ? t("water.invalidNumber") : undefined,
   };
 
+  // Same rule as every add dialog: "Speichern" stays disabled until the entry is valid.
+  const canSave = Boolean(beds.byId.get(draft.bedId)) && litersNum > 0 && !errors.duration;
+
   const handleSave = () => {
     setSubmitted(true);
     const bed = beds.byId.get(draft.bedId);
@@ -292,7 +295,7 @@ export function WaterTracker() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{t("common.save")}</Button>
+            <Button onClick={handleSave} disabled={!canSave}>{t("common.save")}</Button>
           </>
         }
       >
@@ -324,7 +327,7 @@ export function WaterTracker() {
           {/* Stacked on phones: "Tropfbewässerung" does not fit a half-width select. */}
           <div className="grid gap-4 sm:grid-cols-2">
             <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
-            <Input label={t("water.durationLabel")} inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} hint={t("common.optional")} error={errors.duration} />
+            <Input label={t("common.optionalLabel", { label: t("water.durationLabel") })} inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} error={errors.duration} />
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />

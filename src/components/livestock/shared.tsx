@@ -302,7 +302,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
             ]}
           />
         </div>
-        <Input label={t("livestock.cost")} hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
+        <Input label={t("common.optionalLabel", { label: t("livestock.cost") })} hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
         <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
@@ -372,7 +372,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
           options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))}
         />
         <Input label={t("livestock.healthDesc")} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} autoFocus />
-        <Input label={t("livestock.cost")} hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
+        <Input label={t("common.optionalLabel", { label: t("livestock.cost") })} hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
         <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
@@ -478,7 +478,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
             </div>
           </fieldset>
         )}
-        <Input label={t("livestock.animalName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
+        <Input label={t("common.optionalLabel", { label: t("livestock.animalName") })} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
         {/* The count is short, the date long ("9. Oktober 2026"): give the date the room. */}
         <div className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-3">
           <Input label={t("livestock.count")} inputMode="numeric" value={count} onChange={(e) => setCount(e.target.value)} />

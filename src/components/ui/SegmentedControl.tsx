@@ -18,6 +18,8 @@ interface SegmentedControlProps<T extends string> {
   size?: "sm" | "md";
   /** Stretch segments to the full width (mobile filters, dialog toggles). */
   fullWidth?: boolean;
+  /** Hug the content at every width, e.g. a unit toggle beside an input. */
+  inline?: boolean;
   className?: string;
 }
 
@@ -25,7 +27,7 @@ interface SegmentedControlProps<T extends string> {
  * Exclusive choice between 2–5 short options: filters, view modes, type
  * toggles in dialogs. Radio-group semantics with arrow-key navigation.
  */
-export function SegmentedControl<T extends string>({ options, value, onChange, label, size = "md", fullWidth, className = "" }: SegmentedControlProps<T>) {
+export function SegmentedControl<T extends string>({ options, value, onChange, label, size = "md", fullWidth, inline, className = "" }: SegmentedControlProps<T>) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const onKeyDown = (e: KeyboardEvent, index: number) => {
@@ -41,8 +43,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
   // Phones: a regular-size control spans the row (a 2/3-wide control leaves a
   // grey stub that reads as broken), but never shrinks below its content, so
   // a long one still scrolls inside its wrapper. From sm on it hugs its content.
-  const width = fullWidth ? "flex w-full" : size === "md" ? "flex w-full min-w-max sm:inline-flex sm:w-auto" : "inline-flex";
-  const segment = fullWidth ? "flex-1" : size === "md" ? "flex-1 sm:flex-none" : "";
+  const width = inline ? "inline-flex shrink-0" : fullWidth ? "flex w-full" : size === "md" ? "flex w-full min-w-max sm:inline-flex sm:w-auto" : "inline-flex";
+  const segment = inline ? "" : fullWidth ? "flex-1" : size === "md" ? "flex-1 sm:flex-none" : "";
 
   return (
     <div role="radiogroup" aria-label={label} className={`${width} gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-white/5 ${className}`}>
