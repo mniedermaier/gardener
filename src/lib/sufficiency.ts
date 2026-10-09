@@ -1,6 +1,7 @@
 import type { Plant, PreservationMethod } from "@/types/plant";
 import type { Garden } from "@/types/garden";
 import type { Animal } from "@/types/animal";
+import type { PantryItem } from "@/types/pantry";
 import { PRODUCT_NUTRITION } from "@/types/animal";
 import { capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
 import { addWeeks, addDays, parseISO, getMonth } from "date-fns";
@@ -204,6 +205,8 @@ export function calculateSufficiency(
   gridCellSizeCm: number,
   lastFrostDate: string = "2026-05-15",
   animals: Animal[] = [],
+  pantryItems: PantryItem[] = [],
+  now: Date = new Date(),
 ): SufficiencyResult {
   const plantMap = new Map(plants.map((p) => [p.id, p]));
 
@@ -349,6 +352,34 @@ export function calculateSufficiency(
     }
   }
 
+  // Real stock from the pantry (not yet consumed): spread evenly from this
+  // month until it expires (at most a year). Per month the larger of the
+  // simulated preservation and the real stock counts — the stock usually *is*
+  // this season's preserved surplus, so adding both would count it twice.
+  // The annual coverage below stays a pure forecast.
+  const pantryKg = Array.from({ length: 12 }, () => 0);
+  const pantryCalories = Array.from({ length: 12 }, () => 0);
+  const nowMonth = now.getFullYear() * 12 + now.getMonth();
+  for (const item of pantryItems) {
+    if (item.consumed || !(item.quantityKg > 0)) continue;
+    const exp = parseISO(item.expiresDate);
+    const expMonth = Number.isNaN(exp.getTime()) ? nowMonth + 11 : exp.getFullYear() * 12 + exp.getMonth();
+    const span = Math.max(1, Math.min(12, expMonth - nowMonth + 1));
+    const kcalPerKg = (plantMap.get(item.plantId)?.caloriesPer100g ?? 0) * 10;
+    for (let i = 0; i < span; i++) {
+      const m = (now.getMonth() + i) % 12;
+      pantryKg[m] += item.quantityKg / span;
+      pantryCalories[m] += (item.quantityKg * kcalPerKg) / span;
+    }
+  }
+  const simulatedStoredCal = storedCalories.slice();
+  for (let m = 0; m < 12; m++) {
+    if (pantryKg[m] > storedKg[m]) {
+      storedKg[m] = pantryKg[m];
+      storedCalories[m] = pantryCalories[m];
+    }
+  }
+
   // Build monthly food array
   const monthlyFood: MonthlyFood[] = Array.from({ length: 12 }, (_, month) => {
     const freshCal = monthlyCalories[month];
@@ -377,7 +408,7 @@ export function calculateSufficiency(
     : null;
 
   // Annual coverage
-  const totalProducedCal = monthlyFood.reduce((s, m) => s + m.calories, 0);
+  const totalProducedCal = monthlyCalories.reduce((s, c, m) => s + c + simulatedStoredCal[m], 0);
   const totalNeededCal = monthlyFood.reduce((s, m) => s + m.caloriesNeeded, 0);
   const annualCoveragePercent = Math.min(100, Math.round((totalProducedCal / totalNeededCal) * 100));
 

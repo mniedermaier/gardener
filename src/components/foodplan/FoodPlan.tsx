@@ -20,6 +20,9 @@ import { PRODUCT_ICON } from "@/components/livestock/icons";
 import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { useToday } from "@/hooks/useToday";
 
+/** A crop whose forecast reaches less than this share of its target gets "Große Lücke". */
+const BIG_GAP_SHARE = 0.25;
+
 export function FoodPlan() {
   const now = useToday();
   const { t } = useTranslation();
@@ -141,31 +144,42 @@ export function FoodPlan() {
               // Rows come sorted by the largest gap (getCropPlan), so the top of the
               // list is "where it is missing most" — no separate card repeating it.
               <List label={t("foodplan.cropPlan")}>
-                {grown.map((r, i) => {
+                {grown.map((r) => {
                   const p = plantMap.get(r.plantId)!;
                   const covered = r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg;
                   const gap = r.deficitKg > 0.05;
+                  // "Große Lücke" by a rule, not by rank: the forecast reaches less
+                  // than a quarter of the target (two crops with the same figures
+                  // always get the same badge).
+                  const bigGap = gap && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE;
                   return (
                     <ListRow
                       key={r.plantId}
                       leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
                       title={plantName(p.id)}
-                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : gap && i < 5 ? <Badge tone="warning">{t("foodplan.bigGap")}</Badge> : undefined}
-                      trailing={t("foodplan.rowOfTarget", { actual: f.formatNumber(r.actualKg, { maximumFractionDigits: 1 }), target: kg(r.targetKg) })}
+                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : bigGap ? <Badge tone="warning">{t("foodplan.bigGap")}</Badge> : undefined}
                       meta={[
                         t("foodplan.rowForecast", { forecast: kg(r.forecastKg) }),
                         gap ? t("foodplan.rowGap", { kg: kg(r.deficitKg), area: f.formatArea(r.extraAreaM2) }) : null,
                       ]}
                       description={
-                        <Meter
-                          className="mt-1.5 max-w-md"
-                          size={6}
-                          actual={r.actualKg}
-                          forecast={r.forecastKg}
-                          max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}
-                          target={r.targetKg}
-                          label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
-                        />
+                        // Bar and amount side by side, the amount in a fixed-width
+                        // column: every bar starts and ends at the same x, and on
+                        // wide screens the number sits next to its bar.
+                        <span className="mt-1.5 flex max-w-xl items-center gap-3">
+                          <Meter
+                            className="min-w-0 flex-1"
+                            size={6}
+                            actual={r.actualKg}
+                            forecast={r.forecastKg}
+                            max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}
+                            target={r.targetKg}
+                            label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
+                          />
+                          <span className="w-28 shrink-0 text-right text-xs font-medium text-gray-900 tabular-nums dark:text-gray-100">
+                            {t("foodplan.rowOfTarget", { actual: f.formatNumber(r.actualKg, { maximumFractionDigits: 1 }), target: kg(r.targetKg) })}
+                          </span>
+                        </span>
                       }
                     />
                   );
@@ -218,7 +232,8 @@ export function FoodPlan() {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("foodplan.animalIntro", { count: householdSize })}</p>
               </div>
               <List label={t("foodplan.animalProducts")}>
-                {PRODUCT_TYPES.filter((ty) => animalForecast[ty] > 0).map((ty) => {
+                {/* A food plan lists food: wax and wool have no consumption figure and stay out. */}
+                {PRODUCT_TYPES.filter((ty) => animalForecast[ty] > 0 && ANNUAL_CONSUMPTION_KG_PER_PERSON[ty] !== undefined).map((ty) => {
                   const perPerson = ANNUAL_CONSUMPTION_KG_PER_PERSON[ty];
                   // Typical household consumption in the recording unit (eggs as hen's eggs).
                   const need = perPerson === undefined ? null : (perPerson / (ty === "eggs" ? EGG_WEIGHT_KG : 1)) * householdSize;

@@ -282,7 +282,8 @@ export function HarvestLog() {
             ]}
           />
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          {/* items-start: each card as tall as its content — no empty band under the chart. */}
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
             <Card className="min-w-0">
               {/* The subtitle names the range actually drawn (from the first harvest month, 3–12 months). */}
               <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint", { month: formatDate(stats.months[0].date, "monthYear") })} />
@@ -325,9 +326,15 @@ export function HarvestLog() {
                 })}
               </ul>
               {stats.ranking.length > 6 && (
-                <Button variant="ghost" size="sm" className="mt-3 -ml-3" onClick={() => setShowAllPlants((v) => !v)}>
+                // Same "show more" link style as the calendar lists.
+                <button
+                  type="button"
+                  className="mt-2 flex min-h-11 items-center text-sm font-medium text-garden-700 hover:underline dark:text-garden-300"
+                  onClick={() => setShowAllPlants((v) => !v)}
+                  aria-expanded={showAllPlants}
+                >
                   {showAllPlants ? t("harvest.showLess") : t("harvest.showAll", { count: stats.ranking.length })}
-                </Button>
+                </button>
               )}
             </Card>
           </div>

@@ -1364,8 +1364,8 @@
     "needMore": "-{{kg}} kg (need +{{m2}} m²)",
     "cropPlan": "Crop plan",
     "animalProducts": "Animal products",
-    "coverageForecast": "Quantity target · forecast",
-    "coverageActual": "Quantity target · harvested so far",
+    "coverageForecast": "Forecast · by weight",
+    "coverageActual": "Harvested so far",
     "ofTarget": "of {{kg}} annual target",
     "actualKg": "{{kg}} of planned crops recorded",
     "areaNeeded": "{{area}} needed",
@@ -1444,8 +1444,8 @@
     "toLivestock": "Add animals",
     "coverageDesc_one": "Forecast for one year, needs of {{count}} person.",
     "coverageDesc_other": "Forecast for one year, needs of {{count}} people.",
-    "monthlyDesc_one": "Share of the calorie needs of {{count}} person, fresh and from storage (forecast).",
-    "monthlyDesc_other": "Share of the calorie needs of {{count}} people, fresh and from storage (forecast).",
+    "monthlyDesc_one": "Share of the calorie needs of {{count}} person: fresh from the forecast and from storage.",
+    "monthlyDesc_other": "Share of the calorie needs of {{count}} people: fresh from the forecast and from storage.",
     "monthlyCaption": "Calorie coverage per month",
     "monthlyKgTitle": "Food available per month",
     "monthlyKgCaption": "Food available per month in kg: from the garden (fresh and stored) and from the animals",
@@ -1472,8 +1472,8 @@
     "surplus": "surplus {{amount}}",
     "emptyText_one": "One person needs about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
     "emptyText_other": "{{count}} people need about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
-    "monthlyDescFresh_one": "Share of the calorie needs of {{count}} person (forecast). The harvest is not yet large enough to store.",
-    "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). The harvest is not yet large enough to store.",
+    "monthlyDescFresh_one": "Share of the calorie needs of {{count}} person (forecast). Nothing in storage yet.",
+    "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). Nothing in storage yet.",
     "monthlyKgCaptionFresh": "Food available per month in kg: fresh from the garden and from the animals"
   },
   "pests": {
@@ -1820,7 +1820,7 @@
     "needPlant": "Choose a plant",
     "invalidNumber": "Enter a valid number",
     "invalidYear": "Enter a year between 1950 and today",
-    "orOnionSets": "or onion sets"
+    "onionSets": "Onion sets"
   },
   "soil": {
     "title": "Soil",
@@ -2360,8 +2360,8 @@
     "forecast": "Forecast",
     "actualShort": "recorded {{value}}",
     "actualVsForecast": "Recorded {{actual}} of {{forecast}} forecast",
-    "selfSufficiencyForecast": "Self-sufficiency · annual forecast",
-    "selfSufficiencyActual": "Self-sufficiency · recorded so far",
+    "selfSufficiencyForecast": "Annual forecast · by calories",
+    "selfSufficiencyActual": "Recorded so far",
     "caloriesFor_one": "Calorie needs of {{count}} person",
     "caloriesFor_other": "Calorie needs of {{count}} people",
     "recordedSince": "Harvests and animal products since 1 January {{year}}",
@@ -2385,7 +2385,7 @@
     "compositionLabel": "Garden {{garden}}, animal products {{animals}} of the annual need",
     "fromGarden": "Garden",
     "fromAnimals": "Animal products",
-    "surplusNote": "Forecast for the year above typical consumption, so not counted: {{items}}.",
+    "surplusNote": "Surplus, not counted: {{items}}.",
     "notCovered": "Not covered"
   }
 }

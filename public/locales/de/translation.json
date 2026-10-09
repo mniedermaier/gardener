@@ -1364,8 +1364,8 @@
     "needMore": "-{{kg}} kg (brauche +{{m2}} m²)",
     "cropPlan": "Anbauplan",
     "animalProducts": "Tierische Produkte",
-    "coverageForecast": "Mengenziel · Prognose",
-    "coverageActual": "Mengenziel · bisher geerntet",
+    "coverageForecast": "Prognose · nach Gewicht",
+    "coverageActual": "Bisher geerntet",
     "ofTarget": "von {{kg}} Jahresziel",
     "actualKg": "{{kg}} der Plan-Kulturen erfasst",
     "areaNeeded": "{{area}} wären nötig",
@@ -1444,8 +1444,8 @@
     "toLivestock": "Tiere hinzufügen",
     "coverageDesc_one": "Prognose für ein Jahr, Bedarf von {{count}} Person.",
     "coverageDesc_other": "Prognose für ein Jahr, Bedarf von {{count}} Personen.",
-    "monthlyDesc_one": "Anteil des Kalorienbedarfs von {{count}} Person, frisch und aus dem Vorrat (Prognose).",
-    "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen, frisch und aus dem Vorrat (Prognose).",
+    "monthlyDesc_one": "Anteil des Kalorienbedarfs von {{count}} Person: frisch laut Prognose und aus dem Vorrat.",
+    "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen: frisch laut Prognose und aus dem Vorrat.",
     "monthlyCaption": "Kalorienabdeckung pro Monat",
     "monthlyKgTitle": "Verfügbare Menge pro Monat",
     "monthlyKgCaption": "Verfügbare Lebensmittel pro Monat in kg: aus dem Garten (frisch und aus dem Vorrat) und von den Tieren",
@@ -1472,8 +1472,8 @@
     "surplus": "Überschuss {{amount}}",
     "emptyText_one": "Eine Person braucht rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
     "emptyText_other": "{{count}} Personen brauchen rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
-    "monthlyDescFresh_one": "Anteil des Kalorienbedarfs von {{count}} Person laut Prognose. Zum Einlagern reicht die Ernte noch nicht.",
-    "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Zum Einlagern reicht die Ernte noch nicht.",
+    "monthlyDescFresh_one": "Anteil des Kalorienbedarfs von {{count}} Person laut Prognose. Im Vorrat liegt noch nichts.",
+    "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Im Vorrat liegt noch nichts.",
     "monthlyKgCaptionFresh": "Verfügbare Lebensmittel pro Monat in kg: frisch aus dem Garten und von den Tieren"
   },
   "pests": {
@@ -1820,7 +1820,7 @@
     "needPlant": "Bitte eine Pflanze wählen",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben",
-    "orOnionSets": "oder Steckzwiebeln"
+    "onionSets": "Steckzwiebeln"
   },
   "soil": {
     "title": "Boden",
@@ -2360,8 +2360,8 @@
     "forecast": "Prognose",
     "actualShort": "erfasst {{value}}",
     "actualVsForecast": "Erfasst {{actual}} von {{forecast}} Prognose",
-    "selfSufficiencyForecast": "Selbstversorgung · Jahresprognose",
-    "selfSufficiencyActual": "Selbstversorgung · bisher erfasst",
+    "selfSufficiencyForecast": "Jahresprognose · nach Kalorien",
+    "selfSufficiencyActual": "Bisher erfasst",
     "caloriesFor_one": "Kalorienbedarf für {{count}} Person",
     "caloriesFor_other": "Kalorienbedarf für {{count}} Personen",
     "recordedSince": "Ernten und Tierprodukte seit 1. Januar {{year}}",
@@ -2385,7 +2385,7 @@
     "compositionLabel": "Garten {{garden}}, Tierprodukte {{animals}} des Jahresbedarfs",
     "fromGarden": "Garten",
     "fromAnimals": "Tierprodukte",
-    "surplusNote": "Laut Jahresprognose mehr als der übliche Verbrauch, daher nicht eingerechnet: {{items}}.",
+    "surplusNote": "Überschuss, nicht eingerechnet: {{items}}.",
     "notCovered": "Nicht gedeckt"
   }
 }

@@ -265,7 +265,7 @@ export function ExpenseDashboard() {
                           <span className="ml-1 text-gray-500 dark:text-gray-400">· {f.formatPercent(r.amount / balance.costs.total)}</span>
                         </span>
                       </div>
-                      <Meter actual={r.amount} max={categoryRows[0].amount} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
+                      <Meter actual={r.amount} max={balance.costs.total} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
                       {r.fromLog > 0 && (
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                           {t(r.key === "veterinary" ? "expenses.fromHealthLog" : "expenses.fromFeedLog", { amount: f.formatCurrency(r.fromLog) })}

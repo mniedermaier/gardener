@@ -41,8 +41,8 @@ export function SufficiencyDashboard() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { gardens, gridCellSizeCm, lastFrostDate, animals } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals })),
+  const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems })),
   );
   const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const plants = usePlants();
@@ -55,8 +55,9 @@ export function SufficiencyDashboard() {
   const result = useMemo(() => {
     const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
     if (!hasPlantings && animals.length === 0) return null;
-    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals);
-  }, [gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals]);
+    // The real pantry stock fills the "aus dem Vorrat" series (see lib/sufficiency).
+    return calculateSufficiency(gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals, pantryItems, now);
+  }, [gardens, plants, householdSize, gridCellSizeCm, lastFrostDate, animals, pantryItems, now]);
 
   const months = useMemo(() => Array.from({ length: 12 }, (_, i) => new Date(2026, i, 1)), []);
   const monthShort = months.map((d) => f.formatDate(d, "month"));
@@ -163,6 +164,7 @@ export function SufficiencyDashboard() {
               formatValue={(r) => f.formatPercent(Math.min(1, r))}
               current={currentMonth}
               currentLabel={t("charts.today")}
+              threshold={LOW_COVERAGE_PERCENT / 100}
               caption={t("sufficiency.monthlyCaption")}
             />
             <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">

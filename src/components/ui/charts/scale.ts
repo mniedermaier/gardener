@@ -46,14 +46,14 @@ export const SERIES_FILL: Record<SeriesColor, string> = {
   brand: "fill-garden-500 dark:fill-garden-400",
   earth: "fill-earth-300 dark:fill-earth-400",
   sky: "fill-water-400 dark:fill-water-300",
-  muted: "fill-gray-300 dark:fill-gray-600",
+  muted: "fill-gray-300 dark:fill-gray-500",
   rain: "fill-water-200 dark:fill-water-600",
 };
 export const SERIES_BG: Record<SeriesColor, string> = {
   brand: "bg-garden-500 dark:bg-garden-400",
   earth: "bg-earth-300 dark:bg-earth-400",
   sky: "bg-water-400 dark:bg-water-300",
-  muted: "bg-gray-300 dark:bg-gray-600",
+  muted: "bg-gray-300 dark:bg-gray-500",
   rain: "bg-water-200 dark:bg-water-600",
 };
 export const SERIES_STROKE: Record<SeriesColor, string> = {

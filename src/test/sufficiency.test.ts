@@ -150,3 +150,31 @@ describe("winter gap", () => {
     expect(result.winterGap!.months).not.toContain(6); // July
   });
 });
+
+describe("pantry stock", () => {
+  const potato: Plant = { ...bean, id: "potato", caloriesPer100g: 77, preservationMethods: ["root_cellar"] };
+  const item = (kg: number, expires: string, consumed = false) => ({
+    id: `p${kg}`, plantId: "potato", method: "root_cellar" as const, quantityKg: kg,
+    date: "2026-09-20", expiresDate: expires, consumed,
+  });
+  const now = new Date(2026, 9, 9);
+
+  it("fills the stored series from now until it expires, evenly", () => {
+    // 6 kg on 9 Oct, good until end of March → Oct–Mar, 1 kg per month.
+    const result = calculateSufficiency([], [potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
+    for (const m of [9, 10, 11, 0, 1, 2]) expect(result.monthlyFood[m].storedKg).toBeCloseTo(1, 1);
+    for (const m of [3, 4, 5, 6, 7, 8]) expect(result.monthlyFood[m].storedKg).toBe(0);
+    // The stock counts towards the month's calories (coverage tiles).
+    expect(result.monthlyFood[0].calories).toBeGreaterThan(0);
+  });
+
+  it("ignores consumed items and keeps the annual forecast unchanged", () => {
+    const without = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [], now);
+    const consumed = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31", true)], now);
+    expect(consumed.monthlyFood.map((m) => m.storedKg)).toEqual(without.monthlyFood.map((m) => m.storedKg));
+    // The annual coverage stays a forecast: real stock is mostly this season's
+    // preserved surplus and must not be counted twice.
+    const withStock = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
+    expect(withStock.annualCoveragePercent).toBe(without.annualCoveragePercent);
+  });
+});
