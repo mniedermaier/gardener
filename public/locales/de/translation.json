@@ -516,7 +516,8 @@
     "cropListTitle": "Im Beet",
     "cropListCount_one": "{{count}} Pflanze",
     "cropListCount_other": "{{count}} Pflanzen",
-    "cropListHarvest": "Ernte {{range}}"
+    "cropListHarvest": "Ernte {{range}}",
+    "cropListHarvestOver": "Ernte vorbei ({{range}})"
   },
   "plants": {
     "title": "Pflanzen",

@@ -191,5 +191,5 @@ export function getHarvestReady(
     }
   }
   // Late first, then what closes first — the same order as the calendar's "Jetzt dran".
-  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || a.end.getTime() - b.end.getTime() || b.cells - a.cells);
+  return Array.from(byKey.values()).sort((a, b) => Number(b.late) - Number(a.late) || a.end.getTime() - b.end.getTime() || a.plantId.localeCompare(b.plantId));
 }

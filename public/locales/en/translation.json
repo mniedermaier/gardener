@@ -516,7 +516,8 @@
     "cropListTitle": "In this bed",
     "cropListCount_one": "{{count}} plant",
     "cropListCount_other": "{{count}} plants",
-    "cropListHarvest": "harvest {{range}}"
+    "cropListHarvest": "harvest {{range}}",
+    "cropListHarvestOver": "harvest over ({{range}})"
   },
   "plants": {
     "title": "Plants",

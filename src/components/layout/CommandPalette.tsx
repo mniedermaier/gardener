@@ -43,6 +43,13 @@ const GROUP_ORDER: GroupKey[] = ["actions", "pages", "plants", "beds", "animals"
 // "Gemüse" matches "gemuse", "Tomate" matches "tomaten".
 const normalize = (s: string) => s.toLocaleLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
+/** The typed text in bold inside a result label (case-insensitive; no match, plain text). */
+function Match({ text, query }: { text: string; query: string }) {
+  const at = query ? text.toLocaleLowerCase().indexOf(query.toLocaleLowerCase()) : -1;
+  if (at < 0) return <>{text}</>;
+  return <>{text.slice(0, at)}<span className="font-bold text-gray-900 dark:text-gray-50">{text.slice(at, at + query.length)}</span>{text.slice(at + query.length)}</>;
+}
+
 /** A few words around a match, cut at word boundaries: "… Die Tomaten abdecken …". */
 function snippet(text: string, at: number, len: number): string {
   const from = at > 16 ? text.lastIndexOf(" ", at - 16) + 1 : 0;
@@ -362,10 +369,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   onKeyDown={(e) => { if (e.key === "Enter") c.run(); }}
                   className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${selected ? "bg-gray-100 dark:bg-white/10" : ""}`}
                 >
-                  <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${c.group === "actions" ? TONE_SOFT.brand : TONE_SOFT.neutral}`} aria-hidden="true">
+                  {/* On the grey selected row the neutral tile turns white, or it would vanish. */}
+                  <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${c.group === "actions" ? TONE_SOFT.brand : selected ? "bg-white text-gray-600 ring-1 ring-gray-200 dark:bg-white/10 dark:text-gray-300 dark:ring-white/10" : TONE_SOFT.neutral}`} aria-hidden="true">
                     {c.leading ?? <Icon size={16} />}
                   </span>
-                  <span className="min-w-0 flex-1 truncate font-medium">{c.label}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium"><Match text={c.label} query={debounced.trim()} /></span>
                   {c.hint && <span className="min-w-0 max-w-[45%] truncate text-xs text-gray-500 dark:text-gray-400">{c.hint}</span>}
                   {selected && <CornerDownLeft size={14} aria-hidden="true" className="hidden shrink-0 text-gray-500 sm:block" />}
                 </div>

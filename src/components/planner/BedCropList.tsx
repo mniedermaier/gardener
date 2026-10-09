@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useToday } from "@/hooks/useToday";
-import { getPhaseWindows, plantedHarvestWindow, seasonFrost } from "@/lib/season";
+import { HARVEST_GRACE_DAYS, getPhaseWindows, plantedHarvestWindow, seasonFrost } from "@/lib/season";
+import { addDays } from "date-fns";
 import { autumnPhaseWindows } from "@/lib/advisor";
 import { getFrostProtectionWeeks, type Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
@@ -83,7 +84,8 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
                 <span className="block truncate text-sm font-medium text-gray-900 dark:text-gray-100">{getPlantName(plant.id)}</span>
                 <span className="block text-xs text-gray-500 dark:text-gray-400">
                   {t("planner.cropListCount", { count })}
-                  {window && <> · {t("planner.cropListHarvest", { range: range(window.start, window.end) })}</>}
+                  {/* A window (plus the late grace) that is over says so: the cells are free to clear. */}
+                  {window && <> · {t(addDays(window.end, HARVEST_GRACE_DAYS) < today ? "planner.cropListHarvestOver" : "planner.cropListHarvest", { range: range(window.start, window.end) })}</>}
                 </span>
               </span>
             </button>

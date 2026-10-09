@@ -138,7 +138,9 @@ export function SeasonTimeline() {
         else if (range.start > today && range.start <= soon) next.push({ tl, phase, range });
       }
     }
-    now.sort((a, b) => a.range.end.getTime() - b.range.end.getTime());
+    // Late first, then what closes first, then by crop — the same order as "Heute".
+    const late = (x: { phase: Phase; range: Range }) => Number(x.phase === "harvest" && x.range.end < today);
+    now.sort((a, b) => late(b) - late(a) || a.range.end.getTime() - b.range.end.getTime() || a.tl.plantId.localeCompare(b.tl.plantId));
     next.sort((a, b) => a.range.start.getTime() - b.range.start.getTime());
     // Nothing starts soon (e.g. in autumn): preview the next windows, rolled into next season.
     const later: typeof next = [];

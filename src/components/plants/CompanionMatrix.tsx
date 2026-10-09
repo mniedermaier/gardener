@@ -362,7 +362,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
               onClick={() => onSelect(id)}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:border-gray-300 sm:min-h-8 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
             >
-              <PlantIconDisplay plantId={id} emoji="" size={16} />
+              <PlantIconDisplay plantId={id} emoji="" size={18} />
               {names.get(id)}
             </button>
           ))}

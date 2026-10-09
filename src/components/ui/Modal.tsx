@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useId, useRef } from "react";
+import { useState, type ReactNode, useEffect, useId, useRef } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -89,6 +89,26 @@ export function Modal({ open, onClose, title, children, description, footer, siz
     };
   }, [open]);
 
+  // A long sheet scrolls under its sticky footer: while more lies below, the
+  // footer casts a shadow upwards, so the dialog does not look finished early.
+  const [moreBelow, setMoreBelow] = useState(false);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || !open) return;
+    const measure = () => setMoreBelow(dialog.scrollHeight - dialog.scrollTop - dialog.clientHeight > 8);
+    const frame = requestAnimationFrame(measure);
+    dialog.addEventListener("scroll", measure, { passive: true });
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(dialog);
+    // Content that grows (a revealed field) changes the scroll height, not the dialog box.
+    for (const child of Array.from(dialog.children)) ro?.observe(child);
+    return () => {
+      cancelAnimationFrame(frame);
+      dialog.removeEventListener("scroll", measure);
+      ro?.disconnect();
+    };
+  }, [open]);
+
   // Esc and the backdrop both go through the dialog's own close event.
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -134,7 +154,7 @@ export function Modal({ open, onClose, title, children, description, footer, siz
       </div>
       {children}
       {footer && (
-        <div className="sticky -bottom-4 -mx-4 mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 bg-white px-4 pt-4 pb-1 sm:-bottom-6 sm:-mx-6 sm:px-6 dark:border-white/10 dark:bg-gray-900">
+        <div className={`sticky -bottom-4 -mx-4 mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 bg-white px-4 pt-4 pb-1 transition-shadow sm:-bottom-6 sm:-mx-6 sm:px-6 dark:border-white/10 dark:bg-gray-900 ${moreBelow ? "shadow-[0_-8px_12px_-8px_rgb(0_0_0/0.15)] dark:shadow-[0_-8px_12px_-8px_rgb(0_0_0/0.6)]" : ""}`}>
           {footer}
         </div>
       )}

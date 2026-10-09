@@ -535,7 +535,8 @@
     "cropListCount_one": "{{count}} plante",
     "cropListCount_other": "{{count}} plantes",
     "cropListCount_many": "{{count}} plantes",
-    "cropListHarvest": "récolte {{range}}"
+    "cropListHarvest": "récolte {{range}}",
+    "cropListHarvestOver": "récolte terminée ({{range}})"
   },
   "plants": {
     "title": "Plantes",
