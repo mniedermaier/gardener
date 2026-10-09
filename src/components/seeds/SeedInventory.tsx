@@ -337,9 +337,9 @@ export function SeedInventory() {
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
           <Input label={t("planner.variety")} optional value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
-          {/* Short pairs stay side by side on phones too; one grid per row so the fields line up. */}
+          {/* Short pairs stay side by side on phones too; the label carries the unit chosen beside it ("Menge (Päckchen)"), as in harvest and feed. */}
           <div className="grid grid-cols-2 gap-4">
-            <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(draft.unit === "grams" ? 5 : draft.unit === "packets" ? 1 : 50) })} error={errors.quantity} />
+            <Input label={`${t("seeds.quantity")} (${t(`seeds.units.${draft.unit}`)})`} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(draft.unit === "grams" ? 5 : draft.unit === "packets" ? 1 : 50) })} error={errors.quantity} />
             {/* A select, not a segmented toggle: three units do not fit a half-width column. */}
             <Select
               label={t("seeds.unit")}

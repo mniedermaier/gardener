@@ -39,7 +39,9 @@ covered here, copy the pattern from the reference page
      "Dauer (Min.)", "Ernte ab (Tage)". Placeholders are plain example numbers
      ("z. B. 4,00"), never a currency string. Every numeric field shows such an
      example; where a unit picker sits beside the amount, the label follows it
-     ("Menge (kg)").
+     ("Gewicht (kg)", "Menge (Päckchen)") — harvest, feed and seeds alike.
+   - **Name fields:** "Titel" for records (journal, task, expense), "Name" for
+     things you keep or identify (bed, plant, animal, preserve, problem).
    - **Costs** that feed the balance (seeds, pantry supplies, soil, feed, health)
      carry the hint `common.costHint` ("Fließt in die Bilanz unter Kosten ein.").
    - **Numbers** use a text field with `inputMode="decimal"`/`"numeric"`, not
@@ -49,15 +51,23 @@ covered here, copy the pattern from the reference page
    - **Plant fields** are a `PlantCombobox` labelled "Pflanze" in every dialog.
    - **Scales** (harvest quality, pest severity) show their two endpoint
      captions under the control.
-   - **Dates:** `DateField` — Heute/Gestern/Anderes Datum for records,
-     `mode="future"` (Heute/Morgen/In 1 Woche) for tasks. A native
+   - **Dates:** `DateField` — Heute/Gestern/Datum … for records,
+     `mode="future"` (Heute/Morgen/+1 Woche/Datum …) for tasks; the last
+     segment is always "Datum …" with the calendar icon. A native
      `DatePicker` only for one-off dates such as "Im Bestand seit".
-   - **Notizen** is always an optional `Textarea` with a placeholder that fits
-     the record: `common.notesPlaceholder` for crops, otherwise the page's own
-     key (`livestock.`, `calendar.`, `water.`, `seeds.`, `pantry.`, `soil.notesPlaceholder`).
+   - **Notizen** is an optional `Textarea` with a placeholder that fits the
+     record: `common.notesPlaceholder` for crops, otherwise the dialog's own key
+     (`livestock.{feed,health,production}.notesPlaceholder`, `calendar.`,
+     `water.`, `seeds.`, `pantry.`, `soil.notesPlaceholder`). Where the text is
+     the record itself (journal "Beobachtung") it is not marked optional.
    - A full-width `SegmentedControl` never overflows: its segments shrink and
-     wrap to two lines; keep labels short ("Datum …" on phones).
-   - Placeholders end in a typographic ellipsis "…" (German with a space before it).
+     wrap to two lines; keep labels short so they don't have to.
+   - A required choice without an unambiguous default (e.g. the bed when
+     watering) starts empty ("Beet wählen …"); prefill only from a deep link,
+     the last entry or a single option.
+   - Placeholders that list examples end in a typographic ellipsis "…" (German
+     with a space before it): "z. B. Aussaat, Frost, Ernte …". A single example
+     value needs none: "z. B. Ingwer", "z. B. 4,00".
    - Save stays disabled until the required fields are valid.
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation

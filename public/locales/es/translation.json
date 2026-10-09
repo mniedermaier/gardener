@@ -305,7 +305,7 @@
     "newGarden": "Añadir huerto",
     "deleteBed": "Eliminar cantero",
     "gardenName": "Nombre del huerto",
-    "bedName": "Nombre del cantero",
+    "bedName": "Nombre",
     "width": "Ancho",
     "height": "Alto",
     "dragPlant": "Toca una planta y luego casillas del bancal, o arrástrala al bancal.",
@@ -322,7 +322,7 @@
     "editCell": "Editar plantación",
     "closeInspector": "Cerrar detalles de la plantación",
     "variety": "Variedad",
-    "varietyPlaceholder": "p. ej. Corazón de buey…",
+    "varietyPlaceholder": "p. ej. Corazón de buey",
     "varietyPlaceholderFor": "p. ej., {{examples}}",
     "plantedDate": "Fecha de plantación",
     "confirmDeleteGarden": "También se eliminarán todos sus bancales. Justo después aún podrás deshacerlo.",
@@ -540,7 +540,7 @@
     "title": "Plantas",
     "search": "Buscar plantas…",
     "addCustom": "Añadir planta personalizada",
-    "customName": "Nombre de la planta",
+    "customName": "Nombre",
     "allCategories": "Todas las categorías",
     "category": {
       "vegetable": "Verduras",
@@ -980,7 +980,7 @@
     "overdue": "Atrasadas",
     "completed": "Completadas",
     "addTask": "Añadir tarea",
-    "taskTitle": "Titulo",
+    "taskTitle": "Título",
     "taskType": "Tipo",
     "taskDate": "Fecha",
     "generate": "Generar",
@@ -1251,13 +1251,14 @@
     "pieces_many": "{{count}} piezas",
     "harvestsCount_many": "{{count}} cosechas",
     "showAll_many": "Mostrar los {{count}}",
-    "showOlder": "Mostrar meses anteriores"
+    "showOlder": "Mostrar meses anteriores",
+    "weightIn": "Peso ({{unit}})"
   },
   "journal": {
     "title": "Diario",
     "add": "Añadir entrada",
-    "entryTitle": "Titulo",
-    "text": "Que paso hoy en el huerto?",
+    "entryTitle": "Título",
+    "text": "¿Qué pasó hoy en el huerto?",
     "tags": "Etiquetas",
     "tagsPlaceholder": "p. ej. siembra, helada, cosecha…",
     "animal": "Animal",
@@ -1278,7 +1279,7 @@
     "updated": "Cambios guardados",
     "deleted": "Entrada eliminada",
     "needTitle": "Introduce un título",
-    "titlePlaceholder": "p. ej. Primera helada, tomates desbrotados",
+    "titlePlaceholder": "p. ej. Primera helada, tomates desbrotados…",
     "photos": "Fotos",
     "photoN": "Foto {{n}}",
     "removePhoto": "Quitar foto {{n}}",
@@ -1287,7 +1288,8 @@
     "noAnimal": "Sin animal",
     "linkToggle": "Vincular planta, bancal o animal",
     "photoHintShort": "Hasta {{max}} fotos, solo en este dispositivo.",
-    "tagsHint": "Separa varias etiquetas con comas."
+    "tagsHint": "Separa varias etiquetas con comas.",
+    "bodyLabel": "Observación"
   },
   "pantry": {
     "title": "Despensa",
@@ -1303,7 +1305,7 @@
     "method": "Método",
     "quantity": "Cantidad",
     "unitCount": "Tarros/bolsas",
-    "label": "Etiqueta",
+    "label": "Nombre",
     "labelPlaceholder": "ej. Salsa de tomate agosto 2026",
     "supplyCost": "Coste de insumos (€)",
     "storedOn": "guardado",
@@ -1590,8 +1592,8 @@
     "treatmentHint": "Se guarda con la fecha de hoy.",
     "date": "Detectado el",
     "treatmentOrganic": "Tratamiento (ecológico)",
-    "descriptionPlaceholder": "p. ej. hojas enrolladas, envés pegajoso",
-    "treatmentPlaceholder": "p. ej. lavado con agua, purín de ortiga",
+    "descriptionPlaceholder": "p. ej. hojas enrolladas, envés pegajoso…",
+    "treatmentPlaceholder": "p. ej. lavado con agua, purín de ortiga…",
     "kindLabel": "Tipo"
   },
   "livestock": {
@@ -1604,7 +1606,7 @@
     "animalsTab": "Animales",
     "noProducts": "Registra huevos, miel o leche para ver evolución y valor.",
     "animalName": "Nombre",
-    "namePlaceholder": "ej. Henriette, Colmena 1…",
+    "namePlaceholder": "p. ej. Henriette, Colmena 1…",
     "count": "Cantidad",
     "selectAnimal": "Animal",
     "quantity": "Cantidad",
@@ -1614,7 +1616,7 @@
     "feedAdded": "Pienso registrado",
     "noFeed": "Con cantidades y costes de pienso verás lo que cuestan tus animales.",
     "feedType": "Tipo de alimento",
-    "feedTypePlaceholder": "ej. Mezcla de granos, Heno, Jarabe…",
+    "feedTypePlaceholder": "p. ej. mezcla de granos, heno, jarabe…",
     "feedCost": "Costo (€)",
     "feedTotal": "Coste total de pienso",
     "unit": "Unidad",
@@ -1627,7 +1629,7 @@
     "noHealth": "Anota vacunas, tratamientos y revisiones para no olvidar nada.",
     "healthType": "Tipo",
     "healthDesc": "Descripción",
-    "healthDescPlaceholder": "p. ej. control de peso, desparasitación…",
+    "healthDescPlaceholder": "p. ej. Flubenvet 5 días",
     "editAnimal": "Editar animal",
     "updated": "Animal actualizado",
     "since": "desde",
@@ -1649,7 +1651,8 @@
       "emptyText": "Añade primero un animal. Después registras aquí huevos, miel o leche y ves los totales semanales y la evolución.",
       "yearHint": "~{{amount}} esperados hasta hoy",
       "emptyTitle": "Huevos y miel bajo control",
-      "entries": "Registros"
+      "entries": "Registros",
+      "notesPlaceholder": "p. ej. tiempo, pausa de puesta…"
     },
     "feed": {
       "title": "Alimento",
@@ -1661,7 +1664,8 @@
       "perMonthSince": "desde el {{date}}",
       "plusLiquid": "más {{volume}} de alimento líquido",
       "emptyText": "Añade primero un animal. Después registras aquí el alimento y ves cuánto cuesta al mes.",
-      "emptyTitle": "Coste del alimento al mes"
+      "emptyTitle": "Coste del alimento al mes",
+      "notesPlaceholder": "p. ej. marca, aceptación…"
     },
     "health": {
       "title": "Salud",
@@ -1693,7 +1697,8 @@
       "nextDue": "Próximo refuerzo a partir del {{date}}",
       "dueNames": "Revisar vacunación: {{names}}",
       "emptyText": "Añade primero un animal. Después registras aquí vacunas, desparasitaciones y visitas al veterinario y ves qué toca.",
-      "emptyTitle": "Vacunas y tratamientos bajo control"
+      "emptyTitle": "Vacunas y tratamientos bajo control",
+      "notesPlaceholder": "p. ej. dosis, veterinario…"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -2151,7 +2156,7 @@
   "expenses": {
     "title": "Costes",
     "add": "Registrar gasto",
-    "description": "Descripción",
+    "description": "Título",
     "amount": "Monto (€)",
     "category": "Categoría",
     "totalExpenses": "Gastos totales",
@@ -2171,7 +2176,7 @@
     },
     "subtitle": "Gastos, valor de cosechas y productos animales, y el balance final.",
     "edit": "Editar gasto",
-    "descriptionPlaceholder": "p. ej. semillas de tomate, compost",
+    "descriptionPlaceholder": "p. ej. semillas de tomate, compost…",
     "saved": "{{description}} ({{amount}}) guardado",
     "updated": "Gasto actualizado",
     "deleted": "Gasto eliminado",
@@ -2420,7 +2425,8 @@
     "sparkLabel_one": "Riego de la última {{count}} semana, esta semana {{amount}}",
     "sparkLabel_other": "Riego de las últimas {{count}} semanas, esta semana {{amount}}",
     "sparkLabel_many": "Riego de las últimas {{count}} semanas, esta semana {{amount}}",
-    "notesPlaceholder": "p. ej. suelo aún húmedo, bidón vacío…"
+    "notesPlaceholder": "p. ej. suelo aún húmedo, bidón vacío…",
+    "chooseBed": "Elige un bancal…"
   },
   "storage": {
     "full": "Almacenamiento lleno: los cambios ya no se guardan. Exporta una copia y elimina entradas antiguas.",
@@ -2441,13 +2447,12 @@
   "records": {
     "today": "Hoy",
     "yesterday": "Ayer",
-    "otherDate": "Otra fecha",
     "plantSearch": "Buscar planta …",
     "clearPlant": "Quitar planta",
     "plantedNow": "En tus bancales",
     "allPlants": "Todas las plantas",
     "tomorrow": "Mañana",
-    "inAWeek": "En 1 semana",
+    "inAWeek": "+1 semana",
     "otherDateShort": "Fecha…"
   },
   "importPage": {

@@ -36,7 +36,9 @@ export function QualityInput({ label, value, onChange }: { label: string; value:
       <p className={LABEL_CLASS}>
         {label}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`harvest.qualityLevel.${value}`)}</span>
       </p>
-      <div role="radiogroup" aria-label={label} className="-ml-2 flex">
+      {/* Stars and endpoint captions share one box, so the right caption ends under star 5 (as on the pest scale). */}
+      <div className="-ml-2 inline-flex flex-col">
+      <div role="radiogroup" aria-label={label} className="flex">
         {LEVELS.map((q) => (
           <button
             key={q}
@@ -54,10 +56,10 @@ export function QualityInput({ label, value, onChange }: { label: string; value:
           </button>
         ))}
       </div>
-      {/* Endpoint captions, as on the pest severity scale: the stars' meaning without hovering. */}
-      <div className="flex w-[13.75rem] justify-between text-xs text-gray-500 sm:w-[12.5rem] dark:text-gray-400" aria-hidden="true">
+      <div className="flex justify-between gap-4 px-2 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
         <span>{t("harvest.qualityLevel.1")}</span>
         <span>{t("harvest.qualityLevel.5")}</span>
+      </div>
       </div>
     </div>
   );

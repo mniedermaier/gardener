@@ -293,7 +293,7 @@
     "newGarden": "Garten hinzufügen",
     "deleteBed": "Beet löschen",
     "gardenName": "Gartenname",
-    "bedName": "Beetname",
+    "bedName": "Name",
     "width": "Breite",
     "height": "Höhe",
     "dragPlant": "Antippen und dann Felder im Beet tippen – oder direkt ins Beet ziehen.",
@@ -309,7 +309,7 @@
     "editCell": "Pflanzung bearbeiten",
     "closeInspector": "Pflanzungsdetails schließen",
     "variety": "Sorte",
-    "varietyPlaceholder": "z. B. Ochsenherz …",
+    "varietyPlaceholder": "z. B. Ochsenherz",
     "varietyPlaceholderFor": "z. B. {{examples}}",
     "plantedDate": "Pflanzdatum",
     "confirmDeleteGarden": "Alle Beete dieses Gartens werden mitgelöscht. Direkt danach kannst du das noch rückgängig machen.",
@@ -521,7 +521,7 @@
     "title": "Pflanzen",
     "search": "Pflanzen suchen…",
     "addCustom": "Eigene Pflanze hinzufügen",
-    "customName": "Pflanzenname",
+    "customName": "Name",
     "allCategories": "Alle Kategorien",
     "category": {
       "vegetable": "Gemüse",
@@ -1206,7 +1206,8 @@
     "showAll_other": "Alle {{count}} anzeigen",
     "showLess": "Weniger anzeigen",
     "log": "Protokoll",
-    "showOlder": "Ältere Monate anzeigen"
+    "showOlder": "Ältere Monate anzeigen",
+    "weightIn": "Gewicht ({{unit}})"
   },
   "journal": {
     "title": "Tagebuch",
@@ -1214,7 +1215,7 @@
     "entryTitle": "Titel",
     "text": "Was ist heute im Garten passiert?",
     "tags": "Tags",
-    "tagsPlaceholder": "z. B. aussaat, frost, ernte …",
+    "tagsPlaceholder": "z. B. Aussaat, Frost, Ernte …",
     "animal": "Tier",
     "all": "Alle",
     "addPhotos": "Fotos hinzufügen (max. 3)",
@@ -1233,7 +1234,7 @@
     "updated": "Änderungen gespeichert",
     "deleted": "Eintrag gelöscht",
     "needTitle": "Bitte einen Titel eingeben",
-    "titlePlaceholder": "z. B. Erster Frost, Tomaten ausgegeizt",
+    "titlePlaceholder": "z. B. Erster Frost, Tomaten ausgegeizt …",
     "photos": "Fotos",
     "photoN": "Foto {{n}}",
     "removePhoto": "Foto {{n}} entfernen",
@@ -1242,7 +1243,8 @@
     "noAnimal": "Kein Tier",
     "linkToggle": "Pflanze, Beet oder Tier verknüpfen",
     "photoHintShort": "Bis zu {{max}} Fotos, nur auf diesem Gerät gespeichert.",
-    "tagsHint": "Mehrere Schlagwörter mit Komma trennen."
+    "tagsHint": "Mehrere Schlagwörter mit Komma trennen.",
+    "bodyLabel": "Beobachtung"
   },
   "pantry": {
     "title": "Vorrat",
@@ -1258,7 +1260,7 @@
     "method": "Methode",
     "quantity": "Menge",
     "unitCount": "Gläser/Beutel",
-    "label": "Bezeichnung",
+    "label": "Name",
     "labelPlaceholder": "z. B. Tomatensauce August 2026",
     "supplyCost": "Zubehörkosten (€)",
     "storedOn": "eingelagert",
@@ -1491,7 +1493,7 @@
     "resolved": "Als gelöst markiert",
     "active": "Aktiv",
     "resolvedLabel": "Gelöst",
-    "name": "Bezeichnung",
+    "name": "Name",
     "namePlaceholder": "z. B. Blattläuse, Tomatenfäule, Mehltau …",
     "severity": "Schweregrad",
     "description": "Beschreibung",
@@ -1523,8 +1525,8 @@
     "treatmentHint": "Wird mit dem heutigen Datum gespeichert.",
     "date": "Bemerkt am",
     "treatmentOrganic": "Behandlung (bio)",
-    "descriptionPlaceholder": "z. B. Blätter rollen sich ein, klebrige Unterseiten",
-    "treatmentPlaceholder": "z. B. Mit Wasser abgespritzt, Brennnesseljauche",
+    "descriptionPlaceholder": "z. B. Blätter rollen sich ein, klebrige Unterseiten …",
+    "treatmentPlaceholder": "z. B. Mit Wasser abgespritzt, Brennnesseljauche …",
     "kindLabel": "Art"
   },
   "livestock": {
@@ -1559,7 +1561,7 @@
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
     "healthDesc": "Beschreibung",
-    "healthDescPlaceholder": "z. B. Gewichtskontrolle, Entwurmung …",
+    "healthDescPlaceholder": "z. B. Flubenvet 5 Tage",
     "editAnimal": "Tier bearbeiten",
     "updated": "Tier aktualisiert",
     "since": "seit",
@@ -1581,7 +1583,8 @@
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Eier, Honig oder Milch und siehst Wochensummen und Verlauf.",
       "yearHint": "~{{amount}} bis heute erwartet",
       "emptyTitle": "Eier und Honig im Blick",
-      "entries": "Einträge"
+      "entries": "Einträge",
+      "notesPlaceholder": "z. B. Wetter, Legepause …"
     },
     "feed": {
       "title": "Futter",
@@ -1593,7 +1596,8 @@
       "perMonthSince": "seit {{date}}",
       "plusLiquid": "dazu {{volume}} Flüssigfutter",
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Futter und siehst, was es pro Monat kostet.",
-      "emptyTitle": "Futterkosten pro Monat"
+      "emptyTitle": "Futterkosten pro Monat",
+      "notesPlaceholder": "z. B. Futtermarke, wie gern gefressen …"
     },
     "health": {
       "title": "Gesundheit",
@@ -1624,7 +1628,8 @@
       "nextDue": "Nächste Auffrischung ab {{date}}",
       "dueNames": "Impfung prüfen: {{names}}",
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Impfungen, Entwurmungen und Tierarztbesuche und siehst, was fällig ist.",
-      "emptyTitle": "Impfungen und Behandlungen im Blick"
+      "emptyTitle": "Impfungen und Behandlungen im Blick",
+      "notesPlaceholder": "z. B. Dosierung, Tierarzt …"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -2056,7 +2061,7 @@
   "expenses": {
     "title": "Kosten",
     "add": "Ausgabe erfassen",
-    "description": "Beschreibung",
+    "description": "Titel",
     "amount": "Betrag (€)",
     "category": "Kategorie",
     "totalExpenses": "Gesamtausgaben",
@@ -2076,7 +2081,7 @@
     },
     "subtitle": "Ausgaben, Wert von Ernte und Tierprodukten und was unterm Strich bleibt.",
     "edit": "Ausgabe bearbeiten",
-    "descriptionPlaceholder": "z. B. Saatgut Tomaten, Kompost",
+    "descriptionPlaceholder": "z. B. Saatgut Tomaten, Kompost …",
     "saved": "{{description}} ({{amount}}) gespeichert",
     "updated": "Ausgabe aktualisiert",
     "deleted": "Ausgabe gelöscht",
@@ -2313,7 +2318,8 @@
     "onlyWatering": "nur Gießwasser, ohne Regen",
     "sparkLabel_one": "Gießwasser der letzten {{count}} Woche, diese Woche {{amount}}",
     "sparkLabel_other": "Gießwasser der letzten {{count}} Wochen, diese Woche {{amount}}",
-    "notesPlaceholder": "z. B. Boden noch feucht, Regentonne leer …"
+    "notesPlaceholder": "z. B. Boden noch feucht, Regentonne leer …",
+    "chooseBed": "Beet wählen …"
   },
   "storage": {
     "full": "Speicher voll — Änderungen werden nicht mehr gesichert. Exportiere ein Backup und lösche alte Einträge.",
@@ -2334,13 +2340,12 @@
   "records": {
     "today": "Heute",
     "yesterday": "Gestern",
-    "otherDate": "Anderes Datum",
     "plantSearch": "Pflanze suchen …",
     "clearPlant": "Pflanze entfernen",
     "plantedNow": "In deinen Beeten",
     "allPlants": "Alle Pflanzen",
     "tomorrow": "Morgen",
-    "inAWeek": "In 1 Woche",
+    "inAWeek": "+1 Woche",
     "otherDateShort": "Datum …"
   },
   "importPage": {

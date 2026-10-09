@@ -305,7 +305,7 @@
     "newGarden": "Ajouter un jardin",
     "deleteBed": "Supprimer la parcelle",
     "gardenName": "Nom du jardin",
-    "bedName": "Nom de la parcelle",
+    "bedName": "Nom",
     "width": "Largeur",
     "height": "Hauteur",
     "dragPlant": "Touchez une plante, puis des cases de la planche – ou glissez-la dans la planche.",
@@ -322,7 +322,7 @@
     "editCell": "Modifier la plantation",
     "closeInspector": "Fermer les détails de la plantation",
     "variety": "Variété",
-    "varietyPlaceholder": "p. ex. Cœur de bœuf…",
+    "varietyPlaceholder": "p. ex. Cœur de bœuf",
     "varietyPlaceholderFor": "ex. : {{examples}}",
     "plantedDate": "Date de plantation",
     "confirmDeleteGarden": "Toutes ses planches seront aussi supprimées. Vous pourrez encore l’annuler juste après.",
@@ -540,7 +540,7 @@
     "title": "Plantes",
     "search": "Rechercher des plantes…",
     "addCustom": "Ajouter une plante personnalisée",
-    "customName": "Nom de la plante",
+    "customName": "Nom",
     "allCategories": "Toutes les catégories",
     "category": {
       "vegetable": "Légumes",
@@ -1251,13 +1251,14 @@
     "pieces_many": "{{count}} pièces",
     "harvestsCount_many": "{{count}} récoltes",
     "showAll_many": "Afficher les {{count}}",
-    "showOlder": "Afficher les mois précédents"
+    "showOlder": "Afficher les mois précédents",
+    "weightIn": "Poids ({{unit}})"
   },
   "journal": {
     "title": "Journal",
     "add": "Ajouter une entrée",
     "entryTitle": "Titre",
-    "text": "Que s'est-il passé au jardin aujourd'hui ?",
+    "text": "Que s’est-il passé au jardin aujourd’hui ?",
     "tags": "Mots-clés",
     "tagsPlaceholder": "p. ex. semis, gel, récolte…",
     "animal": "Animal",
@@ -1278,7 +1279,7 @@
     "updated": "Modifications enregistrées",
     "deleted": "Entrée supprimée",
     "needTitle": "Saisissez un titre",
-    "titlePlaceholder": "p. ex. Première gelée, tomates taillées",
+    "titlePlaceholder": "p. ex. Première gelée, tomates taillées…",
     "photos": "Photos",
     "photoN": "Photo {{n}}",
     "removePhoto": "Retirer la photo {{n}}",
@@ -1287,7 +1288,8 @@
     "noAnimal": "Aucun animal",
     "linkToggle": "Lier une plante, un carré ou un animal",
     "photoHintShort": "Jusqu’à {{max}} photos, stockées uniquement sur cet appareil.",
-    "tagsHint": "Sépare plusieurs mots-clés par des virgules."
+    "tagsHint": "Sépare plusieurs mots-clés par des virgules.",
+    "bodyLabel": "Observation"
   },
   "pantry": {
     "title": "Réserves",
@@ -1303,7 +1305,7 @@
     "method": "Méthode",
     "quantity": "Quantité",
     "unitCount": "Bocaux/sachets",
-    "label": "Étiquette",
+    "label": "Nom",
     "labelPlaceholder": "ex. Sauce tomate août 2026",
     "supplyCost": "Coût des fournitures (€)",
     "storedOn": "stocké",
@@ -1590,8 +1592,8 @@
     "treatmentHint": "Enregistré avec la date du jour.",
     "date": "Constaté le",
     "treatmentOrganic": "Traitement (bio)",
-    "descriptionPlaceholder": "p. ex. feuilles enroulées, revers collant",
-    "treatmentPlaceholder": "p. ex. rincé au jet, purin d’ortie",
+    "descriptionPlaceholder": "p. ex. feuilles enroulées, revers collant…",
+    "treatmentPlaceholder": "p. ex. rincé au jet, purin d’ortie…",
     "kindLabel": "Type"
   },
   "livestock": {
@@ -1604,7 +1606,7 @@
     "animalsTab": "Animaux",
     "noProducts": "Notez œufs, miel ou lait pour voir l’évolution et la valeur.",
     "animalName": "Nom",
-    "namePlaceholder": "ex. Henriette, Ruche 1…",
+    "namePlaceholder": "p. ex. Henriette, Ruche 1…",
     "count": "Nombre",
     "selectAnimal": "Animal",
     "quantity": "Quantité",
@@ -1614,7 +1616,7 @@
     "feedAdded": "Alimentation enregistrée",
     "noFeed": "Avec les quantités et coûts d’alimentation, vous voyez ce que coûtent vos animaux.",
     "feedType": "Type de nourriture",
-    "feedTypePlaceholder": "ex. Mélange de grains, Foin, Sirop…",
+    "feedTypePlaceholder": "p. ex. mélange de grains, foin, sirop…",
     "feedCost": "Coût (€)",
     "feedTotal": "Coût total d’alimentation",
     "unit": "Unité",
@@ -1627,7 +1629,7 @@
     "noHealth": "Notez vaccins, traitements et contrôles pour ne rien oublier.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "p. ex. contrôle du poids, vermifuge…",
+    "healthDescPlaceholder": "p. ex. Flubenvet 5 jours",
     "editAnimal": "Modifier l'animal",
     "updated": "Animal mis à jour",
     "since": "depuis",
@@ -1649,7 +1651,8 @@
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici œufs, miel ou lait, avec totaux hebdomadaires et évolution.",
       "yearHint": "~{{amount}} attendus à ce jour",
       "emptyTitle": "Œufs et miel en un coup d’œil",
-      "entries": "Saisies"
+      "entries": "Saisies",
+      "notesPlaceholder": "p. ex. météo, pause de ponte…"
     },
     "feed": {
       "title": "Alimentation",
@@ -1661,7 +1664,8 @@
       "perMonthSince": "depuis le {{date}}",
       "plusLiquid": "plus {{volume}} d’aliment liquide",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici la nourriture et verrez ce qu’elle coûte par mois.",
-      "emptyTitle": "Coût de la nourriture par mois"
+      "emptyTitle": "Coût de la nourriture par mois",
+      "notesPlaceholder": "p. ex. marque, appétence…"
     },
     "health": {
       "title": "Santé",
@@ -1693,7 +1697,8 @@
       "nextDue": "Prochain rappel à partir du {{date}}",
       "dueNames": "Vérifier la vaccination : {{names}}",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire.",
-      "emptyTitle": "Vaccins et soins en un coup d’œil"
+      "emptyTitle": "Vaccins et soins en un coup d’œil",
+      "notesPlaceholder": "p. ex. dosage, vétérinaire…"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -2151,7 +2156,7 @@
   "expenses": {
     "title": "Coûts",
     "add": "Noter une dépense",
-    "description": "Description",
+    "description": "Titre",
     "amount": "Montant (€)",
     "category": "Catégorie",
     "totalExpenses": "Dépenses totales",
@@ -2171,7 +2176,7 @@
     },
     "subtitle": "Dépenses, valeur des récoltes et produits animaux, et le bilan.",
     "edit": "Modifier la dépense",
-    "descriptionPlaceholder": "p. ex. graines de tomates, compost",
+    "descriptionPlaceholder": "p. ex. graines de tomates, compost…",
     "saved": "{{description}} ({{amount}}) enregistré",
     "updated": "Dépense mise à jour",
     "deleted": "Dépense supprimée",
@@ -2420,7 +2425,8 @@
     "sparkLabel_one": "Arrosage de la dernière {{count}} semaine, {{amount}} cette semaine",
     "sparkLabel_other": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
     "sparkLabel_many": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
-    "notesPlaceholder": "p. ex. sol encore humide, récupérateur vide…"
+    "notesPlaceholder": "p. ex. sol encore humide, récupérateur vide…",
+    "chooseBed": "Choisir une planche…"
   },
   "storage": {
     "full": "Stockage plein — les modifications ne sont plus enregistrées. Exportez une sauvegarde et supprimez d'anciennes entrées.",
@@ -2441,13 +2447,12 @@
   "records": {
     "today": "Aujourd’hui",
     "yesterday": "Hier",
-    "otherDate": "Autre date",
     "plantSearch": "Rechercher une plante …",
     "clearPlant": "Retirer la plante",
     "plantedNow": "Dans vos planches",
     "allPlants": "Toutes les plantes",
     "tomorrow": "Demain",
-    "inAWeek": "Dans 1 semaine",
+    "inAWeek": "+1 semaine",
     "otherDateShort": "Date…"
   },
   "importPage": {

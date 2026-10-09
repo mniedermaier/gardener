@@ -293,7 +293,7 @@
     "newGarden": "Add garden",
     "deleteBed": "Delete bed",
     "gardenName": "Garden name",
-    "bedName": "Bed name",
+    "bedName": "Name",
     "width": "Width",
     "height": "Height",
     "dragPlant": "Tap a plant, then tap cells in the bed – or drag it into the bed.",
@@ -309,7 +309,7 @@
     "editCell": "Edit planting",
     "closeInspector": "Close planting details",
     "variety": "Variety",
-    "varietyPlaceholder": "e.g. Oxheart…",
+    "varietyPlaceholder": "e.g. Oxheart",
     "varietyPlaceholderFor": "e.g. {{examples}}",
     "plantedDate": "Planted date",
     "confirmDeleteGarden": "All beds in this garden are deleted with it. You can still undo this right afterwards.",
@@ -521,7 +521,7 @@
     "title": "Plants",
     "search": "Search plants…",
     "addCustom": "Add custom plant",
-    "customName": "Plant name",
+    "customName": "Name",
     "allCategories": "All categories",
     "category": {
       "vegetable": "Vegetables",
@@ -1206,7 +1206,8 @@
     "showAll_other": "Show all {{count}}",
     "showLess": "Show less",
     "log": "Log",
-    "showOlder": "Show older months"
+    "showOlder": "Show older months",
+    "weightIn": "Weight ({{unit}})"
   },
   "journal": {
     "title": "Journal",
@@ -1233,7 +1234,7 @@
     "updated": "Changes saved",
     "deleted": "Entry deleted",
     "needTitle": "Enter a title",
-    "titlePlaceholder": "e.g. First frost, tomatoes pruned",
+    "titlePlaceholder": "e.g. First frost, tomatoes pruned…",
     "photos": "Photos",
     "photoN": "Photo {{n}}",
     "removePhoto": "Remove photo {{n}}",
@@ -1242,7 +1243,8 @@
     "noAnimal": "No animal",
     "linkToggle": "Link a plant, bed or animal",
     "photoHintShort": "Up to {{max}} photos, stored on this device only.",
-    "tagsHint": "Separate several tags with commas."
+    "tagsHint": "Separate several tags with commas.",
+    "bodyLabel": "Observation"
   },
   "pantry": {
     "title": "Pantry",
@@ -1258,7 +1260,7 @@
     "method": "Method",
     "quantity": "Quantity",
     "unitCount": "Jars/bags",
-    "label": "Label",
+    "label": "Name",
     "labelPlaceholder": "e.g. Tomato Sauce August 2026",
     "supplyCost": "Supply cost (€)",
     "storedOn": "stored",
@@ -1523,8 +1525,8 @@
     "treatmentHint": "Saved with today's date.",
     "date": "Noticed on",
     "treatmentOrganic": "Treatment (organic)",
-    "descriptionPlaceholder": "e.g. leaves curling, sticky undersides",
-    "treatmentPlaceholder": "e.g. hosed off, nettle tea",
+    "descriptionPlaceholder": "e.g. leaves curling, sticky undersides…",
+    "treatmentPlaceholder": "e.g. hosed off, nettle tea…",
     "kindLabel": "Type"
   },
   "livestock": {
@@ -1559,7 +1561,7 @@
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "e.g. weight check, deworming…",
+    "healthDescPlaceholder": "e.g. Flubenvet for 5 days",
     "editAnimal": "Edit animal",
     "updated": "Animal updated",
     "since": "since",
@@ -1581,7 +1583,8 @@
       "emptyText": "Add an animal first. Then you log eggs, honey or milk here and see weekly totals and the trend.",
       "yearHint": "~{{amount}} expected to date",
       "emptyTitle": "Keep track of eggs and honey",
-      "entries": "Entries"
+      "entries": "Entries",
+      "notesPlaceholder": "e.g. weather, laying break…"
     },
     "feed": {
       "title": "Feed",
@@ -1593,7 +1596,8 @@
       "perMonthSince": "since {{date}}",
       "plusLiquid": "plus {{volume}} liquid feed",
       "emptyText": "Add an animal first. Then you log feed here and see what it costs per month.",
-      "emptyTitle": "Feed costs per month"
+      "emptyTitle": "Feed costs per month",
+      "notesPlaceholder": "e.g. brand, how well it was eaten…"
     },
     "health": {
       "title": "Health",
@@ -1624,7 +1628,8 @@
       "nextDue": "Next booster from {{date}}",
       "dueNames": "Check vaccination: {{names}}",
       "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due.",
-      "emptyTitle": "Keep track of vaccinations and treatments"
+      "emptyTitle": "Keep track of vaccinations and treatments",
+      "notesPlaceholder": "e.g. dosage, vet…"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -2056,7 +2061,7 @@
   "expenses": {
     "title": "Costs",
     "add": "Log expense",
-    "description": "Description",
+    "description": "Title",
     "amount": "Amount (€)",
     "category": "Category",
     "totalExpenses": "Total expenses",
@@ -2076,7 +2081,7 @@
     },
     "subtitle": "Spending, the value of harvests and animal products, and the bottom line.",
     "edit": "Edit expense",
-    "descriptionPlaceholder": "e.g. tomato seeds, compost",
+    "descriptionPlaceholder": "e.g. tomato seeds, compost…",
     "saved": "{{description}} ({{amount}}) saved",
     "updated": "Expense updated",
     "deleted": "Expense deleted",
@@ -2313,7 +2318,8 @@
     "onlyWatering": "watering only, no rain",
     "sparkLabel_one": "Watering over the last {{count}} week, {{amount}} this week",
     "sparkLabel_other": "Watering over the last {{count}} weeks, {{amount}} this week",
-    "notesPlaceholder": "e.g. soil still moist, rain barrel empty…"
+    "notesPlaceholder": "e.g. soil still moist, rain barrel empty…",
+    "chooseBed": "Choose a bed…"
   },
   "storage": {
     "full": "Storage full — changes are no longer being saved. Export a backup and remove old entries.",
@@ -2334,13 +2340,12 @@
   "records": {
     "today": "Today",
     "yesterday": "Yesterday",
-    "otherDate": "Other date",
     "plantSearch": "Search plants …",
     "clearPlant": "Clear plant",
     "plantedNow": "In your beds",
     "allPlants": "All plants",
     "tomorrow": "Tomorrow",
-    "inAWeek": "In 1 week",
+    "inAWeek": "+1 week",
     "otherDateShort": "Date…"
   },
   "importPage": {

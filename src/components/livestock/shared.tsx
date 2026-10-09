@@ -227,7 +227,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
           autoFocus
         />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.production.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -316,7 +316,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
         </div>
         <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.feed.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -386,7 +386,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
         <Input label={t("livestock.healthDesc")} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} autoFocus />
         <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.health.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
