@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculatePlantYield, calculateSufficiency, estimatePlantArea } from "@/lib/sufficiency";
+import { calculatePlantYield, calculateSufficiency, estimatePlantArea, loggedKgByMonth } from "@/lib/sufficiency";
 import type { Plant } from "@/types/plant";
 import type { Garden } from "@/types/garden";
 
@@ -176,5 +176,21 @@ describe("pantry stock", () => {
     // preserved surplus and must not be counted twice.
     const withStock = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
     expect(withStock.annualCoveragePercent).toBe(without.annualCoveragePercent);
+  });
+});
+
+describe("loggedKgByMonth", () => {
+  it("sums logged grams per month of the given year only", () => {
+    const kg = loggedKgByMonth([
+      { date: "2026-06-03", weightGrams: 1000 },
+      { date: "2026-06-20", weightGrams: 500 },
+      { date: "2026-09-01", weightGrams: 8000 },
+      { date: "2025-06-01", weightGrams: 9999 },
+      { date: "2026-07-01" },
+    ], 2026);
+    expect(kg[5]).toBeCloseTo(1.5);
+    expect(kg[8]).toBeCloseTo(8);
+    expect(kg[6]).toBe(0);
+    expect(kg.reduce((a, b) => a + b, 0)).toBeCloseTo(9.5);
   });
 });

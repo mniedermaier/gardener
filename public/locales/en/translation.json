@@ -203,10 +203,9 @@
       "never": "No backup yet",
       "old_one": "Last backup {{count}} day ago",
       "old_other": "Last backup {{count}} days ago",
-      "why": "Your data lives only in this browser. A backup protects it and helps when you switch devices.",
+      "why": "Your data lives only on this device. A backup protects it and helps when you switch devices.",
       "action": "Download backup",
-      "later": "Later",
-      "whyApp": "Your data lives only in this app on this device. A backup protects it and helps when you switch devices."
+      "later": "Later"
     },
     "forecastValue": "Forecast {{value}}",
     "roiValue": "Return {{value}}",
@@ -979,8 +978,8 @@
     },
     "reopenNamed": "Reopen “{{title}}”",
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
-    "untilRange": "until {{range}}, depending on the bed",
-    "fromRange": "from {{range}}, depending on the bed",
+    "untilRange": "Ends by bed: {{range}}",
+    "fromRange": "Starts by bed: {{range}}",
     "upNextFrom": "Coming up next · from {{date}}",
     "notesPlaceholder": "e.g. tools, reminders…"
   },
@@ -1430,7 +1429,6 @@
     "yieldByPlant": "Yield by plant",
     "monthlyTitle": "Supply per month",
     "annualCoverage": "Annual coverage",
-    "fresh": "Garden, fresh",
     "stored": "From storage",
     "months": "months shelf life",
     "winterGap": "Winter storage gap",
@@ -1458,7 +1456,6 @@
     "monthlyDesc_other": "Share of the calorie needs of {{count}} people: fresh from the forecast and from storage.",
     "monthlyCaption": "Calorie coverage per month",
     "monthlyKgTitle": "Food available per month",
-    "monthlyKgCaption": "Food available per month in kg: from the garden (fresh and stored) and from the animals",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
     "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
     "ofNeed": "{{produced}} of {{needed}}",
@@ -1484,7 +1481,9 @@
     "emptyText_other": "{{count}} people need about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
     "monthlyDescFresh_one": "Share of the calorie needs of {{count}} person (forecast). Nothing in storage yet.",
     "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). Nothing in storage yet.",
-    "monthlyKgCaptionFresh": "Food available per month in kg: fresh from the garden and from the animals"
+    "harvested": "Harvested",
+    "freshForecast": "Fresh forecast",
+    "monthlyKgCaptionSplit": "Up to {{month}} the logged harvest, after that the forecast from the current beds; plus stored food and animal products."
   },
   "pests": {
     "title": "Pests",
@@ -1532,7 +1531,7 @@
   "livestock": {
     "title": "Animals",
     "addAnimal": "Add animal",
-    "addProduct": "Log production",
+    "addProduct": "Log yield",
     "added": "{{name}} added",
     "totalAnimals": "Total animals",
     "eggsThisWeek": "Eggs, last 7 days",
@@ -1556,7 +1555,7 @@
     "liters": "Liters",
     "productionEntries_one": "{{count}} entry",
     "productionEntries_other": "{{count}} entries",
-    "addHealth": "Log health event",
+    "addHealth": "Log treatment",
     "healthAdded": "Health entry logged",
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
@@ -1701,7 +1700,7 @@
     "eggsThisYear": "Eggs this year",
     "feedEntriesCount_one": "{{count}} feed entry",
     "feedEntriesCount_other": "{{count}} feed entries",
-    "chartDesc12": "Per month from the first entry, up to 12 months. Occasional harvests such as honey are listed below.",
+    "chartDesc12": "Eggs per month; honey and wax listed below.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "pieces per month",
@@ -1770,10 +1769,9 @@
     "tabTreatments": "Treatments",
     "costPerUnit": "Cost per unit",
     "noEggsToday": "No eggs logged today yet",
-    "addYield": "Log yield",
     "notesPlaceholder": "e.g. behaviour, feed brand…",
-    "monthValues": "Monthly values",
-    "monthAvg": "Avg. {{amount}} per month with entries"
+    "monthAvgLabel": "Avg. per month",
+    "bestMonth": "Best month"
   },
   "seeds": {
     "title": "Seeds",
@@ -2050,13 +2048,14 @@
       "sow_indoors": "Sow indoors",
       "sow_outdoors": "Direct sowing",
       "transplant": "Plant out",
-      "plant_autumn": "Plant",
+      "plant_autumn": "Plant out",
       "sow_autumn": "Autumn sowing"
     },
     "showMore_one": "Show {{count}} more",
     "showMore_other": "Show {{count}} more",
     "bedCount_one": "{{count}} bed",
-    "bedCount_other": "{{count}} beds"
+    "bedCount_other": "{{count}} beds",
+    "afterFrost": "After the frost"
   },
   "expenses": {
     "title": "Costs",
@@ -2142,8 +2141,7 @@
     "sowing": "Sowing",
     "generateTasks": "Add to calendar",
     "nextSpring": "It is too late for successions this year – single autumn sowings are listed above under “Sow & plant now”. Here you plan for spring {{year}}.",
-    "pickNextSpring": "Pick a crop for next spring",
-    "noBeds": "Plan successions once you have added a bed."
+    "pickNextSpring": "Pick a crop for next spring"
   },
   "guilds": {
     "title": "Plant guilds",

@@ -60,6 +60,8 @@ interface Props {
   entryMeta?: (p: AnimalProduct) => string | null;
   onOpen: (p: AnimalProduct) => void;
   renderActions: (p: AnimalProduct) => ReactNode;
+  /** Show only the newest n weeks until "Ältere Wochen anzeigen" is pressed. */
+  initialWeeks?: number;
 }
 
 /**
@@ -68,7 +70,7 @@ interface Props {
  * the production page and the animal detail, so daily egg counts never turn
  * into a wall of 30 identical rows.
  */
-export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: Props) {
+export function ProductWeekList({ products, entryMeta, onOpen, renderActions, initialWeeks }: Props) {
   const { t } = useTranslation();
   const f = useFormat();
   const [openWeeks, setOpenWeeks] = useState<Set<string>>(() => new Set());
@@ -79,10 +81,14 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
     return next;
   });
   const typeCount = new Set(products.map((p) => p.type)).size;
+  const [showAll, setShowAll] = useState(false);
+  const allWeeks = groupByWeek(products);
+  const weeks = initialWeeks !== undefined && !showAll ? allWeeks.slice(0, initialWeeks) : allWeeks;
+  const hiddenWeeks = allWeeks.length - weeks.length;
 
   return (
     <div className="space-y-3">
-      {weeksByMonth(groupByWeek(products)).map((g) => (
+      {weeksByMonth(weeks).map((g) => (
         // The entry count lives on the week rows only, not again in the month header.
         <List key={g.key} header={f.formatDate(g.date, "monthYear")}>
           {g.weeks.map((w) => {
@@ -118,6 +124,15 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
           })}
         </List>
       ))}
+      {hiddenWeeks > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowAll(true)}
+          className="flex min-h-11 items-center text-sm font-medium text-garden-700 hover:underline dark:text-garden-300"
+        >
+          {t("water.showOlder")}
+        </button>
+      )}
     </div>
   );
 }

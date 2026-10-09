@@ -97,7 +97,8 @@ function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
           {title}
-          <Badge tone={tone} dot>{badge}</Badge>
+          {/* The frost title already names "Frost"/"Frostgefahr": its badge would repeat it. */}
+          {group.type !== "frost" && <Badge tone={tone} dot>{badge}</Badge>}
         </p>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{body}</div>
       </div>

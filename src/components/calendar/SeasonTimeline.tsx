@@ -43,7 +43,7 @@ export function SeasonTimeline() {
   const now = useToday();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { formatDate } = useFormat();
+  const { formatDate, formatDateRange } = useFormat();
   const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
@@ -136,10 +136,10 @@ export function SeasonTimeline() {
   );
 
   if (plantedBeds.length === 0) {
-    // Without beds the sowing list is the useful part: it leads, the missing season plan is one hint line.
+    // Without beds the next step comes first (one compact hint card), then the
+    // sowing list as context — every row there would lead to "first add a bed".
     return (
       <div className="space-y-4">
-        {sowingList}
         <Card padding="sm" className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
             <CalendarRange size={18} />
@@ -153,6 +153,7 @@ export function SeasonTimeline() {
             {t("calendar.toPlanner")}
           </Button>
         </Card>
+        {sowingList}
       </div>
     );
   }
@@ -160,7 +161,7 @@ export function SeasonTimeline() {
   const pct = (d: Date) => Math.min(100, Math.max(0, (differenceInCalendarDays(d, yearStart) / yearDays) * 100));
   const todayPct = pct(today);
   const frostPct = pct(frostDate);
-  const rangeLabel = (r: Range) => `${formatDate(r.start, "short")} – ${formatDate(r.end, "short")}`;
+  const rangeLabel = (r: Range) => formatDateRange(r.start, r.end);
   const phaseLabel = (p: Phase) => t(`plants.details.${p}`);
 
   const filterSelect = plantedBeds.length > 1 && (

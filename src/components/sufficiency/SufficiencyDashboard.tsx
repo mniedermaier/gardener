@@ -9,7 +9,7 @@ import { usePlantMap, usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
-import { calculateSufficiency, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
+import { calculateSufficiency, loggedKgByMonth, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
 import { annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
 import type { ProductType } from "@/types/animal";
 import { PRODUCT_NUTRITION } from "@/types/animal";
@@ -41,8 +41,8 @@ export function SufficiencyDashboard() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems })),
+  const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems, harvests } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems, harvests: s.harvests })),
   );
   const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const plants = usePlants();
@@ -115,6 +115,8 @@ export function SufficiencyDashboard() {
   // Small shares get a decimal, so "erwartet bis heute" late in the year does not
   // read as the same 4 % as the annual forecast.
   const pct = (r: number) => f.formatPercent(r, r < 0.1 ? 1 : 0);
+  // Past and running months: what was logged; later months: the forecast.
+  const logged = loggedKgByMonth(harvests, now.getFullYear());
   const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
 
   return (
@@ -186,22 +188,29 @@ export function SufficiencyDashboard() {
             <div className="mt-6">
               <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.monthlyKgTitle")}</h3>
               <BarChart
-                // Garden (fresh + stored) and animal products stacked apart, so the
-                // garden kg match "Ertrag (Prognose)" and the herd is its own part.
+                // Garden: logged harvest up to this month (solid), forecast after it
+                // (hatched) — past months match the harvest log. Stored food and
+                // animal products are their own parts.
                 data={result.monthlyFood.map((m) => ({
                   key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month],
-                  values: [m.freshKg, ...(hasStored ? [m.storedKg] : []), ...(hasAnimals ? [m.animalKg] : [])],
+                  values: [
+                    m.month <= currentMonth ? logged[m.month] : 0,
+                    m.month > currentMonth ? m.freshKg : 0,
+                    ...(hasStored ? [m.storedKg] : []),
+                    ...(hasAnimals ? [m.animalKg] : []),
+                  ],
                 }))}
                 series={[
-                  { label: t("sufficiency.fresh"), color: "brand" },
+                  { label: t("sufficiency.harvested"), color: "brand" },
+                  { label: t("sufficiency.freshForecast"), color: "brand", hatched: true },
                   // Legend only for a series that is actually drawn.
-                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "brand" as const, hatched: true }] : []),
+                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const }] : []),
                   ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
                 formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}
                 marker={{ index: currentMonth, label: t("charts.today") }}
-                caption={t(hasStored ? "sufficiency.monthlyKgCaption" : "sufficiency.monthlyKgCaptionFresh")}
+                caption={t("sufficiency.monthlyKgCaptionSplit", { month: monthLong[currentMonth] })}
                 categoryLabel={t("charts.month")}
               />
             </div>

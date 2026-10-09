@@ -131,7 +131,7 @@ export function ProductionPage() {
             <section className="space-y-3">
               {/* Filters sit in the list header instead of a row of their own. */}
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("livestock.production.entries")}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("livestock.production.entries")}</h2>
                 {(animals.length > 1 || productTypes.length > 1) && (
                   <div className="flex flex-wrap items-center gap-2">
                     {productTypes.length > 1 && (
