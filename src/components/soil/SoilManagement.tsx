@@ -301,10 +301,16 @@ export function SoilManagement() {
                       </span>
                     </div>
                     <Scale value={s.ph} min={target.min} max={target.max} scaleMin={4} scaleMax={9} label={`${t("soil.ph")} ${formatNumber(s.ph)}, ${t("soil.target")} ${rangeText(target)}`} />
-                    <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
-                      <span>{formatNumber(4)}</span>
-                      <span>{t("soil.target")} {rangeText(target)}</span>
-                      <span>{formatNumber(9)}</span>
+                    {/* The target caption sits under the middle of the green band, not the scale. */}
+                    <div className="relative mt-1 h-4 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
+                      <span className="absolute left-0">{formatNumber(4)}</span>
+                      <span
+                        className="absolute -translate-x-1/2 whitespace-nowrap"
+                        style={{ left: `${Math.min(80, Math.max(20, (((target.min + target.max) / 2 - 4) / 5) * 100))}%` }}
+                      >
+                        {t("soil.target")} {rangeText(target)}
+                      </span>
+                      <span className="absolute right-0">{formatNumber(9)}</span>
                     </div>
                   </div>
 
@@ -327,8 +333,8 @@ export function SoilManagement() {
                         <div key={n}>
                           <dt className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>{t(`soil.nutrients.${n}`)}</span>
-                            {/* Same status language as the pH badge: too much is a warning, too little a cooler "info". */}
-                            <Badge size="sm" dot tone={level === "optimal" ? "positive" : level === "high" ? "warning" : "info"}>{t(`soil.levels.${level}`)}</Badge>
+                            {/* Off target either way needs action: warning; only the optimum is positive. */}
+                            <Badge size="sm" dot tone={level === "optimal" ? "positive" : "warning"}>{t(`soil.levels.${level}`)}</Badge>
                           </dt>
                           <dd className="mt-0.5">
                             <span className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{nutrientValue(n, value)}</span>

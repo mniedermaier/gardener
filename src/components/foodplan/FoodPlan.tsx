@@ -151,8 +151,9 @@ export function FoodPlan() {
               <List label={t("foodplan.cropPlan")}>
                 {grown.map((r) => {
                   const p = plantMap.get(r.plantId)!;
-                  const covered = r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg;
                   const gap = r.deficitKg > 0.05;
+                  // One tolerance for both states, so no row ends up with neither.
+                  const covered = r.targetKg > 0 && !gap;
                   return (
                     <ListRow
                       key={r.plantId}
