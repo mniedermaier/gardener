@@ -126,8 +126,8 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("plants.customIcon")}
           </span>
-          {/* 16 icons: an even 4 × 4 grid on phones, 8 × 2 across the full field width on wider screens. An old emoji icon stays selectable as an extra tile. */}
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-8" role="group" aria-labelledby="custom-plant-icon-label">
+          {/* 16 icons: 6 per row on phones (3 short rows of 44 px targets — 8 per row would drop below 44 px at 390 px), 8 × 2 across the full field width on wider screens. An old emoji icon stays selectable as an extra tile. */}
+          <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">
             {(ICONS.includes(draft.icon) ? ICONS : [...ICONS, draft.icon]).map((ic) => (
               <button
                 key={ic}
@@ -136,7 +136,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
                 aria-label={ICONS.includes(ic) ? getPlantName(ic) : ic}
                 title={ICONS.includes(ic) ? getPlantName(ic) : undefined}
                 aria-pressed={draft.icon === ic}
-                className={`flex h-12 items-center justify-center rounded-lg border ${
+                className={`flex h-11 items-center justify-center rounded-lg border ${
                   draft.icon === ic
                     ? "border-garden-500 bg-garden-50 ring-1 ring-garden-500 dark:bg-garden-500/15"
                     : "border-gray-200 hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10"

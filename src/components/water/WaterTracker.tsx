@@ -60,7 +60,11 @@ export function WaterTracker() {
   const openAdd = useCallback((params: AddParams = {}) => {
     setEditingId(null);
     setSubmitted(false);
-    const bedId = params.bed && beds.byId.has(params.bed) ? params.bed : lastEntry && beds.byId.has(lastEntry.bedId) ? lastEntry.bedId : beds.beds[0]?.id ?? "";
+    // Prefill only an unambiguous bed (deep link, last used, or the only one);
+    // otherwise "Beet wählen …" and Save stays disabled until one is chosen.
+    const bedId = params.bed && beds.byId.has(params.bed) ? params.bed
+      : lastEntry && beds.byId.has(lastEntry.bedId) ? lastEntry.bedId
+        : beds.beds.length === 1 ? beds.beds[0].id : "";
     setDraft({ bedId, liters: "", method: lastEntry && lastEntry.method !== "rain" ? lastEntry.method : "manual", duration: "", date: params.date ?? todayISO(), notes: "" });
     setDialogOpen(true);
   }, [beds, lastEntry]);
@@ -300,9 +304,9 @@ export function WaterTracker() {
         }
       >
         <div className="space-y-5">
-          <Select label={t("planner.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} options={beds.options} error={errors.bed} />
+          <Select label={t("planner.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} placeholder={t("water.chooseBed")} options={beds.options} error={errors.bed} />
           <div>
-            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} error={errors.liters} autoFocus />
+            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} placeholder={t("common.examplePlaceholder", { value: 10 })} error={errors.liters} autoFocus />
             <div className="mt-2 flex flex-wrap gap-1.5">
               {QUICK_LITERS.map((l) => {
                 const active = litersNum === l;
@@ -325,7 +329,7 @@ export function WaterTracker() {
             </div>
           </div>
           {/* A short pair: side by side on phones too (design system rule 9). */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-[3fr_2fr] gap-4">
             <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
             <Input label={t("water.durationLabel")} optional inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder={t("common.examplePlaceholder", { value: 15 })} error={errors.duration} />
           </div>

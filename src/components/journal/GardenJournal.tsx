@@ -421,7 +421,27 @@ export function GardenJournal() {
       >
         <div className="space-y-5">
           <Input label={t("journal.entryTitle")} value={draft.title} onChange={(e) => patch({ title: e.target.value })} placeholder={t("journal.titlePlaceholder")} error={titleError} autoFocus />
-          <Textarea label={t("harvest.notes")} optional value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
+          {/* The entry's body is its main content, so it is not marked "(optional)" even though only the title is required. */}
+          <Textarea label={t("journal.bodyLabel")} value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} />
+          {/* Tags right after the text: always visible, never pushed under the footer by photos or links. */}
+          <div>
+            <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} hint={t("journal.tagsHint")} />
+            {suggestedTags.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
+                {suggestedTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
+                    className="inline-flex min-h-11 items-center rounded-full bg-gray-100 px-2.5 text-xs sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                  >
+                    + #{tag}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
 
           {/* Photos */}
@@ -430,7 +450,7 @@ export function GardenJournal() {
             <div className="flex flex-wrap gap-2">
               {draft.photos.map((photo, idx) => (
                 <div key={photo} className="relative">
-                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-28 rounded-lg border border-gray-200 object-cover dark:border-white/10" />
+                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-24 rounded-lg border border-gray-200 object-cover sm:size-20 dark:border-white/10" />
                   <IconButton
                     icon={X}
                     size="sm"
@@ -441,7 +461,7 @@ export function GardenJournal() {
                 </div>
               ))}
               {draft.photos.length < MAX_PHOTOS && (
-                <label className="flex size-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
+                <label className="flex size-24 sm:size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
                   {uploading ? <Camera size={20} aria-hidden="true" className="animate-pulse" /> : <ImagePlus size={20} aria-hidden="true" />}
                   {t("journal.addPhoto")}
                   <input ref={fileInputRef} type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoSelect} />
@@ -488,25 +508,6 @@ export function GardenJournal() {
             </div>
             </div>
           </details>
-
-          <div>
-            <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} hint={t("journal.tagsHint")} />
-            {suggestedTags.length > 0 && (
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
-                {suggestedTags.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
-                    className="inline-flex min-h-11 items-center rounded-full bg-gray-100 px-2.5 text-xs sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
-                  >
-                    + #{tag}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </Modal>
 

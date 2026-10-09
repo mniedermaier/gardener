@@ -17,15 +17,15 @@ interface DateFieldProps {
   /** Allow dates in the future (e.g. best-before). Default false. */
   allowFuture?: boolean;
   /**
-   * "past" (records, default): Heute / Gestern / Anderes Datum.
-   * "future" (tasks): Heute / Morgen / In 1 Woche / Anderes Datum.
+   * "past" (records, default): Heute / Gestern / Datum ….
+   * "future" (tasks): Heute / Morgen / +1 Woche / Datum ….
    */
   mode?: "past" | "future";
 }
 
 /**
  * Date input with the most common answers as one tap — "Heute" / "Gestern"
- * for records, "Heute" / "Morgen" / "In 1 Woche" for things to do — and any
+ * for records, "Heute" / "Morgen" / "+1 Woche" for things to do — and any
  * other date via `DatePicker` (native calendar, displayed in the app language).
  */
 export function DateField({ label, value, onChange, allowFuture = false, mode = "past" }: DateFieldProps) {
@@ -63,10 +63,9 @@ export function DateField({ label, value, onChange, allowFuture = false, mode = 
         onChange={select}
         options={[
           ...presets.map((p) => ({ value: p.value, label: p.label })),
-          // Four segments on a phone: "Datum …" instead of "Anderes Datum", no icon.
-          mode === "future"
-            ? { value: "custom", label: <><span className="sm:hidden">{t("records.otherDateShort")}</span><span className="hidden sm:inline">{t("records.otherDate")}</span></> }
-            : { value: "custom", label: t("records.otherDate"), icon: CalendarDays },
+          // One look in every dialog and at every width: short "Datum …" with the
+          // calendar icon, so no segment wraps (four segments fit 390 px).
+          { value: "custom", label: t("records.otherDateShort"), icon: CalendarDays },
         ]}
       />
       {choice === "custom" ? (

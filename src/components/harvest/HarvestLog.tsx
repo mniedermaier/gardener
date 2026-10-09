@@ -444,7 +444,7 @@ export function HarvestLog() {
             <div className="flex items-end gap-2">
               <Input
                 wrapperClassName="min-w-0 flex-1"
-                label={t("harvest.weight")}
+                label={t("harvest.weightIn", { unit: draft.unit })}
                 inputMode="decimal"
                 autoComplete="off"
                 value={draft.amount}
