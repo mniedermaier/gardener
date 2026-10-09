@@ -1512,14 +1512,14 @@
       "pest": "Ravageur",
       "disease": "Maladie"
     },
-    "subtitle": "Consignez les problèmes, traitez-les et repérez les tendances d'une saison à l'autre.",
+    "subtitle": "Signalez les problèmes, traitez-les et repérez les tendances d'une saison à l'autre.",
     "updated": "Modifications enregistrées",
     "deleted": "Entrée supprimée",
     "edit": "Modifier le problème",
     "reopen": "Rouvrir",
     "filterLabel": "Filtre de statut",
-    "emptyTitle": "Aucun problème enregistré",
-    "emptyText": "Consignez ravageurs et maladies dès leur apparition pour voir ce qui fonctionne et ce qui revient chaque année.",
+    "emptyTitle": "Aucun problème signalé",
+    "emptyText": "Signalez ravageurs et maladies dès leur apparition pour voir ce qui fonctionne et ce qui revient chaque année.",
     "emptyFilter": "Aucune entrée dans cette vue.",
     "severityLevel": {
       "1": "Très faible",
@@ -1952,7 +1952,8 @@
       }
     },
     "openInPlanner": "Ouvrir dans le planificateur",
-    "yourNote": "Note :"
+    "yourNote": "Note :",
+    "emptyNoBeds": "Les analyses et amendements se rattachent à une planche. Créez d’abord une planche dans le planificateur."
   },
   "preservation": {
     "title": "Guide de conservation",

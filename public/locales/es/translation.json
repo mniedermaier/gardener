@@ -1493,7 +1493,7 @@
   },
   "pests": {
     "title": "Plagas",
-    "add": "Registrar problema",
+    "add": "Señalar problema",
     "added": "Problema registrado",
     "resolved": "Marcado como resuelto",
     "active": "Activos",
@@ -1512,14 +1512,14 @@
       "pest": "Plaga",
       "disease": "Enfermedad"
     },
-    "subtitle": "Registra problemas, trátalos y detecta patrones a lo largo de las temporadas.",
+    "subtitle": "Señala problemas, trátalos y detecta patrones a lo largo de las temporadas.",
     "updated": "Cambios guardados",
     "deleted": "Registro eliminado",
     "edit": "Editar problema",
     "reopen": "Reabrir",
     "filterLabel": "Filtro de estado",
-    "emptyTitle": "Sin problemas registrados",
-    "emptyText": "Registra plagas y enfermedades en cuanto aparezcan para ver qué funciona y qué vuelve cada año.",
+    "emptyTitle": "Sin problemas señalados",
+    "emptyText": "Señala plagas y enfermedades en cuanto aparezcan para ver qué funciona y qué vuelve cada año.",
     "emptyFilter": "No hay registros en esta vista.",
     "severityLevel": {
       "1": "Muy baja",
@@ -1952,7 +1952,8 @@
       }
     },
     "openInPlanner": "Abrir en el planificador",
-    "yourNote": "Nota:"
+    "yourNote": "Nota:",
+    "emptyNoBeds": "Los análisis y las enmiendas pertenecen a un bancal. Crea primero un bancal en el planificador."
   },
   "preservation": {
     "title": "Guía de conservación",

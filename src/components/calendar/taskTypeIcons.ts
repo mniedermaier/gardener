@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { House, Sprout, Shovel, Droplets, Apple, Leaf, Search, CookingPot, TestTube, ClipboardList } from "lucide-react";
+import { House, Sprout, Shovel, Droplets, Apple, Leaf, Eye, CookingPot, TestTube, ClipboardList } from "lucide-react";
 import type { TaskType } from "@/types/task";
 
 export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
@@ -9,7 +9,8 @@ export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
   water: Droplets,
   harvest: Apple,
   fertilize: Leaf,
-  scout: Search,
+  // An eye, not a magnifier: in a row the magnifier reads as a search button.
+  scout: Eye,
   preserve: CookingPot,
   soil_test: TestTube,
   custom: ClipboardList,

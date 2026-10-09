@@ -140,12 +140,13 @@ export function PestTracker() {
       <PageHeader
         title={t("pests.title")}
         description={t("pests.subtitle")}
-        actions={
+        // While the empty state shows, its button is the one way in.
+        actions={pests.length > 0 ? (
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("pests.add")}
           </Button>
-        }
+        ) : undefined}
       />
 
       {pests.length === 0 ? (

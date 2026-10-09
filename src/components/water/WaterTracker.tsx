@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 import { useNavigate } from "react-router-dom";
-import { CloudRain, Droplets, Pencil, Plus, Trash2 } from "lucide-react";
+import { CloudRain, Droplets, LayoutGrid, Pencil, Plus, Trash2 } from "lucide-react";
 import { addWeeks, endOfWeek, getISOWeek, startOfMonth, startOfWeek, subWeeks } from "date-fns";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
@@ -154,12 +154,13 @@ export function WaterTracker() {
       <PageHeader
         title={t("water.title")}
         description={t("water.subtitle")}
-        actions={
-          <Button onClick={openAddPlain} disabled={beds.beds.length === 0}>
+        // While the empty state shows, its own button is the one way in (no disabled duplicate up here).
+        actions={waterEntries.length > 0 && beds.beds.length > 0 ? (
+          <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("water.add")}
           </Button>
-        }
+        ) : undefined}
       />
 
       {waterEntries.length === 0 ? (
@@ -170,7 +171,7 @@ export function WaterTracker() {
             description={beds.beds.length ? t("water.emptyText") : t("water.emptyNoBeds")}
             action={beds.beds.length
               ? <Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("water.add")}</Button>
-              : <Button onClick={() => navigate("/planner")}>{t("importPage.toPlanner")}</Button>}
+              : <Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>}
           />
         </Card>
       ) : (
@@ -225,13 +226,18 @@ export function WaterTracker() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("water.log")}</h2>
             {data.weeks.slice(0, weeksShown).map(([ws, entries]) => {
               const total = entries.filter((e) => e.method !== "rain").reduce((s, e) => s + e.liters, 0);
+              const rain = entries.filter((e) => e.method === "rain").reduce((s, e) => s + e.liters, 0);
               return (
                 <List
                   key={ws.getTime()}
                   header={
                     <span className="flex items-center justify-between gap-2">
                       <span>{t("water.weekShort", { week: getISOWeek(ws) })} · {weekRange(ws)}</span>
-                      <span className="font-medium tabular-nums">{formatVolume(total)}</span>
+                      {/* Watered and rain apart, like the key figures: the total alone would hide the rain rows below. */}
+                      <span className="font-medium tabular-nums">
+                        {formatVolume(total)}
+                        {rain > 0 && <span className="font-normal"> {t("water.plusRain", { amount: formatVolume(rain) })}</span>}
+                      </span>
                     </span>
                   }
                 >
@@ -247,7 +253,7 @@ export function WaterTracker() {
                         meta={[
                           t(`water.methods.${e.method}`),
                           e.duration ? t("water.minutesCount", { count: e.duration }) : null,
-                          <time key="d" dateTime={toISODate(e.date)}>{formatDate(e.date, "relative")}</time>,
+                          <time key="d" dateTime={toISODate(e.date)}>{formatDate(e.date)}</time>,
                         ]}
                         description={e.notes}
                         trailing={formatVolume(e.liters)}
@@ -293,23 +299,32 @@ export function WaterTracker() {
         <div className="space-y-5">
           <Select label={t("planner.bed")} value={draft.bedId} onChange={(e) => patch({ bedId: e.target.value })} options={beds.options} error={errors.bed} />
           <div>
-            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} placeholder="10" error={errors.liters} autoFocus />
+            <Input label={t("water.litersLabel")} inputMode="decimal" value={draft.liters} onChange={(e) => patch({ liters: e.target.value })} error={errors.liters} autoFocus />
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {QUICK_LITERS.map((l) => (
-                <button
-                  key={l}
-                  type="button"
-                  onClick={() => patch({ liters: String(l) })}
-                  className="inline-flex min-h-9 items-center rounded-full bg-gray-100 px-3 text-sm font-medium text-gray-700 hover:bg-gray-200 sm:min-h-8 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
-                >
-                  {formatVolume(l)}
-                </button>
-              ))}
+              {QUICK_LITERS.map((l) => {
+                const active = litersNum === l;
+                return (
+                  <button
+                    key={l}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => patch({ liters: String(l) })}
+                    className={`inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium sm:min-h-8 ${
+                      active
+                        ? "bg-garden-100 text-garden-800 ring-1 ring-garden-600/40 dark:bg-garden-500/20 dark:text-garden-200 dark:ring-garden-400/40"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                    }`}
+                  >
+                    {formatVolume(l)}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          {/* Stacked on phones: "Tropfbewässerung" does not fit a half-width select. */}
+          <div className="grid gap-4 sm:grid-cols-2">
             <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
-            <Input label={t("water.durationLabel")} inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder="15" hint={t("common.optional")} error={errors.duration} />
+            <Input label={t("water.durationLabel")} inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} hint={t("common.optional")} error={errors.duration} />
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <Textarea label={t("harvest.notes")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />

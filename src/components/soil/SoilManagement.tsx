@@ -180,23 +180,28 @@ export function SoilManagement() {
   const testEditingItem = testEditing ? soilTests.find((s) => s.id === testEditing) : undefined;
   const amendEditingItem = amendEditing ? amendments.find((a) => a.id === amendEditing) : undefined;
   const draftTarget = test.bedId ? bedTarget(test.bedId) : undefined;
+  // Tests and amendments belong to a bed: without one the empty states point to the planner.
+  const noBeds = beds.beds.length === 0;
+  const toPlanner = <Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>;
 
   return (
     <div>
       <PageHeader
         title={t("soil.title")}
         description={t("soil.subtitle")}
+        // One action, the one for the open tab; none while that tab's empty state carries it.
         actions={
-          <>
-            <Button variant="secondary" onClick={openAddAmend}>
-              <Leaf size={16} aria-hidden="true" />
-              {t("soil.addAmendment")}
-            </Button>
+          tab === "tests" && sortedTests.length > 0 ? (
             <Button onClick={openAddTest}>
               <Beaker size={16} aria-hidden="true" />
               {t("soil.addTest")}
             </Button>
-          </>
+          ) : tab === "amendments" && sortedAmendments.length > 0 ? (
+            <Button onClick={openAddAmend}>
+              <Leaf size={16} aria-hidden="true" />
+              {t("soil.addAmendment")}
+            </Button>
+          ) : undefined
         }
         tabs={
           <Tabs
@@ -204,8 +209,8 @@ export function SoilManagement() {
             value={tab}
             onChange={setTab}
             items={[
-              { value: "tests", label: t("soil.tests"), count: soilTests.length },
-              { value: "amendments", label: t("soil.amendments"), count: amendments.length },
+              { value: "tests", label: t("soil.tests"), count: soilTests.length || undefined },
+              { value: "amendments", label: t("soil.amendments"), count: amendments.length || undefined },
             ]}
           />
         }
@@ -217,12 +222,13 @@ export function SoilManagement() {
             <EmptyState
               icon={Beaker}
               title={t("soil.emptyTestsTitle")}
-              description={t("soil.emptyTestsText")}
-              action={<Button onClick={openAddTest}><Plus size={16} aria-hidden="true" />{t("soil.addTest")}</Button>}
+              description={noBeds ? t("soil.emptyNoBeds") : t("soil.emptyTestsText")}
+              action={noBeds ? toPlanner : <Button onClick={openAddTest}><Plus size={16} aria-hidden="true" />{t("soil.addTest")}</Button>}
             />
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          // items-start: a short card keeps its own height instead of stretching to its neighbour's.
+          <div className="grid items-start gap-4 md:grid-cols-2">
             {sortedTests.map((s) => {
               const assessment = assessPh(s.ph, beds.byId.get(s.bedId)?.plantIds ?? []);
               const { advice, target } = assessment;
@@ -340,8 +346,8 @@ export function SoilManagement() {
             <EmptyState
               icon={Layers}
               title={t("soil.emptyAmendmentsTitle")}
-              description={t("soil.emptyAmendmentsText")}
-              action={<Button onClick={openAddAmend}><Plus size={16} aria-hidden="true" />{t("soil.addAmendment")}</Button>}
+              description={noBeds ? t("soil.emptyNoBeds") : t("soil.emptyAmendmentsText")}
+              action={noBeds ? toPlanner : <Button onClick={openAddAmend}><Plus size={16} aria-hidden="true" />{t("soil.addAmendment")}</Button>}
             />
           </Card>
         ) : (
@@ -355,7 +361,7 @@ export function SoilManagement() {
                   leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-earth-100 text-earth-700 dark:bg-earth-500/15 dark:text-earth-300"><Icon size={16} aria-hidden="true" /></span>}
                   title={a.material}
                   badges={<Badge variant="outline">{t(`soil.types.${a.type}`)}</Badge>}
-                  meta={[bedName(a.bedId), <time key="d" dateTime={a.date}>{formatDate(a.date, "relative")}</time>]}
+                  meta={[bedName(a.bedId), <time key="d" dateTime={a.date}>{formatDate(a.date)}</time>]}
                   description={a.notes}
                   trailing={
                     <span className="flex flex-col items-end">
