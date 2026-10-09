@@ -7,6 +7,11 @@ export interface SegmentOption<T extends string> {
   icon?: LucideIcon;
   /** Optional count shown after the label ("Aktiv 2"). */
   count?: number;
+  /**
+   * Icon only below sm (label stays for screen readers) and no share of the
+   * row: a fourth "Datum …" segment then leaves room for the others.
+   */
+  compact?: boolean;
 }
 
 interface SegmentedControlProps<T extends string> {
@@ -63,14 +68,14 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1 font-medium transition-colors ${segment} ${box} ${
+            className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1 font-medium transition-colors ${o.compact ? "flex-none whitespace-nowrap sm:flex-1" : segment} ${box} ${
               selected
                 ? "bg-white text-gray-900 shadow-xs dark:bg-gray-700 dark:text-gray-50"
                 : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             }`}
           >
             {Icon && <Icon size={14} aria-hidden="true" className="shrink-0" />}
-            {o.label}
+            {o.compact ? <span className="sr-only sm:not-sr-only">{o.label}</span> : o.label}
             {o.count !== undefined && " "}
             {o.count !== undefined && (
               <span className={`tabular-nums ${selected ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"}`}>{o.count}</span>

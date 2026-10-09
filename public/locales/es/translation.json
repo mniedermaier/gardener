@@ -1625,12 +1625,11 @@
     "productionEntries_one": "{{count}} registro",
     "productionEntries_many": "{{count}} registros",
     "productionEntries_other": "{{count}} registros",
-    "addHealth": "Registrar tratamiento",
+    "addHealth": "Registrar salud",
     "healthAdded": "Registro de salud guardado",
     "noHealth": "Anota vacunas, tratamientos y revisiones para no olvidar nada.",
     "healthType": "Tipo",
     "healthDesc": "Descripción",
-    "healthDescPlaceholder": "p. ej. Flubenvet 5 días",
     "editAnimal": "Editar animal",
     "updated": "Animal actualizado",
     "since": "desde",
@@ -1699,7 +1698,7 @@
       "dueNames": "Revisar vacunación: {{names}}",
       "emptyText": "Añade primero un animal. Después registras aquí vacunas, desparasitaciones y visitas al veterinario y ves qué toca.",
       "emptyTitle": "Vacunas y tratamientos bajo control",
-      "notesPlaceholder": "p. ej. dosis, veterinario…"
+      "notesPlaceholder": "p. ej. veterinario, próxima cita…"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1801,7 +1800,8 @@
       "pieces": "unidades",
       "kg": "kg",
       "g": "g",
-      "liters": "litros"
+      "liters": "litros",
+      "litersShort": "l"
     },
     "editProduct": "Editar producción",
     "productSaved": "{{amount}} de {{product}} registrado",
@@ -1856,7 +1856,17 @@
     "noEggsToday": "Hoy aún no hay huevos registrados",
     "notesPlaceholder": "p. ej. comportamiento, marca de pienso…",
     "monthAvgLabel": "Media mensual",
-    "bestMonth": "Mejor mes"
+    "bestMonth": "Mejor mes",
+    "healthDescPlaceholders": {
+      "vaccination": "p. ej. Newcastle (ND), en el agua",
+      "deworming": "p. ej. Flubenvet, 7 días",
+      "illness": "p. ej. resfriado, diarrea",
+      "injury": "p. ej. picotazo en la cresta",
+      "checkup": "p. ej. plumaje, heces, peso",
+      "treatment": "p. ej. antiácaros",
+      "death": "p. ej. zorro, vejez",
+      "other": "p. ej. recorte de pezuñas"
+    }
   },
   "seeds": {
     "title": "Semillas",

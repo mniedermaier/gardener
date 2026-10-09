@@ -1557,12 +1557,11 @@
     "liters": "Liters",
     "productionEntries_one": "{{count}} entry",
     "productionEntries_other": "{{count}} entries",
-    "addHealth": "Log treatment",
+    "addHealth": "Log health",
     "healthAdded": "Health entry logged",
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "e.g. Flubenvet for 5 days",
     "editAnimal": "Edit animal",
     "updated": "Animal updated",
     "since": "since",
@@ -1630,7 +1629,7 @@
       "dueNames": "Check vaccination: {{names}}",
       "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due.",
       "emptyTitle": "Keep track of vaccinations and treatments",
-      "notesPlaceholder": "e.g. dosage, vet…"
+      "notesPlaceholder": "e.g. vet, next appointment…"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1719,7 +1718,8 @@
       "pieces": "pieces",
       "kg": "kg",
       "g": "g",
-      "liters": "litres"
+      "liters": "litres",
+      "litersShort": "l"
     },
     "editProduct": "Edit production",
     "productSaved": "{{amount}} {{product}} logged",
@@ -1773,7 +1773,17 @@
     "noEggsToday": "No eggs logged today yet",
     "notesPlaceholder": "e.g. behaviour, feed brand…",
     "monthAvgLabel": "Avg. per month",
-    "bestMonth": "Best month"
+    "bestMonth": "Best month",
+    "healthDescPlaceholders": {
+      "vaccination": "e.g. Newcastle (ND), drinking water",
+      "deworming": "e.g. Flubenvet, 7 days",
+      "illness": "e.g. cold, diarrhoea",
+      "injury": "e.g. peck wound on comb",
+      "checkup": "e.g. feathers, droppings, weight",
+      "treatment": "e.g. mite treatment",
+      "death": "e.g. fox, old age",
+      "other": "e.g. hoof trimming"
+    }
   },
   "seeds": {
     "title": "Seeds",

@@ -255,23 +255,12 @@ export function PestTracker() {
         }
       >
         <div className="space-y-4">
-          <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("pests.kindLabel")}</p>
-          <SegmentedControl
-            fullWidth
-            label={t("pests.kindLabel")}
-            value={draft.type}
-            onChange={(type) => patch({ type })}
-            options={[
-              { value: "pest", label: t("pests.types.pest"), icon: Bug },
-              { value: "disease", label: t("pests.types.disease"), icon: Microscope },
-            ]}
-          />
-          <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("pests.namePlaceholder")} autoFocus />
           <PlantCombobox
             label={t("harvest.plant")}
             plants={plants}
             beds={beds.beds}
             optional
+            autoFocus
             value={draft.plantId}
             bedId={draft.bedId}
             onChange={({ plantId, bedId }) => patch({ plantId, ...(bedId ? { bedId } : {}) })}
@@ -286,6 +275,20 @@ export function PestTracker() {
               options={beds.options}
             />
           )}
+          <div>
+            <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("pests.kindLabel")}</p>
+            <SegmentedControl
+              fullWidth
+              label={t("pests.kindLabel")}
+              value={draft.type}
+              onChange={(type) => patch({ type })}
+              options={[
+                { value: "pest", label: t("pests.types.pest"), icon: Bug },
+                { value: "disease", label: t("pests.types.disease"), icon: Microscope },
+              ]}
+            />
+          </div>
+          <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("pests.namePlaceholder")} />
           <DateField label={t("pests.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">

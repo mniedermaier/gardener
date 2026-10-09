@@ -294,23 +294,25 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
       <div className="space-y-4">
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
         <Input label={t("livestock.feedType")} value={feedType} onChange={(e) => setFeedType(e.target.value)} placeholder={t("livestock.feedTypePlaceholder")} autoFocus />
-        <div className="grid grid-cols-2 gap-3">
-          {/* The label carries the unit chosen beside it ("Menge (kg)"). */}
+        {/* Same pattern as the harvest weight: the field plus an inline unit toggle (DESIGN_SYSTEM rule 9). */}
+        <div className="flex items-end gap-2">
           <Input
-            label={`${t("livestock.quantity")} (${t(`livestock.units.${unit}`)})`}
+            wrapperClassName="min-w-0 flex-1"
+            label={t("livestock.quantity")}
             inputMode="decimal"
             value={qty}
             onChange={(e) => setQty(e.target.value)}
             placeholder={t("common.examplePlaceholder", { value: f.formatNumber(unit === "g" ? 500 : unit === "liters" ? 2 : 10) })}
           />
-          <Select
+          <SegmentedControl
+            inline
             label={t("livestock.unit")}
             value={unit}
-            onChange={(e) => setUnit(e.target.value as FeedUnit)}
+            onChange={setUnit}
             options={[
               { value: "kg", label: t("livestock.units.kg") },
               { value: "g", label: t("livestock.units.g") },
-              { value: "liters", label: t("livestock.units.liters") },
+              { value: "liters", label: t("livestock.units.litersShort") },
             ]}
           />
         </div>
@@ -354,12 +356,13 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
   }
 
   const costNum = parseNum(cost);
-  const canSave = !!aid && desc.trim() !== "";
+  // The type alone is a valid entry ("Kontrolle"); the description only adds detail.
+  const canSave = !!aid;
 
   const save = () => {
     if (!canSave) return;
     const fields = {
-      animalId: aid, date, type, description: desc.trim(),
+      animalId: aid, date, type, description: desc.trim() || t(`livestock.healthTypes.${type}`),
       cost: Number.isFinite(costNum) && costNum >= 0 ? costNum : undefined, notes: notes.trim() || undefined,
     };
     if (entry) updateHealthEvent(entry.id, fields);
@@ -383,7 +386,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
           onChange={(e) => setType(e.target.value as HealthEventType)}
           options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))}
         />
-        <Input label={t("livestock.healthDesc")} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} autoFocus />
+        <Input label={t("livestock.healthDesc")} optional value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t(`livestock.healthDescPlaceholders.${type}`)} autoFocus />
         <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
         <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.health.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />

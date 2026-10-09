@@ -38,8 +38,11 @@ covered here, copy the pattern from the reference page
    - **Units** sit in the label in parentheses: "Kosten (€)", "Menge (l)",
      "Dauer (Min.)", "Ernte ab (Tage)". Placeholders are plain example numbers
      ("z. B. 4,00"), never a currency string. Every numeric field shows such an
-     example; where a unit picker sits beside the amount, the label follows it
-     ("Gewicht (kg)", "Menge (Päckchen)") — harvest, feed and seeds alike.
+     example. The unit is named exactly once: in the label when it is fixed,
+     otherwise by the picker beside the field — an inline `SegmentedControl`
+     for short units (harvest g/kg, feed kg/g/l, the label follows it:
+     "Gewicht (kg)"), a `Select` next to a plain "Menge" when the unit words are
+     long (seeds: Päckchen/Gramm/Samen).
    - **Name fields:** "Titel" for records (journal, task, expense), "Name" for
      things you keep or identify (bed, plant, animal, preserve, problem).
    - **Costs** that feed the balance (seeds, pantry supplies, soil, feed, health)
@@ -53,8 +56,13 @@ covered here, copy the pattern from the reference page
      captions under the control.
    - **Dates:** `DateField` — Heute/Gestern/Datum … for records,
      `mode="future"` (Heute/Morgen/+1 Woche/Datum …) for tasks; the last
-     segment is always "Datum …" with the calendar icon. A native
-     `DatePicker` only for one-off dates such as "Im Bestand seit".
+     segment is always "Datum …" with the calendar icon (icon only on phones in
+     the four-segment future mode, so nothing wraps). A native `DatePicker`
+     only for one-off dates such as "Im Bestand seit".
+   - **Field order:** what the record is about first (Pflanze in harvest,
+     pantry, seeds and pests; the animal in livestock dialogs), then the
+     details, then Datum, then Notizen. Tasks are the exception: the due date
+     is the point of a task, so it comes right after the title.
    - **Notizen** is an optional `Textarea` with a placeholder that fits the
      record: `common.notesPlaceholder` for crops, otherwise the dialog's own key
      (`livestock.{feed,health,production}.notesPlaceholder`, `calendar.`,
@@ -64,7 +72,17 @@ covered here, copy the pattern from the reference page
      wrap to two lines; keep labels short so they don't have to.
    - A required choice without an unambiguous default (e.g. the bed when
      watering) starts empty ("Beet wählen …"); prefill only from a deep link,
-     the last entry or a single option.
+     the last entry or a single option. A choice may start on its most likely
+     value when that value is the common case and harmless if kept (expense
+     category, task type "Sonstiges", health "Kontrolle"). A choice that
+     depends on an earlier field appears only once that field is set (pantry
+     method after the plant).
+   - **Prefilled numbers** only where the default is a real, typical value the
+     user usually keeps (custom plant days, seed packets 1 and this year, a new
+     bed 1,2 × 2,4 m); every other numeric field starts empty with a
+     "z. B." placeholder.
+   - Paired fields align on their inputs (`items-end`), so a label that wraps
+     never pushes its field below its neighbour.
    - Placeholders that list examples end in a typographic ellipsis "…" (German
      with a space before it): "z. B. Aussaat, Frost, Ernte …". A single example
      value needs none: "z. B. Ingwer", "z. B. 4,00".
