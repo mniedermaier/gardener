@@ -17,7 +17,9 @@ import { familyNameKeys, type PlantFamily } from "@/data/plantFamilies";
 
 // The icon of a custom plant is the id of a catalogue SVG, so custom plants look
 // like the rest of the catalogue (PlantIconDisplay also still renders old emoji icons).
-const ICONS = ["lettuce", "kale", "carrot", "potato", "onion", "garlic", "bean", "corn", "pumpkin", "cucumber", "tomato", "pepper", "strawberry", "raspberry", "basil", "sunflower"];
+const ICONS = ["lettuce", "kale", "carrot", "potato", "onion", "garlic", "bean", "corn", "pumpkin", "cucumber", "tomato", "pepper", "strawberry", "basil", "sunflower"];
+/** The neutral sprout leads the grid and is the visible default: 16 tiles, 4 × 4 / 8 × 2. */
+const ICON_TILES = [NEUTRAL_ICON, ...ICONS];
 
 interface Props {
   open: boolean;
@@ -27,23 +29,33 @@ interface Props {
   onDeleted?: () => void;
 }
 
+/**
+ * Category, sun, water and the sowing timing start unset (DESIGN_SYSTEM rule 9:
+ * a wrong guess there is a silent data error); Save waits until they are chosen.
+ */
 interface Draft {
   name: string;
-  category: PlantCategory;
+  category: PlantCategory | "";
   /** "" = not set: crop rotation treats the plant as "Sonstige". */
   family: PlantFamily | "";
   sowing: SowingDraft;
+  /** Unset for a new plant: mode and its week selects have no default. */
+  sowModeSet: boolean;
+  sowTimingSet: { sow: boolean; indoors: boolean; transplant: boolean };
   icon: string;
   /** The user picked a symbol: changing the category no longer changes it. */
   iconTouched: boolean;
-  sun: SunRequirement;
-  water: WaterNeed;
+  sun: SunRequirement | "";
+  water: WaterNeed | "";
   spacingCm: number;
   harvestMin: number;
   harvestMax: number;
 }
 
-const EMPTY: Draft = { name: "", category: "vegetable", family: "", sowing: DEFAULT_SOWING, icon: NEUTRAL_ICON, iconTouched: false, sun: "full", water: "medium", spacingCm: 0, harvestMin: 0, harvestMax: 0 };
+const EMPTY: Draft = {
+  name: "", category: "", family: "", sowing: DEFAULT_SOWING, sowModeSet: false, sowTimingSet: { sow: false, indoors: false, transplant: false },
+  icon: NEUTRAL_ICON, iconTouched: false, sun: "", water: "", spacingCm: 0, harvestMin: 0, harvestMax: 0,
+};
 
 const FAMILIES = (Object.keys(familyNameKeys) as PlantFamily[]).filter((f) => f !== "other");
 
@@ -53,7 +65,8 @@ const range = (from: number, to: number) => Array.from({ length: to - from + 1 }
 function toDraft(p?: Plant): Draft {
   if (!p) return EMPTY;
   return {
-    name: p.displayName ?? "", category: p.category, family: p.family ?? "", sowing: sowingDraftOf(p), icon: p.icon, iconTouched: true, sun: p.sunRequirement, water: p.waterNeed,
+    name: p.displayName ?? "", category: p.category, family: p.family ?? "", sowing: sowingDraftOf(p),
+    sowModeSet: true, sowTimingSet: { sow: true, indoors: true, transplant: true }, icon: p.icon, iconTouched: true, sun: p.sunRequirement, water: p.waterNeed,
     spacingCm: p.spacingCm, harvestMin: p.harvestDaysMin, harvestMax: p.harvestDaysMax,
   };
 }
@@ -76,10 +89,12 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
   const name = draft.name.trim();
   // Only once both are filled: typing "ab" before "bis" is not an error yet.
   const harvestError = draft.harvestMin > 0 && draft.harvestMax > 0 && draft.harvestMax < draft.harvestMin ? t("plants.form.harvestError") : undefined;
-  const valid = name.length > 0 && !harvestError && draft.spacingCm > 0 && draft.harvestMin > 0;
+  const timingSet = draft.sowModeSet && (draft.sowing.mode === "direct" ? draft.sowTimingSet.sow : draft.sowTimingSet.indoors && draft.sowTimingSet.transplant);
+  const valid = name.length > 0 && !harvestError && draft.spacingCm > 0 && draft.harvestMin > 0
+    && draft.category !== "" && draft.sun !== "" && draft.water !== "" && timingSet;
 
   const handleSave = () => {
-    if (!valid) return;
+    if (!valid || !draft.category || !draft.sun || !draft.water) return;
     const fields = {
       displayName: name,
       category: draft.category,
@@ -141,21 +156,22 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
         <Input label={t("plants.customName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("plants.form.namePlaceholder")} autoFocus />
         {/* Symbol right after the name: it is identity, not a detail. */}
         <div>
-          {/* The chosen symbol is named next to the label: no silent default. */}
+          {/* The chosen symbol is named next to the label; the neutral sprout is the visible default. */}
           <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("plants.customIcon")}
-            {ICONS.includes(draft.icon) && <span className="font-normal text-gray-600 dark:text-gray-400">: {getPlantName(draft.icon)}</span>}
+            <span className="font-normal text-gray-600 dark:text-gray-400">: {ICONS.includes(draft.icon) ? getPlantName(draft.icon) : t("plants.form.iconNeutral")}</span>
           </span>
-          {/* 16 icons: 4 × 4 on phones, 8 × 2 on wider screens — no row ends with a lone tile. Only an old emoji icon of an edited plant is added as an extra tile; the neutral default is not a choice. */}
-          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">
-            {(ICONS.includes(draft.icon) || draft.icon === NEUTRAL_ICON ? ICONS : [...ICONS, draft.icon]).map((ic) => (
+          {/* 16 tiles: 4 × 4 on phones, 8 × 2 wider — no row ends with a lone tile. An old emoji icon of an edited plant replaces the sprout tile. */}
+          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8 sm:gap-2" role="radiogroup" aria-labelledby="custom-plant-icon-label">
+            {(ICON_TILES.includes(draft.icon) ? ICON_TILES : [draft.icon, ...ICONS]).map((ic) => (
               <button
                 key={ic}
                 type="button"
+                role="radio"
                 onClick={() => patch({ icon: ic, iconTouched: true })}
-                aria-label={ICONS.includes(ic) ? getPlantName(ic) : ic}
-                title={ICONS.includes(ic) ? getPlantName(ic) : undefined}
-                aria-pressed={draft.icon === ic}
+                aria-label={ICONS.includes(ic) ? getPlantName(ic) : t("plants.form.iconNeutral")}
+                title={ICONS.includes(ic) ? getPlantName(ic) : t("plants.form.iconNeutral")}
+                aria-checked={draft.icon === ic}
                 className={`flex h-11 items-center justify-center rounded-lg border ${
                   draft.icon === ic
                     ? "border-garden-500 bg-garden-50 ring-1 ring-garden-500 dark:bg-garden-500/15"
@@ -172,6 +188,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           <Select
             label={t("plants.form.category")}
             value={draft.category}
+            placeholder={t("plants.form.categoryChoose")}
             onChange={(e) => {
               const category = e.target.value as PlantCategory;
               patch({ category });
@@ -193,22 +210,41 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             <SegmentedControl
               fullWidth
               label={t("plants.form.sowMode")}
-              value={draft.sowing.mode}
-              onChange={(mode) => patchSowing({ mode })}
+              value={draft.sowModeSet ? draft.sowing.mode : ""}
+              onChange={(mode) => { if (mode) { patch({ sowModeSet: true }); patchSowing({ mode }); } }}
               options={[{ value: "direct", label: t("plants.form.sowDirect") }, { value: "indoors", label: t("plants.form.sowIndoors") }]}
             />
           </div>
-          {draft.sowing.mode === "direct" ? (
-            <Select label={t("plants.form.sowWhen")} value={String(draft.sowing.sowWeeks)} onChange={(e) => patchSowing({ sowWeeks: Number(e.target.value) })} options={relOptions(-8, 8)} />
+          {!draft.sowModeSet ? null : draft.sowing.mode === "direct" ? (
+            <Select
+              label={t("plants.form.sowWhen")}
+              value={draft.sowTimingSet.sow ? String(draft.sowing.sowWeeks) : ""}
+              placeholder={t("plants.form.timingChoose")}
+              onChange={(e) => { patch({ sowTimingSet: { ...draft.sowTimingSet, sow: true } }); patchSowing({ sowWeeks: Number(e.target.value) }); }}
+              options={relOptions(-8, 8)}
+            />
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              <Select label={t("plants.form.indoorsWhen")} value={String(draft.sowing.indoorsWeeks)} onChange={(e) => patchSowing({ indoorsWeeks: Number(e.target.value) })} options={relOptions(-12, -1)} />
-              <Select label={t("plants.form.transplantWhen")} value={String(draft.sowing.transplantWeeks)} onChange={(e) => patchSowing({ transplantWeeks: Number(e.target.value) })} options={relOptions(-4, 6)} />
+              <Select
+                label={t("plants.form.indoorsWhen")}
+                value={draft.sowTimingSet.indoors ? String(draft.sowing.indoorsWeeks) : ""}
+                placeholder={t("plants.form.timingChoose")}
+                onChange={(e) => { patch({ sowTimingSet: { ...draft.sowTimingSet, indoors: true } }); patchSowing({ indoorsWeeks: Number(e.target.value) }); }}
+                options={relOptions(-12, -1)}
+              />
+              <Select
+                label={t("plants.form.transplantWhen")}
+                value={draft.sowTimingSet.transplant ? String(draft.sowing.transplantWeeks) : ""}
+                placeholder={t("plants.form.timingChoose")}
+                onChange={(e) => { patch({ sowTimingSet: { ...draft.sowTimingSet, transplant: true } }); patchSowing({ transplantWeeks: Number(e.target.value) }); }}
+                options={relOptions(-4, 6)}
+              />
             </div>
           )}
         </div>
         <div>
-          <div className="grid grid-cols-2 gap-4">
+          {/* Three short numbers in one row from sm; on phones the spacing gets its own row. */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <Input
               label={t("plants.form.harvestMin")}
               inputMode="numeric"
@@ -224,18 +260,18 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
               error={harvestError}
               onChange={(e) => patch({ harvestMax: Number(e.target.value.replace(/\D/g, "")) })}
             />
+            <Input
+              label={t("plants.form.spacingCm")}
+              inputMode="numeric"
+              wrapperClassName="col-span-2 sm:col-span-1"
+              placeholder={t("common.examplePlaceholder", { value: 30 })}
+              value={String(draft.spacingCm || "")}
+              onChange={(e) => patch({ spacingCm: Number(e.target.value.replace(/\D/g, "")) })}
+            />
           </div>
           {/* One shared hint for both fields: what the days count from. */}
           {!harvestError && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.form.daysAfterSowing")}</p>}
         </div>
-        <Input
-          label={t("plants.form.spacingCm")}
-          inputMode="numeric"
-          wrapperClassName="sm:w-1/2 sm:pr-2"
-          placeholder={t("common.examplePlaceholder", { value: 30 })}
-          value={String(draft.spacingCm || "")}
-          onChange={(e) => patch({ spacingCm: Number(e.target.value.replace(/\D/g, "")) })}
-        />
         <div>
           <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("plants.details.sun")}</p>
           <SegmentedControl

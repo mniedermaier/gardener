@@ -795,7 +795,7 @@
       "namePlaceholder": "p. ej., jengibre",
       "daysAfterSowing": "Ambos contados desde la siembra.",
       "family": "Familia botánica",
-      "familyUnknown": "Elegir…",
+      "familyUnknown": "Elige una familia…",
       "sowMode": "Siembra",
       "sowDirect": "Directa en el bancal",
       "sowIndoors": "En semillero",
@@ -808,7 +808,10 @@
       "weeksBefore_many": "{{count}} semanas antes de la última helada",
       "weeksAfter_one": "{{count}} semana después de la última helada",
       "weeksAfter_other": "{{count}} semanas después de la última helada",
-      "weeksAfter_many": "{{count}} semanas después de la última helada"
+      "weeksAfter_many": "{{count}} semanas después de la última helada",
+      "categoryChoose": "Elige una categoría…",
+      "timingChoose": "Elige el momento…",
+      "iconNeutral": "Neutro"
     },
     "detail": {
       "today": "Hoy",
@@ -1994,7 +1997,9 @@
     "onionSets": "Bulbillos",
     "itemsCrops_one": "{{count}} cultivo",
     "itemsCrops_other": "{{count}} cultivos",
-    "itemsCrops_many": "{{count}} cultivos"
+    "itemsCrops_many": "{{count}} cultivos",
+    "sourceChoose": "Elige el origen…",
+    "yearHarvested": "Año de cosecha"
   },
   "soil": {
     "title": "Suelo",

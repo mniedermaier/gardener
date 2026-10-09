@@ -40,14 +40,15 @@ interface Draft {
   quantity: string;
   unit: SeedUnit;
   year: string;
-  source: SeedSource;
+  /** "" = not chosen yet: where seed came from is never guessed (rule 9). */
+  source: SeedSource | "";
   shopName: string;
   cost: string;
   notes: string;
 }
 
 const emptyDraft = (plantId = ""): Draft => ({
-  plantId, variety: "", quantity: "1", unit: "packets", year: String(CURRENT_YEAR), source: "shop", shopName: "", cost: "", notes: "",
+  plantId, variety: "", quantity: "1", unit: "packets", year: String(CURRENT_YEAR), source: "", shopName: "", cost: "", notes: "",
 });
 
 const num = (s: string) => Number(s.trim().replace(",", "."));
@@ -128,14 +129,14 @@ export function SeedInventory() {
 
   const handleSave = () => {
     setSubmitted(true);
-    if (!draft.plantId || errors.quantity || errors.year || errors.cost) { focusFirstInvalid(); return; }
+    if (!draft.plantId || !draft.source || errors.quantity || errors.year || errors.cost) { focusFirstInvalid(); return; }
     const fields = {
       plantId: draft.plantId,
       variety: draft.variety.trim() || undefined,
       quantity: quantityNum,
       unit: draft.unit,
       yearAcquired: yearNum,
-      source: draft.source,
+      source: draft.source as SeedSource,
       shopName: draft.source === "shop" ? draft.shopName.trim() || undefined : undefined,
       cost: draft.source === "shop" ? costNum || undefined : undefined,
       notes: draft.notes.trim() || undefined,
@@ -322,7 +323,7 @@ export function SeedInventory() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={!draft.plantId}>{t("common.save")}</Button>
+            <Button onClick={handleSave} disabled={!draft.plantId || !draft.source}>{t("common.save")}</Button>
           </>
         }
       >
@@ -353,13 +354,15 @@ export function SeedInventory() {
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input label={t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
+            {/* Source first: the year means "bought" or "harvested" depending on it. */}
             <Select
               label={t("seeds.source")}
               value={draft.source}
+              placeholder={t("seeds.sourceChoose")}
               onChange={(e) => patch({ source: e.target.value as SeedSource })}
               options={SOURCES.map((s) => ({ value: s, label: t(`seeds.sources.${s}`) }))}
             />
+            <Input label={draft.source === "saved" ? t("seeds.yearHarvested") : t("seeds.year")} inputMode="numeric" value={draft.year} onChange={(e) => patch({ year: e.target.value })} error={errors.year} />
           </div>
           {/* Shop and price only matter for bought seed. */}
           {draft.source === "shop" && (

@@ -22,6 +22,7 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { ChoiceTiles } from "@/components/ui/ChoiceTiles";
 import { LABEL_CLASS } from "@/components/ui/Field";
 import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
@@ -393,32 +394,12 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
       <div className="space-y-4">
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} placeholder={t("livestock.chooseAnimal")} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
         {/* A small fixed set (8): icon tiles, like the animal species (DESIGN_SYSTEM rule 9). */}
-        <div>
-          <p id="health-type-label" className={LABEL_CLASS}>{t("livestock.healthType")}</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-labelledby="health-type-label">
-            {HEALTH_EVENT_TYPES.map((ty) => {
-              const Icon = HEALTH_ICON[ty];
-              const selected = type === ty;
-              return (
-                <button
-                  key={ty}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => setType(ty)}
-                  className={`flex min-h-11 items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm ${
-                    selected
-                      ? "border-garden-500 bg-garden-50 font-medium text-garden-800 ring-1 ring-garden-500 dark:bg-garden-500/15 dark:text-garden-200"
-                      : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
-                  }`}
-                >
-                  <Icon size={16} aria-hidden="true" className="shrink-0" />
-                  <span className="min-w-0 truncate">{t(`livestock.healthTypes.${ty}`)}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <ChoiceTiles
+          label={t("livestock.healthType")}
+          value={type}
+          onChange={setType}
+          options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`), icon: HEALTH_ICON[ty] }))}
+        />
         <Input label={t("livestock.healthDesc")} optional value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t(`livestock.healthDescPlaceholders.${type}`)} />
         <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
@@ -500,34 +481,12 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
     >
       <div className="space-y-4">
         {!animal && (
-          <fieldset>
-            <legend className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.animalType")}</legend>
-            {/* Two columns on phones ("Bienenvölker" must not break mid-word), four on wider screens;
-                no row ends with a lone tile: on phones an odd last tile spans the row. */}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {ANIMAL_TYPES.map((ty, i) => {
-                const Icon = ANIMAL_ICON[ty];
-                const selected = type === ty;
-                return (
-                  <button
-                    key={ty}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => setType(ty)}
-                    className={`flex min-h-11 min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2 text-left text-sm transition-colors sm:gap-2 sm:px-3 ${i === ANIMAL_TYPES.length - 1 && ANIMAL_TYPES.length % 2 === 1 ? "col-span-2 sm:col-span-1" : ""} ${
-                      selected
-                        ? "border-garden-600 bg-garden-50 font-medium text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
-                        : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
-                    }`}
-                  >
-                    {/* Fixed icon box: every tile starts its label at the same x, whatever the glyph's width. */}
-                    <span className="inline-flex size-5 shrink-0 items-center justify-center" aria-hidden="true"><Icon size={18} /></span>
-                    <span className="min-w-0 leading-tight hyphens-auto">{t(`livestock.types.${ty}`)}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
+          <ChoiceTiles
+            label={t("livestock.animalType")}
+            value={type}
+            onChange={setType}
+            options={ANIMAL_TYPES.map((ty) => ({ value: ty, label: t(`livestock.types.${ty}`), icon: ANIMAL_ICON[ty] }))}
+          />
         )}
         <Input label={t("livestock.animalName")} optional value={name} onChange={(e) => setName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
         {/* The count is short, the date long ("9. Oktober 2026"): give the date the room. */}

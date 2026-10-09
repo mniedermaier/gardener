@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChoiceTiles } from "@/components/ui/ChoiceTiles";
 import { useTranslation } from "react-i18next";
 import { ArrowLeftRight, ArrowUpDown, ChartColumn, Flame, Grid2x2, Network, Scale, Sprout, Trash2, Wheat, Zap, type LucideIcon } from "lucide-react";
 import type { Bed, ColdFrameConfig, ContainerConfig, EnvironmentType, GreenhouseConfig, RaisedBedConfig } from "@/types/garden";
@@ -113,34 +114,12 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
     >
       <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid) onSave(draft); }}>
         <Input label={t("planner.bedName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("planner.bedNamePlaceholder")} autoFocus />
-        <fieldset>
-          <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("planner.environment")}</legend>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="radiogroup" aria-label={t("planner.environment")}>
-            {ALL_ENVIRONMENTS.map((env) => {
-              const Icon = ENVIRONMENT_LUCIDE[env];
-              const selected = draft.environmentType === env;
-              return (
-                <button
-                  key={env}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => patch({ environmentType: env })}
-                  className={cn(
-                    // Icon left of the label on every width, like the other choice tiles.
-                    "flex min-h-11 items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm leading-tight transition-colors",
-                    selected
-                      ? "border-garden-600 bg-garden-50 font-medium text-garden-800 ring-1 ring-garden-600 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200 dark:ring-garden-400"
-                      : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5",
-                  )}
-                >
-                  <Icon size={18} aria-hidden="true" className="shrink-0" />
-                  <span className="leading-tight">{t(`planner.environmentTypes.${env}`)}</span>
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
+        <ChoiceTiles
+          label={t("planner.environment")}
+          value={draft.environmentType}
+          onChange={(env) => patch({ environmentType: env })}
+          options={ALL_ENVIRONMENTS.map((env) => ({ value: env, label: t(`planner.environmentTypes.${env}`), icon: ENVIRONMENT_LUCIDE[env] }))}
+        />
         {/* Text fields with a decimal keypad: a native number field shows spin arrows and the browser's separator ("1.8"), not the app's ("1,8"). */}
         <div className="grid grid-cols-2 gap-4">
           <Input label={t("planner.widthM")} inputMode="decimal" value={widthText} onChange={(e) => { setWidthText(e.target.value); patch({ widthM: parseMetres(e.target.value) }); }} />

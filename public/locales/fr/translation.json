@@ -795,7 +795,7 @@
       "namePlaceholder": "p. ex. gingembre",
       "daysAfterSowing": "Les deux comptés à partir du semis.",
       "family": "Famille botanique",
-      "familyUnknown": "Choisir…",
+      "familyUnknown": "Choisir une famille…",
       "sowMode": "Semis",
       "sowDirect": "Direct en pleine terre",
       "sowIndoors": "À l’abri",
@@ -808,7 +808,10 @@
       "weeksBefore_many": "{{count}} semaines avant la dernière gelée",
       "weeksAfter_one": "{{count}} semaine après la dernière gelée",
       "weeksAfter_other": "{{count}} semaines après la dernière gelée",
-      "weeksAfter_many": "{{count}} semaines après la dernière gelée"
+      "weeksAfter_many": "{{count}} semaines après la dernière gelée",
+      "categoryChoose": "Choisir une catégorie…",
+      "timingChoose": "Choisir le moment…",
+      "iconNeutral": "Neutre"
     },
     "detail": {
       "today": "Aujourd’hui",
@@ -1994,7 +1997,9 @@
     "onionSets": "Bulbilles",
     "itemsCrops_one": "{{count}} culture",
     "itemsCrops_other": "{{count}} cultures",
-    "itemsCrops_many": "{{count}} cultures"
+    "itemsCrops_many": "{{count}} cultures",
+    "sourceChoose": "Choisir la provenance…",
+    "yearHarvested": "Année de récolte"
   },
   "soil": {
     "title": "Sol",

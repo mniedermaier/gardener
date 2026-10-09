@@ -321,7 +321,6 @@ export function PestTracker() {
           </div>
           {/* Rule 9: details, then the date, then the free text. */}
           <DateField label={t("pests.date")} value={draft.date} onChange={(date) => patch({ date })} />
-          <Textarea label={t("pests.description")} optional value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
           {/* A new report rarely has a treatment yet: folded away, open when editing one that has it. */}
           {draft.treatmentOpen ? (
             <Textarea label={t("pests.treatment")} optional hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
@@ -334,6 +333,8 @@ export function PestTracker() {
           {draft.treatment.trim() && (
             <Checkbox label={t("pests.organicOnly")} checked={draft.organic} onChange={(e) => patch({ organic: e.target.checked })} />
           )}
+          {/* Rule 9: the free text closes the form and is called "Notizen" in every dialog. */}
+          <Textarea label={t("harvest.notes")} optional value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
         </div>
       </Modal>
     </div>

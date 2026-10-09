@@ -775,7 +775,7 @@
       "namePlaceholder": "e.g. Ginger",
       "daysAfterSowing": "Both counted from sowing.",
       "family": "Plant family",
-      "familyUnknown": "Choose…",
+      "familyUnknown": "Choose a family…",
       "sowMode": "Sowing",
       "sowDirect": "Direct in the bed",
       "sowIndoors": "Start indoors",
@@ -786,7 +786,10 @@
       "weeksBefore_one": "{{count}} week before the last frost",
       "weeksBefore_other": "{{count}} weeks before the last frost",
       "weeksAfter_one": "{{count}} week after the last frost",
-      "weeksAfter_other": "{{count}} weeks after the last frost"
+      "weeksAfter_other": "{{count}} weeks after the last frost",
+      "categoryChoose": "Choose a category…",
+      "timingChoose": "Choose timing…",
+      "iconNeutral": "Neutral"
     },
     "detail": {
       "today": "Today",
@@ -1899,7 +1902,9 @@
     "notesPlaceholder": "e.g. germination rate, origin…",
     "onionSets": "Onion sets",
     "itemsCrops_one": "{{count}} crop",
-    "itemsCrops_other": "{{count}} crops"
+    "itemsCrops_other": "{{count}} crops",
+    "sourceChoose": "Choose a source…",
+    "yearHarvested": "Harvest year"
   },
   "soil": {
     "title": "Soil",

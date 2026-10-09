@@ -775,7 +775,7 @@
       "namePlaceholder": "z. B. Ingwer",
       "daysAfterSowing": "Beide gezählt ab der Aussaat.",
       "family": "Pflanzenfamilie",
-      "familyUnknown": "Wählen …",
+      "familyUnknown": "Familie wählen …",
       "sowMode": "Aussaat",
       "sowDirect": "Direkt ins Beet",
       "sowIndoors": "Vorziehen",
@@ -786,7 +786,10 @@
       "weeksBefore_one": "{{count}} Woche vor dem letzten Frost",
       "weeksBefore_other": "{{count}} Wochen vor dem letzten Frost",
       "weeksAfter_one": "{{count}} Woche nach dem letzten Frost",
-      "weeksAfter_other": "{{count}} Wochen nach dem letzten Frost"
+      "weeksAfter_other": "{{count}} Wochen nach dem letzten Frost",
+      "categoryChoose": "Kategorie wählen …",
+      "timingChoose": "Zeitpunkt wählen …",
+      "iconNeutral": "Neutral"
     },
     "detail": {
       "today": "Heute",
@@ -1899,7 +1902,9 @@
     "notesPlaceholder": "z. B. Keimrate, Herkunft …",
     "onionSets": "Steckzwiebeln",
     "itemsCrops_one": "{{count}} Kultur",
-    "itemsCrops_other": "{{count}} Kulturen"
+    "itemsCrops_other": "{{count}} Kulturen",
+    "sourceChoose": "Quelle wählen …",
+    "yearHarvested": "Erntejahr"
   },
   "soil": {
     "title": "Boden",
