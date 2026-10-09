@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { Select } from "@/components/ui/Select";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductionChart } from "./ProductionChart";
@@ -128,16 +129,27 @@ export function ProductionPage() {
             </Card>
           ) : (
             <section className="space-y-3">
-              {(animals.length > 1 || productTypes.length > 1) && (
-                <div className={`grid gap-3 sm:max-w-lg ${animals.length > 1 && productTypes.length > 1 ? "grid-cols-2" : "sm:grid-cols-2"}`}>
-                  {animals.length > 1 && (
-                    <Select label={t("livestock.filterAnimal")} value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
-                  )}
-                  {productTypes.length > 1 && (
-                    <Select label={t("livestock.filterProduct")} value={filterType} onChange={(e) => setFilterType(e.target.value)} placeholder={t("livestock.production.allProducts")} options={productTypes.map((ty) => ({ value: ty, label: t(`livestock.products.${ty}`) }))} />
-                  )}
-                </div>
-              )}
+              {/* Filters sit in the list header instead of a row of their own. */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("livestock.production.entries")}</h2>
+                {(animals.length > 1 || productTypes.length > 1) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {productTypes.length > 1 && (
+                      <SegmentedControl
+                        size="sm"
+                        inline
+                        label={t("livestock.filterProduct")}
+                        value={filterType}
+                        onChange={setFilterType}
+                        options={[{ value: "", label: t("common.all") }, ...productTypes.map((ty) => ({ value: ty as string, label: t(`livestock.products.${ty}`) }))]}
+                      />
+                    )}
+                    {animals.length > 1 && (
+                      <Select aria-label={t("livestock.filterAnimal")} wrapperClassName="w-48" value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
+                    )}
+                  </div>
+                )}
+              </div>
               {filtered.length === 0 ? (
                 <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
               ) : (

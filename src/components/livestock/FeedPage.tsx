@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Bird, Coins, Pencil, Plus, Trash2, Wheat } from "lucide-react";
+import { Bird, Pencil, Plus, Trash2, Wheat } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
@@ -74,7 +74,7 @@ export function FeedPage() {
             hero={{
               label: t("livestock.feedCost30"),
               value: f.formatCurrency(stats.last30Days),
-              icon: Coins,
+              icon: Wheat,
               hint: t("livestock.feedEntriesCount", { count: stats.entriesLast30Days }),
             }}
             items={[

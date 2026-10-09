@@ -1639,7 +1639,8 @@
       "subtitle": "Œufs, miel et autres productions de vos animaux.",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici œufs, miel ou lait, avec totaux hebdomadaires et évolution.",
       "yearHint": "~{{amount}} attendus à ce jour",
-      "emptyTitle": "Œufs et miel en un coup d’œil"
+      "emptyTitle": "Œufs et miel en un coup d’œil",
+      "entries": "Saisies"
     },
     "feed": {
       "title": "Alimentation",
@@ -1839,7 +1840,9 @@
     "tabTreatments": "Soins",
     "costPerUnit": "Coût par unité",
     "noEggsToday": "Aucun œuf noté aujourd’hui",
-    "addYield": "Noter un rendement"
+    "addYield": "Noter un rendement",
+    "monthValues": "Valeurs mensuelles",
+    "monthAvg": "Moy. {{amount}} par mois avec saisies"
   },
   "seeds": {
     "title": "Semences",
@@ -1958,7 +1961,7 @@
     "phAdvice": {
       "limeStrong": "Nettement sous la plage cible (pH {{range}}). Apporter de la chaux agricole ou du lithothamne, idéalement en automne, et refaire une mesure après un an.",
       "limeLight": "Un peu sous la plage cible (pH {{range}}). Une petite dose de lithothamne suffit ; ne pas trop chauler.",
-      "optimal": "Dans la plage cible des cultures (pH {{range}}). Ni chaux ni soufre nécessaires : apporter du compost avec modération (2–3 l par m² et par an).",
+      "optimal": "Dans la plage cible des cultures (pH {{range}}). Ni chaux ni soufre nécessaires : rien à faire pour le pH.",
       "noLime": "Un peu au-dessus de la plage cible (pH {{range}}). Ne pas chauler, pas de cendre de bois. Le terreau de feuilles, le compost d’écorce et les aiguilles de pin abaissent lentement le pH ; le compost ordinaire est neutre à basique, à utiliser avec parcimonie. Le soufre est inutile.",
       "sulfur": "Nettement au-dessus de la plage cible (pH {{range}}). Incorporer du soufre élémentaire par petites doses ; ni chaux ni cendre de bois.",
       "limeVeto": "Ne pas chauler : un pH de {{ph}} convient à {{crops}} (cible {{range}}). {{reason}} Les autres cultures de la planche s’en accommodent ; chauler après la récolte, pour la culture suivante.",

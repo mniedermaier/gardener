@@ -1571,7 +1571,8 @@
       "subtitle": "Eggs, honey and other yields from your animals.",
       "emptyText": "Add an animal first. Then you log eggs, honey or milk here and see weekly totals and the trend.",
       "yearHint": "~{{amount}} expected to date",
-      "emptyTitle": "Keep track of eggs and honey"
+      "emptyTitle": "Keep track of eggs and honey",
+      "entries": "Entries"
     },
     "feed": {
       "title": "Feed",
@@ -1756,7 +1757,9 @@
     "tabTreatments": "Treatments",
     "costPerUnit": "Cost per unit",
     "noEggsToday": "No eggs logged today yet",
-    "addYield": "Log yield"
+    "addYield": "Log yield",
+    "monthValues": "Monthly values",
+    "monthAvg": "Avg. {{amount}} per month with entries"
   },
   "seeds": {
     "title": "Seeds",
@@ -1870,7 +1873,7 @@
     "phAdvice": {
       "limeStrong": "Well below the target range (pH {{range}}). Apply garden lime or calcified seaweed, ideally in autumn, and test again after a year.",
       "limeLight": "Slightly below the target range (pH {{range}}). A small dose of calcified seaweed is enough – do not over-lime.",
-      "optimal": "Within the crops' target range (pH {{range}}). No lime or sulphur needed – add compost in moderation (2–3 l per m² a year).",
+      "optimal": "Within the crops' target range (pH {{range}}). No lime or sulphur needed – nothing to do for the pH.",
       "noLime": "Slightly above the target range (pH {{range}}). Do not lime and no wood ash. Leaf mould, bark compost and pine needles lower the pH slowly; ordinary garden compost is neutral to alkaline, so use it sparingly. Sulphur is not needed.",
       "sulfur": "Well above the target range (pH {{range}}). Work in elemental sulphur in small doses; no lime and no wood ash.",
       "limeVeto": "Do not lime: pH {{ph}} suits {{crops}} (target {{range}}). {{reason}} The other crops in the bed cope with it; lime after the harvest, for the next crop.",

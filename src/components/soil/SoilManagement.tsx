@@ -227,8 +227,8 @@ export function SoilManagement() {
             />
           </Card>
         ) : (
-          // Masonry columns: cards keep their own height and fill the holes a two-column grid leaves.
-          <div className="gap-4 md:columns-2">
+          // Row order (read across, like every other grid); items-start keeps short cards short.
+          <div className="grid items-start gap-4 md:grid-cols-2">
             {sortedTests.map((s) => {
               const assessment = assessPh(s.ph, beds.byId.get(s.bedId)?.plantIds ?? []);
               const { advice, target } = assessment;
@@ -241,7 +241,7 @@ export function SoilManagement() {
                 return level === "optimal" ? [] : [t(`soil.nutrientAdvice.${n}.${level}`)];
               });
               return (
-                <article key={s.id} className="relative mb-4 break-inside-avoid rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
+                <article key={s.id} className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
@@ -308,9 +308,10 @@ export function SoilManagement() {
                       const level = nutrientLevel(n, value);
                       return (
                         <div key={n}>
-                          <dt className="flex items-baseline justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+                          <dt className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>{t(`soil.nutrients.${n}`)}</span>
-                            <span className={level === "optimal" ? "" : "font-medium text-warning"}>{t(`soil.levels.${level}`)}</span>
+                            {/* Same status language as the pH badge above. */}
+                            <Badge size="sm" tone={level === "optimal" ? "positive" : "warning"}>{t(`soil.levels.${level}`)}</Badge>
                           </dt>
                           <dd className="mt-0.5">
                             <span className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{nutrientValue(n, value)}</span>

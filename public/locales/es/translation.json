@@ -1639,7 +1639,8 @@
       "subtitle": "Huevos, miel y otros rendimientos de tus animales.",
       "emptyText": "Añade primero un animal. Después registras aquí huevos, miel o leche y ves los totales semanales y la evolución.",
       "yearHint": "~{{amount}} esperados hasta hoy",
-      "emptyTitle": "Huevos y miel bajo control"
+      "emptyTitle": "Huevos y miel bajo control",
+      "entries": "Registros"
     },
     "feed": {
       "title": "Alimento",
@@ -1839,7 +1840,9 @@
     "tabTreatments": "Tratamientos",
     "costPerUnit": "Coste por unidad",
     "noEggsToday": "Hoy aún no hay huevos registrados",
-    "addYield": "Registrar rendimiento"
+    "addYield": "Registrar rendimiento",
+    "monthValues": "Valores mensuales",
+    "monthAvg": "Media {{amount}} por mes con registros"
   },
   "seeds": {
     "title": "Semillas",
@@ -1958,7 +1961,7 @@
     "phAdvice": {
       "limeStrong": "Bastante por debajo del rango objetivo (pH {{range}}). Aporta cal agrícola o lithothamnium, mejor en otoño, y vuelve a medir al cabo de un año.",
       "limeLight": "Algo por debajo del rango objetivo (pH {{range}}). Basta una pequeña dosis de lithothamnium; no encales de más.",
-      "optimal": "Dentro del rango objetivo de los cultivos (pH {{range}}). No hace falta cal ni azufre; aporta compost con moderación (2–3 l por m² y año).",
+      "optimal": "Dentro del rango objetivo de los cultivos (pH {{range}}). No hace falta cal ni azufre: el pH no necesita nada.",
       "noLime": "Algo por encima del rango objetivo (pH {{range}}). No encales ni uses ceniza de madera. El mantillo de hojas, el compost de corteza y la pinocha bajan el pH poco a poco; el compost normal es neutro o algo alcalino, úsalo con moderación. No hace falta azufre.",
       "sulfur": "Bastante por encima del rango objetivo (pH {{range}}). Incorpora azufre elemental en pequeñas dosis; nada de cal ni ceniza de madera.",
       "limeVeto": "No encales: el pH {{ph}} conviene a {{crops}} (objetivo {{range}}). {{reason}} Los demás cultivos del bancal lo toleran; encala después de la cosecha, para el cultivo siguiente.",

@@ -7,6 +7,13 @@ import type { Plant } from "@/types/plant";
 import type { CellConflict, CellSide } from "@/lib/placementValidation";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { cn } from "@/lib/cn";
+import { familyColors, plantFamilyMap } from "@/data/plantFamilies";
+
+/**
+ * Cell tint = the crop's family (same colours as the crop-rotation legend):
+ * Mangold, Spinat and Rote Bete share one, so a bed reads as rotation groups.
+ */
+const familyTint = (plant: Plant | undefined) => (plant ? familyColors[plantFamilyMap[plant.id] ?? "other"] : "transparent");
 
 export type GridMode = "inspect" | "place" | "path";
 
@@ -62,7 +69,7 @@ const PlannerCell = memo(function PlannerCell({
   const { setNodeRef, isOver } = useDroppable({ id: `cell-${bedId}-${x}-${y}`, data: { bedId, x, y } });
   const empty = !plant && !isPath;
 
-  const style: CSSProperties & Record<"--tint", string> = { width: cellSize, height: cellSize, "--tint": plant?.color ?? "transparent" };
+  const style: CSSProperties & Record<"--tint", string> = { width: cellSize, height: cellSize, "--tint": familyTint(plant) };
   const shadow = conflictShadow(conflict);
   if (shadow) style.boxShadow = shadow;
 
@@ -89,7 +96,7 @@ const PlannerCell = memo(function PlannerCell({
         empty && mode === "path" && "cursor-pointer bg-white/60 hover:bg-gray-200 dark:bg-white/[0.03] dark:hover:bg-white/10",
         empty && mode === "inspect" && "bg-white/60 dark:bg-white/[0.03]",
         // Dark: one neutral cell surface, the family colour as a bottom bar (side-by-side tints turned muddy).
-        plant && "bg-(--tint)/15 dark:bg-white/[0.07] dark:shadow-[inset_0_-3px_0_0_var(--tint)]",
+        plant && "bg-(--tint)/15 dark:bg-white/[0.07] dark:shadow-[inset_0_-3px_0_0_color-mix(in_oklab,var(--tint)_65%,white)]",
         plant && mode !== "path" && "cursor-pointer hover:brightness-95 dark:hover:brightness-125",
         plant && mode === "path" && "cursor-pointer",
         selected && "ring-2 ring-garden-600 ring-offset-1 ring-offset-gray-100 dark:ring-garden-300 dark:ring-offset-gray-900",
@@ -268,9 +275,9 @@ export const MiniBedGrid = memo(function MiniBedGrid({ bed, plantMap, conflicts,
           key={key}
           className={cn(
             "relative flex items-center justify-center rounded-[3px]",
-            isPath ? "bg-gray-300/70 dark:bg-earth-700/40" : plant ? "bg-(--tint)/15 dark:bg-white/[0.08] dark:shadow-[inset_0_-2px_0_0_var(--tint)]" : "bg-white/70 dark:bg-white/[0.03]",
+            isPath ? "bg-gray-300/70 dark:bg-earth-700/40" : plant ? "bg-(--tint)/15 dark:bg-white/[0.08] dark:shadow-[inset_0_-2px_0_0_color-mix(in_oklab,var(--tint)_65%,white)]" : "bg-white/70 dark:bg-white/[0.03]",
           )}
-          style={{ width: cell, height: cell, ...(plant ? { "--tint": plant.color } : {}) } as CSSProperties}
+          style={{ width: cell, height: cell, ...(plant ? { "--tint": familyTint(plant) } : {}) } as CSSProperties}
         >
           {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={icon} />}
           {/* The same ⚠ as in the editor and on the card's "ungünstige Nachbarn" badge — no unexplained edge marks. */}
