@@ -315,17 +315,21 @@ export function PantryPage() {
               </div>
             )}
 
-            <div>
-              {active.length > 3 && (
-                <Select
-                  wrapperClassName="mb-4 sm:max-w-xs"
-                  label={t("pantry.method")}
-                  value={filterMethod}
-                  onChange={(e) => setFilterMethod(e.target.value)}
-                  placeholder={t("pantry.allMethods")}
-                  options={METHODS.map((m) => ({ value: m, label: t(`preservation.methods.${m}`) }))}
-                />
-              )}
+            <section className="space-y-3">
+              {/* Same list header as the livestock records: heading left, filter right. */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("pantry.stockTab")}</h2>
+                {active.length > 3 && (
+                  <Select
+                    aria-label={t("pantry.method")}
+                    wrapperClassName="w-full sm:w-48"
+                    value={filterMethod}
+                    onChange={(e) => setFilterMethod(e.target.value)}
+                    placeholder={t("pantry.allMethods")}
+                    options={METHODS.map((m) => ({ value: m, label: t(`preservation.methods.${m}`) }))}
+                  />
+                )}
+              </div>
               {stock.length === 0 ? (
                 <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("pantry.emptyFilter")}</p></Card>
               ) : (
@@ -371,7 +375,7 @@ export function PantryPage() {
                   })}
                 </List>
               )}
-            </div>
+            </section>
           </div>
         )
       )}

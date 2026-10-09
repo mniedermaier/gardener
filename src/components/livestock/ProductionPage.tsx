@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { expectationStart, expectedShareToDate, getActualProducts } from "@/lib/metrics";
+import { expectationBasisDate, expectationStart, expectedShareToDate, getActualProducts } from "@/lib/metrics";
 import { ANNUAL_YIELD, EGG_LAYERS, type AnimalProduct, type ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -74,12 +74,22 @@ export function ProductionPage() {
   // against what the herd should have yielded by now, then the week.
   const heroType = herdTypes[0];
   const heroExpected = heroType ? expectedToDate(heroType) : 0;
+  const heroAmount = heroType === "eggs" ? f.formatNumber(heroExpected, { maximumFractionDigits: 0 }) : heroType ? formatProductAmount(heroType, heroExpected, f, t) : "";
+  // Name the basis when it is not 1 January (earliest arrival/first entry of the producing animals).
+  const heroBasis = heroType
+    ? animals
+      .filter((a) => ANNUAL_YIELD[a.type]?.some((x) => x.product === heroType))
+      .map((a) => expectationBasisDate(expectationStart(a, animalProducts), now))
+      .reduce<string | null>((min, d) => (d === null ? min : min === null || d < min ? d : min), null)
+    : null;
   const heroFigure = heroType
     ? {
         ...yearFigure(heroType),
         icon: PRODUCT_ICON[heroType],
         hint: heroExpected > 0
-          ? t("livestock.production.yearHint", { amount: heroType === "eggs" ? f.formatNumber(heroExpected, { maximumFractionDigits: 0 }) : formatProductAmount(heroType, heroExpected, f, t) })
+          ? (heroBasis
+            ? t("livestock.production.yearHintSince", { amount: heroAmount, date: f.formatDate(heroBasis, "short") })
+            : t("livestock.production.yearHint", { amount: heroAmount }))
           : undefined,
       }
     : null;

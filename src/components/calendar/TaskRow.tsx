@@ -1,6 +1,6 @@
 import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, ClipboardList, Repeat } from "lucide-react";
+import { Check, Repeat } from "lucide-react";
 import type { Task } from "@/types/task";
 import type { Plant } from "@/types/plant";
 import type { TaskGroup } from "@/lib/tasks";
@@ -9,7 +9,6 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { ListRow } from "@/components/ui/List";
 import { Badge } from "@/components/ui/Badge";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { TASK_TYPE_ICONS } from "./taskTypeIcons";
 
 interface Props {
   task: Task;
@@ -27,7 +26,7 @@ interface Props {
 /**
  * One task row for the dashboard and the task page: round checkbox on the
  * left (tap to complete, tap again to reopen), title with overdue/recurring
- * badges, "Typ · Beet · Pflanze · Datum" meta, plant or type icon on the right.
+ * badges, "Typ · Beet · Pflanze · Datum" meta, the plant icon on the right.
  */
 export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onComplete, onReopen, onOpen, actions }: Props) {
   const { t } = useTranslation();
@@ -35,7 +34,6 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
   const getPlantName = usePlantName();
   const done = !!task.completedDate;
   const due = task.dueDate.slice(0, 10);
-  const TypeIcon = TASK_TYPE_ICONS[task.type] ?? ClipboardList;
   const plantName = plant ? getPlantName(plant.id) : null;
 
   const meta = [
@@ -85,13 +83,13 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
       }
       meta={meta}
       description={task.description}
-      // One slot, one size: the plant when the task has one, else the task type. No fill —
-      // a grey tile read as a button and swallowed pale plant icons (garlic).
-      trailing={
-        <span className="inline-flex size-8 items-center justify-center text-gray-500 dark:text-gray-400" aria-hidden="true">
-          {plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} /> : <TypeIcon size={16} />}
+      // The trailing slot has one meaning: the plant the task is about. The task
+      // type is already named in the meta line (a line icon there read as a button).
+      trailing={plant ? (
+        <span className="inline-flex size-8 items-center justify-center" aria-hidden="true">
+          <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />
         </span>
-      }
+      ) : undefined}
       actions={actions}
     />
   );

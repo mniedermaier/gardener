@@ -256,9 +256,11 @@ export function WeatherDashboard() {
       )}
 
       {weather && (
-        // Phones: now → forecast → daylight. Desktop: now and daylight on the left, forecast spans both rows.
-        <div className="grid gap-6 lg:grid-cols-5 lg:grid-rows-[auto_1fr] lg:items-start">
-          <Card className="lg:col-span-2">
+        // Phones: now → forecast → daylight (order). Desktop: now and daylight stacked on
+        // the left, the daylight card stretching so both columns end on one line.
+        <div className="grid gap-6 lg:grid-cols-5 lg:items-stretch">
+          <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-6">
+          <Card className="order-1">
             <div className="-mt-1 -mr-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
               <MapPin size={14} aria-hidden="true" className="shrink-0" />
               <span className="min-w-0 truncate">{weather.locationName}</span>
@@ -290,12 +292,14 @@ export function WeatherDashboard() {
             {locationLat !== null && locationLon !== null && (
               <div className="mt-4 border-t border-gray-100 pt-3 dark:border-white/5">
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{t("weather.dayArcTitle")}</p>
-                <DayArc lat={locationLat} lon={locationLon} className="mx-auto mt-1 max-w-sm" />
+                <DayArc lat={locationLat} lon={locationLon} className="mx-auto mt-1 max-w-60" />
               </div>
             )}
           </Card>
+          <SunlightWidget compact className="order-3 lg:flex-1" />
+          </div>
 
-          <Card padding="none" className="lg:col-span-3 lg:row-span-2">
+          <Card padding="none" className="order-2 lg:col-span-3">
             <div className="px-4 pt-4 sm:px-6 sm:pt-5">
               <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })} />
             </div>
@@ -347,9 +351,6 @@ export function WeatherDashboard() {
             </p>
           </Card>
 
-          <div className="lg:col-span-2">
-            <SunlightWidget compact />
-          </div>
         </div>
       )}
 

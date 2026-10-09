@@ -906,7 +906,10 @@
     "fallbackAuth": "OpenWeatherMap a refusé votre clé API. En attendant que vous la vérifiiez, les données météo viennent d’Open-Meteo.",
     "fallbackUnavailable": "OpenWeatherMap ne répond pas pour le moment. Les données météo viennent d’Open-Meteo en attendant.",
     "dayArcTitle": "Le soleil aujourd’hui",
-    "dayArcLabel": "Lever {{sunrise}}, coucher {{sunset}}, {{hours}} de jour"
+    "dayArcLabel": "Lever {{sunrise}}, coucher {{sunset}}, {{hours}} de jour",
+    "daylightLeft": "Encore {{hours}} h de jour",
+    "afterSunset": "Soleil couché à {{time}}",
+    "beforeSunrise": "Lever du soleil à {{time}}"
   },
   "calendar": {
     "subtitle": "Ce qui est à faire au jardin, trié par échéance.",
@@ -980,7 +983,7 @@
     "taskTitle": "Titre",
     "taskType": "Type",
     "taskDate": "Date",
-    "generate": "Générer",
+    "generate": "Proposer des tâches",
     "generated_one": "{{count}} tâche générée",
     "generated_many": "{{count}} tâches générées",
     "generated_other": "{{count}} tâches générées",
@@ -1655,7 +1658,8 @@
       "yearHint": "~{{amount}} attendus à ce jour",
       "emptyTitle": "Œufs et miel en un coup d’œil",
       "entries": "Saisies",
-      "notesPlaceholder": "p. ex. météo, pause de ponte…"
+      "notesPlaceholder": "p. ex. météo, pause de ponte…",
+      "yearHintSince": "~{{amount}} attendus depuis le {{date}}"
     },
     "feed": {
       "title": "Alimentation",
@@ -1701,7 +1705,8 @@
       "dueNames": "Vérifier la vaccination : {{names}}",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire.",
       "emptyTitle": "Vaccins et soins en un coup d’œil",
-      "notesPlaceholder": "p. ex. vétérinaire, prochain rendez-vous…"
+      "notesPlaceholder": "p. ex. vétérinaire, prochain rendez-vous…",
+      "vaccCoverageScoped": "Groupes à vacciner, protégés"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1855,7 +1860,6 @@
     "tabYields": "Rendements",
     "tabFeedings": "Rations",
     "tabTreatments": "Soins",
-    "costPerUnit": "Coût par unité",
     "noEggsToday": "Aucun œuf noté aujourd’hui",
     "notesPlaceholder": "p. ex. comportement, marque d’aliment…",
     "monthAvgLabel": "Moyenne par mois",
@@ -1869,7 +1873,8 @@
       "treatment": "p. ex. traitement anti-acariens",
       "death": "p. ex. renard, vieillesse",
       "other": "p. ex. parage des onglons"
-    }
+    },
+    "ofExpectedSince": "sur ~{{amount}} attendus depuis le {{date}}"
   },
   "seeds": {
     "title": "Semences",
@@ -2165,7 +2170,7 @@
     "bedCount_one": "{{count}} planche",
     "bedCount_many": "{{count}} planches",
     "bedCount_other": "{{count}} planches",
-    "afterFrost": "Après le gel"
+    "afterFrost": "Après la vague de froid (dès le {{date}})"
   },
   "expenses": {
     "title": "Coûts",

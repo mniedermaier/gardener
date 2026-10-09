@@ -21,7 +21,7 @@ import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
 import { PlantableNowRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
-import { agendaPlantCount } from "@/lib/advisor";
+import { agendaPlantCount, autumnPhaseWindows } from "@/lib/advisor";
 import { useToday } from "@/hooks/useToday";
 
 interface Range {
@@ -35,6 +35,8 @@ interface PlantTimeline {
   bedName: string;
   envType: EnvironmentType;
   phases: Partial<Record<Phase, Range>>;
+  /** Autumn sowing/planting windows, drawn in the lane of their phase. */
+  autumn: Array<{ phase: Phase; range: Range }>;
 }
 
 /** Rows of "Jetzt dran" before "n weitere anzeigen" — the same cap as the sowing list. */
@@ -89,7 +91,8 @@ export function SeasonTimeline() {
           if (!plant) continue;
           const phases: PlantTimeline["phases"] = {};
           for (const w of getPhaseWindows(plant, frostDate, { frostProtectionWeeks: protection })) phases[w.phase] = { start: w.start, end: w.end };
-          result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases });
+          const autumn = autumnPhaseWindows(plantId, frostDate.getFullYear(), protection, bed.environmentType).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
+          result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn });
         }
       }
     }
@@ -318,9 +321,13 @@ const TimelineRow = memo(function TimelineRow({
   frostPct: number;
   describe: (p: Phase, r: Range) => string;
 }) {
-  const summary = PHASES.filter((p) => tl.phases[p]).map((p) => describe(p, tl.phases[p]!)).join("; ");
+  const bars = [
+    ...PHASES.filter((p) => tl.phases[p]).map((p) => ({ phase: p, range: tl.phases[p]! })),
+    ...tl.autumn,
+  ];
+  const summary = bars.map((b) => describe(b.phase, b.range)).join("; ");
   return (
-    <li className="flex items-center gap-3 py-1.5">
+    <li className="flex items-center gap-3 py-1">
       <div className="flex w-44 shrink-0 items-center gap-2">
         <PlantIconDisplay plantId={tl.plantId} emoji={icon} size={20} />
         <div className="min-w-0">
@@ -333,18 +340,17 @@ const TimelineRow = memo(function TimelineRow({
           )}
         </div>
       </div>
-      <div className="relative h-9 flex-1 rounded-md bg-gray-50 dark:bg-white/[0.03]" role="img" aria-label={`${name}: ${summary}`}>
-        {PHASES.map((p, i) => {
-          const r = tl.phases[p];
-          if (!r) return null;
+      <div className="relative h-8 flex-1 rounded-md bg-gray-50 dark:bg-white/[0.03]" role="img" aria-label={`${name}: ${summary}`}>
+        {/* One lane per phase; autumn windows share the lane of their phase. */}
+        {bars.map(({ phase: p, range: r }) => {
           const left = pct(r.start);
           const width = Math.max(pct(r.end) - left, 1);
           const fill = phaseFill(p);
           return (
             <div
-              key={p}
-              className={`absolute h-[7px] rounded-sm ${fill.className}`}
-              style={{ ...fill.style, left: `${left}%`, width: `${width}%`, top: `${2 + i * 8}px` }}
+              key={`${p}-${r.start.getTime()}`}
+              className={`absolute h-1.5 rounded-sm ${fill.className}`}
+              style={{ ...fill.style, left: `${left}%`, width: `${width}%`, top: `${2 + PHASES.indexOf(p) * 7}px` }}
               title={describe(p, r)}
             />
           );

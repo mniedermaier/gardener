@@ -49,6 +49,13 @@ export const DayArc = memo(function DayArc({ lat, lon, className = "" }: { lat: 
       .join(" ");
   };
   const hours = t("sunlight.hoursValue", { hours: f.formatNumber(info.hours, { maximumFractionDigits: 1 }) });
+  // What the arc means right now: daylight left, or when the sun went down / comes up.
+  const left = Math.max(0, info.set.getTime() - now.getTime()) / 3_600_000;
+  const status = day
+    ? t("weather.daylightLeft", { hours: f.formatNumber(left, { maximumFractionDigits: 1 }) })
+    : info.progress >= 1
+      ? t("weather.afterSunset", { time: time(info.set) })
+      : t("weather.beforeSunrise", { time: time(info.rise) });
   const label = t("weather.dayArcLabel", { sunrise: time(info.rise), sunset: time(info.set), hours });
 
   return (
@@ -63,6 +70,7 @@ export const DayArc = memo(function DayArc({ lat, lon, className = "" }: { lat: 
         <text x={W - PAD_X} y={H - 4} textAnchor="middle" className="fill-gray-500 text-[11px] tabular-nums dark:fill-gray-400">{time(info.set)}</text>
         <text x={W / 2} y={BASE - 6} textAnchor="middle" className="fill-gray-700 text-[12px] font-medium tabular-nums dark:fill-gray-200">{hours}</text>
       </svg>
+      <figcaption className="mt-1 text-center text-xs text-gray-600 dark:text-gray-400">{status}</figcaption>
     </figure>
   );
 });

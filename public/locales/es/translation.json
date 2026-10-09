@@ -906,7 +906,10 @@
     "fallbackAuth": "OpenWeatherMap rechazó tu clave de API. Hasta que la revises, los datos del tiempo vienen de Open-Meteo.",
     "fallbackUnavailable": "OpenWeatherMap no responde ahora mismo. Mientras tanto, los datos del tiempo vienen de Open-Meteo.",
     "dayArcTitle": "El sol hoy",
-    "dayArcLabel": "Amanecer {{sunrise}}, atardecer {{sunset}}, {{hours}} de luz"
+    "dayArcLabel": "Amanecer {{sunrise}}, atardecer {{sunset}}, {{hours}} de luz",
+    "daylightLeft": "Quedan {{hours}} h de luz",
+    "afterSunset": "El sol se puso a las {{time}}",
+    "beforeSunrise": "Amanecer a las {{time}}"
   },
   "calendar": {
     "subtitle": "Lo que toca en el huerto, ordenado por fecha.",
@@ -980,7 +983,7 @@
     "taskTitle": "Título",
     "taskType": "Tipo",
     "taskDate": "Fecha",
-    "generate": "Generar",
+    "generate": "Sugerir tareas",
     "generated_one": "Se generó {{count}} tarea",
     "generated_many": "Se generaron {{count}} tareas",
     "generated_other": "Se generaron {{count}} tareas",
@@ -1655,7 +1658,8 @@
       "yearHint": "~{{amount}} esperados hasta hoy",
       "emptyTitle": "Huevos y miel bajo control",
       "entries": "Registros",
-      "notesPlaceholder": "p. ej. tiempo, pausa de puesta…"
+      "notesPlaceholder": "p. ej. tiempo, pausa de puesta…",
+      "yearHintSince": "~{{amount}} esperados desde el {{date}}"
     },
     "feed": {
       "title": "Alimento",
@@ -1701,7 +1705,8 @@
       "dueNames": "Revisar vacunación: {{names}}",
       "emptyText": "Añade primero un animal. Después registras aquí vacunas, desparasitaciones y visitas al veterinario y ves qué toca.",
       "emptyTitle": "Vacunas y tratamientos bajo control",
-      "notesPlaceholder": "p. ej. veterinario, próxima cita…"
+      "notesPlaceholder": "p. ej. veterinario, próxima cita…",
+      "vaccCoverageScoped": "Grupos con vacuna obligatoria, protegidos"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1855,7 +1860,6 @@
     "tabYields": "Rendimientos",
     "tabFeedings": "Raciones",
     "tabTreatments": "Tratamientos",
-    "costPerUnit": "Coste por unidad",
     "noEggsToday": "Hoy aún no hay huevos registrados",
     "notesPlaceholder": "p. ej. comportamiento, marca de pienso…",
     "monthAvgLabel": "Media mensual",
@@ -1869,7 +1873,8 @@
       "treatment": "p. ej. antiácaros",
       "death": "p. ej. zorro, vejez",
       "other": "p. ej. recorte de pezuñas"
-    }
+    },
+    "ofExpectedSince": "de ~{{amount}} esperados desde el {{date}}"
   },
   "seeds": {
     "title": "Semillas",
@@ -2165,7 +2170,7 @@
     "bedCount_one": "{{count}} bancal",
     "bedCount_many": "{{count}} bancales",
     "bedCount_other": "{{count}} bancales",
-    "afterFrost": "Tras la helada"
+    "afterFrost": "Tras la ola de frío (desde el {{date}})"
   },
   "expenses": {
     "title": "Costes",

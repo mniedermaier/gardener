@@ -1,4 +1,4 @@
-import { expectedShareToDate } from "@/lib/metrics";
+import { expectationBasisDate, expectedShareToDate } from "@/lib/metrics";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2 } from "lucide-react";
@@ -64,6 +64,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
           // Same time basis as the recorded value: expected so far this year (since arrival or the first entry).
+          const basis = expectationBasisDate(expectedFrom, now);
           const expectedQty = y.quantity * animal.count * expectedShareToDate(y.product, now, expectedFrom);
           // "225 Eier von ~1.019 bis heute erwartet": the unit is already in the value, count only.
           const expected = y.product === "eggs" ? f.formatNumber(expectedQty, { maximumFractionDigits: 0 }) : formatProductAmount(y.product, expectedQty, f, t);
@@ -76,7 +77,9 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
               <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
                 <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
-                  {t("livestock.ofExpectedToDate", { amount: expected })}
+                  {basis
+                    ? t("livestock.ofExpectedSince", { amount: expected, date: f.formatDate(basis, "short") })
+                    : t("livestock.ofExpectedToDate", { amount: expected })}
                 </span>
               </dd>
             </div>

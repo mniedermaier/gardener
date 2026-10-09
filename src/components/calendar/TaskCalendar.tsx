@@ -120,7 +120,8 @@ export function TaskCalendar() {
   );
   const openCount = typed.filter((x) => !x.completedDate).length;
   const doneCount = typed.length - openCount;
-  const overdueCount = tasks.filter((x) => !x.completedDate && x.dueDate.slice(0, 10) < todayKey).length;
+  // Same rule as the groups (lib/tasks): a missed daily task is today's, not overdue.
+  const overdueCount = tasks.filter((x) => !x.completedDate && x.dueDate.slice(0, 10) < todayKey && x.recurring?.interval !== "daily").length;
   const totalOpen = tasks.filter((x) => !x.completedDate).length;
 
   const groups = useMemo(() => {

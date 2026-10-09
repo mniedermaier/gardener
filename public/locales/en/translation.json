@@ -881,7 +881,10 @@
     "fallbackAuth": "OpenWeatherMap rejected your API key. Until you check it, weather data comes from Open-Meteo.",
     "fallbackUnavailable": "OpenWeatherMap is unreachable right now. Weather data comes from Open-Meteo in the meantime.",
     "dayArcTitle": "Sun today",
-    "dayArcLabel": "Sunrise {{sunrise}}, sunset {{sunset}}, {{hours}} of daylight"
+    "dayArcLabel": "Sunrise {{sunrise}}, sunset {{sunset}}, {{hours}} of daylight",
+    "daylightLeft": "{{hours}} h of daylight left",
+    "afterSunset": "Sun set at {{time}}",
+    "beforeSunrise": "Sunrise at {{time}}"
   },
   "calendar": {
     "subtitle": "What's coming up in the garden, sorted by due date.",
@@ -953,7 +956,7 @@
     "taskTitle": "Title",
     "taskType": "Type",
     "taskDate": "Date",
-    "generate": "Generate",
+    "generate": "Suggest tasks",
     "generated_one": "Generated {{count}} task",
     "generated_other": "Generated {{count}} tasks",
     "active": "Active",
@@ -1586,7 +1589,8 @@
       "yearHint": "~{{amount}} expected to date",
       "emptyTitle": "Keep track of eggs and honey",
       "entries": "Entries",
-      "notesPlaceholder": "e.g. weather, laying break…"
+      "notesPlaceholder": "e.g. weather, laying break…",
+      "yearHintSince": "~{{amount}} expected since {{date}}"
     },
     "feed": {
       "title": "Feed",
@@ -1631,7 +1635,8 @@
       "dueNames": "Check vaccination: {{names}}",
       "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due.",
       "emptyTitle": "Keep track of vaccinations and treatments",
-      "notesPlaceholder": "e.g. vet, next appointment…"
+      "notesPlaceholder": "e.g. vet, next appointment…",
+      "vaccCoverageScoped": "Groups needing vaccination, covered"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1771,7 +1776,6 @@
     "tabYields": "Yields",
     "tabFeedings": "Feedings",
     "tabTreatments": "Treatments",
-    "costPerUnit": "Cost per unit",
     "noEggsToday": "No eggs logged today yet",
     "notesPlaceholder": "e.g. behaviour, feed brand…",
     "monthAvgLabel": "Avg. per month",
@@ -1785,7 +1789,8 @@
       "treatment": "e.g. mite treatment",
       "death": "e.g. fox, old age",
       "other": "e.g. hoof trimming"
-    }
+    },
+    "ofExpectedSince": "of ~{{amount}} expected since {{date}}"
   },
   "seeds": {
     "title": "Seeds",
@@ -2069,7 +2074,7 @@
     "showMore_other": "Show {{count}} more",
     "bedCount_one": "{{count}} bed",
     "bedCount_other": "{{count}} beds",
-    "afterFrost": "After the frost"
+    "afterFrost": "After the cold spell (from {{date}})"
   },
   "expenses": {
     "title": "Costs",

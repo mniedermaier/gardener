@@ -316,7 +316,7 @@ export function SoilManagement() {
                           <dt className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>{t(`soil.nutrients.${n}`)}</span>
                             {/* Same status language as the pH badge above. */}
-                            <Badge size="sm" tone={level === "optimal" ? "positive" : "warning"}>{t(`soil.levels.${level}`)}</Badge>
+                            <Badge size="sm" dot tone={level === "optimal" ? "positive" : "warning"}>{t(`soil.levels.${level}`)}</Badge>
                           </dt>
                           <dd className="mt-0.5">
                             <span className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{nutrientValue(n, value)}</span>

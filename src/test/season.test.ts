@@ -119,6 +119,11 @@ describe("task groups (dashboard and task page)", () => {
     expect(taskGroup(task("d", "2026-10-06"), monday)).toBe("tomorrow");
   });
 
+  it("files a missed daily task under today, not overdue", () => {
+    expect(taskGroup(task("g", "2026-10-01", { recurring: { interval: "daily" } }), monday)).toBe("today");
+    expect(taskGroup(task("h", "2026-10-01", { recurring: { interval: "weekly" } }), monday)).toBe("overdue");
+  });
+
   it("orders groups and sorts by due date", () => {
     const groups = groupTasksByDue([task("x", "2026-10-09"), task("y", "2026-10-05"), task("z", "2026-10-07")], monday);
     expect(groups.map((g) => g.group)).toEqual(["today", "next7"]);

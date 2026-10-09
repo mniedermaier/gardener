@@ -184,11 +184,16 @@ export function AnimalDetail() {
               t("livestock.entriesHint", { count: products.length }),
             ].join(" · "),
           },
-          { label: t("livestock.totalCosts"), value: f.formatCurrency(analytics.cost), hint: t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) }) },
-          // The production value already stands in the bars above; the cost per egg / kg is the new figure.
-          analytics.cost > 0 && analytics.perUnit
-            ? { label: t("livestock.costPerUnit"), value: t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) }) }
-            : { label: t("livestock.productionValue"), value: f.formatCurrency(analytics.value) },
+          {
+            label: t("livestock.totalCosts"),
+            value: f.formatCurrency(analytics.cost),
+            // The cost per egg / kg is a derived figure: meta size, under the costs it comes from.
+            hint: [
+              t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) }),
+              analytics.cost > 0 && analytics.perUnit ? t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) }) : null,
+            ].filter(Boolean).join(" · "),
+          },
+          { label: t("livestock.productionValue"), value: f.formatCurrency(analytics.value) },
         ]}
       />
       <div className="mb-6">
@@ -201,7 +206,7 @@ export function AnimalDetail() {
       {products.length > 0 && (
         <Card className="mb-6">
           <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-gray-100">{t("livestock.chartTitle")}</h2>
-          <ProductionChart animalProducts={products} />
+          <ProductionChart animalProducts={products} rangeProducts={animalProducts} months={12} />
         </Card>
       )}
 

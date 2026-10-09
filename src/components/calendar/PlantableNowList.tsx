@@ -97,7 +97,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
                 <PhaseBadge phase={actionPhase(item.actions[0])} label={[...new Set(item.actions.map((a) => t(`advisor.actions.${a}`)))].join(" / ")} />
                 {/* The window closes before the frost is over: no badge-plus-date contradiction, just this. */}
                 {frostBlocks(item, plant) && !windowAfterFrost(item) && (
-                  <Badge tone="warning" size="sm">{t("advisor.afterFrost")}</Badge>
+                  <Badge tone="warning" size="sm">{t("advisor.afterFrost", { date: formatDate(addDays(lastFrostNight!, 1), "short") })}</Badge>
                 )}
               </>
             ) : undefined}
