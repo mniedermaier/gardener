@@ -22,12 +22,14 @@ import { HowCalculated } from "@/components/ui/charts";
 import { HEALTH_ICON, HEALTH_TONE } from "./icons";
 import { HEALTH_EVENT_TYPES, HealthDialog, IconTile, animalLabel, useRecordActions } from "./shared";
 import { groupByMonth } from "./groupByMonth";
+import { useToday } from "@/hooks/useToday";
 
 /** Animals with common routine vaccinations (poultry: ND; rabbits: RHD/Myxo; goats/sheep: clostridia). Bees have none. */
 const VACCINATED_TYPES: AnimalType[] = ["chicken", "duck", "quail", "rabbit", "goat", "sheep"];
 const VACCINATION_INTERVAL_DAYS = 180;
 
 export function HealthPage() {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
@@ -60,7 +62,7 @@ export function HealthPage() {
       if (!VACCINATED_TYPES.includes(a.type)) continue;
       const last = lastVacc.get(a.id);
       const d = last ? toDate(last) : null;
-      const days = d ? differenceInCalendarDays(new Date(), d) : undefined;
+      const days = d ? differenceInCalendarDays(now, d) : undefined;
       if (days === undefined || days > VACCINATION_INTERVAL_DAYS) due.push({ animalId: a.id, lastDate: last, days });
     }
     return {
@@ -68,7 +70,7 @@ export function HealthPage() {
       losses: healthEvents.filter((h) => h.type === "death").length,
       due,
     };
-  }, [healthEvents, animals]);
+  }, [now, healthEvents, animals]);
 
   const groups = groupByMonth(filtered);
   const addButton = (

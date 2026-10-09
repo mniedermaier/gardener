@@ -21,6 +21,7 @@ import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
 import { PlantableNowRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
+import { useToday } from "@/hooks/useToday";
 
 interface Range {
   start: Date;
@@ -36,6 +37,7 @@ interface PlantTimeline {
 }
 
 export function SeasonTimeline() {
+  const now = useToday();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { formatDate } = useFormat();
@@ -47,7 +49,7 @@ export function SeasonTimeline() {
   const plantableCount = sowing.now.length;
 
   const todayKey = todayISO();
-  const today = useMemo(() => startOfDay(toDate(todayKey) ?? new Date()), [todayKey]);
+  const today = useMemo(() => startOfDay(toDate(todayKey) ?? now), [todayKey, now]);
   const year = today.getFullYear();
   const yearStart = startOfYear(today);
   const yearDays = differenceInCalendarDays(endOfYear(today), yearStart) + 1;

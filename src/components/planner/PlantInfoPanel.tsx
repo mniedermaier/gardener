@@ -10,6 +10,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { toDate } from "@/lib/format";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
+import { useToday } from "@/hooks/useToday";
 
 interface Props {
   plant: Plant;
@@ -29,8 +30,9 @@ export const PlantInfoPanel = memo(function PlantInfoPanel({ plant, frostProtect
   const { lastFrostDate } = useStore(useShallow((s) => ({ lastFrostDate: s.lastFrostDate })));
 
   // This season's frost day, even if the stored date is from an earlier year.
-  const stored = toDate(lastFrostDate) ?? new Date();
-  const frost = new Date(new Date().getFullYear(), stored.getMonth(), stored.getDate());
+  const now = useToday();
+  const stored = toDate(lastFrostDate) ?? now;
+  const frost = new Date(now.getFullYear(), stored.getMonth(), stored.getDate());
   const timings: Array<{ label: string; date: Date }> = [];
   const add = (label: string, weeks: number | null) => {
     if (weeks !== null) timings.push({ label, date: addWeeks(frost, weeks - frostProtectionWeeks) });

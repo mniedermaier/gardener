@@ -6,6 +6,7 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useFormat } from "@/hooks/useFormat";
 import type { Garden } from "@/types/garden";
 import type { Plant } from "@/types/plant";
+import { useToday } from "@/hooks/useToday";
 
 interface PrintBedLayoutProps {
   garden: Garden;
@@ -15,6 +16,7 @@ interface PrintBedLayoutProps {
 }
 
 export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }: PrintBedLayoutProps) {
+  const now = useToday();
   const { t } = useTranslation();
   const { formatDate, formatNumber } = useFormat();
 
@@ -24,7 +26,7 @@ export function PrintBedLayout({ garden, plants, gridCellSizeCm, getPlantName }:
     return map;
   }, [plants]);
 
-  const today = formatDate(new Date(), "long");
+  const today = formatDate(now, "long");
 
   return (
     <>

@@ -25,6 +25,7 @@ import { DateField } from "@/components/ui/DateField";
 import { BarChart } from "@/components/ui/charts";
 import { useBeds } from "@/components/records/useBeds";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
+import { useToday } from "@/hooks/useToday";
 
 const METHODS = ["manual", "hose", "drip", "sprinkler", "rain"] as const;
 type Method = (typeof METHODS)[number];
@@ -37,6 +38,7 @@ const num = (s: string) => Number(s.trim().replace(",", "."));
 const weekStart = (d: Date) => startOfWeek(d, { weekStartsOn: 1 });
 
 export function WaterTracker() {
+  const now = useToday();
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
   const { formatDate, formatVolume, formatNumber, locale } = useFormat();
@@ -115,7 +117,6 @@ export function WaterTracker() {
 
   // ---------------------------------------------------------------- aggregates
   const data = useMemo(() => {
-    const now = new Date();
     const thisWeek = weekStart(now);
     const thisMonth = startOfMonth(now);
     let week = 0, weekRain = 0, month = 0;
@@ -140,7 +141,7 @@ export function WaterTracker() {
       .sort((a, b) => b[0] - a[0])
       .map(([ws, entries]) => [new Date(ws), entries.sort((a, b) => b.date.localeCompare(a.date))] as const);
     return { week, weekRain, month, avg, chart, weeks };
-  }, [waterEntries]);
+  }, [now, waterEntries]);
 
   const [weeksShown, setWeeksShown] = useState(4);
   const editing = editingId ? waterEntries.find((e) => e.id === editingId) : undefined;

@@ -7,6 +7,7 @@ import { DatePicker } from "./DatePicker";
 import { LABEL_CLASS } from "./Field";
 import { useFormat } from "@/hooks/useFormat";
 import { toISODate, todayISO } from "@/lib/format";
+import { useToday } from "@/hooks/useToday";
 
 type Choice = "today" | "yesterday" | "custom";
 
@@ -25,10 +26,11 @@ interface DateFieldProps {
  * displayed in the app language).
  */
 export function DateField({ label, value, onChange, allowFuture = false }: DateFieldProps) {
+  const now = useToday();
   const { t } = useTranslation();
   const { formatDate } = useFormat();
   const today = todayISO();
-  const yesterday = toISODate(subDays(new Date(), 1));
+  const yesterday = toISODate(subDays(now, 1));
   const preset: Choice = value === today ? "today" : value === yesterday ? "yesterday" : "custom";
   const [custom, setCustom] = useState(preset === "custom");
   const choice: Choice = custom ? "custom" : preset;

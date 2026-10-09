@@ -7,6 +7,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { BarChart } from "@/components/ui/charts";
 import { getDaylightInfo, getMonthlyDaylight } from "@/lib/sunlight";
+import { useToday } from "@/hooks/useToday";
 
 function Fact({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
@@ -25,7 +26,7 @@ export function SunlightWidget() {
   const { t } = useTranslation();
   const f = useFormat();
   const { locationLat, locationLon } = useStore(useShallow((s) => ({ locationLat: s.locationLat, locationLon: s.locationLon })));
-  const now = useMemo(() => new Date(), []);
+  const now = useToday();
 
   const today = useMemo(() => (locationLat === null || locationLon === null ? null : getDaylightInfo(now, locationLat, locationLon)), [locationLat, locationLon, now]);
   const yearly = useMemo(() => (locationLat === null || locationLon === null ? null : getMonthlyDaylight(locationLat, locationLon, now.getFullYear())), [locationLat, locationLon, now]);

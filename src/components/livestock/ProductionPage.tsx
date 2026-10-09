@@ -22,8 +22,10 @@ import { ProductionChart } from "./ProductionChart";
 import { PRODUCT_ICON } from "./icons";
 import { IconTile, ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
 import { groupByMonth } from "./groupByMonth";
+import { useToday } from "@/hooks/useToday";
 
 export function ProductionPage() {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
@@ -44,16 +46,15 @@ export function ProductionPage() {
     [animalProducts, filterAnimalId, filterType],
   );
 
-  const year = new Date().getFullYear();
+  const year = now.getFullYear();
   const stats = useMemo(() => {
-    const now = new Date();
     const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
     const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
     return {
       eggsWeek: animalProducts.filter((p) => p.type === "eggs" && p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
       year: getActualProducts(animalProducts, year),
     };
-  }, [animalProducts, year]);
+  }, [now, animalProducts, year]);
 
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
   const groups = groupByMonth(filtered);

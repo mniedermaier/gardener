@@ -6,6 +6,7 @@ import { BarChart } from "@/components/ui/charts";
 import { PRODUCT_TYPES } from "@/lib/metrics";
 import { formatProductAmount } from "./shared";
 import { PRODUCT_ICON } from "./icons";
+import { useToday } from "@/hooks/useToday";
 
 interface ProductionChartProps {
   animalProducts: AnimalProduct[];
@@ -17,11 +18,11 @@ interface ProductionChartProps {
  * its own unit (eggs are counted, honey is weighed) — never stacked on one axis.
  */
 export function ProductionChart({ animalProducts, months = 6 }: ProductionChartProps) {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
 
   const { buckets, perType } = useMemo(() => {
-    const now = new Date();
     const buckets = Array.from({ length: months }, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
       return { key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, date: d };
@@ -36,7 +37,7 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
       perType.set(p.type, arr);
     }
     return { buckets, perType };
-  }, [animalProducts, months]);
+  }, [now, animalProducts, months]);
 
   const types = PRODUCT_TYPES.filter((ty) => perType.get(ty)?.some((v) => v > 0));
   if (types.length === 0) {

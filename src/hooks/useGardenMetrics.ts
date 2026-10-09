@@ -17,6 +17,7 @@ import {
   type SeasonYield,
   type SelfSufficiency,
 } from "@/lib/metrics";
+import { useToday } from "@/hooks/useToday";
 
 export interface GardenMetrics {
   /** The period the "actual" numbers cover (calendar year or null = all time). */
@@ -41,7 +42,8 @@ export interface GardenMetrics {
  *   formatCurrency(m.balance.net)
  */
 export function useGardenMetrics(opts: { period?: Period } = {}): GardenMetrics {
-  const period = opts.period === undefined ? new Date().getFullYear() : opts.period;
+  const now = useToday();
+  const period = opts.period === undefined ? now.getFullYear() : opts.period;
   const s = useStore(
     useShallow((st) => ({
       gardens: st.gardens,

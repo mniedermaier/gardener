@@ -34,6 +34,7 @@ import { useToast } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
+import { useToday } from "@/hooks/useToday";
 
 const METHODS: PreservationMethod[] = ["canning", "freezing", "fermenting", "drying", "root_cellar"];
 const METHOD_ICON: Record<PreservationMethod, LucideIcon> = {
@@ -111,6 +112,7 @@ function MethodPicker({ label, value, options, onChange }: { label: string; valu
 }
 
 export function PantryPage() {
+  const now = useToday();
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
   const { formatDate, formatWeight, formatNumber, formatCurrency, formatPercent, locale } = useFormat();
@@ -166,7 +168,7 @@ export function PantryPage() {
   const quantityNum = num(draft.quantity);
   const unitsNum = draft.units.trim() ? Math.round(num(draft.units)) : 0;
   const costNum = draft.supplyCost.trim() ? num(draft.supplyCost) : 0;
-  const expiresDate = toISODate(addMonths(toDate(draft.date) ?? new Date(), SHELF_LIFE_MONTHS[draft.method]));
+  const expiresDate = toISODate(addMonths(toDate(draft.date) ?? now, SHELF_LIFE_MONTHS[draft.method]));
   const errors = {
     plant: submitted && !draft.plantId ? t("pantry.needPlant") : undefined,
     quantity: (submitted || draft.quantity.trim()) && !(quantityNum > 0) ? t("pantry.needQuantity") : undefined,
@@ -209,7 +211,7 @@ export function PantryPage() {
   };
 
   // ---------------------------------------------------------------- data
-  const today = useMemo(() => new Date(), []);
+  const today = now;
   const daysLeft = useCallback((item: PantryItem) => differenceInCalendarDays(toDate(item.expiresDate) ?? today, today), [today]);
   const active = useMemo(() => pantryItems.filter((p) => !p.consumed), [pantryItems]);
   const consumed = useMemo(
