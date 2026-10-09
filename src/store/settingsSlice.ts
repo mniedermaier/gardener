@@ -1,4 +1,5 @@
 import type { StateCreator } from "zustand";
+import { deviceLocale } from "@/lib/deviceLocale";
 
 export interface AlertConfig {
   frostAlertEnabled: boolean;
@@ -37,7 +38,7 @@ export interface SettingsSlice {
 }
 
 export const createSettingsSlice: StateCreator<SettingsSlice> = (set) => ({
-  locale: "de",
+  locale: deviceLocale(),
   weatherApiKey: "",
   locationLat: null,
   locationLon: null,

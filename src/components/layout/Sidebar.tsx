@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Sprout, X } from "lucide-react";
+import { Settings, Sprout, X } from "lucide-react";
 import { NAV_GROUPS, SETTINGS_ENTRY, sectionIdForPath, type NavEntry } from "./navigation";
 
 interface SidebarProps {
@@ -77,6 +77,16 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </span>
             <span className="text-base font-semibold tracking-tight text-gray-900 dark:text-gray-50">{t("app.title")}</span>
           </div>
+          {/* Phones: settings sit in the header, so all groups fit above the fold. */}
+          <div className="flex items-center gap-1 lg:hidden">
+          <NavLink
+            to={SETTINGS_ENTRY.to}
+            onClick={onClose}
+            aria-label={t(SETTINGS_ENTRY.labelKey)}
+            className={({ isActive }) => `inline-flex size-11 items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 ${isActive ? "text-garden-700 dark:text-garden-300" : "text-gray-500 hover:text-gray-800 dark:text-gray-400"}`}
+          >
+            <Settings size={20} aria-hidden="true" />
+          </NavLink>
           <button
             ref={closeRef}
             type="button"
@@ -86,11 +96,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           >
             <X size={20} aria-hidden="true" />
           </button>
+          </div>
         </div>
 
         <nav aria-label={t("shell.mainNavigation")} className="scroll-shadow-y flex-1 overflow-y-auto px-3 pb-6">
           {NAV_GROUPS.map((group) => (
-            <div key={group.id} className={group.labelKey ? "mt-3 lg:mt-4" : "mt-1"}>
+            <div key={group.id} className={group.labelKey ? "mt-2 lg:mt-4" : "mt-1"}>
               {group.labelKey && (
                 <h2 className="mb-1 px-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                   {t(group.labelKey)}
@@ -107,7 +118,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="shrink-0 border-t border-gray-200 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-white/10">
+        <div className="hidden shrink-0 border-t border-gray-200 px-3 pt-3 lg:block pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-white/10">
           <NavItem item={SETTINGS_ENTRY} active={activeId === "settings"} onNavigate={onClose} />
         </div>
       </aside>

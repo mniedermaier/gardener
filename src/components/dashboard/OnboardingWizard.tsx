@@ -87,7 +87,7 @@ function StartOption({ id, name, value, checked, onSelect, icon: Icon, title, de
 }
 
 /** Welcome hero: a small raised bed drawn with the catalogue's own plant icons. */
-const HERO_PLANTS = ["tomato", "lettuce", "carrot", "bean", "strawberry", "pepper", "basil", "zucchini"] as const;
+const HERO_PLANTS = ["tomato", "carrot", "strawberry", "pepper", "pumpkin", "onion", "radish", "cucumber"] as const;
 
 function GardenVignette() {
   return (
@@ -336,12 +336,18 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                       setFrostTouched(true);
                       setFrostDate(`${frostYear}-${c.md}`);
                     }}
-                    options={CLIMATES.map((c) => ({ value: c.value, label: t(`onboarding.climate.${c.value}`) }))}
+                    // Each choice shows its date, so no separate legend line is needed.
+                    options={CLIMATES.map((c) => ({
+                      value: c.value,
+                      label: (
+                        <span className="flex flex-col items-center leading-tight">
+                          {t(`onboarding.climate.${c.value}`)}
+                          <span className="text-xs font-normal opacity-75">{formatDate(`${frostYear}-${c.md}`, "dayMonth")}</span>
+                        </span>
+                      ),
+                    }))}
                     fullWidth
                   />
-                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    {CLIMATES.map((c) => `${t(`onboarding.climate.${c.value}`)} ≈ ${formatDate(`${frostYear}-${c.md}`, "dayMonth")}`).join(" · ")}
-                  </p>
                 </div>
               )}
               <FrostPreview frost={shownFrost} />
@@ -390,7 +396,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               </Button>
             ) : <span />}
             <div className="flex items-center gap-2">
-              <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "secondary" : "primary"}>
+              <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "secondary" : "primary"} className={index === 0 ? "w-full sm:w-auto" : undefined}>
                 {busy && <Loader2 size={16} aria-hidden="true" className="animate-spin" />}
                 {primaryLabel}
                 {step !== "start" && <ArrowRight size={16} aria-hidden="true" />}
