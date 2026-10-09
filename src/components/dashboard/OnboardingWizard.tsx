@@ -2,7 +2,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { LucideIcon } from "lucide-react";
 import {
-  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck, Sun,
+  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -258,7 +258,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
         </div>
 
         {/* Phones: the card fills the screen and the footer sits at the bottom, in thumb reach. */}
-        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[40rem] sm:flex-none">
+        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[44rem] sm:flex-none">
           {step === "welcome" && (
             <>
               <StepHeader icon={Sprout} title={t("onboarding.welcome")} description={t("onboarding.welcomeDesc")} visual={<GardenVignette />} />
@@ -284,14 +284,10 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             <>
               <StepHeader icon={MapPin} title={t("onboarding.locationTitle")} description={t("onboarding.locationDesc")} />
               <LocationPicker value={location} onChange={setLocationDraft} prominent />
-              <ul className="mt-6 space-y-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-white/5 dark:text-gray-400">
-                {([[ShieldCheck, "onboarding.locationPrivate"], [Sun, "onboarding.locationUses"]] as const).map(([Icon, key]) => (
-                  <li key={key} className="flex items-start gap-2.5">
-                    <Icon size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
-                    {t(key)}
-                  </li>
-                ))}
-              </ul>
+              <p className="mt-4 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <ShieldCheck size={14} aria-hidden="true" className="mt-px shrink-0 text-garden-600 dark:text-garden-300" />
+                {t("onboarding.locationPrivate")}
+              </p>
             </>
           )}
 
@@ -371,9 +367,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             </>
           )}
 
-          <div className="h-6 shrink-0 sm:hidden" aria-hidden="true" />
+          <div className="h-6 shrink-0 sm:h-8" aria-hidden="true" />
           {/* Phones: the footer sticks to the bottom edge, so "Weiter"/"Anlegen" is never below the fold. */}
-          <div className="sticky bottom-0 -mx-4 -mb-4 mt-auto flex items-center justify-between gap-2 rounded-b-xl border-t border-gray-100 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:mt-8 sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none dark:border-white/10 dark:bg-gray-900/95 sm:dark:bg-transparent">
+          <div className="sticky bottom-0 -mx-4 -mb-4 mt-auto flex items-center justify-between gap-2 rounded-b-xl border-t border-gray-100 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:mt-auto sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none dark:border-white/10 dark:bg-gray-900/95 sm:dark:bg-transparent">
             {index > 0 ? (
               <Button variant="ghost" onClick={back}>
                 <ArrowLeft size={16} aria-hidden="true" />

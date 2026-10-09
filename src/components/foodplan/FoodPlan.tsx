@@ -59,8 +59,9 @@ export function FoodPlan() {
         {/* Nothing planted yet: the targets per crop are the useful part, so they stay;
             only the 0 % figures give way to a slim hint. */}
         {empty ? (
-          // The need is known before anything grows: it is the page's figure.
-          // The one way forward is the planner button in the crop list below.
+          // The need is known before anything grows: it is the page's figure,
+          // and the one way forward (a first bed) sits right under it.
+          <div className="space-y-3">
           <KeyFigures
             hero={{
               label: t("foodplan.annualNeed"),
@@ -71,9 +72,16 @@ export function FoodPlan() {
             }}
             items={[
               { label: t("foodplan.areaNeededLabel"), value: f.formatArea(plan.neededAreaM2), hint: t("foodplan.areaNeededHint") },
-              { label: t("foodplan.grownShare"), value: f.formatPercent(0), hint: t("foodplan.grownShareHint") },
             ]}
           />
+          <div className="flex flex-col gap-3 rounded-xl border border-garden-200 bg-garden-50 p-4 sm:flex-row sm:items-center dark:border-garden-500/30 dark:bg-garden-500/10">
+            <p className="min-w-0 flex-1 text-sm text-gray-700 dark:text-gray-300">{t("foodplan.emptyCta")}</p>
+            <Button onClick={() => navigate("/planner")} className="shrink-0">
+              <LayoutGrid size={16} aria-hidden="true" />
+              {t("planner.addBed")}
+            </Button>
+          </div>
+          </div>
         ) : (
           <div>
             <KeyFigures
@@ -165,11 +173,16 @@ export function FoodPlan() {
               </List>
             )}
             {unplanted.length > 0 && (
-              <details open={empty || undefined} className="group rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
+              <details className="group rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
                 <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 [&::-webkit-details-marker]:hidden">
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.unplantedTitle", { count: unplanted.length })}</span>
-                    <span className="block text-xs text-gray-500 dark:text-gray-400">{t("foodplan.unplantedDesc", { area: f.formatArea(unplantedArea) })}</span>
+                    <span className="block text-xs text-gray-500 dark:text-gray-400">
+                      {/* Without beds the area is already the hero's second figure: name the biggest gaps instead. */}
+                      {empty
+                        ? t("foodplan.biggestGaps", { plants: [...unplanted].sort((a, b) => b.targetKg - a.targetKg).slice(0, 3).map((r) => plantName(r.plantId)).join(", ") })
+                        : t("foodplan.unplantedDesc", { area: f.formatArea(unplantedArea) })}
+                    </span>
                   </span>
                   <ChevronDown size={18} aria-hidden="true" className="shrink-0 text-gray-500 transition-transform group-open:rotate-180 dark:text-gray-400" />
                 </summary>
@@ -186,12 +199,14 @@ export function FoodPlan() {
                     );
                   })}
                 </ul>
-                <div className="border-t border-gray-100 px-4 py-3 dark:border-white/5">
-                  <Button variant="secondary" size="sm" onClick={() => navigate("/planner")}>
-                    <LayoutGrid size={16} aria-hidden="true" />
-                    {t("plants.placeInPlanner")}
-                  </Button>
-                </div>
+                {!empty && (
+                  <div className="border-t border-gray-100 px-4 py-3 dark:border-white/5">
+                    <Button variant="secondary" size="sm" onClick={() => navigate("/planner")}>
+                      <LayoutGrid size={16} aria-hidden="true" />
+                      {t("plants.placeInPlanner")}
+                    </Button>
+                  </div>
+                )}
               </details>
             )}
           </section>

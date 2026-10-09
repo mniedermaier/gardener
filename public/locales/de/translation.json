@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Ort suchen",
-    "searchPlaceholder": "z. B. Freising oder 85354",
+    "searchPlaceholder": "z. B. Freising oder 85354 …",
     "results": "Gefundene Orte",
     "searchError": "Ortssuche nicht erreichbar. Nutze den Gerätestandort oder gib Koordinaten ein.",
     "noPlaces": "Kein Ort gefunden. Prüfe die Schreibweise.",
@@ -279,8 +279,7 @@
       "mid": "Mittel",
       "cold": "Rau"
     },
-    "locationPrivate": "Bleibt auf diesem Gerät, kein Konto nötig.",
-    "locationUses": "Nur für Wetter, Sonnenstand und Frosttermine."
+    "locationPrivate": "Nur für Wetter und Frosttermine, bleibt auf diesem Gerät."
   },
   "search": {
     "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen …",
@@ -1395,12 +1394,12 @@
     "annualNeedHint_other": "Gemüse und Obst für {{count}} Personen",
     "areaNeededLabel": "Fläche nötig",
     "areaNeededHint": "für alle Kulturen im Plan",
-    "grownShare": "Angebaut",
-    "grownShareHint": "noch keine Beete bepflanzt",
     "cropPlanDesc": "Sortiert nach der größten Lücke laut Prognose.",
     "bigGap": "Große Lücke",
     "rowOfTarget": "{{actual}} / {{target}}",
-    "rowGap": "fehlen {{kg}} (+{{area}})"
+    "rowGap": "fehlen {{kg}} (+{{area}})",
+    "emptyCta": "Lege ein Beet an, dann zeigt der Plan, wie viel davon du schon anbaust.",
+    "biggestGaps": "Größte Mengen: {{plants}}"
   },
   "sufficiency": {
     "title": "Selbstversorgung",

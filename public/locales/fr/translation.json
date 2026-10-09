@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Rechercher une commune",
-    "searchPlaceholder": "p. ex. Angers",
+    "searchPlaceholder": "p. ex. Angers…",
     "results": "Lieux trouvés",
     "searchError": "Recherche indisponible. Utilisez la position de l’appareil ou saisissez des coordonnées.",
     "noPlaces": "Aucun lieu trouvé. Vérifiez l’orthographe.",
@@ -295,8 +295,7 @@
       "mid": "Moyen",
       "cold": "Rude"
     },
-    "locationPrivate": "Reste sur cet appareil, sans compte.",
-    "locationUses": "Uniquement pour la météo, l’ensoleillement et les gelées."
+    "locationPrivate": "Uniquement pour la météo et les gelées, reste sur cet appareil."
   },
   "planner": {
     "title": "Plan du jardin",
@@ -1456,12 +1455,12 @@
     "annualNeedHint_many": "Légumes et fruits pour {{count}} personnes",
     "areaNeededLabel": "Surface nécessaire",
     "areaNeededHint": "pour toutes les cultures du plan",
-    "grownShare": "Cultivé",
-    "grownShareHint": "aucune planche plantée pour l’instant",
     "cropPlanDesc": "Trié par le plus grand manque prévu.",
     "bigGap": "Gros manque",
     "rowOfTarget": "{{actual}} / {{target}}",
-    "rowGap": "{{kg}} manquants (+{{area}})"
+    "rowGap": "{{kg}} manquants (+{{area}})",
+    "emptyCta": "Ajoute une planche et le plan montrera ce que tu cultives déjà.",
+    "biggestGaps": "Plus grandes quantités : {{plants}}"
   },
   "sufficiency": {
     "title": "Autosuffisance",

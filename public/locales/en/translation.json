@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Find your town",
-    "searchPlaceholder": "e.g. Bristol",
+    "searchPlaceholder": "e.g. Bristol…",
     "results": "Matching places",
     "searchError": "Place search is unavailable. Use your device location or enter coordinates.",
     "noPlaces": "No place found. Check the spelling.",
@@ -283,8 +283,7 @@
       "mid": "Average",
       "cold": "Harsh"
     },
-    "locationPrivate": "Stays on this device, no account needed.",
-    "locationUses": "Used only for weather, sunlight and frost dates."
+    "locationPrivate": "Only for weather and frost dates, stays on this device."
   },
   "planner": {
     "title": "Planner",
@@ -1395,12 +1394,12 @@
     "annualNeedHint_other": "Vegetables and fruit for {{count}} people",
     "areaNeededLabel": "Area needed",
     "areaNeededHint": "for all crops in the plan",
-    "grownShare": "Grown",
-    "grownShareHint": "no beds planted yet",
     "cropPlanDesc": "Sorted by the largest forecast gap.",
     "bigGap": "Large gap",
     "rowOfTarget": "{{actual}} / {{target}}",
-    "rowGap": "{{kg}} short (+{{area}})"
+    "rowGap": "{{kg}} short (+{{area}})",
+    "emptyCta": "Add a bed and the plan shows how much of this you already grow.",
+    "biggestGaps": "Largest amounts: {{plants}}"
   },
   "sufficiency": {
     "title": "Self-sufficiency",

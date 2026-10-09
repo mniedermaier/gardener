@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Buscar localidad",
-    "searchPlaceholder": "p. ej. Valladolid",
+    "searchPlaceholder": "p. ej. Valladolid…",
     "results": "Lugares encontrados",
     "searchError": "La búsqueda no está disponible. Usa la ubicación del dispositivo o introduce coordenadas.",
     "noPlaces": "No se encontró ningún lugar. Revisa la ortografía.",
@@ -295,8 +295,7 @@
       "mid": "Medio",
       "cold": "Duro"
     },
-    "locationPrivate": "Se queda en este dispositivo, sin cuenta.",
-    "locationUses": "Solo para el tiempo, la luz solar y las heladas."
+    "locationPrivate": "Solo para el tiempo y las heladas; se queda en este dispositivo."
   },
   "planner": {
     "title": "Planificador",
@@ -1456,12 +1455,12 @@
     "annualNeedHint_many": "Verdura y fruta para {{count}} personas",
     "areaNeededLabel": "Superficie necesaria",
     "areaNeededHint": "para todos los cultivos del plan",
-    "grownShare": "Cultivado",
-    "grownShareHint": "aún no hay bancales plantados",
     "cropPlanDesc": "Ordenado por el mayor déficit previsto.",
     "bigGap": "Gran déficit",
     "rowOfTarget": "{{actual}} / {{target}}",
-    "rowGap": "faltan {{kg}} (+{{area}})"
+    "rowGap": "faltan {{kg}} (+{{area}})",
+    "emptyCta": "Crea un bancal y el plan mostrará cuánto de esto ya cultivas.",
+    "biggestGaps": "Mayores cantidades: {{plants}}"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
