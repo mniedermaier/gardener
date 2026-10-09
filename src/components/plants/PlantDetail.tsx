@@ -350,20 +350,19 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
       {(description || sowNote || !hasBeds || plant.caloriesPer100g) && (
         <div className="-mt-2 mb-6 max-w-3xl text-sm">
           {sowNote && (
-            <p className="mb-2 inline-flex items-center gap-1.5 font-medium text-garden-700 dark:text-garden-300">
-              <CalendarClock size={14} aria-hidden="true" />
-              {/* No bed yet: one clause on the sowing line instead of a third "add a bed" prompt. */}
-              {sowNote.text}
+            <div className="mb-2">
+              <p className="flex items-start gap-1.5 font-medium text-garden-700 dark:text-garden-300">
+                <CalendarClock size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
+                {sowNote.text}
+              </p>
+              {/* No bed yet: the one way forward sits right under the date. */}
               {!hasBeds && (
-                <>
-                  {" – "}
-                  <button type="button" onClick={addBed} className="inline-flex min-h-11 items-center gap-1 font-semibold underline underline-offset-2 hover:text-garden-800 dark:hover:text-garden-200">
-                    <Plus size={14} aria-hidden="true" />
-                    {t("planner.addBed")}
-                  </button>
-                </>
+                <Button variant="secondary" size="sm" className="mt-2" onClick={addBed}>
+                  <Plus size={14} aria-hidden="true" />
+                  {t("planner.addBed")}
+                </Button>
               )}
-            </p>
+            </div>
           )}
           {!hasBeds && !sowNote && (
             <p className="mb-2 text-gray-600 dark:text-gray-400">

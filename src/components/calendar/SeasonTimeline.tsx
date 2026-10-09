@@ -19,9 +19,9 @@ import { EnvironmentChip } from "@/components/planner/environment";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
 import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
-import { PlantableNowRows } from "./PlantableNowList";
+import { PlantableNowRows, useVisibleAgendaRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
-import { agendaPlantCount, autumnPhaseWindows } from "@/lib/advisor";
+import { autumnPhaseWindows } from "@/lib/advisor";
 import { useToday } from "@/hooks/useToday";
 
 interface Range {
@@ -54,7 +54,7 @@ export function SeasonTimeline() {
   const [filter, setFilter] = useState<string>("all");
   const [nowExpanded, setNowExpanded] = useState(false);
   const sowing = useSowingAgenda();
-  const plantableCount = agendaPlantCount(sowing.now);
+  const plantableCount = useVisibleAgendaRows(sowing.now).length;
 
   const todayKey = todayISO();
   const today = useMemo(() => startOfDay(toDate(todayKey) ?? now), [todayKey, now]);

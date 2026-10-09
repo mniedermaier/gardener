@@ -11,7 +11,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useHarvestReady } from "@/hooks/useHarvestReady";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
-import { agendaPlantCount } from "@/lib/advisor";
+import { useVisibleAgendaRows } from "@/components/calendar/PlantableNowList";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { Card } from "@/components/ui/Card";
@@ -68,6 +68,7 @@ export function Dashboard() {
   const wide = useWide();
   const harvestReady = useHarvestReady(now);
   const sowing = useSowingAgenda();
+  const visibleNow = useVisibleAgendaRows(sowing.now);
   // One weather fetch for the card and the map's frost pins.
   const glance = useWeatherGlance();
   const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
@@ -144,7 +145,7 @@ export function Dashboard() {
                 className="[&>[role=tablist]]:px-2"
                 items={[
                   { value: "harvest", label: t("dashboard.tabHarvest"), count: harvestReady.length },
-                  { value: "sow", label: t("dashboard.tabSow"), count: agendaPlantCount(sowing.now) },
+                  { value: "sow", label: t("dashboard.tabSow"), count: visibleNow.length },
                 ]}
               >
                 <div className="-mt-4">

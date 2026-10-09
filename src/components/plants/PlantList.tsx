@@ -7,6 +7,7 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
+import { useVisibleAgendaRows } from "@/components/calendar/PlantableNowList";
 import { PlantCard } from "./PlantCard";
 import { PlantDetail } from "./PlantDetail";
 import { CustomPlantForm } from "./CustomPlantForm";
@@ -59,7 +60,9 @@ export function PlantList() {
   // "Jetzt säen": the same agenda as the calendar and "Heute", so a new user has
   // a seasonal way into the 47 crops instead of an alphabetical wall.
   const agenda = useSowingAgenda();
-  const sowNowIds = useMemo(() => new Set(agenda.now.map((n) => n.plantId)), [agenda]);
+  // Same rows as the calendar's "Jetzt säen & pflanzen" (frost-dropped windows excluded).
+  const visibleNow = useVisibleAgendaRows(agenda.now);
+  const sowNowIds = useMemo(() => new Set(visibleNow.map((n) => n.plantId)), [visibleNow]);
 
   const counts = useMemo(() => {
     const c: Record<CategoryFilter, number> = { all: plants.length, now: 0, vegetable: 0, fruit: 0, berry: 0, herb: 0, flower: 0 };

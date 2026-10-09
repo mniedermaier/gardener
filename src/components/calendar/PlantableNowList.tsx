@@ -14,6 +14,27 @@ import { isFrostSensitive } from "@/lib/weatherAlerts";
 import { addDays, differenceInCalendarDays } from "date-fns";
 
 /**
+ * The agenda rows actually shown: a window that leaves three days or less after
+ * the forecast frost is no real chance to plant out (lettuce in mid-October),
+ * so it is dropped. Counts in headers and tabs use this too, so "· 9" always
+ * matches the rows below it.
+ */
+export function useVisibleAgendaRows(now: PlantableNow[], soon: PlantableSoon[] = []): AgendaPlantRow[] {
+  const plantMap = usePlantMap();
+  const { lastFrostNight, holds } = useFrostHold();
+  return useMemo(() => {
+    const all = [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)];
+    if (!lastFrostNight) return all;
+    return all.filter((item) => {
+      const plant = plantMap.get(item.plantId);
+      if (!plant || item.kind !== "now" || !holds(plant, item.actions)) return true;
+      const end = new Date(Math.max(...groupAgendaBedsByDate(item).map((g) => g.date.getTime())));
+      return differenceInCalendarDays(end, addDays(lastFrostNight, 1)) >= 3;
+    });
+  }, [now, soon, plantMap, lastFrostNight, holds]);
+}
+
+/**
  * Rows of the sowing agenda (`useSowingAgenda`): what can be sown or planted
  * now, then what opens soon. Shared by the dashboard and the calendar so both
  * always say the same. The caller provides the surrounding card/list.
@@ -63,14 +84,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     return [when, beds].filter((x): x is string => !!x);
   };
 
-  const all = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);
-  // A window that leaves three days or less after the forecast frost is no real
-  // chance to plant out (lettuce in mid-October): drop it instead of advising it.
-  const items = all.filter((item) => {
-    const plant = plantMap.get(item.plantId);
-    if (!plant || !lastFrostNight || !frostBlocks(item, plant)) return true;
-    return differenceInCalendarDays(windowEnd(item), addDays(lastFrostNight, 1)) >= 3;
-  });
+  const items = useVisibleAgendaRows(now, soon);
   // "1 weitere anzeigen" hides almost nothing: show everything then.
   const shown = expanded || items.length <= limit + 1 ? items : items.slice(0, limit);
   const hidden = items.length - shown.length;
