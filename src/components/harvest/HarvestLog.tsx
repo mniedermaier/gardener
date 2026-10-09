@@ -349,15 +349,11 @@ export function HarvestLog() {
                         onClick={() => openEdit(h)}
                         leading={plant ? <PlantIconDisplay plantId={h.plantId} emoji={plant.icon} size={28} /> : <Apple size={20} aria-hidden="true" className="text-gray-500" />}
                         title={getPlantName(h.plantId)}
-                        meta={
-                          <span className="inline-flex flex-wrap items-center gap-x-1.5">
-                            {bedLabel && <span>{bedLabel}</span>}
-                            {bedLabel && <span aria-hidden="true">·</span>}
-                            <time dateTime={h.date}>{formatDate(h.date, "relative")}</time>
-                            <span aria-hidden="true">·</span>
-                            <QualityStars value={h.quality} />
-                          </span>
-                        }
+                        meta={[
+                          bedLabel,
+                          <time key="d" dateTime={h.date}>{formatDate(h.date, "relative")}</time>,
+                          <QualityStars key="q" value={h.quality} />,
+                        ]}
                         description={h.notes}
                         trailing={amountText(h.weightGrams, h.count) || "–"}
                         actions={

@@ -180,7 +180,7 @@ export function SeasonTimeline() {
           kind === "now"
             ? t("calendar.until", { date: formatDate(range.end, "short") })
             : t("calendar.from", { date: formatDate(range.start, "short") }),
-        ].join(" · ")}
+        ]}
       />
     );
   };

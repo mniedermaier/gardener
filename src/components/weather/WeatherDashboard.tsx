@@ -1,18 +1,16 @@
-import { createElement, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
+import { createElement, useState, useEffect, useCallback, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown, Cloud, CloudFog, CloudLightning, CloudOff, CloudRain, CloudSnow, CloudSun, Droplets, MapPin, Moon,
-  Info, RefreshCw, Settings, Snowflake, Sprout, Sun, Thermometer, Umbrella, Wind, type LucideIcon,
+  Info, RefreshCw, Settings, Snowflake, Sun, Thermometer, Umbrella, Wind, type LucideIcon,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
-import { usePlantMap } from "@/hooks/usePlants";
 import { useFormat } from "@/hooks/useFormat";
-import { toDate, todayISO } from "@/lib/format";
-import { getAllAlerts, groupAlerts, type AlertGroup, type FrostSummary, type WeatherAlert } from "@/lib/weatherAlerts";
+import { todayISO } from "@/lib/format";
+import type { AlertGroup, FrostSummary } from "@/lib/weatherAlerts";
 import { fetchWeather as fetchWeather_, getWeatherProvider, isWeatherConfigured, WeatherAuthError } from "@/lib/weather";
-import type { Plant } from "@/types/plant";
 import type { WeatherData } from "@/types/weather";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -21,22 +19,12 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { TONE_SOFT, type Tone } from "@/components/ui/tone";
+import { TONE_SOFT } from "@/components/ui/tone";
 import { RangeBar } from "@/components/ui/charts";
 import { SunlightWidget } from "./SunlightWidget";
 import { DayArc } from "./DayArc";
 import { FrostTaskButton, useDayLabel, useFrostAffectedText, useFrostSummary } from "./frost";
-
-const ALERT_ICON: Record<WeatherAlert["type"], LucideIcon> = {
-  frost: Snowflake,
-  heat: Sun,
-  greenhouse_hot: Thermometer,
-  greenhouse_cold: Snowflake,
-  watering: Droplets,
-  weekly: Sprout,
-};
-
-const SEVERITY_TONE: Record<WeatherAlert["severity"], Tone> = { danger: "danger", warning: "warning", info: "info" };
+import { ALERT_ICON, SEVERITY_TONE, useAlertText, useWeatherAlerts } from "./alerts";
 
 /** OpenWeatherMap icon code → Lucide. */
 function weatherIcon(code: string): LucideIcon {
@@ -52,26 +40,14 @@ function weatherIcon(code: string): LucideIcon {
 
 type FetchError = "auth" | "network";
 
-/** "Mittwoch, 7. Okt." — the day inside an alert sentence. */
-function dayPhrase(date: string, locale: string): string {
-  const d = toDate(date);
-  return d ? new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "short" }).format(d) : date;
-}
-
 function AlertCallout({ group, frost }: { group: AlertGroup; frost: { summary: FrostSummary; title: string } | null }) {
   const { t } = useTranslation();
   const f = useFormat();
   const dayLabel = useDayLabel();
+  const alertText = useAlertText();
   const affected = useFrostAffectedText(frost?.summary);
   const Icon = ALERT_ICON[group.type];
   const tone = SEVERITY_TONE[group.severity];
-  const fmtParams = (p?: Record<string, string | number>) => {
-    if (!p) return p;
-    const out: Record<string, string | number> = { ...p };
-    if (typeof p.date === "string") out.date = dayPhrase(p.date, f.locale);
-    for (const k of ["temp", "max", "min", "outside", "buffer"] as const) if (typeof p[k] === "number") out[k] = f.formatTemperature(p[k] as number);
-    return out;
-  };
 
   let title: string;
   let body: ReactNode;
@@ -94,9 +70,7 @@ function AlertCallout({ group, frost }: { group: AlertGroup; frost: { summary: F
       </>
     );
   } else {
-    const a = group.alerts[0];
-    title = t(a.titleKey, fmtParams(a.titleParams));
-    body = t(a.descriptionKey, fmtParams(a.descriptionParams));
+    ({ title, description: body } = alertText(group.alerts[0]));
   }
 
   return (
@@ -119,8 +93,7 @@ export function WeatherDashboard() {
   const { t, i18n } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, gardens: s.gardens, addWeatherHistory: s.addWeatherHistory })));
-  const plantMap = usePlantMap();
+  const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, addWeatherHistory: s.addWeatherHistory })));
   const [weather, setWeather] = useState<WeatherData | null>(() => {
     try {
       const cached = sessionStorage.getItem("gardener-weather");
@@ -132,15 +105,8 @@ export function WeatherDashboard() {
   const [fallback, setFallback] = useState<"auth" | "unavailable" | null>(null);
   const dayLabel = useDayLabel();
 
-  const allBeds = useMemo(() => gardens.flatMap((g) => g.beds), [gardens]);
-  const plantedPlants = useMemo(() => {
-    const ids = new Set<string>();
-    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) ids.add(c.plantId);
-    return Array.from(ids).map((id) => plantMap.get(id)).filter((p): p is Plant => !!p);
-  }, [gardens, plantMap]);
-
-  const allAlerts = useMemo(() => (weather ? getAllAlerts(weather.forecast.filter((d) => d.date >= todayISO()), allBeds, plantedPlants, alertConfig) : []), [weather, allBeds, plantedPlants, alertConfig]);
-  const groups = useMemo(() => groupAlerts(allAlerts), [allAlerts]);
+  // Same alerts as the weather card on "Heute".
+  const { alerts: allAlerts, groups } = useWeatherAlerts(weather?.forecast);
   const weekly = allAlerts.find((a) => a.type === "weekly");
   const frost = useFrostSummary(weather?.forecast);
 

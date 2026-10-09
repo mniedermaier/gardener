@@ -269,7 +269,7 @@ export function SufficiencyDashboard() {
                     key={y.plantId}
                     leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
                     title={plantName(p.id)}
-                    meta={[f.formatArea(y.areaM2), t("sufficiency.kcalValue", { kcal: f.formatNumber(y.calories, { maximumFractionDigits: 0 }) }), t("metrics.actualShort", { value: f.formatWeight(actualG) })].join(" · ")}
+                    meta={[f.formatArea(y.areaM2), t("sufficiency.kcalValue", { kcal: f.formatNumber(y.calories, { maximumFractionDigits: 0 }) }), t("metrics.actualShort", { value: f.formatWeight(actualG) })]}
                     description={<Meter actual={actualG} forecast={forecastG} max={Math.max(actualG, forecastG, 1)} label={t("metrics.actualVsForecast", { actual: f.formatWeight(actualG), forecast: f.formatWeight(forecastG) })} className="mt-1.5 max-w-xs" size={6} />}
                     trailing={<span title={t("metrics.forecast")}>{f.formatWeight(forecastG)}</span>}
                   />
@@ -417,7 +417,7 @@ function AnimalYields() {
                 t("metrics.actualShort", { value: formatProductAmount(ty, actual, f, t) }),
                 kcal > 0 ? t("sufficiency.kcalCounted", { kcal: f.formatNumber(kcal, { maximumFractionDigits: 0 }) }) : t("sufficiency.nonFood"),
                 surplus > 0.05 ? t("sufficiency.surplus", { amount: formatProductAmount(ty, kgToUnits(ty, surplus), f, t) }) : null,
-              ].filter(Boolean).join(" · ")}
+              ]}
               description={<Meter actual={actual} forecast={forecast[ty]} max={Math.max(actual, forecast[ty], 1)} size={6} className="mt-1.5 max-w-xs" label={t("metrics.actualVsForecast", { actual: formatProductAmount(ty, actual, f, t), forecast: formatProductAmount(ty, forecast[ty], f, t) })} />}
               trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, forecast[ty], f, t) })}
             />

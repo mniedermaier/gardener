@@ -16,7 +16,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const sizes = {
-  sm: "min-h-8 px-3 py-1 text-sm",
+  sm: "min-h-11 px-3 py-1 text-sm sm:min-h-8",
   md: "min-h-11 px-4 py-2 text-sm sm:min-h-10",
   lg: "min-h-12 px-6 py-3 text-base",
 };

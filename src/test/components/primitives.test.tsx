@@ -107,6 +107,19 @@ describe("List and ListRow", () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("region", { name: "Ernten" })).toBeInTheDocument();
   });
+
+  it("keeps meta parts unbroken with the separator at the end, never at a line start", () => {
+    const { container } = render(
+      <List label="Futter">
+        <ListRow title="Körner" meta={["2 kg", null, "Hühnerschar", false, "15. Sept."]} />
+        <ListRow title="Heu" meta="Beet · Heute" />
+      </List>,
+    );
+    const rows = container.querySelectorAll("li");
+    const parts = (li: Element) => [...li.querySelectorAll("span.inline-block")].map((s) => s.textContent);
+    expect(parts(rows[0])).toEqual(["2 kg ·", "Hühnerschar ·", "15. Sept."]);
+    expect(parts(rows[1])).toEqual(["Beet ·", "Heute"]);
+  });
 });
 
 describe("display primitives", () => {

@@ -15,6 +15,9 @@ import { useFormat } from "@/hooks/useFormat";
 import type { GlanceState } from "@/hooks/useWeatherGlance";
 import { todayISO } from "@/lib/format";
 import { FrostTaskButton, useFrostAffectedText, useFrostSummary } from "@/components/weather/frost";
+import { ALERT_ICON, SEVERITY_TONE, useAlertText, useWeatherAlerts } from "@/components/weather/alerts";
+import { Badge } from "@/components/ui/Badge";
+import { TONE_TEXT } from "@/components/ui/tone";
 
 const ICONS: Record<string, LucideIcon> = {
   "01": Sun, "02": CloudSun, "03": Cloud, "04": Cloud, "09": CloudDrizzle, "10": CloudRain, "11": CloudLightning, "13": CloudSnow, "50": CloudFog,
@@ -45,6 +48,10 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
   const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
   // Names the same crops and beds as the map pins and the weather page.
   const affected = useFrostAffectedText(frost?.summary);
+  // The weather page's alerts (one source): warnings beyond the frost sentence, e.g. the greenhouse cold warning.
+  const { groups } = useWeatherAlerts(glance.status === "ready" ? glance.data.days : undefined);
+  const warnings = groups.filter((g) => g.type !== "frost" && g.severity !== "info");
+  const alertText = useAlertText();
 
   const more = (
     <Link to="/weather" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
@@ -120,6 +127,24 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
           <FrostTaskButton summary={frost.summary} className="mt-2 ml-6 bg-white dark:bg-gray-900" />
         </div>
       )}
+
+      {warnings.map((g) => {
+        const { title, description } = alertText(g.alerts[0]);
+        const tone = SEVERITY_TONE[g.severity];
+        const Icon = ALERT_ICON[g.type];
+        return (
+          <div key={g.id} className={`mt-3 rounded-lg px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200 ${g.severity === "danger" ? "bg-danger/10" : "bg-warning/10"}`}>
+            <p className="flex items-start gap-2">
+              <Icon size={16} aria-hidden="true" className={`mt-0.5 shrink-0 ${TONE_TEXT[tone]}`} />
+              <span className="min-w-0">
+                <span className="font-medium">{title}</span>{" "}
+                <Badge tone={tone} size="sm" className="align-text-bottom">{t(`alerts.severity.${g.severity}`)}</Badge>
+                <span className="mt-0.5 line-clamp-2 text-gray-600 dark:text-gray-300">{description}</span>
+              </span>
+            </p>
+          </div>
+        );
+      })}
     </Card>
   );
 });

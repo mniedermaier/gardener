@@ -9,6 +9,8 @@ import { searchPlaces, roundCoord, type Place } from "@/lib/location";
 
 export interface PickedLocation {
   name: string;
+  /** "Bayern, Deutschland" when the place came from the search; cleared for the device position or typed values. */
+  region?: string;
   lat: number | null;
   lon: number | null;
   /** Metres above sea level, when the geocoder knows it (improves the frost estimate). */
@@ -64,7 +66,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
   }, [query, i18n.resolvedLanguage]);
 
   const pick = (p: Place) => {
-    onChange({ name: p.name, lat: roundCoord(p.latitude), lon: roundCoord(p.longitude), elevation: p.elevation });
+    onChange({ name: p.name, region: p.region, lat: roundCoord(p.latitude), lon: roundCoord(p.longitude), elevation: p.elevation });
     setQuery("");
     setResults([]);
     setEditing(false);
@@ -79,7 +81,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
-        onChange({ name: value.name, lat: roundCoord(pos.coords.latitude), lon: roundCoord(pos.coords.longitude), elevation: pos.coords.altitude ?? undefined });
+        onChange({ name: value.name, region: "", lat: roundCoord(pos.coords.latitude), lon: roundCoord(pos.coords.longitude), elevation: pos.coords.altitude ?? undefined });
         setEditing(false);
         toast(t("location.geoSuccess"), "success");
       },
@@ -108,7 +110,11 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{value.name || t("location.unnamed")}</p>
-          <p className="text-xs text-gray-500 tabular-nums dark:text-gray-400">{coordLabel}</p>
+          {/* Region first: it tells apart places with the same name (Neustadt …); the coordinates confirm it. */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {value.region && <span>{value.region} · </span>}
+            <span className="tabular-nums">{coordLabel}</span>
+          </p>
         </div>
         <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
           <Pencil size={14} aria-hidden="true" />
@@ -181,7 +187,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           <Input
             label={t("settings.locationName")}
             value={value.name}
-            onChange={(e) => onChange({ ...value, name: e.target.value })}
+            onChange={(e) => onChange({ ...value, name: e.target.value, region: "" })}
             wrapperClassName="sm:col-span-3"
           />
           <Input
@@ -191,7 +197,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             min={-90}
             max={90}
             value={value.lat ?? ""}
-            onChange={(e) => onChange({ ...value, lat: e.target.value === "" ? null : Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, region: "", lat: e.target.value === "" ? null : Number(e.target.value) })}
           />
           <Input
             label={t("settings.longitude")}
@@ -200,7 +206,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             min={-180}
             max={180}
             value={value.lon ?? ""}
-            onChange={(e) => onChange({ ...value, lon: e.target.value === "" ? null : Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, region: "", lon: e.target.value === "" ? null : Number(e.target.value) })}
           />
         </div>
       )}

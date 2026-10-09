@@ -193,7 +193,7 @@ export function PestTracker() {
                         {pest.resolved && <Badge tone="positive" icon={Check}>{t("pests.resolvedLabel")}</Badge>}
                       </>
                     }
-                    meta={[plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")].filter(Boolean).join(" · ")}
+                    meta={[plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")]}
                     description={
                       pest.treatment || pest.description ? (
                         <>
@@ -247,7 +247,7 @@ export function PestTracker() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={!draft.name.trim()}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave} disabled={!draft.name.trim()}>{t("common.save")}</Button>
           </>
         }
       >

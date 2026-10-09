@@ -118,8 +118,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   };
 
   const saveSettings = () => {
-    if (location.lat !== null && location.lon !== null) setLocation(location.lat, location.lon, location.name.trim());
-    else if (location.name.trim()) useStore.setState({ locationName: location.name.trim() });
+    if (location.lat !== null && location.lon !== null) setLocation(location.lat, location.lon, location.name.trim(), location.region);
+    else if (location.name.trim()) useStore.setState({ locationName: location.name.trim(), locationRegion: "" });
     setLastFrostDate(shownFrost);
   };
 

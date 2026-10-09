@@ -31,6 +31,34 @@ export function focusFirstInvalid(): void {
   });
 }
 
+const FIELD_SELECTOR = [
+  "input:not([type='hidden']):not([type='checkbox']):not([type='radio']):not([disabled]):not([readonly])",
+  "select:not([disabled])",
+  "textarea:not([disabled]):not([readonly])",
+].join(",");
+
+/**
+ * Where focus goes when a dialog opens — never the × button (showModal's default):
+ * 1. an explicit marker `[data-autofocus]` ("Abbrechen" in a confirmation);
+ * 2. with a mouse/trackpad, the first empty form field (a prefilled dialog
+ *    continues where input is still missing), else the first field that is
+ *    not a combobox (focus would open its list) — React's autoFocus fires
+ *    before the dialog is open and is lost;
+ * 3. otherwise the title, so screen readers start at the top and a phone does
+ *    not pop up its keyboard over the sheet.
+ */
+function initialFocus(dialog: HTMLDialogElement): HTMLElement | null {
+  const marked = dialog.querySelector<HTMLElement>("[data-autofocus]");
+  if (marked) return marked;
+  const fine = typeof window.matchMedia === "function" && window.matchMedia("(pointer: fine)").matches;
+  if (fine) {
+    const fields = [...dialog.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(FIELD_SELECTOR)].filter((el) => el.getClientRects().length > 0);
+    const field = fields.find((el) => el.value === "") ?? fields.find((el) => el.getAttribute("role") !== "combobox");
+    if (field) return field;
+  }
+  return dialog.querySelector<HTMLElement>("[data-dialog-title]");
+}
+
 /**
  * Built on <dialog>, which supplies the focus trap, Esc-to-close and focus
  * restoration that a div-based dialog has to reimplement by hand.
@@ -47,9 +75,7 @@ export function Modal({ open, onClose, title, children, description, footer, siz
 
     if (open && !dialog.open) {
       dialog.showModal();
-      // React's autoFocus fires before the dialog is open, so honour an
-      // explicit initial-focus marker (e.g. "Abbrechen" in a confirmation).
-      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+      initialFocus(dialog)?.focus();
       document.body.style.overflow = "hidden";
     } else if (!open && dialog.open) {
       dialog.close();
@@ -91,16 +117,16 @@ export function Modal({ open, onClose, title, children, description, footer, siz
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 id={titleId} className="text-lg font-semibold">{title}</h2>
+          <h2 id={titleId} data-dialog-title tabIndex={-1} className="text-lg font-semibold focus:outline-none">{title}</h2>
           {description && <p id={descId} className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
         </div>
         <button
           type="button"
           onClick={onClose}
-          aria-label={t("common.close")}
+          aria-label={t("common.closeDialog")}
           className="-mr-2 -mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:size-9 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-100"
         >
-          <X size={20} />
+          <X size={20} aria-hidden="true" />
         </button>
       </div>
       {children}

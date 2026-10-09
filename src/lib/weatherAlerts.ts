@@ -206,13 +206,26 @@ export function detectGreenhouseAlerts(
   return alerts;
 }
 
+/**
+ * Watering advice for the next three days. Rain only waters open beds: with
+ * `beds` given, planted beds under cover (greenhouse, polytunnel, cold frame,
+ * windowsill) are left out of "no watering needed" — the advice then speaks of
+ * the open beds and names the covered ones, or, when only covered beds are
+ * planted, ignores the rain altogether.
+ */
 export function generateWateringAdvice(
   forecast: WeatherForecastItem[],
   plantedPlants: Plant[],
+  beds: Pick<Bed, "name" | "environmentType" | "cells">[] = [],
 ): WeatherAlert[] {
-  const totalRainNext3Days = forecast
+  const planted = beds.filter((b) => b.cells.length > 0);
+  const covered = planted.filter((b) => PROTECTED_ENVIRONMENTS.includes(b.environmentType));
+  const rainReachesBeds = planted.length === 0 || covered.length < planted.length;
+  const rainDays = forecast
     .slice(0, 3)
     .reduce((sum, d) => sum + (d.precipitation > 50 ? 1 : 0), 0);
+  // Rain the beds actually get: none when every planted bed is under cover.
+  const totalRainNext3Days = rainReachesBeds ? rainDays : 0;
   const avgTempNext3Days = forecast.length > 0
     ? forecast.slice(0, 3).reduce((sum, d) => sum + d.tempMax, 0) / Math.min(forecast.length, 3)
     : 20;
@@ -235,14 +248,23 @@ export function generateWateringAdvice(
       descriptionParams: { temp: Math.round(avgTempNext3Days) },
     });
   } else if (totalRainNext3Days >= 2) {
-    alerts.push({
-      id: "watering-rain",
-      type: "watering",
-      severity: "info",
-      titleKey: "alerts.wateringNotNeeded",
-      descriptionKey: "alerts.wateringRainExpected",
-    });
-  } else if (highWaterPlants.length > 0 && totalRainNext3Days === 0) {
+    alerts.push(covered.length > 0
+      ? {
+        id: "watering-rain",
+        type: "watering",
+        severity: "info",
+        titleKey: "alerts.wateringNotNeededOpen",
+        descriptionKey: "alerts.wateringRainExpectedCovered",
+        descriptionParams: { beds: covered.map((b) => b.name).join(", ") },
+      }
+      : {
+        id: "watering-rain",
+        type: "watering",
+        severity: "info",
+        titleKey: "alerts.wateringNotNeeded",
+        descriptionKey: "alerts.wateringRainExpected",
+      });
+  } else if (highWaterPlants.length > 0 && rainDays === 0) {
     alerts.push({
       id: "watering-high-need",
       type: "watering",
@@ -303,7 +325,7 @@ export function getAllAlerts(
     alerts.push(...detectGreenhouseAlerts(forecast, beds));
   }
   if (config.wateringReminders) {
-    alerts.push(...generateWateringAdvice(forecast, plantedPlants));
+    alerts.push(...generateWateringAdvice(forecast, plantedPlants, beds));
   }
 
   return alerts;

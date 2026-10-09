@@ -1,5 +1,5 @@
-import { memo, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { memo, useMemo, type ReactNode } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { ArrowLeft, Copy, Eraser, Footprints, Pencil, Trash2, Wand2, ZoomIn, ZoomOut, Check, MousePointerClick, ShieldCheck, TriangleAlert } from "lucide-react";
 import type { Bed } from "@/types/garden";
 import { getFrostProtectionWeeks } from "@/types/garden";
@@ -49,6 +49,18 @@ interface Props {
  * The single-bed editor: header with actions, an explicit mode bar
  * (placing / paths), the grid, conflict explanations and key figures.
  */
+/** Icon + label inside the placing hint (Trans component): the same marks as the grid and the legend. */
+function HintMark({ kind, children }: { kind: "good" | "bad"; children?: ReactNode }) {
+  return (
+    <span className="whitespace-nowrap">
+      {kind === "good"
+        ? <Check size={12} strokeWidth={3} aria-hidden="true" className="mr-0.5 inline-block align-[-1px] text-positive" />
+        : <TriangleAlert size={12} aria-hidden="true" className="mr-0.5 inline-block align-[-1px] text-warning" />}
+      {children}
+    </span>
+  );
+}
+
 export const BedEditor = memo(function BedEditor(props: Props) {
   const {
     gardenId, bed, plantMap, gridCellSizeCm, mode, placingPlant, hints, conflicts, conflictMap, companionPairs,
@@ -127,7 +139,10 @@ export const BedEditor = memo(function BedEditor(props: Props) {
             </span>
             <span className="min-w-0 flex-1">
               <span className="font-semibold">{t("planner.placing", { plant: getPlantName(placingPlant.id) })}</span>
-              <span className="block text-xs text-garden-800 sm:inline sm:pl-2 dark:text-garden-200">{fine ? t("planner.placingHintClick") : t("planner.placingHint")}</span>
+              <span className="block text-xs text-garden-800 sm:inline sm:pl-2 dark:text-garden-200"><Trans
+                  i18nKey={fine ? "planner.placingHintClick" : "planner.placingHint"}
+                  components={{ good: <HintMark kind="good" />, bad: <HintMark kind="bad" /> }}
+                /></span>
             </span>
             <Button size="sm" onClick={onStopMode}>
               <Check size={16} aria-hidden="true" />
@@ -180,7 +195,14 @@ export const BedEditor = memo(function BedEditor(props: Props) {
               </>
             )}
             {conflicts.length > 0 && (
-              <li className="inline-flex items-center gap-1.5"><span className="size-4 rounded bg-white shadow-[inset_-3px_0_0_0_var(--color-warning)] dark:bg-white/10" />{t("planner.legendConflict")}</li>
+              <li className="inline-flex items-center gap-1.5">
+                <span className="relative size-4 rounded bg-white shadow-[inset_-3px_0_0_0_var(--color-warning)] dark:bg-white/10">
+                  <span className="absolute -top-1 -right-1 flex size-3 items-center justify-center rounded-full bg-warning text-white ring-1 ring-white dark:text-gray-950 dark:ring-gray-900">
+                    <TriangleAlert size={8} strokeWidth={3} aria-hidden="true" />
+                  </span>
+                </span>
+                {t("planner.legendConflict")}
+              </li>
             )}
           </ul>
         )}

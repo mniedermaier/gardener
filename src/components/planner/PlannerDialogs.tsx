@@ -88,7 +88,7 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
     <Modal
       open={open}
       onClose={onClose}
-      title={bed ? t("planner.editBed") : t("planner.newBed")}
+      title={bed ? t("planner.editBed") : t("planner.addBed")}
       footer={
         <>
           {bed && onDelete && (
@@ -98,7 +98,7 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
             </Button>
           )}
           <Button variant="secondary" onClick={onClose}>{t("common.cancel")}</Button>
-          <Button onClick={() => valid && onSave(draft)} disabled={!valid}>{bed ? t("common.save") : t("common.add")}</Button>
+          <Button onClick={() => valid && onSave(draft)} disabled={!valid}>{t("common.save")}</Button>
         </>
       }
     >

@@ -246,7 +246,7 @@ export function GardenJournal() {
   };
 
   const chip = (active: boolean) =>
-    `inline-flex min-h-9 items-center rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-8 ${
+    `inline-flex min-h-11 items-center rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-8 ${
       active
         ? "border-garden-600 bg-garden-600 text-white dark:border-garden-500 dark:bg-garden-500/20 dark:text-garden-200"
         : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
@@ -373,7 +373,7 @@ export function GardenJournal() {
                                   type="button"
                                   onClick={() => setFilterTag(tag)}
                                   aria-label={t("journal.filterTag", { tag })}
-                                  className="inline-flex min-h-6 items-center rounded px-1 text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
+                                  className="relative inline-flex min-h-6 items-center rounded px-1 before:absolute before:inset-x-0 before:-inset-y-2.5 before:content-[''] sm:before:hidden text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
                                 >
                                   #{tag}
                                 </button>
@@ -408,7 +408,7 @@ export function GardenJournal() {
               </Button>
             )}
             <Button variant="secondary" onClick={closeDialog}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={uploading}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave} disabled={uploading}>{t("common.save")}</Button>
           </>
         }
       >
@@ -481,7 +481,7 @@ export function GardenJournal() {
                     key={tag}
                     type="button"
                     onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
-                    className="inline-flex min-h-8 items-center rounded-full bg-gray-100 px-2.5 text-xs font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                    className="inline-flex min-h-11 items-center rounded-full bg-gray-100 px-2.5 text-xs sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
                   >
                     + #{tag}
                   </button>

@@ -42,9 +42,9 @@ describe("toDate / toISODate", () => {
 
 describe("formatDate", () => {
   it("short omits the current year and keeps other years", () => {
-    expect(formatDate("2026-10-03", "short", { locale: "de", now: NOW })).toBe("3. Okt.");
-    expect(formatDate("2025-10-03", "short", { locale: "de", now: NOW })).toBe("3. Okt. 2025");
-    expect(formatDate("2026-10-03", "short", { locale: "en", now: NOW })).toBe("3 Oct");
+    expect(formatDate("2026-10-03", "short", { locale: "de", now: NOW })).toBe("3.\u00a0Okt.");
+    expect(formatDate("2025-10-03", "short", { locale: "de", now: NOW })).toBe("3.\u00a0Okt.\u00a02025");
+    expect(formatDate("2026-10-03", "short", { locale: "en", now: NOW })).toBe("3\u00a0Oct");
   });
 
   it("numeric and long", () => {
@@ -60,7 +60,7 @@ describe("formatDate", () => {
     expect(rel("2026-10-06")).toBe("Morgen");
     expect(rel("2026-10-02")).toBe("Vor 3 Tagen");
     expect(rel("2026-10-08")).toBe("In 3 Tagen");
-    expect(rel("2026-09-01")).toBe("1. Sept.");
+    expect(rel("2026-09-01")).toBe("1.\u00a0Sept.");
     expect(rel("2026-10-04", "en")).toBe("Yesterday");
     expect(rel("2026-10-02", "es")).toBe("Hace 3 días");
   });
@@ -69,7 +69,7 @@ describe("formatDate", () => {
     const inl = (iso: string, locale = "de") => formatDate(iso, "relativeInline", { locale, now: NOW });
     expect(inl("2026-10-02")).toBe("vor 3 Tagen");
     expect(inl("2026-10-04", "en")).toBe("yesterday");
-    expect(inl("2026-09-01")).toBe("1. Sept.");
+    expect(inl("2026-09-01")).toBe("1.\u00a0Sept.");
   });
 });
 
@@ -79,6 +79,12 @@ describe("numbers and units", () => {
     expect(formatNumber(1234.56, { locale: "en" })).toBe("1,234.6");
     expect(formatNumber(2, { locale: "de", minimumFractionDigits: 2 })).toBe("2,00");
     expect(formatNumber(Number.NaN)).toBe("–");
+  });
+
+  it("never breaks between number and unit", () => {
+    for (const text of [formatWeight(750, { locale: "de" }), formatTemperature(1, { locale: "de" }), formatVolume(10, { locale: "fr" }), formatPercent(0.25, { locale: "de" }), formatCurrency(4.5, { locale: "de" }), formatArea(2, { locale: "de" })]) {
+      expect(text).not.toMatch(/ /);
+    }
   });
 
   it("formatWeight switches between g and kg", () => {

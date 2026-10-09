@@ -253,17 +253,21 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
           onChange={(e) => onSelect(e.target.value)}
           options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
         />
-        <div className="mt-4 flex items-center gap-3">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
-            <PlantIconDisplay plantId={selected.id} emoji={selected.icon} size={30} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{names.get(selected.id)}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t("companions.goodCount", { count: good.length })} · {t("companions.badCount", { count: bad.length })}
-            </p>
+        {/* Stacked on phones: long FR/ES labels would squeeze the name to a narrow column. */}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
+              <PlantIconDisplay plantId={selected.id} emoji={selected.icon} size={30} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{names.get(selected.id)}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="whitespace-nowrap">{t("companions.goodCount", { count: good.length })} ·</span>{" "}
+                <span className="whitespace-nowrap">{t("companions.badCount", { count: bad.length })}</span>
+              </p>
+            </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
+          <Button variant="ghost" size="sm" className="self-start sm:self-auto" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
             {t("companions.openDetails")}
             <ChevronRight size={16} aria-hidden="true" />
           </Button>

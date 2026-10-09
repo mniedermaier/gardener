@@ -175,7 +175,7 @@ export function SoilManagement() {
   const sortedAmendments = useMemo(() => [...amendments].sort((a, b) => b.date.localeCompare(a.date)), [amendments]);
   const bedName = (id: string) => beds.label(id) ?? t("soil.unknownBed");
   const rangeText = (r: PhRange) => t("soil.phRange", { min: formatNumber(r.min, { minimumFractionDigits: 1 }), max: formatNumber(r.max, { minimumFractionDigits: 1 }) });
-  const nutrientValue = (n: Nutrient, v: number) => (n === "organicMatter" ? `${formatNumber(v)} %` : t("soil.ppm", { value: formatNumber(v, { maximumFractionDigits: 0 }) }));
+  const nutrientValue = (n: Nutrient, v: number) => (n === "organicMatter" ? `${formatNumber(v)}\u00a0%` : t("soil.ppm", { value: formatNumber(v, { maximumFractionDigits: 0 }) }));
 
   const testEditingItem = testEditing ? soilTests.find((s) => s.id === testEditing) : undefined;
   const amendEditingItem = amendEditing ? amendments.find((a) => a.id === amendEditing) : undefined;
@@ -350,7 +350,7 @@ export function SoilManagement() {
                   leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-earth-100 text-earth-700 dark:bg-earth-500/15 dark:text-earth-300"><Icon size={16} aria-hidden="true" /></span>}
                   title={a.material}
                   badges={<Badge variant="outline">{t(`soil.types.${a.type}`)}</Badge>}
-                  meta={<>{bedName(a.bedId)} · <time dateTime={a.date}>{formatDate(a.date, "relative")}</time></>}
+                  meta={[bedName(a.bedId), <time key="d" dateTime={a.date}>{formatDate(a.date, "relative")}</time>]}
                   description={a.notes}
                   trailing={
                     <span className="flex flex-col items-end">
@@ -389,7 +389,7 @@ export function SoilManagement() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setTestOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={saveTest}>{testEditing ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={saveTest}>{t("common.save")}</Button>
           </>
         }
       >
@@ -431,7 +431,7 @@ export function SoilManagement() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setAmendOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={saveAmend}>{amendEditing ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={saveAmend}>{t("common.save")}</Button>
           </>
         }
       >

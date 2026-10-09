@@ -183,7 +183,7 @@ export function Menu({ items, label, trigger, align = "end", className = "" }: M
         onKeyDown={onTriggerKeyDown}
         className={
           trigger
-            ? "inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-800 shadow-xs hover:bg-gray-50 dark:border-white/15 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10"
+            ? "inline-flex min-h-11 items-center sm:min-h-10 gap-1.5 rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-800 shadow-xs hover:bg-gray-50 dark:border-white/15 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10"
             : "inline-flex size-11 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:size-9 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-100"
         }
       >

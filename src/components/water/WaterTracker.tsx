@@ -244,14 +244,11 @@ export function WaterTracker() {
                         onClick={() => openEdit(e)}
                         leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-info/10 text-info"><Icon size={16} aria-hidden="true" /></span>}
                         title={beds.label(e.bedId) ?? t("water.unknownBed")}
-                        meta={
-                          <>
-                            {t(`water.methods.${e.method}`)}
-                            {e.duration ? ` · ${t("water.minutesCount", { count: e.duration })}` : ""}
-                            {" · "}
-                            <time dateTime={toISODate(e.date)}>{formatDate(e.date, "relative")}</time>
-                          </>
-                        }
+                        meta={[
+                          t(`water.methods.${e.method}`),
+                          e.duration ? t("water.minutesCount", { count: e.duration }) : null,
+                          <time key="d" dateTime={toISODate(e.date)}>{formatDate(e.date, "relative")}</time>,
+                        ]}
                         description={e.notes}
                         trailing={formatVolume(e.liters)}
                         actions={
@@ -289,7 +286,7 @@ export function WaterTracker() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave}>{t("common.save")}</Button>
           </>
         }
       >

@@ -156,7 +156,7 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
               type="button"
               aria-label={t("records.clearPlant")}
               onClick={() => onChange({ plantId: "" })}
-              className="inline-flex size-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+              className="inline-flex size-11 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 sm:size-8 dark:hover:bg-white/10"
             >
               <X size={16} aria-hidden="true" />
             </button>

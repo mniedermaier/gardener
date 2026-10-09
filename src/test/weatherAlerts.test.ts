@@ -106,6 +106,44 @@ describe("Watering advice", () => {
   });
 });
 
+describe("Watering advice and covered beds", () => {
+  const plant: Plant = {
+    id: "lettuce", category: "vegetable", sowIndoorsWeeks: -6, sowOutdoorsWeeks: -2,
+    transplantWeeks: 0, harvestDaysMin: 50, harvestDaysMax: 70, spacingCm: 25,
+    rowSpacingCm: 30, sunRequirement: "full", waterNeed: "medium",
+    companions: [], antagonists: [], color: "#22c55e", icon: "🥬",
+  };
+  const rainy = [makeForecast({ precipitation: 80 }), makeForecast({ precipitation: 70 }), makeForecast({ precipitation: 60 })];
+  const cell = [{ cellX: 0, cellY: 0, plantId: "lettuce" }];
+  const bed = (name: string, environmentType: Bed["environmentType"], cells = cell) => ({ name, environmentType, cells });
+
+  it("speaks of the open beds and names the covered ones when the garden has both", () => {
+    const alerts = generateWateringAdvice(rainy, [plant], [bed("Hochbeet", "raised_bed"), bed("Gewächshaus", "greenhouse")]);
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0].titleKey).toBe("alerts.wateringNotNeededOpen");
+    expect(alerts[0].descriptionParams).toEqual({ beds: "Gewächshaus" });
+  });
+
+  it("gives no rain advice when only covered beds are planted", () => {
+    const alerts = generateWateringAdvice(rainy, [plant], [bed("Gewächshaus", "greenhouse"), bed("Leer", "outdoor_bed", [])]);
+    expect(alerts.some((a) => a.id === "watering-rain")).toBe(false);
+  });
+
+  it("keeps the plain advice for open beds only, and ignores empty covered beds", () => {
+    const alerts = generateWateringAdvice(rainy, [plant], [bed("Acker", "outdoor_bed"), bed("Gewächshaus", "greenhouse", [])]);
+    expect(alerts[0].titleKey).toBe("alerts.wateringNotNeeded");
+  });
+
+  it("getAllAlerts passes the beds on", () => {
+    const config = { frostAlertEnabled: false, frostThresholdC: 2, wateringReminders: true, greenhouseAlerts: false, weeklyDigest: false };
+    const beds = [
+      { id: "a", name: "Hochbeet", x: 0, y: 0, width: 2, height: 2, environmentType: "raised_bed", cells: cell },
+      { id: "b", name: "Gewächshaus", x: 0, y: 0, width: 2, height: 2, environmentType: "greenhouse", cells: cell },
+    ] as Bed[];
+    expect(getAllAlerts(rainy, beds, [plant], config)[0].titleKey).toBe("alerts.wateringNotNeededOpen");
+  });
+});
+
 describe("Weekly summary", () => {
   it("should generate frost summary when cold", () => {
     const forecast = [makeForecast({ tempMin: -1, tempMax: 8 })];

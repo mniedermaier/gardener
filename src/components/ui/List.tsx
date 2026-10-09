@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from "react";
+import { Fragment, memo, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 
 interface ListProps {
@@ -34,8 +34,12 @@ interface ListRowProps {
   /** Fixed-width leading slot (w-8): PlantIconDisplay, tinted Lucide tile, avatar. */
   leading?: ReactNode;
   title: ReactNode;
-  /** Secondary line: "Hochbeet Süd · 3. Okt. · Tropf". */
-  meta?: ReactNode;
+  /**
+   * Secondary line: "Hochbeet Süd · 3. Okt. · Tropf". Pass the parts as an
+   * array (falsy entries are skipped); a string is split at " · ". Each part
+   * stays on one line and keeps its separator, so no line starts with "·".
+   */
+  meta?: ReactNode | MetaPart[];
   /** Optional third line / note, clamped to 2 lines. */
   description?: ReactNode;
   /** Badges after the title. */
@@ -51,6 +55,39 @@ interface ListRowProps {
   /** De-emphasised (done, resolved, archived). */
   muted?: boolean;
   className?: string;
+}
+
+function hasMeta(meta: ReactNode | MetaPart[]): boolean {
+  return Array.isArray(meta) ? meta.some((p) => p !== null && p !== undefined && p !== false && p !== "") : !!meta;
+}
+
+/** Segmented meta is never clamped: clamping would cut whole segments (the date) off. */
+function isSegmented(meta: ReactNode | MetaPart[]): boolean {
+  return Array.isArray(meta) || (typeof meta === "string" && meta.includes(META_SEPARATOR));
+}
+
+type MetaPart = ReactNode | null | undefined | false;
+const META_SEPARATOR = " · ";
+
+/** Renders meta parts as unbreakable segments: "A ·" "B ·" "C". */
+function MetaLine({ meta }: { meta: ReactNode | MetaPart[] }) {
+  const parts: MetaPart[] = Array.isArray(meta) ? meta : typeof meta === "string" && meta.includes(META_SEPARATOR) ? meta.split(META_SEPARATOR) : [meta];
+  const visible = parts.filter((p) => p !== null && p !== undefined && p !== false && p !== "");
+  if (visible.length <= 1 && !Array.isArray(meta)) return <>{meta}</>;
+  return (
+    <>
+      {visible.map((part, i) => (
+        <Fragment key={i}>
+          {i > 0 && " "}
+          {/* An atomic box: moves to the next line as a whole and only wraps inside when it is wider than the row. */}
+          <span className="inline-block max-w-full align-top break-words">
+            {part}
+            {i < visible.length - 1 && <span aria-hidden="true">{"\u00a0·"}</span>}
+          </span>
+        </Fragment>
+      ))}
+    </>
+  );
 }
 
 /**
@@ -79,7 +116,7 @@ export const ListRow = memo(function ListRow({ leading, title, meta, description
           )}
           {badges}
         </div>
-        {meta && <div className="mt-0.5 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">{meta}</div>}
+        {hasMeta(meta) && <div className={`mt-0.5 text-xs text-gray-500 dark:text-gray-400 ${isSegmented(meta) ? "" : "line-clamp-2"}`}><MetaLine meta={meta} /></div>}
         {description && <div className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{description}</div>}
       </div>
       {trailing !== undefined && (

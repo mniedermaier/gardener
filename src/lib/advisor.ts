@@ -11,12 +11,21 @@ export type PlantableAction = "sow_indoors" | "sow_outdoors" | "transplant" | "p
 export interface AgendaBed {
   id: string;
   name: string;
+  /**
+   * Garden-level agenda: this bed's own date — last day of its window ("now")
+   * or first day ("soon"). Beds under glass close later than open beds.
+   */
+  date?: Date;
 }
 
 export interface PlantableNow {
   plantId: string;
   action: PlantableAction;
-  /** Last day of the window (local date). */
+  /**
+   * Last day of the window (local date). Garden-level agenda: the earliest
+   * close among its beds — a date that holds for every bed listed; the beds
+   * that stay open longer carry their own `date`.
+   */
   until: Date;
   /** Garden-level agenda: the beds where the window is open now (empty: no bed needed, e.g. sowing indoors). */
   beds?: AgendaBed[];
@@ -25,7 +34,7 @@ export interface PlantableNow {
 export interface PlantableSoon {
   plantId: string;
   action: PlantableAction;
-  /** First day of the window (local date). */
+  /** First day of the window (local date). Garden-level agenda: the earliest opening among its beds (each bed carries its own `date`). */
   from: Date;
   beds?: AgendaBed[];
 }
@@ -187,19 +196,21 @@ export function getGardenSowingAgenda(
   const now = new Map<string, PlantableNow>();
   const soon = new Map<string, PlantableSoon>();
   for (const bed of beds) {
-    const ref = { id: bed.id, name: bed.name };
     const agenda = getSowingAgenda(plants, lastFrostDate, { ...opts, frostProtectionWeeks: bed.frostProtectionWeeks, environmentType: bed.environmentType });
     for (const item of agenda.now) {
       const key = `${item.plantId}|${item.action}`;
+      const ref = { id: bed.id, name: bed.name, date: item.until };
       const hit = now.get(key);
       if (!hit) now.set(key, { ...item, beds: [ref] });
       else {
         hit.beds!.push(ref);
-        if (item.until > hit.until) hit.until = item.until;
+        // The row's date must hold for every bed it names: the earliest close.
+        if (item.until < hit.until) hit.until = item.until;
       }
     }
     for (const item of agenda.soon) {
       const key = `${item.plantId}|${item.action}`;
+      const ref = { id: bed.id, name: bed.name, date: item.from };
       const hit = soon.get(key);
       if (!hit) soon.set(key, { ...item, beds: [ref] });
       else {
@@ -218,6 +229,60 @@ export function getGardenSowingAgenda(
     now: [...now.values()].sort((a, b) => a.until.getTime() - b.until.getTime()),
     soon: [...soon.values()].filter((i) => !nowIds.has(i.plantId)).sort((a, b) => a.from.getTime() - b.from.getTime()),
   };
+}
+
+/** One row per plant as the agenda lists show it: a crop can be due for different actions in different beds (lettuce: sow under glass, plant out in the raised bed). */
+export interface AgendaPlantRow {
+  kind: "now" | "soon";
+  plantId: string;
+  actions: PlantableAction[];
+  /** Now: the earliest close among the beds; soon: the earliest opening. Without beds: the row's own date. */
+  date: Date;
+  /** Each bed with its own date (now: the latest close over the actions; soon: the earliest opening). */
+  beds: AgendaBed[];
+}
+
+const time = (d: Date) => d.getTime();
+
+/** Merges the garden agenda per plant (see `AgendaPlantRow`), sorted by date. */
+export function agendaRowsByPlant(kind: AgendaPlantRow["kind"], rows: Array<PlantableNow | PlantableSoon>): AgendaPlantRow[] {
+  const byPlant = new Map<string, AgendaPlantRow>();
+  const later = (a: Date, b: Date) => (kind === "now" ? a > b : a < b);
+  for (const row of rows) {
+    const rowDate = kind === "now" ? (row as PlantableNow).until : (row as PlantableSoon).from;
+    let hit = byPlant.get(row.plantId);
+    if (!hit) {
+      hit = { kind, plantId: row.plantId, actions: [], date: rowDate, beds: [] };
+      byPlant.set(row.plantId, hit);
+    } else if (later(rowDate, hit.date)) hit.date = rowDate; // only used without beds
+    if (!hit.actions.includes(row.action)) hit.actions.push(row.action);
+    for (const b of row.beds ?? []) {
+      const date = b.date ?? rowDate;
+      const known = hit.beds.find((x) => x.id === b.id);
+      if (!known) hit.beds.push({ ...b, date });
+      else if (later(date, known.date!)) known.date = date;
+    }
+  }
+  for (const row of byPlant.values()) {
+    if (row.beds.length > 0) row.date = new Date(Math.min(...row.beds.map((b) => time(b.date!))));
+  }
+  return [...byPlant.values()].sort((a, b) => time(a.date) - time(b.date));
+}
+
+/**
+ * The beds of an agenda row grouped by their own date, earliest first, so the
+ * meta line never promises a date that is wrong for a bed it names:
+ * "bis 10. Okt. · 2 Beete · Hochbeet Süd bis 17. Okt. · Gewächshaus bis 31. Okt."
+ * (soon: "ab …"). Without beds (sowing indoors) or with one date for all: one group.
+ */
+export function groupAgendaBedsByDate(row: Pick<AgendaPlantRow, "date" | "beds">): Array<{ date: Date; beds: AgendaBed[] }> {
+  const groups = new Map<number, AgendaBed[]>();
+  for (const b of row.beds) {
+    const key = time(b.date ?? row.date);
+    groups.set(key, [...(groups.get(key) ?? []), b]);
+  }
+  if (groups.size === 0) return [{ date: row.date, beds: [] }];
+  return [...groups.entries()].sort(([a], [b]) => a - b).map(([t, beds]) => ({ date: new Date(t), beds }));
 }
 
 /** Crops on an agenda list: one per plant, as the rows show them (lettuce sown under glass and planted out counts once). */

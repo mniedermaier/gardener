@@ -175,7 +175,7 @@ export function FoodPlan() {
                       badges={need !== null && surplus > 0 ? <Badge tone="neutral">{t("foodplan.surplusBadge")}</Badge> : undefined}
                       meta={need === null
                         ? t("sufficiency.nonFood")
-                        : [t("foodplan.animalNeed", { amount: formatProductAmount(ty, need, f, t) }), surplus > 0 ? t("foodplan.animalSurplus", { amount: formatProductAmount(ty, surplus, f, t) }) : null].filter(Boolean).join(" · ")}
+                        : [t("foodplan.animalNeed", { amount: formatProductAmount(ty, need, f, t) }), surplus > 0 ? t("foodplan.animalSurplus", { amount: formatProductAmount(ty, surplus, f, t) }) : null]}
                       trailing={t("sufficiency.perYear", { amount: formatProductAmount(ty, animalForecast[ty], f, t) })}
                     />
                   );

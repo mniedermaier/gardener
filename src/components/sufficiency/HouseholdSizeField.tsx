@@ -38,7 +38,7 @@ export function HouseholdSizeField() {
             if (e.target.value !== "" && Number.isFinite(n)) setSize(n);
           }}
           onBlur={() => setText(String(size))}
-          className="w-10 appearance-none bg-transparent text-center text-sm font-semibold tabular-nums text-gray-900 [-moz-appearance:textfield] focus-visible:outline-2 focus-visible:outline-focus dark:text-gray-100 [&::-webkit-inner-spin-button]:appearance-none"
+          className="min-h-11 w-10 appearance-none bg-transparent text-center sm:min-h-0 text-sm font-semibold tabular-nums text-gray-900 [-moz-appearance:textfield] focus-visible:outline-2 focus-visible:outline-focus dark:text-gray-100 [&::-webkit-inner-spin-button]:appearance-none"
         />
         <IconButton icon={Plus} size="sm" label={t("sufficiency.morePeople")} onClick={() => setSize(size + 1)} disabled={size >= 20} />
       </div>

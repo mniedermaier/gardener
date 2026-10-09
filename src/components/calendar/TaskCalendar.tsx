@@ -4,8 +4,8 @@ import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks }
 import { parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { usePlants, usePlantMap } from "@/hooks/usePlants";
-import { usePlantName } from "@/hooks/usePlantName";
+import { usePlantMap } from "@/hooks/usePlants";
+import { usePlantName, usePlantOptions } from "@/hooks/usePlantName";
 import { useOpenAddOnNavigate, type AddPrefill } from "@/hooks/useOpenAddOnNavigate";
 import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 import { toISODate, todayISO } from "@/lib/format";
@@ -56,7 +56,7 @@ export function TaskCalendar() {
       addTask: s.addTask, updateTask: s.updateTask, deleteTask: s.deleteTask, generateTasks: s.generateTasks,
     }))
   );
-  const plants = usePlants();
+  const plantOptions = usePlantOptions();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
 
@@ -336,7 +336,7 @@ export function TaskCalendar() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={!draft.title.trim() || !draft.dueDate}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave} disabled={!draft.title.trim() || !draft.dueDate}>{t("common.save")}</Button>
           </>
         }
       >
@@ -381,7 +381,7 @@ export function TaskCalendar() {
               value={draft.plantId}
               onChange={(e) => patch({ plantId: e.target.value })}
               placeholder="–"
-              options={plants.map((p) => ({ value: p.id, label: getPlantName(p.id) }))}
+              options={plantOptions}
             />
           </div>
           <div>

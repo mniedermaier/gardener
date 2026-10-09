@@ -51,7 +51,7 @@ export const HarvestReady = memo(function HarvestReady({ items }: { items: Harve
             key={r.key}
             leading={plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} /> : undefined}
             title={getPlantName(r.plantId)}
-            meta={[r.bedName, t("dashboard.plantCount", { count: r.cells })].join(" · ")}
+            meta={[r.bedName, t("dashboard.plantCount", { count: r.cells })]}
             // The tab already says "ripe"; the row offers the action, and only "late" needs a badge.
             badges={r.late ? <Badge tone="warning">{t("dashboard.harvestSoon")}</Badge> : undefined}
             trailing={

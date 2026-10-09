@@ -96,7 +96,7 @@ export function ImportPage() {
                   meta={[
                     t("importPage.size", { w: formatNumber(bed.w), h: formatNumber(bed.h) }),
                     t("importPage.plantings", { count: bed.cells.length }),
-                  ].join(" · ")}
+                  ]}
                   description={ids.length ? ids.map((id) => getPlantName(id)).join(", ") : undefined}
                   trailing={
                     <span className="flex -space-x-1" aria-hidden="true">

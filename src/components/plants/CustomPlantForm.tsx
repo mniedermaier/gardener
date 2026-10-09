@@ -111,7 +111,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             </Button>
           )}
           <Button variant="secondary" onClick={onClose}>{t("common.cancel")}</Button>
-          <Button onClick={handleSave} disabled={!valid}>{plant ? t("common.save") : t("common.add")}</Button>
+          <Button onClick={handleSave} disabled={!valid}>{t("common.save")}</Button>
         </>
       }
     >

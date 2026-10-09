@@ -128,5 +128,12 @@ describe("Zustand store", () => {
       expect(store.getState().locationLon).toBe(11.582);
       expect(store.getState().locationName).toBe("Munich");
     });
+
+    it("keeps the region of a searched place and clears it for a new place without one", () => {
+      store.getState().setLocation(48.1351, 11.582, "München", "Bayern, Deutschland");
+      expect(store.getState().locationRegion).toBe("Bayern, Deutschland");
+      store.getState().setLocation(48.2, 11.6, "Garten");
+      expect(store.getState().locationRegion).toBe("");
+    });
   });
 });

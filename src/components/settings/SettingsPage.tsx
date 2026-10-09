@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, ChevronRight, Coffee, ExternalLink, MapPin, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
+import { Check, ChevronRight, CloudOff, Coffee, ExternalLink, Loader2, MapPin, RefreshCw, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
 import { estimateLastFrost } from "@/lib/location";
-import { fetchWeather, getOwmKeyStatus, getWeatherProvider, isWeatherConfigured, subscribeOwmKeyStatus } from "@/lib/weather";
+import { fetchWeather, getOwmKeyStatus, getWeatherFetchStatus, getWeatherProvider, isWeatherConfigured, subscribeOwmKeyStatus, subscribeWeatherFetchStatus } from "@/lib/weather";
 import { clearAllData } from "@/lib/dataImport";
 import { useFormat } from "@/hooks/useFormat";
 import { Card } from "@/components/ui/Card";
@@ -31,7 +31,7 @@ const LANGUAGES: Array<{ value: Locale; label: string }> = [
 ];
 
 const SETTING_KEYS = [
-  "locale", "theme", "weatherApiKey", "locationLat", "locationLon", "locationName",
+  "locale", "theme", "weatherApiKey", "locationLat", "locationLon", "locationName", "locationRegion",
   "lastFrostDate", "gridCellSizeCm", "backendUrl", "alerts",
 ] as const;
 
@@ -66,6 +66,7 @@ export function SettingsPage() {
       locationLat: s.locationLat,
       locationLon: s.locationLon,
       locationName: s.locationName,
+      locationRegion: s.locationRegion,
       lastFrostDate: s.lastFrostDate,
       gridCellSizeCm: s.gridCellSizeCm,
       backendUrl: s.backendUrl,
@@ -110,8 +111,8 @@ export function SettingsPage() {
 
   const handleLocation = (v: PickedLocation) => {
     setElevation(v.elevation);
-    if (v.lat !== null && v.lon !== null) store.setLocation(v.lat, v.lon, v.name);
-    else useStore.setState({ locationLat: v.lat, locationLon: v.lon, locationName: v.name });
+    if (v.lat !== null && v.lon !== null) store.setLocation(v.lat, v.lon, v.name, v.region);
+    else useStore.setState({ locationLat: v.lat, locationLon: v.lon, locationName: v.name, locationRegion: v.region ?? "" });
   };
 
   const handleClearAll = async () => {
@@ -127,22 +128,36 @@ export function SettingsPage() {
   // back to Open-Meteo (lib/weather.ts), and Settings must say so.
   const keyStatus = useSyncExternalStore(subscribeOwmKeyStatus, () => getOwmKeyStatus(store.weatherApiKey));
   const provider = configuredProvider === "openweathermap" && (keyStatus === "auth" || keyStatus === "unavailable") ? "open-meteo" : configuredProvider;
-  // A key nobody has used yet this session is checked once, after typing stops.
-  const checkKey = configuredProvider === "openweathermap" && keyStatus === undefined && hasLocation;
+  // What the last request for this location really found (same fetch as the weather page and "Heute").
+  const fetchStatus = useSyncExternalStore(subscribeWeatherFetchStatus, () => getWeatherFetchStatus(store.locationLat, store.locationLon));
+  // Nothing fetched yet this session, a key nobody has used yet, or "Erneut versuchen": check once per
+  // location/key/retry, after typing stops. fetchWeather gives up after a timeout, so "checking" always ends.
+  const [retry, setRetry] = useState(0);
+  const attempt = `${store.locationLat}|${store.locationLon}|${store.weatherApiKey}|${retry}`;
+  const [doneAttempt, setDoneAttempt] = useState<string | null>(null);
+  const wanted = fetchStatus === undefined || (configuredProvider === "openweathermap" && keyStatus === undefined) || retry > 0;
+  const checking = hasLocation && wanted && doneAttempt !== attempt;
   useEffect(() => {
-    if (!checkKey || store.locationLat === null || store.locationLon === null) return;
+    if (!checking || store.locationLat === null || store.locationLon === null) return;
     const ctrl = new AbortController();
     const timer = setTimeout(() => {
-      fetchWeather({ lat: store.locationLat!, lon: store.locationLon!, apiKey: store.weatherApiKey, locale: store.locale, t, signal: ctrl.signal }).catch(() => {});
+      fetchWeather({ lat: store.locationLat!, lon: store.locationLon!, apiKey: store.weatherApiKey, locale: store.locale, t, signal: ctrl.signal })
+        .catch(() => {})
+        .finally(() => { if (!ctrl.signal.aborted) setDoneAttempt(attempt); });
     }, 800);
     return () => { clearTimeout(timer); ctrl.abort(); };
-  }, [checkKey, store.locationLat, store.locationLon, store.weatherApiKey, store.locale, t]);
+  }, [checking, attempt, store.locationLat, store.locationLon, store.weatherApiKey, store.locale, t]);
+  const weatherState: "needsLocation" | "checking" | "error" | "ok" =
+    !hasLocation ? "needsLocation" : fetchStatus === "error" && !checking ? "error" : fetchStatus === "ok" ? "ok" : "checking";
+  const place = store.locationName || t("settings.weatherYourLocation");
   const providerStatus =
     configuredProvider !== "openweathermap" ? t("settings.weatherProviderActive", { provider: "Open-Meteo" })
     : keyStatus === "auth" ? t("settings.weatherKeyRejected")
     : keyStatus === "unavailable" ? t("settings.weatherOwmUnavailable")
     : keyStatus === "ok" ? t("settings.weatherProviderActive", { provider: "OpenWeatherMap" })
-    : hasLocation ? t("settings.weatherKeyChecking") : t("settings.weatherProviderActive", { provider: "OpenWeatherMap" });
+    : !hasLocation ? t("settings.weatherProviderActive", { provider: "OpenWeatherMap" })
+    : fetchStatus === "error" && !checking ? t("settings.weatherKeyUnchecked")
+    : t("settings.weatherKeyChecking");
 
   return (
     <div className="pb-8">
@@ -187,7 +202,7 @@ export function SettingsPage() {
         <Section id="settings-location" title={t("settings.locationClimate")} description={t("settings.locationClimateDesc")}>
           <div className="space-y-5">
             <LocationPicker
-              value={{ name: store.locationName, lat: store.locationLat, lon: store.locationLon, elevation }}
+              value={{ name: store.locationName, region: store.locationRegion, lat: store.locationLat, lon: store.locationLon, elevation }}
               onChange={handleLocation}
             />
             <div className="grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 dark:border-white/10">
@@ -221,13 +236,30 @@ export function SettingsPage() {
         <Section id="settings-weather" title={t("settings.weather")} description={t("settings.weatherDesc")}>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <span className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${hasLocation ? "bg-positive/10 text-positive" : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"}`} aria-hidden="true">
-                {hasLocation ? <Check size={16} /> : <MapPin size={16} />}
+              <span
+                className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
+                  weatherState === "ok" ? "bg-positive/10 text-positive" : weatherState === "error" ? "bg-warning/10 text-warning" : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+                }`}
+                aria-hidden="true"
+              >
+                {weatherState === "ok" ? <Check size={16} /> : weatherState === "error" ? <CloudOff size={16} /> : weatherState === "checking" ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
               </span>
-              <div className="min-w-0 text-sm">
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                  {hasLocation ? t("settings.weatherReady", { place: store.locationName || t("settings.weatherYourLocation") }) : t("settings.weatherNeedsLocation")}
+              <div className="min-w-0 flex-1 text-sm">
+                <p role="status" className="font-medium text-gray-900 dark:text-gray-100">
+                  {weatherState === "ok" ? t("settings.weatherReady", { place })
+                    : weatherState === "error" ? t("settings.weatherUnavailable", { place })
+                    : weatherState === "checking" ? t("settings.weatherChecking", { place })
+                    : t("settings.weatherNeedsLocation")}
                 </p>
+                {weatherState === "error" && (
+                  <>
+                    <p className="mt-0.5 text-gray-600 dark:text-gray-300">{t("settings.weatherUnavailableHint")}</p>
+                    <Button variant="secondary" size="sm" className="my-2" onClick={() => setRetry((n) => n + 1)}>
+                      <RefreshCw size={14} aria-hidden="true" />
+                      {t("weather.retry")}
+                    </Button>
+                  </>
+                )}
                 <p className="mt-0.5 text-gray-500 dark:text-gray-400">
                   {t("settings.weatherSource")}{" "}
                   {provider === "openweathermap" ? (
@@ -262,7 +294,7 @@ export function SettingsPage() {
                   hint={
                     <>
                       {t("settings.apiKeyHint")}{" "}
-                      <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
+                      <a href="https://home.openweathermap.org/users/sign_up" target="_blank" rel="noopener noreferrer" className="relative inline-flex items-center gap-0.5 font-medium text-garden-700 underline-offset-2 after:absolute after:-inset-y-3.5 after:inset-x-0 after:content-[''] hover:underline dark:text-garden-300">
                         openweathermap.org <ExternalLink size={12} aria-hidden="true" />
                       </a>
                     </>

@@ -141,7 +141,7 @@ import { List, ListRow } from "@/components/ui/List";
     leading={<PlantIconDisplay plantId={h.plantId} emoji={plant.icon} size={28} />}
     title={getPlantName(h.plantId)}
     badges={<Badge tone="warning">…</Badge>}
-    meta={[bedName, formatDate(h.date, "relative")].filter(Boolean).join(" · ")}
+    meta={[bedName, <time key="d" dateTime={h.date}>{formatDate(h.date, "relative")}</time>]}  // parts, not join(" · "): each part wraps as a unit, falsy parts skipped
     description={h.notes}                               // clamped to 2 lines
     trailing={formatWeight(h.grams)}                    // right-aligned value
     onClick={() => openEdit(h)}                         // whole row → edit dialog

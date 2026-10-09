@@ -216,7 +216,7 @@ export function AnimalDetail() {
                   key={e.id}
                   leading={<IconTile icon={Wheat} />}
                   title={e.feedType}
-                  meta={[f.formatDate(e.date, "relative"), formatFeedAmount(e, f)].join(" · ")}
+                  meta={[f.formatDate(e.date, "relative"), formatFeedAmount(e, f)]}
                   description={e.notes}
                   trailing={e.cost !== undefined ? f.formatCurrency(e.cost) : undefined}
                   onClick={() => setDialog({ kind: "feed", entry: e })}

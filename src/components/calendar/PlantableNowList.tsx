@@ -4,31 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import type { AgendaBed, PlantableNow, PlantableSoon } from "@/lib/advisor";
+import { agendaRowsByPlant, groupAgendaBedsByDate, type AgendaBed, type AgendaPlantRow, type PlantableNow, type PlantableSoon } from "@/lib/advisor";
 import { ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { PhaseBadge, actionPhase } from "@/components/ui/phase";
-
-/** One row per plant: a crop can be due for different actions in different beds (lettuce: sow under glass, plant out in the raised bed). */
-interface Item { kind: "now" | "soon"; plantId: string; actions: PlantableNow["action"][]; date: Date; beds: AgendaBed[] }
-
-function groupByPlant(kind: Item["kind"], rows: Array<PlantableNow | PlantableSoon>): Item[] {
-  const byPlant = new Map<string, Item>();
-  for (const row of rows) {
-    const date = kind === "now" ? (row as PlantableNow).until : (row as PlantableSoon).from;
-    const hit = byPlant.get(row.plantId);
-    if (!hit) {
-      byPlant.set(row.plantId, { kind, plantId: row.plantId, actions: [row.action], date, beds: [...(row.beds ?? [])] });
-      continue;
-    }
-    if (!hit.actions.includes(row.action)) hit.actions.push(row.action);
-    // Now: open until the latest close; soon: from the earliest opening.
-    if (kind === "now" ? date > hit.date : date < hit.date) hit.date = date;
-    for (const b of row.beds ?? []) if (!hit.beds.some((x) => x.id === b.id)) hit.beds.push(b);
-  }
-  // A merged row can close later (open earlier) than its first action: sort again.
-  return [...byPlant.values()].sort((a, b) => a.date.getTime() - b.date.getTime());
-}
 
 /**
  * Rows of the sowing agenda (`useSowingAgenda`): what can be sown or planted
@@ -46,7 +25,19 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const bedLabel = (beds?: AgendaBed[]) =>
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
-  const items = useMemo(() => [...groupByPlant("now", now), ...groupByPlant("soon", soon)], [now, soon]);
+  /** "bis 10. Okt. · 2 Beete · Hochbeet Süd bis 17. Okt.": one date per group of beds, never a date wrong for a bed it names. */
+  const meta = (item: AgendaPlantRow) => {
+    const key = item.kind === "now" ? "until" : "from";
+    const groups = groupAgendaBedsByDate(item);
+    return groups.flatMap((g, i) => {
+      const date = formatDate(g.date, "short");
+      // With exceptions after it, the lead group is just counted: the line stays short, the exceptions carry the names.
+      if (i === 0) return [t(`calendar.${key}`, { date }), groups.length > 1 && g.beds.length > 1 ? t("advisor.bedCount", { count: g.beds.length }) : bedLabel(g.beds)];
+      return [t(`calendar.${key === "until" ? "bedsUntil" : "bedsFrom"}`, { beds: bedLabel(g.beds), date })];
+    }).filter(Boolean).join(" · ");
+  };
+
+  const items = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);
   const shown = expanded ? items : items.slice(0, limit);
   const hidden = items.length - shown.length;
 
@@ -63,10 +54,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
             badges={item.actions.map((action) => (
               <PhaseBadge key={action} phase={actionPhase(action)} label={t(`advisor.actions.${action}`)} />
             ))}
-            meta={[
-              item.kind === "now" ? t("calendar.until", { date: formatDate(item.date, "short") }) : t("calendar.from", { date: formatDate(item.date, "short") }),
-              bedLabel(item.beds),
-            ].filter(Boolean).join(" · ")}
+            meta={meta(item)}
             onClick={() => {
               // With beds: straight to placing it (one bed: that bed; several: pick one). Indoors: the plant.
               const beds = item.beds;

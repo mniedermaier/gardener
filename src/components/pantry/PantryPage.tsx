@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { Fragment, useCallback, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle, Archive, Check, CookingPot, FlaskRound, Lightbulb, Package, Pencil, Plus, RotateCcw, Snowflake, Sun, Trash2, Warehouse, type LucideIcon,
@@ -337,16 +337,14 @@ export function PantryPage() {
                             : d <= SOON_DAYS ? <Badge tone="warning" dot>{t("pantry.daysLeft", { count: d })}</Badge>
                               : undefined
                         }
-                        meta={
-                          <span className="inline-flex flex-wrap items-center gap-x-1.5">
-                            <span className="inline-flex items-center gap-1">
-                              <MethodIcon method={item.method} />
-                              {t(`preservation.methods.${item.method}`)}
-                            </span>
-                            {item.units ? <span>· {unitText(item.units, item)}</span> : null}
-                            <span>· {t("pantry.expiresOn")} <time dateTime={item.expiresDate}>{formatDate(item.expiresDate)}</time></span>
-                          </span>
-                        }
+                        meta={[
+                          <span key="m" className="inline-flex items-center gap-1 align-top">
+                            <MethodIcon method={item.method} />
+                            {t(`preservation.methods.${item.method}`)}
+                          </span>,
+                          item.units ? unitText(item.units, item) : null,
+                          <Fragment key="e">{t("pantry.expiresOn")} <time dateTime={item.expiresDate}>{formatDate(item.expiresDate)}</time></Fragment>,
+                        ]}
                         description={item.notes}
                         trailing={formatWeight(item.quantityKg * 1000)}
                         actions={
@@ -477,7 +475,7 @@ export function PantryPage() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave}>{t("common.save")}</Button>
           </>
         }
       >

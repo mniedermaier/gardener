@@ -134,6 +134,7 @@ function importOverwrite(data: GardenerExport["data"]): ImportResult {
       locationLat: s.locationLat ?? null,
       locationLon: s.locationLon ?? null,
       locationName: s.locationName ?? "",
+      locationRegion: s.locationRegion ?? "",
       theme: (s.theme as "light" | "dark" | "system") ?? "system",
     });
     if (s.alerts) {

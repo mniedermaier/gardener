@@ -29,7 +29,7 @@ const COLLECTION_KEYS = [
 
 const SETTINGS_KEYS = [
   "locale", "lastFrostDate", "gridCellSizeCm", "locationLat", "locationLon",
-  "locationName", "theme", "alerts",
+  "locationName", "locationRegion", "theme", "alerts",
 ] as const;
 
 export type SyncOutcome =

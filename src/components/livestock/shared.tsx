@@ -182,7 +182,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
       open={open}
       onClose={onClose}
       title={entry ? t("livestock.editProduct") : t("livestock.addProduct")}
-      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={entry ? t("common.save") : t("common.add")} onDelete={entry ? () => void deleteProduct(entry).then((ok) => ok && onClose()) : undefined} />}
+      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={t("common.save")} onDelete={entry ? () => void deleteProduct(entry).then((ok) => ok && onClose()) : undefined} />}
     >
       <div className="space-y-4">
         {!animalId && (
@@ -278,7 +278,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
       open={open}
       onClose={onClose}
       title={entry ? t("livestock.editFeed") : t("livestock.addFeed")}
-      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={entry ? t("common.save") : t("common.add")} onDelete={entry ? () => void deleteFeed(entry).then((ok) => ok && onClose()) : undefined} />}
+      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={t("common.save")} onDelete={entry ? () => void deleteFeed(entry).then((ok) => ok && onClose()) : undefined} />}
     >
       <div className="space-y-4">
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
@@ -354,7 +354,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
       open={open}
       onClose={onClose}
       title={entry ? t("livestock.editHealth") : t("livestock.addHealth")}
-      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={entry ? t("common.save") : t("common.add")} onDelete={entry ? () => void deleteHealth(entry).then((ok) => ok && onClose()) : undefined} />}
+      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={t("common.save")} onDelete={entry ? () => void deleteHealth(entry).then((ok) => ok && onClose()) : undefined} />}
     >
       <div className="space-y-4">
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
@@ -440,7 +440,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
       open={open}
       onClose={onClose}
       title={animal ? t("livestock.editAnimal") : t("livestock.addAnimal")}
-      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={animal ? t("common.save") : t("common.add")} onDelete={animal ? () => void remove() : undefined} />}
+      footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={t("common.save")} onDelete={animal ? () => void remove() : undefined} />}
     >
       <div className="space-y-4">
         {!animal && (

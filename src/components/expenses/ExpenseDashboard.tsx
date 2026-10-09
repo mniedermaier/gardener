@@ -288,7 +288,7 @@ export function ExpenseDashboard() {
                     key={e.id}
                     leading={<CategoryTile category={e.category} />}
                     title={e.description}
-                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")].join(" · ")}
+                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")]}
                     trailing={f.formatCurrency(e.amountCents / 100)}
                     onClick={() => openEdit(e)}
                     actions={
@@ -322,7 +322,7 @@ export function ExpenseDashboard() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={save} disabled={!canSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={save} disabled={!canSave}>{t("common.save")}</Button>
           </>
         }
       >

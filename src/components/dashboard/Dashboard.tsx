@@ -220,16 +220,14 @@ export function Dashboard() {
                       key={h.id}
                       leading={plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={24} /> : undefined}
                       title={getPlantName(h.plantId)}
-                      meta={
-                        <span className="inline-flex items-center gap-1.5">
-                          <time dateTime={h.date}>{formatDate(h.date, "relative")}</time>
-                          {h.quality > 0 && (
-                            <span className="inline-flex items-center gap-0.5" aria-label={t("dashboard.quality", { count: h.quality })}>
-                              · <Star size={11} aria-hidden="true" className="fill-current text-gray-400" />{h.quality}
-                            </span>
-                          )}
-                        </span>
-                      }
+                      meta={[
+                        <time key="d" dateTime={h.date}>{formatDate(h.date, "relative")}</time>,
+                        h.quality > 0 && (
+                          <span key="q" className="inline-flex items-center gap-0.5 align-top" aria-label={t("dashboard.quality", { count: h.quality })}>
+                            <Star size={11} aria-hidden="true" className="fill-current text-gray-400" />{h.quality}
+                          </span>
+                        ),
+                      ]}
                       trailing={h.weightGrams ? formatWeight(h.weightGrams) : undefined}
                     />
                   );

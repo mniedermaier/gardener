@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import {
-  fetchWeather, getWeatherProvider, isWeatherConfigured, openMeteoUrl, parseOpenMeteo, WeatherAuthError, WMO_CODES, wmoToIcon,
+  fetchWeather, getWeatherFetchStatus, WEATHER_TIMEOUT_MS, getWeatherProvider, isWeatherConfigured, openMeteoUrl, parseOpenMeteo, WeatherAuthError, WMO_CODES, wmoToIcon,
 } from "@/lib/weather";
 
 const LOCALES = ["de", "en", "es", "fr"] as const;
@@ -122,5 +122,42 @@ describe("fetchWeather", () => {
   it("throws on a server error so the page can offer a retry", async () => {
     const fetchImpl = vi.fn(async () => new Response("", { status: 503 }));
     await expect(fetchWeather({ lat: 1, lon: 2, locale: "de", t: tFor("de"), fetchImpl: fetchImpl as unknown as typeof fetch })).rejects.toThrow();
+  });
+
+  it("records the outcome per location, the status Settings shows", async () => {
+    expect(getWeatherFetchStatus(3, 4)).toBeUndefined();
+    const down = vi.fn(async () => new Response("", { status: 503 }));
+    await expect(fetchWeather({ lat: 3, lon: 4, locale: "de", t: tFor("de"), fetchImpl: down as unknown as typeof fetch })).rejects.toThrow();
+    expect(getWeatherFetchStatus(3, 4)).toBe("error");
+    const up = vi.fn(async () => new Response(JSON.stringify(sample), { status: 200 }));
+    await fetchWeather({ lat: 3, lon: 4, locale: "de", t: tFor("de"), fetchImpl: up as unknown as typeof fetch });
+    expect(getWeatherFetchStatus(3, 4)).toBe("ok");
+    expect(getWeatherFetchStatus(5, 6)).toBeUndefined();
+  });
+
+  it("gives up on a hanging request instead of checking forever", async () => {
+    vi.useFakeTimers();
+    try {
+      // Never answers; only the abort signal ends it.
+      const hang = vi.fn((_url: string, init?: RequestInit) => new Promise<Response>((_, reject) => {
+        if (init?.signal?.aborted) reject(init.signal.reason);
+        init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+      }));
+      const p = fetchWeather({ lat: 7, lon: 8, apiKey: "key", locale: "de", t: tFor("de"), fetchImpl: hang as unknown as typeof fetch });
+      const done = expect(p).rejects.toThrow();
+      await vi.advanceTimersByTimeAsync(WEATHER_TIMEOUT_MS + 10);
+      await done;
+      expect(getWeatherFetchStatus(7, 8)).toBe("error");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not count an abort by the caller as an error", async () => {
+    const ctrl = new AbortController();
+    const fetchImpl = vi.fn(async () => { throw new DOMException("aborted", "AbortError"); });
+    ctrl.abort();
+    await expect(fetchWeather({ lat: 9, lon: 10, locale: "de", t: tFor("de"), signal: ctrl.signal, fetchImpl: fetchImpl as unknown as typeof fetch })).rejects.toThrow();
+    expect(getWeatherFetchStatus(9, 10)).toBeUndefined();
   });
 });

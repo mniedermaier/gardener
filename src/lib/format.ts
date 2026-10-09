@@ -27,13 +27,17 @@ const MINUS = "\u2212";
 function withMinus(text: string): string {
   return text.replace(/-/g, MINUS);
 }
+/** Number and unit stay on one line ("1 °C", "1,9 kg", "473,10 €"): non-breaking space. */
+function keepTogether(text: string): string {
+  return text.replace(/ /g, "\u00a0");
+}
 /** Values that round to 0 must not keep their sign. */
 function noNegativeZero(value: number, maximumFractionDigits: number): number {
   const f = 10 ** maximumFractionDigits;
   return Math.round(value * f) === 0 ? 0 : value;
 }
 /**
- * - short:     "3. Okt." (current year) / "3. Okt. 2025" — lists, compact
+ * - short:     "3. Okt." (current year) / "3. Okt. 2025" — lists, compact (non-breaking spaces)
  * - numeric:   "03.10.2026"                              — tables, exports
  * - long:      "Samstag, 3. Oktober 2026"                — headers, details
  * - relative:  "Heute", "Gestern", "Vor 3 Tagen", "In 2 Tagen"; beyond ±6 days falls back to short
@@ -94,13 +98,18 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
     case "weekday":
       return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(d);
     case "weekdayDate":
-      return new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }).format(d);
+      return nonBreaking(new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }).format(d));
     case "short":
     default: {
       const sameYear = d.getFullYear() === now.getFullYear();
-      return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }) }).format(d);
+      return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }) }).format(d));
     }
   }
+}
+
+/** Compact dates wrap as a whole ("15. Sept."), never between day and month. */
+function nonBreaking(text: string): string {
+  return text.replace(/ /g, "\u00a0");
 }
 
 /** "heute" at the start of a sentence/cell reads better as "Heute". */
@@ -135,32 +144,32 @@ export function formatWeight(grams: number, opts: FormatOptions & { unit?: "g" |
   const locale = intlLocale(opts.locale);
   const useKg = opts.unit === "kg" || (opts.unit !== "g" && Math.abs(grams) >= 1000);
   if (!useKg) {
-    return withMinus(new Intl.NumberFormat(locale, { style: "unit", unit: "gram", maximumFractionDigits: 0 }).format(noNegativeZero(grams, 0)));
+    return keepTogether(withMinus(new Intl.NumberFormat(locale, { style: "unit", unit: "gram", maximumFractionDigits: 0 }).format(noNegativeZero(grams, 0))));
   }
   const kg = grams / 1000;
-  return withMinus(new Intl.NumberFormat(locale, {
+  return keepTogether(withMinus(new Intl.NumberFormat(locale, {
     style: "unit",
     unit: "kilogram",
     maximumFractionDigits: Math.abs(kg) >= 100 ? 0 : 1,
-  }).format(kg));
+  }).format(kg)));
 }
 
 /** Amount in **euros** (not cents): 473.1 → "473,10 €" (de) / "€473.10" (en). */
 export function formatCurrency(amount: number, opts: FormatOptions & { currency?: string; maximumFractionDigits?: number } = {}): string {
   if (!Number.isFinite(amount)) return "–";
   const max = opts.maximumFractionDigits ?? 2;
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), {
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), {
     style: "currency",
     currency: opts.currency ?? "EUR",
     maximumFractionDigits: max,
     minimumFractionDigits: Math.min(2, max),
-  }).format(noNegativeZero(amount, max)));
+  }).format(noNegativeZero(amount, max))));
 }
 
 /** Volume in **litres**: 10 → "10 l"; up to one decimal. */
 export function formatVolume(liters: number, opts: FormatOptions = {}): string {
   if (!Number.isFinite(liters)) return "–";
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "liter", maximumFractionDigits: 1 }).format(noNegativeZero(liters, 1)));
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "liter", maximumFractionDigits: 1 }).format(noNegativeZero(liters, 1))));
 }
 
 /** Area in m²: 13.5 → "13,5 m²". */
@@ -172,7 +181,7 @@ export function formatArea(squareMeters: number, opts: FormatOptions = {}): stri
 /** Temperature in °C: -1.4 → "−1 °C" (true minus sign), -0.3 → "0 °C". */
 export function formatTemperature(celsius: number, opts: FormatOptions = {}): string {
   if (!Number.isFinite(celsius)) return "–";
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "celsius", maximumFractionDigits: 0 }).format(noNegativeZero(celsius, 0)));
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "celsius", maximumFractionDigits: 0 }).format(noNegativeZero(celsius, 0))));
 }
 
 /**
@@ -182,7 +191,7 @@ export function formatTemperature(celsius: number, opts: FormatOptions = {}): st
 export function formatPercent(ratio: number, opts: FormatOptions & { maximumFractionDigits?: number } = {}): string {
   if (!Number.isFinite(ratio)) return "–";
   const max = opts.maximumFractionDigits ?? 0;
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "percent", maximumFractionDigits: max }).format(noNegativeZero(ratio, max + 2)));
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "percent", maximumFractionDigits: max }).format(noNegativeZero(ratio, max + 2))));
 }
 
 /** All formatters bound to one language — what useFormat() returns. */

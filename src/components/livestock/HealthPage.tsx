@@ -191,7 +191,7 @@ export function HealthPage() {
                         leading={<IconTile icon={HEALTH_ICON[h.type]} tone={HEALTH_TONE[h.type]} />}
                         title={h.description}
                         badges={<Badge tone={HEALTH_TONE[h.type]}>{t(`livestock.healthTypes.${h.type}`)}</Badge>}
-                        meta={[animal ? animalLabel(animal, t) : null, f.formatDate(h.date, "relative")].filter(Boolean).join(" · ")}
+                        meta={[animal ? animalLabel(animal, t) : null, f.formatDate(h.date, "relative")]}
                         description={h.notes}
                         trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : undefined}
                         onClick={() => setDialog({ open: true, entry: h })}

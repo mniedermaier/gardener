@@ -93,7 +93,7 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
                 <ListRow
                   leading={<IconTile icon={open ? ChevronDown : ChevronRight} />}
                   title={weekTitle}
-                  meta={`${f.formatDate(w.from, "short")} – ${f.formatDate(w.to, "short")} · ${t("livestock.entriesHint", { count: w.items.length })}`}
+                  meta={[`${f.formatDate(w.from, "short")} – ${f.formatDate(w.to, "short")}`, t("livestock.entriesHint", { count: w.items.length })]}
                   clickLabel={`${weekTitle} – ${t(open ? "livestock.hideEntries" : "livestock.showEntries")}`}
                   onClick={() => toggle(w.key)}
                   trailing={null}
@@ -104,7 +104,7 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
                     className="pl-8 sm:pl-10"
                     leading={<IconTile icon={PRODUCT_ICON[p.type]} />}
                     title={formatProductAmount(p.type, p.unit === "g" ? p.quantity / 1000 : p.quantity, f, t)}
-                    meta={[typeCount > 1 ? t(`livestock.products.${p.type}`) : null, entryMeta?.(p) ?? null, f.formatDate(p.date, "relative")].filter(Boolean).join(" · ")}
+                    meta={[typeCount > 1 ? t(`livestock.products.${p.type}`) : null, entryMeta?.(p) ?? null, f.formatDate(p.date, "relative")]}
                     description={p.notes}
                     onClick={() => onOpen(p)}
                     actions={renderActions(p)}

@@ -26,6 +26,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
+import { varietyPlaceholder } from "@/data/varietyExamples";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const UNITS: SeedUnit[] = ["packets", "grams", "seeds"];
@@ -216,7 +217,7 @@ export function SeedInventory() {
                   type="button"
                   onClick={() => openAdd({ plant: id })}
                   aria-label={t("seeds.addFor", { name: getPlantName(id) })}
-                  className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-gray-200 bg-white py-1 pr-3 pl-1.5 text-sm font-medium text-gray-800 hover:border-garden-500 hover:bg-garden-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-garden-500/15"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-gray-200 sm:min-h-10 bg-white py-1 pr-3 pl-1.5 text-sm font-medium text-gray-800 hover:border-garden-500 hover:bg-garden-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-garden-500/15"
                 >
                   <PlantIconDisplay plantId={id} emoji={plant.icon} size={22} />
                   {getPlantName(id)}
@@ -275,7 +276,7 @@ export function SeedInventory() {
                     t(`seeds.unitCount.${seed.unit}`, { count: seed.quantity, n: formatNumber(seed.quantity) }),
                     sourceText,
                     t("seeds.acquired", { year: seed.yearAcquired }),
-                  ].join(" · ")}
+                  ]}
                   description={
                     viability.status === "testRecommended"
                       ? t("seeds.testExplain", { name, years: yearsText(viability.viabilityYears) })
@@ -314,7 +315,7 @@ export function SeedInventory() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave}>{t("common.save")}</Button>
           </>
         }
       >
@@ -331,7 +332,7 @@ export function SeedInventory() {
             />
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
-          <Input label={t("planner.variety")} value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={t("planner.varietyPlaceholder")} />
+          <Input label={t("planner.variety")} value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
           <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
             <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} error={errors.quantity} />
             <div>

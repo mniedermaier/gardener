@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/Input";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { Textarea } from "@/components/ui/Textarea";
 import { PlantInfoPanel } from "./PlantInfoPanel";
+import { varietyPlaceholder } from "@/data/varietyExamples";
 
 interface Props {
   gardenId: string;
@@ -68,7 +69,7 @@ export const CellInspector = memo(function CellInspector({
             {bed.name} · {t("planner.cellPosition", { row: cell.cellY + 1, col: cell.cellX + 1 })}
           </p>
         </div>
-        <IconButton icon={X} label={t("common.close")} onClick={onClose} className="-mt-1 -mr-1" />
+        <IconButton icon={X} label={t("planner.closeInspector")} onClick={onClose} className="-mt-1 -mr-1" />
       </div>}
 
       {conflictPartners.length > 0 && (
@@ -122,7 +123,7 @@ export const CellInspector = memo(function CellInspector({
           label={t("planner.variety")}
           value={cell.variety ?? ""}
           onChange={(e) => onUpdate({ variety: e.target.value || undefined })}
-          placeholder={t("planner.varietyPlaceholder")}
+          placeholder={varietyPlaceholder(t, cell.plantId)}
         />
         <DatePicker
           label={t("planner.plantedDate")}

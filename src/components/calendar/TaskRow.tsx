@@ -47,9 +47,9 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
     done
       ? t("calendar.doneOn", { date: formatDate(task.completedDate!.slice(0, 10), "relativeInline") })
       : group === "overdue" || group === "today" || group === "tomorrow" ? null
-        // Non-breaking spaces: the date wraps as a whole ("Di., 13. Okt."), never in the middle.
-        : formatDate(due, group === "later" ? "short" : "weekdayDate").replace(/ /g, "\u00a0"),
-  ].filter(Boolean).join(" · ");
+        // Short dates use non-breaking spaces: "Di., 13. Okt." wraps as a whole.
+        : formatDate(due, group === "later" ? "short" : "weekdayDate"),
+  ];
 
   return (
     <ListRow
@@ -83,7 +83,7 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
           {task.recurring && <Badge icon={Repeat} title={t("calendar.recurrence")}>{t(`calendar.recurring.${task.recurring.interval}`)}</Badge>}
         </>
       }
-      meta={meta || undefined}
+      meta={meta}
       description={task.description}
       trailing={
         plant ? (

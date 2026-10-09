@@ -127,7 +127,7 @@ export function FeedPage() {
                       key={e.id}
                       leading={<IconTile icon={Wheat} />}
                       title={e.feedType}
-                      meta={[formatFeedAmount(e, f), animal ? animalLabel(animal, t) : null, f.formatDate(e.date, "relative")].filter(Boolean).join(" · ")}
+                      meta={[formatFeedAmount(e, f), animal ? animalLabel(animal, t) : null, f.formatDate(e.date, "relative")]}
                       description={e.notes}
                       trailing={e.cost !== undefined ? f.formatCurrency(e.cost) : undefined}
                       onClick={() => setDialog({ open: true, entry: e })}

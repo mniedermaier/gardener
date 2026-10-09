@@ -117,13 +117,71 @@ export function subscribeOwmKeyStatus(listener: () => void): () => void {
   return () => owmListeners.delete(listener);
 }
 
+// ------------------------------------------------------------------ fetch status
+
 /**
- * Fetches from the configured provider. A failing OpenWeatherMap (rejected
- * key, outage) never leaves the user without weather: the call falls back to
- * Open-Meteo and reports why in `fallback`. Only when both fail the original
- * error is thrown (`WeatherAuthError` for a rejected key).
+ * What the last weather request for a location found: "ok" or "error" (no
+ * provider reachable, timeout). Every caller (weather page, "Heute", Settings)
+ * goes through `fetchWeather`, so Settings reports the same state the pages
+ * show instead of assuming the forecast works.
+ */
+export type WeatherFetchStatus = "ok" | "error";
+
+const fetchStatus = new Map<string, WeatherFetchStatus>();
+const statusListeners = new Set<() => void>();
+const statusKey = (lat: number, lon: number) => `${lat},${lon}`;
+
+/** Status of the last request for these coordinates, undefined while none has finished this session. */
+export function getWeatherFetchStatus(lat: number | null, lon: number | null): WeatherFetchStatus | undefined {
+  return lat === null || lon === null ? undefined : fetchStatus.get(statusKey(lat, lon));
+}
+
+/** For useSyncExternalStore: notifies when a fetch status changes. */
+export function subscribeWeatherFetchStatus(listener: () => void): () => void {
+  statusListeners.add(listener);
+  return () => statusListeners.delete(listener);
+}
+
+function setWeatherFetchStatus(lat: number, lon: number, status: WeatherFetchStatus): void {
+  const key = statusKey(lat, lon);
+  if (fetchStatus.get(key) === status) return;
+  fetchStatus.set(key, status);
+  statusListeners.forEach((l) => l());
+}
+
+/** A request that hangs (captive portal, dead connection) ends as an error after this long. */
+export const WEATHER_TIMEOUT_MS = 15_000;
+
+/**
+ * Fetches from the configured provider and records the outcome for the
+ * location (`getWeatherFetchStatus`). Gives up after `WEATHER_TIMEOUT_MS`.
+ * A failing OpenWeatherMap (rejected key, outage) never leaves the user
+ * without weather: the call falls back to Open-Meteo and reports why in
+ * `fallback`. Only when both fail the original error is thrown
+ * (`WeatherAuthError` for a rejected key).
  */
 export async function fetchWeather(opts: FetchWeatherOptions): Promise<WeatherResult> {
+  // The caller's signal plus a timeout ("TimeoutError", not "AbortError": it counts as a failure).
+  const ctrl = new AbortController();
+  const onAbort = () => ctrl.abort(opts.signal?.reason);
+  if (opts.signal?.aborted) onAbort();
+  else opts.signal?.addEventListener("abort", onAbort);
+  const timer = setTimeout(() => ctrl.abort(new DOMException("weather request timed out", "TimeoutError")), WEATHER_TIMEOUT_MS);
+  try {
+    const result = await fetchFromProvider({ ...opts, signal: ctrl.signal });
+    setWeatherFetchStatus(opts.lat, opts.lon, "ok");
+    return result;
+  } catch (e) {
+    // Aborted by the caller (unmount, new request): says nothing about the service.
+    if (!opts.signal?.aborted && (e as Error).name !== "AbortError") setWeatherFetchStatus(opts.lat, opts.lon, "error");
+    throw e;
+  } finally {
+    clearTimeout(timer);
+    opts.signal?.removeEventListener("abort", onAbort);
+  }
+}
+
+async function fetchFromProvider(opts: FetchWeatherOptions): Promise<WeatherResult> {
   if (getWeatherProvider(opts.apiKey) !== "openweathermap") return fetchOpenMeteo(opts);
   try {
     const result = await fetchOpenWeatherMap(opts);

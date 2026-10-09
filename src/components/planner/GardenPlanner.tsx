@@ -650,7 +650,7 @@ export function GardenPlanner() {
               {activeGarden ? (
                 <Button onClick={() => setBedDialog({ open: true })}>
                   <Plus size={16} aria-hidden="true" />
-                  {t("planner.newBed")}
+                  {t("planner.addBed")}
                 </Button>
               ) : null}
             </>
@@ -765,7 +765,7 @@ export function GardenPlanner() {
                   </span>
                   {sheetOpen ? <ChevronDown size={20} aria-hidden="true" className="shrink-0 text-gray-500" /> : <ChevronUp size={20} aria-hidden="true" className="shrink-0 text-gray-500" />}
                 </button>
-                {inspectedCell && <IconButton icon={X} label={t("common.close")} onClick={() => { setInspectKey(null); setSheetOpen(false); }} />}
+                {inspectedCell && <IconButton icon={X} label={t("planner.closeInspector")} onClick={() => { setInspectKey(null); setSheetOpen(false); }} />}
               </div>
               {sheetOpen && (
                 <div className={`${sheetFull || !inspectedCell ? "max-h-[62dvh]" : "max-h-[34dvh]"} overflow-y-auto overscroll-contain border-t border-gray-100 px-4 pt-3 pb-4 dark:border-white/5`}>
@@ -791,7 +791,7 @@ export function GardenPlanner() {
                   icon={Fence}
                   title={t("planner.emptyBedsTitle")}
                   description={pointerFine ? t("planner.emptyBedsTextClick") : t("planner.emptyBedsText")}
-                  action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.newBed")}</Button>}
+                  action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
                 />
               </Card>
             ) : (
@@ -836,7 +836,7 @@ export function GardenPlanner() {
                     key={`${a.gardenId}-${a.season}`}
                     leading={<Archive size={18} aria-hidden="true" className="text-gray-500" />}
                     title={t("season.current", { year: a.season })}
-                    meta={[t("season.beds", { count: a.beds.length }), t("season.plants", { count: a.beds.reduce((s, b) => s + b.cells.length, 0) })].join(" · ")}
+                    meta={[t("season.beds", { count: a.beds.length }), t("season.plants", { count: a.beds.reduce((s, b) => s + b.cells.length, 0) })]}
                     trailing={<time dateTime={a.archivedAt} className="text-xs font-normal text-gray-500 dark:text-gray-400">{formatDate(a.archivedAt, "short")}</time>}
                   />
                 ))}
@@ -861,7 +861,7 @@ export function GardenPlanner() {
           footer={
             <>
               <Button variant="secondary" onClick={() => setNewGardenOpen(false)}>{t("common.cancel")}</Button>
-              <Button onClick={handleCreateGarden} disabled={!gardenName.trim()}>{t("common.add")}</Button>
+              <Button onClick={handleCreateGarden} disabled={!gardenName.trim()}>{t("common.save")}</Button>
             </>
           }
         >

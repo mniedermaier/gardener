@@ -3,7 +3,7 @@ import plantsData from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
 import type { Bed, Garden } from "@/types/garden";
 import { getPhaseWindows, getHarvestReady, seasonFrost, suitsEnvironment } from "@/lib/season";
-import { getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda } from "@/lib/advisor";
+import { agendaRowsByPlant, getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda, groupAgendaBedsByDate } from "@/lib/advisor";
 import { recommendBedPlanting } from "@/lib/bedRecommendation";
 import { groupTasksByDue, nextDue, taskGroup } from "@/lib/tasks";
 import type { Task } from "@/types/task";
@@ -185,6 +185,60 @@ describe("autumn season: tasks, palette, garden agenda agree", () => {
     }
     expect(agenda.now.find((r) => r.plantId === "spinach")!.beds!.map((b) => b.id)).toEqual(["hb", "gh", "kk"]);
     expect(agenda.now.find((r) => r.plantId === "garlic")!.beds!.map((b) => b.id)).toEqual(["hb", "kk"]);
+  });
+
+  it("garden agenda never promises a date that is wrong for a bed it names", () => {
+    const beds = [
+      { id: "hb", name: "Hochbeet", ...raised },
+      { id: "gh", name: "Gewächshaus", ...glass },
+      { id: "kk", name: "Kübel", environmentType: "container" as const, frostProtectionWeeks: 0 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    // Every row's date holds for every bed it names: the earliest close.
+    for (const row of agenda.now) {
+      for (const b of row.beds!) {
+        const bed = beds.find((x) => x.id === b.id)!;
+        const own = getPlantableNow(plants, FROST, { now: OCT_9, ...bed }).find((p) => p.plantId === row.plantId && p.action === row.action)!;
+        expect(b.date, `${row.plantId} ${b.name}`).toEqual(own.until);
+        expect(row.until <= own.until, `${row.plantId} ${b.name}`).toBe(true);
+      }
+    }
+    // Lamb's lettuce: open beds until Oct 10/17, the greenhouse until Oct 31.
+    const lambs = agenda.now.find((r) => r.plantId === "lambs_lettuce")!;
+    expect(lambs.until).toEqual(new Date(2026, 9, 10));
+    const [row] = agendaRowsByPlant("now", agenda.now.filter((r) => r.plantId === "lambs_lettuce"));
+    // One group per date, earliest first: each bed is named with its own date.
+    expect(groupAgendaBedsByDate(row).map((g) => [g.date.getDate(), g.beds.map((b) => b.id)])).toEqual([[10, ["kk"]], [17, ["hb"]], [31, ["gh"]]]);
+  });
+
+  it("one row per plant keeps each bed's latest close over its actions", () => {
+    const beds = [
+      { id: "hb", name: "Hochbeet", ...raised },
+      { id: "gh", name: "Gewächshaus", ...glass },
+      { id: "kk", name: "Kübel", environmentType: "container" as const, frostProtectionWeeks: 0 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    // Lettuce: planted out until Oct 22 (raised bed) / Oct 15 (container), sown and planted under glass until Oct 31.
+    const [lettuce] = agendaRowsByPlant("now", agenda.now.filter((r) => r.plantId === "lettuce"));
+    expect(lettuce.date).toEqual(new Date(2026, 9, 15));
+    expect(Object.fromEntries(lettuce.beds.map((b) => [b.id, b.date!.getDate()]))).toEqual({ hb: 22, gh: 31, kk: 15 });
+    expect(groupAgendaBedsByDate(lettuce).map((g) => [g.date.getDate(), g.beds.map((b) => b.id)])).toEqual([[15, ["kk"]], [22, ["hb"]], [31, ["gh"]]]);
+  });
+
+  it("groups beds by their own date, also for soon rows and indoor sowing", () => {
+    const d = (day: number) => new Date(2026, 10, day);
+    const groups = groupAgendaBedsByDate({
+      date: d(1),
+      beds: [{ id: "hb", name: "Hochbeet", date: d(8) }, { id: "gh", name: "Gewächshaus", date: d(1) }, { id: "kk", name: "Kübel", date: d(8) }],
+    });
+    expect(groups.map((g) => [g.date.getDate(), g.beds.map((b) => b.id)])).toEqual([[1, ["gh"]], [8, ["hb", "kk"]]]);
+    // Indoor sowing: no beds, the row's own date.
+    expect(groupAgendaBedsByDate({ date: d(3), beds: [] })).toEqual([{ date: d(3), beds: [] }]);
+    // Soon rows open at the earliest opening.
+    const soon = agendaRowsByPlant("soon", [
+      { plantId: "x", action: "sow_outdoors", from: d(5), beds: [{ id: "a", name: "A", date: d(9) }, { id: "b", name: "B", date: d(5) }] },
+    ]);
+    expect(soon[0].date).toEqual(d(5));
   });
 
   it("a sowing task the bed is due for is offered by that bed's palette on its due date", () => {

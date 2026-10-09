@@ -192,16 +192,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     t.action?.onClick();
                     dismiss(t.id);
                   }}
-                  className="-my-1 min-h-9 shrink-0 rounded-lg px-2 font-semibold text-garden-700 hover:bg-garden-50 dark:text-garden-300 dark:hover:bg-white/10"
+                  className="-my-1 min-h-11 shrink-0 rounded-lg px-2 sm:min-h-9 font-semibold text-garden-700 hover:bg-garden-50 dark:text-garden-300 dark:hover:bg-white/10"
                 >
                   {t.action.label}
                 </button>
               )}
               <button
                 type="button"
-                aria-label={translate("common.close")}
+                aria-label={translate("common.dismissNotice")}
                 onClick={() => dismiss(t.id)}
-                className="-mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10"
+                className="-mr-1 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-gray-500 sm:size-8 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10"
               >
                 <X size={14} aria-hidden="true" />
               </button>

@@ -44,6 +44,8 @@ export interface GardenerExport {
       locationLat: number | null;
       locationLon: number | null;
       locationName: string;
+      /** Missing in backups made before it existed. */
+      locationRegion?: string;
       theme: string;
       alerts: AlertConfig;
     };
@@ -88,6 +90,7 @@ export function buildExportData(): GardenerExport {
         locationLat: state.locationLat,
         locationLon: state.locationLon,
         locationName: state.locationName,
+        locationRegion: state.locationRegion,
         theme: state.theme,
         alerts: state.alerts,
       },
