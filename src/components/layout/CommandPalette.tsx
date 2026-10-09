@@ -43,6 +43,14 @@ const GROUP_ORDER: GroupKey[] = ["actions", "pages", "plants", "beds", "animals"
 // "Gemüse" matches "gemuse", "Tomate" matches "tomaten".
 const normalize = (s: string) => s.toLocaleLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
+/** A few words around a match, cut at word boundaries: "… Die Tomaten abdecken …". */
+function snippet(text: string, at: number, len: number): string {
+  const from = at > 16 ? text.lastIndexOf(" ", at - 16) + 1 : 0;
+  const stop = text.indexOf(" ", at + len + 20);
+  const to = stop < 0 ? text.length : stop;
+  return `${from > 0 ? "… " : ""}${text.slice(from, to).trim()}${to < text.length ? " …" : ""}`;
+}
+
 // Legacy long page names stay searchable after the navigation was shortened.
 const LEGACY_LABELS: Record<string, string> = {
   today: "nav.dashboard", planner: "nav.planner", plants: "nav.plants", harvest: "nav.harvest",
@@ -256,7 +264,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         const at = normalize(j.text).indexOf(q);
         const hint = inTitle || at < 0
           ? formatDate(j.date, "short")
-          : `${at > 12 ? "…" : ""}${j.text.slice(Math.max(0, at - 12), at + q.length + 18).trim()}…`;
+          : snippet(j.text, at, q.length);
         out.push({ id: `journal:${j.id}`, group: "journal", label: j.title || formatDate(j.date, "long"), hint, icon: BookOpen, run: () => go(`/journal?entry=${encodeURIComponent(j.id)}`) });
       }
     }

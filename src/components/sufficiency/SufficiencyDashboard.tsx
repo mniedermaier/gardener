@@ -266,7 +266,8 @@ export function SufficiencyDashboard() {
                         </span>
                         <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}</span>
                       </div>
-                      <Meter forecast={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}`} />
+                      {/* Solid: the card header already says "Prognose"; a hatch vanished on the short bars. */}
+                      <Meter actual={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}`} />
                       <p className="mt-1 text-xs tabular-nums text-gray-500 dark:text-gray-400">
                         {t("sufficiency.ofNeed", { produced: `${f.formatNumber(data.produced, { maximumFractionDigits: 0 })} ${unit}`, needed: `${f.formatNumber(data.needed, { maximumFractionDigits: 0 })} ${unit}` })}
                       </p>

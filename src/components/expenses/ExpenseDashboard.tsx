@@ -141,12 +141,11 @@ export function ExpenseDashboard() {
   }, [visible, balance.costs.logEntries]);
 
   // One breakdown (metrics.getCosts): livestock feed/vet logs are part of
-  // the animal_feed/veterinary categories, with their origin as a note.
+  // the animal_feed/veterinary categories (their rows carry the log badge).
   const categoryRows = useMemo(() => {
-    const fromLog: Partial<Record<ExpenseCategory, number>> = { animal_feed: balance.costs.feed, veterinary: balance.costs.veterinary };
     return CATEGORIES
       .filter((c) => (balance.costs.byCategory[c] ?? 0) > 0)
-      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0, fromLog: fromLog[c] ?? 0 }))
+      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0 }))
       .sort((a, b) => b.amount - a.amount);
   }, [balance.costs, t]);
 
@@ -272,11 +271,6 @@ export function ExpenseDashboard() {
                         </span>
                       </div>
                       <Meter actual={r.amount} max={balance.costs.total} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
-                      {r.fromLog > 0 && (
-                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {t(r.key === "veterinary" ? "expenses.fromHealthLog" : "expenses.fromFeedLog", { amount: f.formatCurrency(r.fromLog) })}
-                        </p>
-                      )}
                     </li>
                   );
                 })}
