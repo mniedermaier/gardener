@@ -97,7 +97,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
     <div>
       {/* Today flag above the month axis */}
       <div className="flex gap-3">
-        <div className="hidden w-28 shrink-0 sm:block" />
+        <div className="hidden w-36 shrink-0 sm:block" />
         <div className="relative mb-1 h-5 flex-1" aria-hidden="true">
           <span
             className="absolute top-0 -translate-x-1/2 rounded bg-garden-700 px-1.5 text-xs font-medium leading-5 whitespace-nowrap text-white dark:bg-garden-300 dark:text-gray-950"
@@ -109,7 +109,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
       </div>
       {/* Month axis */}
       <div className="flex gap-3">
-        <div className="hidden w-28 shrink-0 sm:block" />
+        <div className="hidden w-36 shrink-0 sm:block" />
         <div className="relative h-5 flex-1 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
           {months.map((m, i) => (
             <span

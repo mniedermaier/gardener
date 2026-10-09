@@ -18,6 +18,7 @@ import { usePlants } from "@/hooks/usePlants";
 import type { Plant } from "@/types/plant";
 import { familyOf } from "@/data/plantFamilies";
 import { PartnerChips } from "./PartnerChips";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 
 type Relation = "good" | "bad" | null;
 type View = "matrix" | "plant";
@@ -271,6 +272,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
   const { t } = useTranslation();
   const navigate = useNavigate();
   const selected = plants.find((p) => p.id === selectedId) ?? plants[0];
+  const { ref: chipRowRef, fadeClass: chipFadeClass } = useScrollFade<HTMLDivElement>("", null);
 
   const { good, bad } = useMemo(() => {
     const g: Plant[] = [];
@@ -322,7 +324,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
             // The meta slot gives the category, or for a bad neighbour of the same
             // family the reason; garden context (with its beds) is the badge.
             badges={gardenBadge(p.id, kind)}
-            meta={[kind === "bad" && familyOf(p.id, p) === familyOf(selected.id, selected) ? t("companions.sameFamilyReason") : t(`plants.category.${p.category}`)]}
+            meta={[t(`plants.category.${p.category}`), kind === "bad" && familyOf(p.id, p) === familyOf(selected.id, selected) ? t("companions.sameFamilyReason") : null]}
             onClick={() => onSelect(p.id)}
           />
         ))
@@ -338,7 +340,6 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
           <Select
             wrapperClassName="min-w-0 flex-1"
             label={t("companions.choosePlant")}
-            hint={isExample ? t("companions.exampleHint") : undefined}
             value={selected.id}
             onChange={(e) => onSelect(e.target.value)}
             options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
@@ -348,19 +349,22 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
             <ChevronRight size={16} aria-hidden="true" />
           </Button>
         </div>
+        {/* The example hint sits under the whole row, so the link stays level with the select. */}
+        {isExample && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("companions.exampleHint")}</p>}
         {/* Quick picks: the crops in the beds (common crops without beds), captioned so they
             are not read as companion results. The active plant is already in the select. */}
         <p className="mt-3 mb-1.5 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
           {t(bedsByPlant.size > 0 ? "companions.quickInGarden" : "companions.quickCommon")}
         </p>
-        <div className="flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
+        {/* One scrolling row (edge fade), so the partner lists start on the first screen. */}
+        <div ref={chipRowRef} className={`-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] ${chipFadeClass}`} role="group" aria-label={t("companions.quickPick")}>
           {/* Every crop in the garden (a caption "Im Garten" must not silently drop some); common picks capped at 8. */}
           {(bedsByPlant.size > 0 ? [...bedsByPlant.keys()] : QUICK_PICKS.slice(0, 8)).filter((id) => names.has(id) && id !== selected.id).map((id) => (
             <button
               key={id}
               type="button"
               onClick={() => onSelect(id)}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:border-gray-300 sm:min-h-8 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:border-gray-300 sm:min-h-8 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
             >
               <PlantIconDisplay plantId={id} emoji="" size={18} />
               {names.get(id)}

@@ -1,4 +1,4 @@
-import { Fragment, memo, type ReactNode } from "react";
+import { Fragment, memo, useLayoutEffect, useRef, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 
 interface ListProps {
@@ -73,22 +73,41 @@ const META_SEPARATOR = " · ";
 
 /** Renders meta parts as unbreakable segments: "A ·" "B ·" "C". */
 function MetaLine({ meta }: { meta: ReactNode | MetaPart[] }) {
+  const ref = useRef<HTMLSpanElement>(null);
   const parts: MetaPart[] = Array.isArray(meta) ? meta : typeof meta === "string" && meta.includes(META_SEPARATOR) ? meta.split(META_SEPARATOR) : [meta];
   const visible = parts.filter((p) => p !== null && p !== undefined && p !== false && p !== "");
+  // A separator before a line break would dangle at the line end: hide it
+  // whenever the next part starts a new line (measured, so it follows the width).
+  useLayoutEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const measure = () => {
+      const boxes = [...root.querySelectorAll<HTMLElement>(":scope > [data-meta-part]")];
+      boxes.forEach((box, i) => {
+        const sep = box.querySelector<HTMLElement>("[data-meta-sep]");
+        const next = boxes[i + 1];
+        if (sep) sep.style.visibility = next && next.offsetTop > box.offsetTop ? "hidden" : "";
+      });
+    };
+    measure();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(root);
+    return () => ro?.disconnect();
+  });
   if (visible.length <= 1 && !Array.isArray(meta)) return <>{meta}</>;
   return (
-    <>
+    <span ref={ref}>
       {visible.map((part, i) => (
         <Fragment key={i}>
           {i > 0 && " "}
           {/* An atomic box: moves to the next line as a whole and only wraps inside when it is wider than the row. */}
-          <span className="inline-block max-w-full align-top break-words">
+          <span data-meta-part="" className="inline-block max-w-full align-top break-words">
             {part}
-            {i < visible.length - 1 && <span aria-hidden="true">{"\u00a0·"}</span>}
+            {i < visible.length - 1 && <span data-meta-sep="" aria-hidden="true">{"\u00a0·"}</span>}
           </span>
         </Fragment>
       ))}
-    </>
+    </span>
   );
 }
 

@@ -12,7 +12,8 @@ covered here, copy the pattern from the reference page
    everything, `garden-*` for the brand and primary actions, and semantic tones
    only for status: `positive` (good/done), `warning` (needs attention soon),
    `danger` (error/overdue/conflict, destructive actions), `info` (neutral
-   hint). Money, weights and counts stay neutral (`text-gray-900 tabular-nums`).
+   hint; also frost — the cold tone, on purpose: the frost warning carries its
+   urgency in the text and the action button, amber stays for "needs attention"). Money, weights and counts stay neutral (`text-gray-900 tabular-nums`).
    Never colour a whole number red or green. Put a `Badge` or trend chip next to it.
 3. **Numbers and dates go through `useFormat()`** (`src/lib/format.ts`). Never use
    `toFixed()`, never print raw `yyyy-MM-dd`, never hard-code `"kg"` or `"€"`.
@@ -83,7 +84,8 @@ covered here, copy the pattern from the reference page
      the last entry or a single option. **Preselected on purpose** (the common
      case, harmless if kept) — and only these: expense category "Saatgut",
      task type "Sonstiges", health "Kontrolle", pest kind "Schädling", bed
-     environment "Freilandbeet", pantry method once a plant is chosen. A wrong value that
+     environment "Freilandbeet", pantry method once a plant is chosen, watering
+     method "Manuell" (or the last entry's). A wrong value that
      would be a silent data error never starts preselected (the species of a new
      animal; a custom plant's category, sun, water and sowing timing; the
      source of seed). The plant symbol starts on the neutral sprout, shown as
