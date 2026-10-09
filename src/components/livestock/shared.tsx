@@ -469,7 +469,8 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
         {!animal && (
           <fieldset>
             <legend className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.animalType")}</legend>
-            <div className="grid grid-cols-3 gap-2">
+            {/* Two columns on phones: "Bienenvölker" must not break mid-word. */}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {ANIMAL_TYPES.map((ty) => {
                 const Icon = ANIMAL_ICON[ty];
                 const selected = type === ty;
@@ -487,7 +488,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
                   >
                     {/* Fixed icon box: every tile starts its label at the same x, whatever the glyph's width. */}
                     <span className="inline-flex size-5 shrink-0 items-center justify-center" aria-hidden="true"><Icon size={18} /></span>
-                    <span className="min-w-0 leading-tight break-words">{t(`livestock.types.${ty}`)}</span>
+                    <span className="min-w-0 leading-tight hyphens-auto">{t(`livestock.types.${ty}`)}</span>
                   </button>
                 );
               })}

@@ -116,6 +116,9 @@ export function SoilManagement() {
     om: testValues.om !== undefined && !(testValues.om >= 0 && testValues.om <= 100) ? t("soil.invalidNumber") : undefined,
   };
 
+  // Save stays disabled until the required fields hold (rule 9).
+  const testValid = !!test.bedId && testValues.ph >= 3 && testValues.ph <= 10 && !testErrors.n && !testErrors.p && !testErrors.k && !testErrors.om;
+
   const saveTest = () => {
     setTestSubmitted(true);
     if (!test.bedId || !(testValues.ph >= 3 && testValues.ph <= 10) || testErrors.n || testErrors.p || testErrors.k || testErrors.om) return;
@@ -160,6 +163,8 @@ export function SoilManagement() {
     kg: !(amendKg >= 0) ? t("soil.invalidNumber") : undefined,
     cost: !(amendCost >= 0) ? t("soil.invalidNumber") : undefined,
   };
+
+  const amendValid = !!amend.bedId && !!amend.material.trim() && !amendErrors.kg && !amendErrors.cost;
 
   const saveAmend = () => {
     setAmendSubmitted(true);
@@ -428,7 +433,7 @@ export function SoilManagement() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setTestOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={saveTest}>{t("common.save")}</Button>
+            <Button onClick={saveTest} disabled={!testValid}>{t("common.save")}</Button>
           </>
         }
       >
@@ -442,17 +447,18 @@ export function SoilManagement() {
             error={testErrors.bed}
             hint={draftTarget ? t("soil.targetHint", { range: rangeText(draftTarget) }) : undefined}
           />
-          <DateField label={t("harvest.date")} value={test.date} onChange={(date) => patchTest({ date })} />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("soil.ph")} inputMode="decimal" value={test.ph} onChange={(e) => patchTest({ ph: e.target.value })} placeholder={formatNumber(6.5)} error={testErrors.ph} />
-            <Input label={`${t("soil.nutrients.organicMatter")} (%)`} inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={formatNumber(4.5)} error={testErrors.om} />
+          {/* Rule 9: subject, details, Datum, Notizen. pH is the one required value. */}
+          <div className="grid grid-cols-2 items-end gap-4">
+            <Input label={t("soil.ph")} inputMode="decimal" value={test.ph} onChange={(e) => patchTest({ ph: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(6.5) })} error={testErrors.ph} />
+            <Input label={`${t("soil.nutrients.organicMatter")} (%)`} optional inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4.5) })} error={testErrors.om} />
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Input label={t("soil.nShort")} inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder="40" error={testErrors.n} />
-            <Input label={t("soil.pShort")} inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder="30" error={testErrors.p} />
-            <Input label={t("soil.kShort")} inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder="150" error={testErrors.k} />
+          <div className="grid grid-cols-3 items-end gap-3">
+            <Input label={t("soil.nShort")} optional inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
+            <Input label={t("soil.pShort")} optional inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />
+            <Input label={t("soil.kShort")} optional inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(150) })} error={testErrors.k} />
           </div>
           <p className="-mt-2 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
+          <DateField label={t("harvest.date")} value={test.date} onChange={(date) => patchTest({ date })} />
           <Textarea label={t("harvest.notes")} optional placeholder={t("soil.testNotesPlaceholder")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
         </div>
       </Modal>
@@ -470,7 +476,7 @@ export function SoilManagement() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setAmendOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={saveAmend}>{t("common.save")}</Button>
+            <Button onClick={saveAmend} disabled={!amendValid}>{t("common.save")}</Button>
           </>
         }
       >
@@ -485,8 +491,8 @@ export function SoilManagement() {
             />
           </div>
           <Input label={t("soil.material")} value={amend.material} onChange={(e) => patchAmend({ material: e.target.value })} placeholder={t("soil.materialPlaceholder")} error={amendErrors.material} />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label={t("soil.quantityKg")} inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(10) })} error={amendErrors.kg} />
+          <div className="grid grid-cols-2 items-end gap-4">
+            <Input label={t("soil.quantityKg")} optional inputMode="decimal" value={amend.kg} onChange={(e) => patchAmend({ kg: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(10) })} error={amendErrors.kg} />
             <Input label={t("soil.cost")} optional inputMode="decimal" value={amend.cost} onChange={(e) => patchAmend({ cost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(12.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("common.costHint")} error={amendErrors.cost} />
           </div>
           <DateField label={t("harvest.date")} value={amend.date} onChange={(date) => patchAmend({ date })} />

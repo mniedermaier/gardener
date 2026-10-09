@@ -123,8 +123,10 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
         <Input label={t("plants.customName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("plants.form.namePlaceholder")} autoFocus />
 
         <div>
+          {/* The chosen symbol is named next to the label: no silent default. */}
           <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("plants.customIcon")}
+            {ICONS.includes(draft.icon) && <span className="font-normal text-gray-600 dark:text-gray-400">: {getPlantName(draft.icon)}</span>}
           </span>
           {/* 16 icons: 6 per row on phones (3 short rows of 44 px targets — 8 per row would drop below 44 px at 390 px), 8 × 2 across the full field width on wider screens. An old emoji icon stays selectable as an extra tile. */}
           <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">

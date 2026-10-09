@@ -56,9 +56,10 @@ export function QualityInput({ label, value, onChange }: { label: string; value:
           </button>
         ))}
       </div>
-      <div className="flex justify-between gap-4 px-2 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
-        <span>{t("harvest.qualityLevel.1")}</span>
-        <span>{t("harvest.qualityLevel.5")}</span>
+      {/* Short endpoint words, so the right one sits under star 5 (the full level name is in the label above). */}
+      <div className="flex justify-between gap-4 px-2.5 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
+        <span>{t("harvest.qualityScaleLow")}</span>
+        <span className="text-right">{t("harvest.qualityScaleHigh")}</span>
       </div>
       </div>
     </div>

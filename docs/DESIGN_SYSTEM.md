@@ -53,7 +53,10 @@ covered here, copy the pattern from the reference page
      side by side on phones.
    - **Plant fields** are a `PlantCombobox` labelled "Pflanze" in every dialog.
    - **Scales** (harvest quality, pest severity) show their two endpoint
-     captions under the control.
+     captions under the control — short words that fit under the end
+     steps ("Schlecht" … "Top"); the full level name sits in the label.
+   - **Measurements** (soil test): only the value the record needs is
+     required (pH); every other reading is `optional`, with "z. B." examples.
    - **Dates:** `DateField` — Heute/Gestern/Datum … for records,
      `mode="future"` (Heute/Morgen/+1 Woche/Datum …) for tasks; the last
      segment is always "Datum …" with the calendar icon (icon only on phones in

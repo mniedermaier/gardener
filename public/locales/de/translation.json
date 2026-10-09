@@ -1213,7 +1213,9 @@
     "log": "Protokoll",
     "showOlder": "Ältere Monate anzeigen",
     "weightIn": "Gewicht ({{unit}})",
-    "prev30": "30 Tage davor: {{weight}}"
+    "prev30": "30 Tage davor: {{weight}}",
+    "qualityScaleLow": "Schlecht",
+    "qualityScaleHigh": "Top"
   },
   "journal": {
     "title": "Tagebuch",
@@ -1245,7 +1247,7 @@
     "photoN": "Foto {{n}}",
     "removePhoto": "Foto {{n}} entfernen",
     "addPhoto": "Foto hinzufügen",
-    "suggestedTags": "Vorschläge:",
+    "suggestedTags": "Häufig verwendet",
     "noAnimal": "Kein Tier",
     "linkToggle": "Pflanze, Beet oder Tier verknüpfen",
     "photoHintShort": "Bis zu {{max}} Fotos, nur auf diesem Gerät gespeichert.",
@@ -1570,11 +1572,11 @@
     "liters": "Liter",
     "productionEntries_one": "{{count}} Eintrag",
     "productionEntries_other": "{{count}} Einträge",
-    "addHealth": "Gesundheit erfassen",
+    "addHealth": "Gesundheitseintrag erfassen",
     "healthAdded": "Gesundheitseintrag erfasst",
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
-    "healthDesc": "Beschreibung",
+    "healthDesc": "Befund",
     "editAnimal": "Tier bearbeiten",
     "updated": "Tier aktualisiert",
     "since": "seit",
@@ -1647,7 +1649,7 @@
       "vaccCoverageScoped": "Impfschutz",
       "vaccScopeHint": "Tiergruppen mit Impfpflicht",
       "vaccDueBadge": "fällig",
-      "addEntry": "Eintrag erfassen"
+      "addEntry": "Gesundheitseintrag erfassen"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1938,7 +1940,7 @@
       "high": "hoch"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nährstoffe in ppm (mg/kg), wie Testsets und Labore sie angeben. Felder leer lassen, wenn nicht gemessen.",
+    "ppmHint": "Nährstoffe in ppm (mg/kg), wie Testsets und Labore sie angeben.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
@@ -2312,7 +2314,7 @@
     "methods": {
       "manual": "Gießkanne",
       "hose": "Schlauch",
-      "drip": "Tropfbewässerung",
+      "drip": "Tropfschlauch",
       "sprinkler": "Sprinkler",
       "rain": "Regen"
     },
