@@ -1456,7 +1456,8 @@
     "rowMissing": "{{kg}} short",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Target reached by the forecast",
-    "rowNothingLogged": "nothing logged yet"
+    "rowNothingLogged": "nothing logged yet",
+    "areaNeededHintEmpty": "full annual target of all crops"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1853,7 +1854,8 @@
     "valueHint": "{{amount}} × {{price}}",
     "ofExpectedSince": "expected ~{{amount}} since first entry ({{date}})",
     "recordedSince": "Recorded since {{date}}",
-    "weekSpan": "wk {{from}}–{{to}}"
+    "weekSpan": "wk {{from}}–{{to}}",
+    "lastEggEntry": "last entry {{date}}"
   },
   "seeds": {
     "title": "Seeds",
@@ -2478,7 +2480,8 @@
     "toPlanner": "Go to planner",
     "restoreBackupHint": "For your own backup (.json) – replaces or merges all data.",
     "includes": "Beds and plantings are copied.",
-    "excludes": "Not included: harvests, animals, notes and expenses."
+    "excludes": "Not included: harvests, animals, notes and expenses.",
+    "backToPlanner": "Back to the planner"
   },
   "charts": {
     "month": "Month",

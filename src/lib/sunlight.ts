@@ -37,7 +37,8 @@ export function getDaylightInfo(
   lat: number,
   lon: number,
 ): DaylightInfo {
-  const times = SunCalc.getTimes(date, lat, lon);
+  // Local noon of the given day: SunCalc picks the solar day around the instant.
+  const times = SunCalc.getTimes(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12), lat, lon);
   const noonPos = SunCalc.getPosition(times.solarNoon, lat, lon);
 
   // At high latitudes the sun may never rise or set — sunrise/sunset are then null

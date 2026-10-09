@@ -61,6 +61,7 @@ export function LivestockPage() {
   // Key figures only for what this herd yields (no "Honig 0 kg" without bees).
   const herdTypes = herdProductTypes(animals, stats.year).slice(0, eggAnimal ? 2 : 3);
   const eggAvg = stats.eggWeeks.reduce((s, n) => s + n, 0) / stats.eggWeeks.length;
+  const lastEggEntry = animalProducts.reduce<string | null>((max, p) => (p.type === "eggs" && (max === null || p.date > max) ? p.date : max), null);
   const feedFigure = {
     label: t("livestock.feedCost30"),
     value: f.formatCurrency(stats.feed.last30Days),
@@ -153,7 +154,7 @@ export function LivestockPage() {
               value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
               icon: Egg,
               visual: <Sparkline values={stats.eggWeeks} color="brand" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
-              hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} />,
+              hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} lastEntry={lastEggEntry} />,
               to: "/livestock/production",
             } : { ...feedFigure, icon: Coins }}
             // A short summary that links on: the year totals and the monthly

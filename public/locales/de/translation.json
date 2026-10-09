@@ -273,7 +273,7 @@
     "previewTitle": "Damit planen wir zum Beispiel:",
     "previewSowIndoors": "vorziehen ab {{date}}",
     "previewTransplant": "auspflanzen ab {{date}}",
-    "previewSowOutdoors": "säen ab {{date}}",
+    "previewSowOutdoors": "direkt säen ab {{date}}",
     "climateLabel": "Oder wähle dein Klima",
     "climate": {
       "mild": "Mild",
@@ -1456,7 +1456,8 @@
     "rowMissing": "fehlen {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Ziel laut Prognose erreicht",
-    "rowNothingLogged": "nichts erfasst"
+    "rowNothingLogged": "nichts erfasst",
+    "areaNeededHintEmpty": "volles Jahresziel aller Kulturen"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1853,7 +1854,8 @@
     "valueHint": "{{amount}} × {{price}}",
     "ofExpectedSince": "erwartet ~{{amount}} seit 1. Eintrag ({{date}})",
     "recordedSince": "Erfasst seit {{date}}",
-    "weekSpan": "KW {{from}}–{{to}}"
+    "weekSpan": "KW {{from}}–{{to}}",
+    "lastEggEntry": "letzter Eintrag {{date}}"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2478,7 +2480,8 @@
     "toPlanner": "Zum Planer",
     "restoreBackupHint": "Für deine eigene Sicherung (.json) – ersetzt oder ergänzt alle Daten.",
     "includes": "Übernommen werden Beete und Bepflanzung.",
-    "excludes": "Nicht enthalten: Ernten, Tiere, Notizen und Ausgaben."
+    "excludes": "Nicht enthalten: Ernten, Tiere, Notizen und Ausgaben.",
+    "backToPlanner": "Zurück zum Planer"
   },
   "charts": {
     "month": "Monat",

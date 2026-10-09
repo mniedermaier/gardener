@@ -35,6 +35,8 @@ interface Command {
   keywords?: string;
   icon?: LucideIcon;
   leading?: ReactNode;
+  /** Overdue tasks: the hint in the danger tone, as on "Heute". */
+  hintDanger?: boolean;
   run: () => void;
 }
 
@@ -260,7 +262,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     for (const task of tasks) {
       if (!cap("tasks")) break;
       if (!task.completedDate && normalize(task.title).includes(q)) {
-        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: dueHint(task.dueDate), icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
+        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: dueHint(task.dueDate), hintDanger: task.dueDate < today, icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
       }
     }
     for (const j of journalEntries) {
@@ -374,7 +376,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     {c.leading ?? <Icon size={16} />}
                   </span>
                   <span className="min-w-0 flex-1 truncate font-medium"><Match text={c.label} query={debounced.trim()} /></span>
-                  {c.hint && <span className="min-w-0 max-w-[45%] truncate text-xs text-gray-500 dark:text-gray-400"><Match text={c.hint} query={debounced.trim()} /></span>}
+                  {c.hint && <span className={`min-w-0 max-w-[45%] truncate text-xs ${c.hintDanger ? "font-medium text-danger" : "text-gray-500 dark:text-gray-400"}`}><Match text={c.hint} query={debounced.trim()} /></span>}
                   {selected && <CornerDownLeft size={14} aria-hidden="true" className="hidden shrink-0 text-gray-500 sm:block" />}
                 </div>
               </div>

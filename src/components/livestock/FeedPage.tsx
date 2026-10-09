@@ -70,15 +70,24 @@ export function FeedPage() {
         </Card>
       ) : (
         <div className="space-y-6">
+          {/* Nothing in the last 30 days: a 0,00 € hero says nothing — the monthly
+              average leads, and the 30-day figure moves into the row. */}
           <KeyFigures
-            hero={{
+            hero={stats.entriesLast30Days > 0 ? {
               label: t("livestock.feedCost30"),
               value: f.formatCurrency(stats.last30Days),
               icon: Wheat,
               hint: t("livestock.feedEntriesCount", { count: stats.entriesLast30Days }),
+            } : {
+              label: t("livestock.feed.perMonth"),
+              value: f.formatCurrency(stats.perMonth),
+              icon: Wheat,
+              hint: stats.since ? t("livestock.feed.perMonthSince", { date: f.formatDate(stats.since) }) : undefined,
             }}
             items={[
-              { label: t("livestock.feed.perMonth"), value: f.formatCurrency(stats.perMonth), hint: stats.since ? t("livestock.feed.perMonthSince", { date: f.formatDate(stats.since) }) : undefined },
+              stats.entriesLast30Days > 0
+                ? { label: t("livestock.feed.perMonth"), value: f.formatCurrency(stats.perMonth), hint: stats.since ? t("livestock.feed.perMonthSince", { date: f.formatDate(stats.since) }) : undefined }
+                : { label: t("livestock.feedCost30"), value: f.formatCurrency(0), hint: t("livestock.feedEntriesCount", { count: 0 }) },
               { label: t("livestock.feed.totalCost"), value: f.formatCurrency(stats.total) },
               {
                 label: t("livestock.feed.totalKg"),

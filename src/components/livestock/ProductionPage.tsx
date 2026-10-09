@@ -66,6 +66,7 @@ export function ProductionPage() {
   });
   const eggWeeks = stats.eggWeeks;
   const eggAvg = eggWeeks.reduce((s, n) => s + n, 0) / eggWeeks.length;
+  const lastEggEntry = animalProducts.reduce<string | null>((max, p) => (p.type === "eggs" && (max === null || p.date > max) ? p.date : max), null);
   // Same basis as the herd cards on "Tiere": expected up to today since arrival or the first entry.
   const expectedToDate = (ty: ProductType) => animals.reduce((sum, a) => {
     const y = ANNUAL_YIELD[a.type]?.find((x) => x.product === ty);
@@ -105,7 +106,7 @@ export function ProductionPage() {
             <Sparkline values={eggWeeks} color="brand" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
           </span>
         ),
-        hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} />,
+        hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} lastEntry={lastEggEntry} />,
       }]
     : [];
   // Wax and wool are listed as single entries under the chart: no second figure for them.

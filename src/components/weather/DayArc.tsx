@@ -27,7 +27,9 @@ export const DayArc = memo(function DayArc({ lat, lon, className = "" }: { lat: 
   const [now] = useState(() => new Date());
 
   const info = useMemo(() => {
-    const times = SunCalc.getTimes(now, lat, lon);
+    // Today's sun: SunCalc picks the solar day around the given instant, so just
+    // after midnight "now" would return yesterday's rise and set — ask for local noon.
+    const times = SunCalc.getTimes(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12), lat, lon);
     if (!times.sunrise || !times.sunset || Number.isNaN(times.sunrise.getTime())) return null;
     const rise = times.sunrise.getTime();
     const set = times.sunset.getTime();

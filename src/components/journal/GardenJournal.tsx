@@ -450,8 +450,34 @@ export function GardenJournal() {
               </div>
             )}
           </div>
+          {/* Photos */}
+          <div>
+            <p className={LABEL_CLASS}>{t("journal.photos")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>
+            <div className="flex flex-wrap gap-2">
+              {draft.photos.map((photo, idx) => (
+                <div key={photo} className="relative">
+                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-24 rounded-lg border border-gray-200 object-cover sm:size-20 dark:border-white/10" />
+                  <IconButton
+                    icon={X}
+                    size="sm"
+                    label={t("journal.removePhoto", { n: idx + 1 })}
+                    onClick={() => removeDraftPhoto(photo)}
+                    className="absolute top-1 right-1 bg-white/90 shadow-xs hover:bg-white dark:bg-gray-900/90"
+                  />
+                </div>
+              ))}
+              {draft.photos.length < MAX_PHOTOS && (
+                <label className="flex size-24 sm:size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
+                  {uploading ? <Camera size={20} aria-hidden="true" className="animate-pulse" /> : <ImagePlus size={20} aria-hidden="true" />}
+                  {t("journal.addPhoto")}
+                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoSelect} />
+                </label>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHintShort", { max: MAX_PHOTOS })}</p>
+          </div>
           {/* Links are optional: a disclosure keeps the dialog short (open when the entry already has one).
-              It sits above the photos so it stays above the fold on phones. */}
+              Photos come first: they are a main reason to open the journal on a phone. */}
           <details
             open={linksOpen}
             onToggle={(e) => setLinksOpen(e.currentTarget.open)}
@@ -488,32 +514,6 @@ export function GardenJournal() {
             </div>
             </div>
           </details>
-          {/* Photos */}
-          <div>
-            <p className={LABEL_CLASS}>{t("journal.photos")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>
-            <div className="flex flex-wrap gap-2">
-              {draft.photos.map((photo, idx) => (
-                <div key={photo} className="relative">
-                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-24 rounded-lg border border-gray-200 object-cover sm:size-20 dark:border-white/10" />
-                  <IconButton
-                    icon={X}
-                    size="sm"
-                    label={t("journal.removePhoto", { n: idx + 1 })}
-                    onClick={() => removeDraftPhoto(photo)}
-                    className="absolute top-1 right-1 bg-white/90 shadow-xs hover:bg-white dark:bg-gray-900/90"
-                  />
-                </div>
-              ))}
-              {draft.photos.length < MAX_PHOTOS && (
-                <label className="flex size-24 sm:size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
-                  {uploading ? <Camera size={20} aria-hidden="true" className="animate-pulse" /> : <ImagePlus size={20} aria-hidden="true" />}
-                  {t("journal.addPhoto")}
-                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoSelect} />
-                </label>
-              )}
-            </div>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHintShort", { max: MAX_PHOTOS })}</p>
-          </div>
 
         </div>
       </Modal>

@@ -76,7 +76,7 @@ export function FoodPlan() {
               hint: t("foodplan.annualNeedHint", { count: householdSize }),
             }}
             items={[
-              { label: t("foodplan.areaNeededLabel"), value: f.formatArea(plan.neededAreaM2), hint: t("foodplan.areaNeededHint") },
+              { label: t("foodplan.areaNeededLabel"), value: f.formatArea(plan.neededAreaM2), hint: t(plan.actualKg > 0 ? "foodplan.areaNeededHint" : "foodplan.areaNeededHintEmpty") },
             ]}
           />
           <div className="flex flex-col gap-3 rounded-xl border border-garden-200 bg-garden-50 p-4 sm:flex-row sm:items-center dark:border-garden-500/30 dark:bg-garden-500/10">

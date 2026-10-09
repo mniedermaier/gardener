@@ -1522,7 +1522,8 @@
     "rowMissing": "faltan {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objetivo alcanzado según la previsión",
-    "rowNothingLogged": "nada registrado aún"
+    "rowNothingLogged": "nada registrado aún",
+    "areaNeededHintEmpty": "objetivo anual completo de todos los cultivos"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1944,7 +1945,8 @@
     "valueHint": "{{amount}} × {{price}}",
     "ofExpectedSince": "esperados ~{{amount}} desde el 1.er registro ({{date}})",
     "recordedSince": "Registrado desde el {{date}}",
-    "weekSpan": "sem. {{from}}–{{to}}"
+    "weekSpan": "sem. {{from}}–{{to}}",
+    "lastEggEntry": "último registro {{date}}"
   },
   "seeds": {
     "title": "Semillas",
@@ -2599,7 +2601,8 @@
     "toPlanner": "Ir al planificador",
     "restoreBackupHint": "Para tu propia copia (.json): sustituye o combina todos los datos.",
     "includes": "Se copian los bancales y las plantaciones.",
-    "excludes": "No se incluyen: cosechas, animales, notas ni gastos."
+    "excludes": "No se incluyen: cosechas, animales, notas ni gastos.",
+    "backToPlanner": "Volver al planificador"
   },
   "charts": {
     "month": "Mes",

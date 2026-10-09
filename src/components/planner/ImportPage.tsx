@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Download, Eye, LayoutGrid, Link2Off, Share2, Upload, Check, X } from "lucide-react";
+import { ArrowLeft, Download, Eye, LayoutGrid, Link2Off, Share2, Upload, Check, X } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { decodeGardenFromUrl, importTemplateToStore } from "@/lib/sharing";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { IconButton } from "@/components/ui/IconButton";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
 
@@ -107,7 +108,7 @@ export function ImportPage() {
     const Icon = broken ? Link2Off : Share2;
     return (
       <div>
-        <PageHeader title={t("importPage.title")} description={t("importPage.noLinkSubtitle")} />
+        <PageHeader leading={<IconButton icon={ArrowLeft} label={t("importPage.backToPlanner")} onClick={() => navigate("/planner")} />} title={t("importPage.title")} description={t("importPage.noLinkSubtitle")} />
         <Card className="max-w-3xl">
           <div className="flex items-start gap-3">
             <span className={`inline-flex size-10 shrink-0 items-center justify-center rounded-lg ${broken ? "bg-warning/10 text-warning" : "bg-garden-50 text-garden-700 dark:bg-garden-500/15 dark:text-garden-300"}`} aria-hidden="true">
@@ -161,7 +162,7 @@ export function ImportPage() {
 
   return (
     <div>
-      <PageHeader title={t("importPage.title")} description={t("importPage.subtitle")} />
+      <PageHeader leading={<IconButton icon={ArrowLeft} label={t("importPage.backToPlanner")} onClick={() => navigate("/planner")} />} title={t("importPage.title")} description={t("importPage.subtitle")} />
       <div className="max-w-3xl space-y-6">
         <Card>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{template.name}</h2>
