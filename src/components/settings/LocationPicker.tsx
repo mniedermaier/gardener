@@ -170,7 +170,7 @@ export function LocationPicker({ value, onChange, prominent = false }: LocationP
       )}
 
       <div className={prominent ? "flex flex-col items-start gap-1" : "flex flex-wrap items-center gap-2"}>
-        <Button variant="secondary" className={prominent ? "w-full" : undefined} onClick={locate} disabled={locating}>
+        <Button variant={prominent ? "primary" : "secondary"} className={prominent ? "w-full" : undefined} onClick={locate} disabled={locating}>
           {locating ? <Loader2 size={16} aria-hidden="true" className="animate-spin" /> : <LocateFixed size={16} aria-hidden="true" />}
           {t("location.useDevice")}
         </Button>

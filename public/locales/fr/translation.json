@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Rechercher une commune",
-    "searchPlaceholder": "p. ex. Angers…",
+    "searchPlaceholder": "p. ex. Angers",
     "results": "Lieux trouvés",
     "searchError": "Recherche indisponible. Utilisez la position de l’appareil ou saisissez des coordonnées.",
     "noPlaces": "Aucun lieu trouvé. Vérifiez l’orthographe.",
@@ -297,7 +297,8 @@
     "locationPrivate": "Uniquement pour la météo et les gelées, reste sur cet appareil.",
     "unlockSun": "Course du soleil",
     "unlockWeather": "Météo à 7 jours",
-    "unlockFrost": "Alertes gel"
+    "unlockFrost": "Alertes gel",
+    "unlockTitle": "Tu obtiens :"
   },
   "planner": {
     "title": "Plan du jardin",
@@ -2440,7 +2441,9 @@
     "taskHint": "Un rappel avec échéance",
     "journalHint": "Observation, note ou photo",
     "pest": "Signaler un problème",
-    "pestHint": "Noter une attaque ou une maladie"
+    "pestHint": "Noter une attaque ou une maladie",
+    "water": "Saisir un arrosage",
+    "waterHint": "Quantité et planche"
   },
   "records": {
     "today": "Aujourd’hui",

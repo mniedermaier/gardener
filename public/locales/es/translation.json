@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Buscar localidad",
-    "searchPlaceholder": "p. ej. Valladolid…",
+    "searchPlaceholder": "p. ej. Valladolid",
     "results": "Lugares encontrados",
     "searchError": "La búsqueda no está disponible. Usa la ubicación del dispositivo o introduce coordenadas.",
     "noPlaces": "No se encontró ningún lugar. Revisa la ortografía.",
@@ -297,7 +297,8 @@
     "locationPrivate": "Solo para el tiempo y las heladas; se queda en este dispositivo.",
     "unlockSun": "Posición del sol",
     "unlockWeather": "Tiempo a 7 días",
-    "unlockFrost": "Avisos de helada"
+    "unlockFrost": "Avisos de helada",
+    "unlockTitle": "Con ella obtienes:"
   },
   "planner": {
     "title": "Planificador",
@@ -2440,7 +2441,9 @@
     "taskHint": "Un recordatorio con fecha",
     "journalHint": "Observación, nota o foto",
     "pest": "Registrar problema",
-    "pestHint": "Anota una plaga o enfermedad"
+    "pestHint": "Anota una plaga o enfermedad",
+    "water": "Registrar riego",
+    "waterHint": "Cantidad y bancal"
   },
   "records": {
     "today": "Hoy",

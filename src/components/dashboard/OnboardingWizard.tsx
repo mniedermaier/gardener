@@ -237,7 +237,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   return (
     // Top-anchored, not vertically centred: header and progress bar stay at
     // the same height in every step, only the card below grows or shrinks.
-    <div className="flex min-h-dvh flex-col items-center bg-gradient-to-b sm:justify-center from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:py-12 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
+    <div className="flex min-h-dvh flex-col items-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:pt-[8vh] sm:pb-12 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
       <div className="flex w-full max-w-lg flex-1 flex-col sm:flex-none">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -285,10 +285,11 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               <StepHeader icon={MapPin} title={t("onboarding.locationTitle")} description={t("onboarding.locationDesc")} />
               <LocationPicker value={location} onChange={setLocationDraft} prominent />
               {/* What the location unlocks, so skipping is an informed choice. */}
-              <ul className="mt-6 grid grid-cols-3 gap-2">
+              <p className="mt-6 mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("onboarding.unlockTitle")}</p>
+              <ul className="space-y-2.5">
                 {([[Sun, "onboarding.unlockSun"], [CloudSun, "onboarding.unlockWeather"], [Snowflake, "onboarding.unlockFrost"]] as const).map(([Icon, key]) => (
-                  <li key={key} className="flex flex-col items-center gap-1.5 rounded-xl bg-garden-50 px-2 py-3 text-center text-xs font-medium text-gray-700 dark:bg-garden-500/10 dark:text-gray-300">
-                    <Icon size={20} aria-hidden="true" className="text-garden-700 dark:text-garden-300" />
+                  <li key={key} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <Icon size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
                     {t(key)}
                   </li>
                 ))}

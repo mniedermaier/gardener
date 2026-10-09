@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Find your town",
-    "searchPlaceholder": "e.g. Bristol…",
+    "searchPlaceholder": "e.g. Bristol",
     "results": "Matching places",
     "searchError": "Place search is unavailable. Use your device location or enter coordinates.",
     "noPlaces": "No place found. Check the spelling.",
@@ -285,7 +285,8 @@
     "locationPrivate": "Only for weather and frost dates, stays on this device.",
     "unlockSun": "Sun position",
     "unlockWeather": "7-day weather",
-    "unlockFrost": "Frost alerts"
+    "unlockFrost": "Frost alerts",
+    "unlockTitle": "This gives you:"
   },
   "planner": {
     "title": "Planner",
@@ -2333,7 +2334,9 @@
     "taskHint": "A reminder with a due date",
     "journalHint": "Observation, note or photo",
     "pest": "Report problem",
-    "pestHint": "Record an infestation or disease"
+    "pestHint": "Record an infestation or disease",
+    "water": "Log watering",
+    "waterHint": "Amount and bed"
   },
   "records": {
     "today": "Today",

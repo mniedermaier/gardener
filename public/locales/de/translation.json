@@ -41,7 +41,7 @@
   },
   "location": {
     "searchLabel": "Ort suchen",
-    "searchPlaceholder": "z. B. Freising oder 85354 …",
+    "searchPlaceholder": "z. B. Freising oder 85354",
     "results": "Gefundene Orte",
     "searchError": "Ortssuche nicht erreichbar. Nutze den Gerätestandort oder gib Koordinaten ein.",
     "noPlaces": "Kein Ort gefunden. Prüfe die Schreibweise.",
@@ -281,7 +281,8 @@
     "locationPrivate": "Nur für Wetter und Frosttermine, bleibt auf diesem Gerät.",
     "unlockSun": "Sonnenstand",
     "unlockWeather": "7-Tage-Wetter",
-    "unlockFrost": "Frostwarnungen"
+    "unlockFrost": "Frostwarnungen",
+    "unlockTitle": "Damit bekommst du:"
   },
   "search": {
     "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen …",
@@ -2333,7 +2334,9 @@
     "taskHint": "Erinnerung mit Fälligkeit",
     "journalHint": "Beobachtung, Notiz oder Foto",
     "pest": "Problem melden",
-    "pestHint": "Befall oder Krankheit festhalten"
+    "pestHint": "Befall oder Krankheit festhalten",
+    "water": "Gießen erfassen",
+    "waterHint": "Menge und Beet"
   },
   "records": {
     "today": "Heute",
