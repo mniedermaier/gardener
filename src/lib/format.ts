@@ -47,7 +47,7 @@ function noNegativeZero(value: number, maximumFractionDigits: number): number {
  * - weekday:   "Sa."                                     — weather strips
  * - weekdayDate: "Mo., 12. Okt."                          — the coming week (one format per group)
  */
-export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday" | "weekdayDate";
+export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday" | "weekdayDate" | "dayMonth" | "date";
 
 export interface FormatOptions {
   locale?: string;
@@ -91,6 +91,12 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
       return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
     case "long":
       return new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(d);
+    case "date":
+      // Form fields: "9. Oktober 2026" — no weekday, so it fits a half-width field on a phone.
+      return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(d));
+    case "dayMonth":
+      // A date that recurs every year (last frost): "15. Mai", no weekday or year.
+      return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(d));
     case "monthYear":
       return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(d);
     case "month":

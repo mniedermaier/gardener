@@ -2,19 +2,20 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { LucideIcon } from "lucide-react";
 import {
-  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2,
+  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import { useFormat } from "@/hooks/useFormat";
 import { applyTheme } from "@/lib/theme";
-import { estimateLastFrost, defaultLastFrost } from "@/lib/location";
+import { estimateLastFrost, defaultLastFrost, upcomingFrostYear } from "@/lib/location";
 import { importAllData, validateExportFile } from "@/lib/dataImport";
 import { LocationPicker, type PickedLocation } from "@/components/settings/LocationPicker";
 import { createStarterGarden } from "./starterGarden";
@@ -99,8 +100,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
 
   const [step, setStep] = useState<Step>("welcome");
   const [location, setLocationDraft] = useState<PickedLocation>({ name: "", lat: null, lon: null });
-  const estimate = location.lat !== null ? estimateLastFrost(location.lat, location.elevation) : null;
-  const [frostDate, setFrostDate] = useState(defaultLastFrost());
+  const frostYear = upcomingFrostYear();
+  const estimate = location.lat !== null ? estimateLastFrost(location.lat, location.elevation, frostYear) : null;
+  const [frostDate, setFrostDate] = useState(() => defaultLastFrost(upcomingFrostYear()));
   // Until the user edits the date, it follows the estimate for the chosen place.
   const [frostTouched, setFrostTouched] = useState(false);
   const shownFrost = frostTouched ? frostDate : estimate ?? frostDate;
@@ -175,8 +177,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   return (
     // Top-anchored, not vertically centred: header and progress bar stay at
     // the same height in every step, only the card below grows or shrinks.
-    <div className="flex min-h-dvh justify-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-8 pt-safe dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
-      <div className="mt-[min(10vh,6rem)] w-full max-w-lg">
+    <div className="flex min-h-dvh justify-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:py-8 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
+      <div className="w-full max-w-lg sm:mt-[min(10vh,6rem)]">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">
@@ -204,6 +206,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   [LayoutGrid, "onboarding.featurePlan"],
                   [Apple, "onboarding.featureLog"],
                   [Scale, "onboarding.featureSufficiency"],
+                  [ShieldCheck, "onboarding.privacy"],
                 ] as const).map(([Icon, key]) => (
                   <li key={key} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
                     <Icon size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
@@ -219,7 +222,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
           {step === "location" && (
             <>
               <StepHeader icon={MapPin} title={t("onboarding.locationTitle")} description={t("onboarding.locationDesc")} />
-              <LocationPicker value={location} onChange={setLocationDraft} />
+              <LocationPicker value={location} onChange={setLocationDraft} prominent />
             </>
           )}
 
@@ -229,20 +232,21 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               <DatePicker
                 label={t("settings.lastFrostDate")}
                 value={shownFrost}
+                display="dayMonth"
                 onChange={(e) => {
                   setFrostTouched(true);
                   setFrostDate(e.target.value);
                 }}
                 hint={
                   estimate
-                    ? t("onboarding.frostEstimate", { place: location.name || t("location.unnamed"), date: formatDate(estimate, "short") })
+                    ? t("onboarding.frostEstimate", { place: location.name || t("location.unnamed"), date: formatDate(estimate, "dayMonth") })
                     : t("onboarding.frostDefault")
                 }
               />
               {estimate && frostTouched && shownFrost !== estimate && (
                 <Button variant="ghost" size="sm" className="mt-2" onClick={() => setFrostTouched(false)}>
                   <Sparkles size={14} aria-hidden="true" />
-                  {t("onboarding.useEstimate", { date: formatDate(estimate, "short") })}
+                  {t("onboarding.useEstimate", { date: formatDate(estimate, "dayMonth") })}
                 </Button>
               )}
             </>
@@ -265,7 +269,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                 <StartOption
                   id={`${radioName}-starter`} name={radioName} value="starter" checked={mode === "starter"} onSelect={setMode}
                   icon={Sparkles} title={t("onboarding.modeStarter")} description={t("onboarding.modeStarterDesc")}
-                  badge={<span className="rounded-full bg-garden-100 px-2 py-0.5 text-xs font-medium text-garden-800 dark:bg-garden-500/20 dark:text-garden-200">{t("onboarding.recommended")}</span>}
+                  badge={<Badge tone="brand" size="sm">{t("onboarding.recommended")}</Badge>}
                 />
                 <StartOption
                   id={`${radioName}-empty`} name={radioName} value="empty" checked={mode === "empty"} onSelect={setMode}
@@ -280,7 +284,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             </>
           )}
 
-          <div className="mt-8 flex items-center justify-between gap-2 border-t border-gray-100 pt-5 dark:border-white/10">
+          {/* Phones: the footer sticks to the bottom edge, so "Weiter"/"Anlegen" is never below the fold. */}
+          <div className="sticky bottom-0 -mx-4 -mb-4 mt-6 flex items-center justify-between gap-2 rounded-b-xl border-t border-gray-100 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:mt-8 sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none dark:border-white/10 dark:bg-gray-900/95 sm:dark:bg-transparent">
             {index > 0 ? (
               <Button variant="ghost" onClick={back}>
                 <ArrowLeft size={16} aria-hidden="true" />
@@ -288,16 +293,15 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               </Button>
             ) : <span />}
             <div className="flex items-center gap-2">
-              <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "secondary" : "primary"}>
+              <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "ghost" : "primary"}>
                 {busy && <Loader2 size={16} aria-hidden="true" className="animate-spin" />}
                 {primaryLabel}
-                {step !== "start" && <ArrowRight size={16} aria-hidden="true" />}
+                {step !== "start" && !skipLocation && <ArrowRight size={16} aria-hidden="true" />}
               </Button>
             </div>
           </div>
         </Card>
 
-        <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">{t("onboarding.privacy")}</p>
       </div>
     </div>
   );

@@ -20,6 +20,8 @@ export interface PickedLocation {
 interface LocationPickerProps {
   value: PickedLocation;
   onChange: (value: PickedLocation) => void;
+  /** First run: the device position is the main way forward (primary, full width on phones). */
+  prominent?: boolean;
 }
 
 /**
@@ -27,7 +29,7 @@ interface LocationPickerProps {
  * position, or type coordinates by hand. Works offline too: the manual
  * fields never depend on the network.
  */
-export function LocationPicker({ value, onChange }: LocationPickerProps) {
+export function LocationPicker({ value, onChange, prominent = false }: LocationPickerProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { formatNumber } = useFormat();
@@ -168,11 +170,11 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button variant="secondary" onClick={locate} disabled={locating}>
+        <Button variant={prominent ? "primary" : "secondary"} className={prominent ? "w-full sm:w-auto" : undefined} onClick={locate} disabled={locating}>
           {locating ? <Loader2 size={16} aria-hidden="true" className="animate-spin" /> : <LocateFixed size={16} aria-hidden="true" />}
           {t("location.useDevice")}
         </Button>
-        <Button variant="ghost" onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+        <Button variant="ghost" className={prominent ? "-ml-3 sm:ml-0" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
           {t("location.manual")}
         </Button>
         {hasCoords && (

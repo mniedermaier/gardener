@@ -210,6 +210,7 @@ export function SettingsPage() {
                 <DatePicker
                   label={t("settings.lastFrostDate")}
                   value={store.lastFrostDate}
+                  display="dayMonth"
                   onChange={(e) => e.target.value && store.setLastFrostDate(e.target.value)}
                   hint={frostEstimate ? t("settings.frostEstimate", { date: formatDate(frostEstimate, "short") }) : t("settings.frostHint")}
                 />

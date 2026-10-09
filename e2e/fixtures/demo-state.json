@@ -1277,11 +1277,11 @@
   },
   {
    "id": "p3",
-   "plantId": "kale",
+   "plantId": "radish",
    "bedId": "b-hochbeet",
    "date": "2026-09-15",
    "type": "pest",
-   "name": "Kohlweißling",
+   "name": "Erdflöhe",
    "severity": 2,
    "organic": true,
    "resolved": false

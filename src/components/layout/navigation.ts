@@ -43,6 +43,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "planner", to: "/planner", icon: LayoutGrid, labelKey: "shell.nav.planner" },
       { id: "plants", to: "/plants", icon: Sprout, labelKey: "shell.nav.plants" },
       { id: "calendar", to: "/calendar", icon: CalendarDays, labelKey: "shell.nav.calendar" },
+      { id: "seeds", to: "/seeds", icon: Bean, labelKey: "shell.nav.seeds" },
     ],
   },
   {
@@ -50,19 +51,18 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: "shell.group.record",
     items: [
       { id: "harvest", to: "/harvest", icon: Apple, labelKey: "shell.nav.harvest" },
-      { id: "journal", to: "/journal", icon: BookOpen, labelKey: "shell.nav.journal" },
-      { id: "livestock", to: "/livestock", icon: Bird, labelKey: "shell.nav.livestock" },
       { id: "pantry", to: "/pantry", icon: Archive, labelKey: "shell.nav.pantry" },
+      { id: "livestock", to: "/livestock", icon: Bird, labelKey: "shell.nav.livestock" },
     ],
   },
   {
     id: "care",
     labelKey: "shell.group.care",
     items: [
-      { id: "seeds", to: "/seeds", icon: Bean, labelKey: "shell.nav.seeds" },
       { id: "soil", to: "/soil", icon: FlaskConical, labelKey: "shell.nav.soil" },
       { id: "pests", to: "/pests", icon: Bug, labelKey: "shell.nav.pests" },
       { id: "water", to: "/water-log", icon: Droplets, labelKey: "shell.nav.water" },
+      { id: "journal", to: "/journal", icon: BookOpen, labelKey: "shell.nav.journal" },
     ],
   },
   {
