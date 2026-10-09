@@ -641,15 +641,16 @@ export function GardenPlanner() {
           actions={
             <>
               {canUndo && <IconButton icon={Undo2} label={t("planner.undo")} onClick={undo} />}
-              {/* A brand-new garden: no lone "…" row; the empty state offers its two useful items. */}
-              {(activeGarden?.beds.length || gardens.length > 1) ? gardenMenu : null}
-              {/* Not while a bed is open (it would add a sibling, not edit this one) or while the empty state offers the same button. */}
+              {/* Primary first, overflow after it (same order as Aufgaben).
+                  Not while a bed is open (it would add a sibling, not edit this one) or while the empty state offers the same button. */}
               {activeGarden && !openBed && activeGarden.beds.length > 0 ? (
                 <Button onClick={() => setBedDialog({ open: true })}>
                   <Plus size={16} aria-hidden="true" />
                   {t("planner.addBed")}
                 </Button>
               ) : null}
+              {/* A brand-new garden: no lone "…" row; the empty state offers its two useful items. */}
+              {(activeGarden?.beds.length || gardens.length > 1) ? gardenMenu : null}
             </>
           }
           tabs={

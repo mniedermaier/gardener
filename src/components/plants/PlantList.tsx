@@ -20,7 +20,7 @@ import { useScrollFade } from "@/components/ui/useScrollFade";
 import type { Plant, PlantCategory } from "@/types/plant";
 
 type CategoryFilter = PlantCategory | "all" | "now";
-const categories: CategoryFilter[] = ["all", "now", "vegetable", "fruit", "berry", "herb"];
+const categories: CategoryFilter[] = ["all", "now", "vegetable", "fruit", "berry", "herb", "flower"];
 
 export function PlantList() {
   const { t } = useTranslation();
@@ -62,7 +62,7 @@ export function PlantList() {
   const sowNowIds = useMemo(() => new Set(agenda.now.map((n) => n.plantId)), [agenda]);
 
   const counts = useMemo(() => {
-    const c: Record<CategoryFilter, number> = { all: plants.length, now: 0, vegetable: 0, fruit: 0, berry: 0, herb: 0 };
+    const c: Record<CategoryFilter, number> = { all: plants.length, now: 0, vegetable: 0, fruit: 0, berry: 0, herb: 0, flower: 0 };
     for (const p of plants) {
       c[p.category]++;
       if (sowNowIds.has(p.id)) c.now++;

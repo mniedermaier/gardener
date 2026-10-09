@@ -8,7 +8,6 @@ import { useFormat } from "@/hooks/useFormat";
 import { usePlantName } from "@/hooks/usePlantName";
 import { ListRow } from "@/components/ui/List";
 import { Badge } from "@/components/ui/Badge";
-import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 
 interface Props {
   task: Task;
@@ -26,7 +25,7 @@ interface Props {
 /**
  * One task row for the dashboard and the task page: round checkbox on the
  * left (tap to complete, tap again to reopen), title with overdue/recurring
- * badges, "Typ · Beet · Pflanze · Datum" meta, the plant icon on the right.
+ * badges, "Typ · Beet · Pflanze · Datum" meta.
  */
 export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onComplete, onReopen, onOpen, actions }: Props) {
   const { t } = useTranslation();
@@ -83,13 +82,8 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
       }
       meta={meta}
       description={task.description}
-      // The trailing slot has one meaning: the plant the task is about. The task
-      // type is already named in the meta line (a line icon there read as a button).
-      trailing={plant ? (
-        <span className="inline-flex size-8 items-center justify-center" aria-hidden="true">
-          <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={20} />
-        </span>
-      ) : undefined}
+      // No trailing icon: it appeared on some rows only and read as a control.
+      // Type, bed and plant are all named in the meta line.
       actions={actions}
     />
   );

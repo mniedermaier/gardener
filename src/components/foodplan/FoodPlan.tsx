@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { ChevronDown, LayoutGrid, Target } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
@@ -22,7 +22,6 @@ import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { useToday } from "@/hooks/useToday";
 
 /** A crop whose forecast reaches less than this share of its target gets "Große Lücke". */
-const BIG_GAP_SHARE = 0.1;
 
 export function FoodPlan() {
   const now = useToday();
@@ -43,7 +42,6 @@ export function FoodPlan() {
   );
   const { selfSufficiency } = useGardenMetrics();
   const animalForecast = useMemo(() => getForecastProducts(animals), [animals]);
-  const deficits = plan.rows.filter((r) => r.deficitKg > 0.05);
   // Crops with neither area nor harvest: collapsed into one group instead of
   // a dozen "0 kg · 0 %" rows.
   const isUnplanted = (r: (typeof plan.rows)[number]) => r.areaM2 === 0 && r.actualKg === 0;
@@ -103,25 +101,19 @@ export function FoodPlan() {
                     label={t("metrics.actualVsForecast", { actual: f.formatPercent(plan.actualCoverage), forecast: f.formatPercent(plan.forecastCoverage) })}
                   />
                 ),
-                hint: (
-                  <>
-                    {t("foodplan.ofTarget", { kg: kg(plan.targetKg) })}
-                    {/* The other headline percentage (calories, with animals) is one tap away. */}
-                    <Link to="/sufficiency" className="mt-0.5 block font-medium text-garden-700 hover:underline dark:text-garden-300">
-                      {t("foodplan.byCalories", { value: f.formatPercent(selfSufficiency.forecastRatio, 1) })}
-                    </Link>
-                  </>
-                ),
+                hint: t("foodplan.ofTarget", { kg: kg(plan.targetKg) }),
               }}
               items={[
                 { label: t("foodplan.coverageActual"), value: f.formatPercent(plan.actualCoverage), hint: t("foodplan.actualKg", { kg: kg(plan.actualKg) }) },
                 { label: t("foodplan.area"), value: f.formatArea(plan.areaM2), hint: t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) }) },
-                // "20 von 20 Kulturen mit Lücke" says nothing and the largest gap is the
-                // first row of "Hier fehlt am meisten": the crops not grown at all are
-                // the figure the plan below acts on.
-                unplanted.length > 0
-                  ? { label: t("foodplan.unplanted"), value: f.formatNumber(unplanted.length, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) }
-                  : { label: t("foodplan.deficits"), value: f.formatNumber(deficits.length, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) },
+                // The other headline percentage (calories, with animal products) as a
+                // figure of its own, one tap from the page that explains it.
+                {
+                  label: t("foodplan.byCaloriesLabel"),
+                  value: f.formatPercent(selfSufficiency.forecastRatio, selfSufficiency.forecastRatio < 0.1 ? 1 : 0),
+                  hint: t("foodplan.byCaloriesHint"),
+                  to: "/sufficiency",
+                },
               ]}
             />
             <HowCalculated className="mt-1">
@@ -158,20 +150,14 @@ export function FoodPlan() {
                   const p = plantMap.get(r.plantId)!;
                   const covered = r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg;
                   const gap = r.deficitKg > 0.05;
-                  // "Große Lücke" by a rule, not by rank: the forecast reaches less
-                  // than a tenth of the target (two crops with the same figures
-                  // always get the same badge).
-                  const bigGap = gap && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE;
                   return (
                     <ListRow
                       key={r.plantId}
                       leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
                       title={plantName(p.id)}
-                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : bigGap ? <Badge tone="warning">{t("foodplan.bigGap")}</Badge> : undefined}
-                      meta={[
-                        t("foodplan.rowForecast", { forecast: kg(r.forecastKg) }),
-                        gap ? t("foodplan.rowGap", { kg: kg(r.deficitKg), area: f.formatArea(r.extraAreaM2) }) : null,
-                      ]}
+                      // No gap badge: the list is sorted by gap and the bar shows the forecast.
+                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : undefined}
+                      meta={gap ? [t("foodplan.rowMissing", { kg: kg(r.deficitKg) }), t("foodplan.rowExtraArea", { area: f.formatArea(r.extraAreaM2) })] : undefined}
                       trailing={
                         // Fixed width: every bar in the list ends at the same x.
                         <span className="block w-24 text-right">
@@ -183,7 +169,7 @@ export function FoodPlan() {
                         <span className="mt-1.5 flex items-center">
                           <Meter
                             className="min-w-0 flex-1"
-                            size={6}
+                            size={8}
                             actual={r.actualKg}
                             forecast={r.forecastKg}
                             max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}

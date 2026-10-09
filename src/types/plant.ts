@@ -1,4 +1,4 @@
-export type PlantCategory = "vegetable" | "fruit" | "berry" | "herb";
+export type PlantCategory = "vegetable" | "fruit" | "berry" | "herb" | "flower";
 export type SunRequirement = "full" | "partial" | "shade";
 export type WaterNeed = "low" | "medium" | "high";
 export type PreservationMethod = "canning" | "freezing" | "fermenting" | "drying" | "root_cellar";
