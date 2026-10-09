@@ -201,7 +201,7 @@
       "bed": "Créez votre première planche",
       "bedHint": "Choisissez taille et type : bac, serre, pot…",
       "plant": "Placez votre première plante",
-      "plantHint": "Faites-la glisser de la palette vers la grille",
+      "plantHint": "Touchez-la dans la palette ou faites-la glisser sur la grille",
       "tasks": "Générer les tâches",
       "tasksHint": "Dates de semis et de plantation issues de votre plan",
       "weather": "Définir votre emplacement",
@@ -1330,7 +1330,8 @@
     "linkToggle": "Lier une plante, un carré ou un animal",
     "photoHintShort": "Jusqu’à {{max}} photos, stockées uniquement sur cet appareil.",
     "tagsHint": "Sépare plusieurs mots-clés par des virgules.",
-    "bodyLabel": "Observation"
+    "bodyLabel": "Observation",
+    "addTag": "Ajouter le mot-clé #{{tag}}"
   },
   "pantry": {
     "title": "Réserves",
@@ -1517,7 +1518,7 @@
     "rowMissing": "{{kg}} manquants",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objectif atteint selon la prévision",
-    "rowNothingLogged": "0 kg saisis"
+    "rowNothingLogged": "rien saisi pour l’instant"
   },
   "sufficiency": {
     "title": "Autosuffisance",

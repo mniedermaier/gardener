@@ -84,14 +84,14 @@ export function ProductionPage() {
   const heroBasis = heroType ? basisFor(heroType) : null;
   // One wording for every expectation (as on the herd cards): "erwartet ~… seit 27. Juli".
   const expectedHint = (amount: string, basis: string | null) =>
-    basis ? t("livestock.ofExpectedSince", { amount, date: f.formatDate(basis, "short") }) : t("livestock.ofExpectedToDate", { amount });
+    basis ? t("livestock.ofExpectedSince", { amount, date: f.formatDate(basis, "monthYearShort") }) : t("livestock.ofExpectedToDate", { amount });
   const heroFigure = heroType
     ? {
         ...yearFigure(heroType),
         icon: PRODUCT_ICON[heroType],
         hint: heroExpected > 0
           ? (heroBasis
-            ? t("livestock.ofExpectedSince", { amount: heroAmount, date: f.formatDate(heroBasis, "short") })
+            ? t("livestock.ofExpectedSince", { amount: heroAmount, date: f.formatDate(heroBasis, "monthYearShort") })
             : t("livestock.production.yearHint", { amount: heroAmount }))
           : undefined,
       }

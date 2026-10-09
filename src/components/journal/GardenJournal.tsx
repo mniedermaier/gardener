@@ -439,9 +439,11 @@ export function GardenJournal() {
                     key={tag}
                     type="button"
                     onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
-                    className="inline-flex min-h-11 items-center rounded-full bg-gray-100 px-2.5 text-xs whitespace-nowrap sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                    aria-label={t("journal.addTag", { tag })}
+                    className="inline-flex min-h-11 items-center gap-1 rounded-full bg-gray-100 px-2.5 text-xs whitespace-nowrap sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
                   >
-                    + #{tag}
+                    {/* One prefix: the plus says "add", the tag is written as in the filter row. */}
+                    <Plus size={12} aria-hidden="true" />#{tag}
                   </button>
                 ))}
                 </div>

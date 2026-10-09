@@ -156,6 +156,17 @@ export function getActualYield(harvests: HarvestEntry[], period: Period): Season
   return { source: "actual", totalGrams: total, byPlant };
 }
 
+/**
+ * A forecast never below what was already harvested: per crop the larger of
+ * forecast and logged amount — the same rule as the food plan's coverage, so
+ * "Ertrag (Prognose)" and the food plan agree.
+ */
+export function floorByActual(forecast: SeasonYield, actual: SeasonYield): SeasonYield {
+  const byPlant: Record<string, number> = { ...forecast.byPlant };
+  for (const [id, g] of Object.entries(actual.byPlant)) if (g > (byPlant[id] ?? 0)) byPlant[id] = g;
+  return { source: "forecast", totalGrams: Object.values(byPlant).reduce((a, b) => a + b, 0), byPlant };
+}
+
 /** Expected season yield of the current planting plan: growing area (plantAreaM2 per plant) × expected kg/m². */
 export function getForecastYield(gardens: Garden[], plants: Plant[] | Map<string, Plant>, gridCellSizeCm: number): SeasonYield {
   const plantMap = plants instanceof Map ? plants : new Map(plants.map((p) => [p.id, p]));
@@ -625,7 +636,11 @@ export function getSelfSufficiency(input: {
   const actualAnimalKcal = productKgCalories(
     capToConsumption(getActualProductKg(input.animalProducts, input.animals, input.period), input.householdSize).counted,
   );
-  const forecastPlantKcal = harvestCalories(getForecastYield(input.gardens, plantMap, input.gridCellSizeCm).byPlant, plantMap);
+  // Never below what is already harvested (floorByActual), like "Ertrag (Prognose)".
+  const forecastPlantKcal = harvestCalories(
+    floorByActual(getForecastYield(input.gardens, plantMap, input.gridCellSizeCm), getActualYield(input.harvests, input.period)).byPlant,
+    plantMap,
+  );
   const herd = capToConsumption(getForecastProductKg(input.animals), input.householdSize);
   const forecastAnimalKcal = productKgCalories(herd.counted);
 

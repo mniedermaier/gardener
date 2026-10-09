@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  animalProductValue, annualCalorieNeed, DEFAULT_PRODUCE_PRICE, DEFAULT_PRODUCT_PRICES, getActualProducts, getActualYield,
+  floorByActual, animalProductValue, annualCalorieNeed, DEFAULT_PRODUCE_PRICE, DEFAULT_PRODUCT_PRICES, getActualProducts, getActualYield,
   getBalance, getCosts, getCropPlan, getForecastProducts, getForecastYield, getSeasonYield, getSelfSufficiency,
   inPeriod, plantedAreaByPlant, produceValue, productToKg, resolveProductPrices,
 } from "@/lib/metrics";
@@ -211,5 +211,16 @@ describe("crop plan", () => {
     const one = getCropPlan({ gardens: [], plants, gridCellSizeCm: 30, harvests: [], householdSize: 1, period: 2026 });
     const four = getCropPlan({ gardens: [], plants, gridCellSizeCm: 30, harvests: [], householdSize: 4, period: 2026 });
     expect(four.targetKg).toBeCloseTo(one.targetKg * 4);
+  });
+});
+
+describe("floorByActual", () => {
+  it("keeps per crop the larger of forecast and logged amount", () => {
+    const f = floorByActual(
+      { source: "forecast", totalGrams: 3000, byPlant: { tomato: 2000, bean: 1000 } },
+      { source: "actual", totalGrams: 2500, byPlant: { tomato: 1000, bean: 1500 } },
+    );
+    expect(f.byPlant).toEqual({ tomato: 2000, bean: 1500 });
+    expect(f.totalGrams).toBe(3500);
   });
 });

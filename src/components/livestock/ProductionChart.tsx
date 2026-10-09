@@ -199,7 +199,7 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
         </dl>
       )}
       {/* A date is context, not a figure: one meta line instead of a stat. */}
-      {firstEntry && <p className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.recordedSince", { date: f.formatDate(firstEntry, "short") })}</p>}
+      {firstEntry && <p className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.recordedSince", { date: f.formatDate(firstEntry, "monthYearShort") })}</p>}
       {charts}
     </div>
   );

@@ -52,7 +52,7 @@ function Match({ text, query }: { text: string; query: string }) {
 
 /** A few words around a match, cut at word boundaries: "… Die Tomaten abdecken …". */
 function snippet(text: string, at: number, len: number): string {
-  const from = at > 16 ? text.lastIndexOf(" ", at - 16) + 1 : 0;
+  const from = at > 8 ? text.lastIndexOf(" ", at - 8) + 1 : 0;
   const stop = text.indexOf(" ", at + len + 20);
   const to = stop < 0 ? text.length : stop;
   return `${from > 0 ? "… " : ""}${text.slice(from, to).trim()}${to < text.length ? " …" : ""}`;
@@ -374,7 +374,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     {c.leading ?? <Icon size={16} />}
                   </span>
                   <span className="min-w-0 flex-1 truncate font-medium"><Match text={c.label} query={debounced.trim()} /></span>
-                  {c.hint && <span className="min-w-0 max-w-[45%] truncate text-xs text-gray-500 dark:text-gray-400">{c.hint}</span>}
+                  {c.hint && <span className="min-w-0 max-w-[45%] truncate text-xs text-gray-500 dark:text-gray-400"><Match text={c.hint} query={debounced.trim()} /></span>}
                   {selected && <CornerDownLeft size={14} aria-hidden="true" className="hidden shrink-0 text-gray-500 sm:block" />}
                 </div>
               </div>

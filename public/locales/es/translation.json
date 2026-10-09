@@ -201,7 +201,7 @@
       "bed": "Crea tu primer bancal",
       "bedHint": "Elige tamaño y tipo: elevado, invernadero, maceta…",
       "plant": "Coloca tu primera planta",
-      "plantHint": "Arrástrala de la paleta a la cuadrícula",
+      "plantHint": "Tócala en la paleta o arrástrala a la cuadrícula",
       "tasks": "Generar tareas",
       "tasksHint": "Fechas de siembra y plantación de tu plan",
       "weather": "Indicar ubicación",
@@ -1330,7 +1330,8 @@
     "linkToggle": "Vincular planta, bancal o animal",
     "photoHintShort": "Hasta {{max}} fotos, solo en este dispositivo.",
     "tagsHint": "Separa varias etiquetas con comas.",
-    "bodyLabel": "Observación"
+    "bodyLabel": "Observación",
+    "addTag": "Añadir etiqueta #{{tag}}"
   },
   "pantry": {
     "title": "Despensa",
@@ -1517,7 +1518,7 @@
     "rowMissing": "faltan {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objetivo alcanzado según la previsión",
-    "rowNothingLogged": "0 kg registrados"
+    "rowNothingLogged": "nada registrado aún"
   },
   "sufficiency": {
     "title": "Autosuficiencia",

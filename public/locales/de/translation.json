@@ -193,7 +193,7 @@
       "bed": "Erstes Beet anlegen",
       "bedHint": "Größe und Art festlegen: Hochbeet, Gewächshaus, Kübel …",
       "plant": "Erste Pflanze setzen",
-      "plantHint": "Aus der Palette ins Raster ziehen",
+      "plantHint": "In der Palette antippen oder ins Raster ziehen",
       "tasks": "Aufgaben erzeugen",
       "tasksHint": "Aussaat- und Pflanztermine aus deinem Plan",
       "weather": "Standort festlegen",
@@ -1283,7 +1283,8 @@
     "linkToggle": "Pflanze, Beet oder Tier verknüpfen",
     "photoHintShort": "Bis zu {{max}} Fotos, nur auf diesem Gerät gespeichert.",
     "tagsHint": "Mehrere Schlagwörter mit Komma trennen.",
-    "bodyLabel": "Beobachtung"
+    "bodyLabel": "Beobachtung",
+    "addTag": "Schlagwort #{{tag}} hinzufügen"
   },
   "pantry": {
     "title": "Vorrat",
@@ -1452,7 +1453,7 @@
     "rowMissing": "fehlen {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Ziel laut Prognose erreicht",
-    "rowNothingLogged": "0 kg erfasst"
+    "rowNothingLogged": "noch nichts erfasst"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -2433,7 +2434,7 @@
     "journalHint": "Beobachtung, Notiz oder Foto",
     "pest": "Problem melden",
     "pestHint": "Befall oder Krankheit festhalten",
-    "water": "Gießen erfassen",
+    "water": "Bewässerung erfassen",
     "waterHint": "Menge und Beet",
     "production": "Ertrag erfassen",
     "productionHint": "Eier, Honig, Milch …"

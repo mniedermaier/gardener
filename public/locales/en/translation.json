@@ -193,7 +193,7 @@
       "bed": "Create your first bed",
       "bedHint": "Choose size and type: raised bed, greenhouse, pot…",
       "plant": "Place your first plant",
-      "plantHint": "Drag it from the palette onto the grid",
+      "plantHint": "Tap it in the palette or drag it onto the grid",
       "tasks": "Generate tasks",
       "tasksHint": "Sowing and planting dates from your plan",
       "weather": "Set your location",
@@ -1283,7 +1283,8 @@
     "linkToggle": "Link a plant, bed or animal",
     "photoHintShort": "Up to {{max}} photos, stored on this device only.",
     "tagsHint": "Separate several tags with commas.",
-    "bodyLabel": "Observation"
+    "bodyLabel": "Observation",
+    "addTag": "Add tag #{{tag}}"
   },
   "pantry": {
     "title": "Pantry",
@@ -1452,7 +1453,7 @@
     "rowMissing": "{{kg}} short",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Target reached by the forecast",
-    "rowNothingLogged": "0 kg logged"
+    "rowNothingLogged": "nothing logged yet"
   },
   "sufficiency": {
     "title": "Self-sufficiency",

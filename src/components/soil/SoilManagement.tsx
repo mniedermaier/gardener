@@ -48,7 +48,7 @@ function Scale({ value, min, max, scaleMin, scaleMax, label }: { value: number; 
   const pct = (v: number) => `${Math.min(100, Math.max(0, ((v - scaleMin) / (scaleMax - scaleMin)) * 100))}%`;
   return (
     <div className="relative h-2 rounded-full bg-gray-100 dark:bg-white/10" role="img" aria-label={label}>
-      <div className="absolute inset-y-0 rounded-full bg-garden-200 dark:bg-garden-500/40" style={{ left: pct(min), right: `calc(100% - ${pct(max)})` }} />
+      <div className="absolute inset-y-0 rounded-full bg-garden-200 dark:bg-garden-400/55" style={{ left: pct(min), right: `calc(100% - ${pct(max)})` }} />
       <div className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-gray-900 shadow-xs dark:border-gray-900 dark:bg-gray-100" style={{ left: pct(value) }} />
     </div>
   );
