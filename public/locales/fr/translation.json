@@ -255,7 +255,7 @@
     "featureSufficiency": "Calculez votre autosuffisance avec le jardin et les animaux",
     "getStarted": "C’est parti",
     "locationTitle": "Où se trouve votre jardin ?",
-    "locationDesc": "Votre position nous permet de calculer l’ensoleillement, la météo et la dernière gelée habituelle.",
+    "locationDesc": "Facultatif – tu peux l’ajouter à tout moment dans les réglages.",
     "skip": "Continuer sans position",
     "frostTitle": "Quand a lieu la dernière gelée ?",
     "frostDesc": "Les dates de semis, de plantation et de récolte en dépendent. Vous pouvez la modifier à tout moment.",
@@ -295,7 +295,10 @@
       "mid": "Moyen",
       "cold": "Rude"
     },
-    "locationPrivate": "Uniquement pour la météo et les gelées, reste sur cet appareil."
+    "locationPrivate": "Uniquement pour la météo et les gelées, reste sur cet appareil.",
+    "unlockSun": "Course du soleil",
+    "unlockWeather": "Météo à 7 jours",
+    "unlockFrost": "Alertes gel"
   },
   "planner": {
     "title": "Plan du jardin",

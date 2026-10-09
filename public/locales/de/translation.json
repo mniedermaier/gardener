@@ -239,7 +239,7 @@
     "featureSufficiency": "Selbstversorgung mit Garten und Tieren berechnen",
     "getStarted": "Los geht’s",
     "locationTitle": "Wo liegt dein Garten?",
-    "locationDesc": "Mit dem Standort berechnen wir Sonnenstand, Wetter und den typischen letzten Frost.",
+    "locationDesc": "Optional – du kannst ihn jederzeit in den Einstellungen ergänzen.",
     "skip": "Ohne Standort weiter",
     "frostTitle": "Wann ist der letzte Frost?",
     "frostDesc": "Von diesem Datum hängen Aussaat, Auspflanzen und Ernte ab. Du kannst es jederzeit ändern.",
@@ -279,7 +279,10 @@
       "mid": "Mittel",
       "cold": "Rau"
     },
-    "locationPrivate": "Nur für Wetter und Frosttermine, bleibt auf diesem Gerät."
+    "locationPrivate": "Nur für Wetter und Frosttermine, bleibt auf diesem Gerät.",
+    "unlockSun": "Sonnenstand",
+    "unlockWeather": "7-Tage-Wetter",
+    "unlockFrost": "Frostwarnungen"
   },
   "search": {
     "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen …",

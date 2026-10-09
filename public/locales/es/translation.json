@@ -255,7 +255,7 @@
     "featureSufficiency": "Calcula tu autosuficiencia con huerto y animales",
     "getStarted": "Empezar",
     "locationTitle": "¿Dónde está tu huerto?",
-    "locationDesc": "Con la ubicación calculamos la luz solar, el tiempo y la última helada habitual.",
+    "locationDesc": "Opcional: puedes añadirla en cualquier momento en los ajustes.",
     "skip": "Seguir sin ubicación",
     "frostTitle": "¿Cuándo es la última helada?",
     "frostDesc": "De esta fecha dependen la siembra, el trasplante y la cosecha. Puedes cambiarla cuando quieras.",
@@ -295,7 +295,10 @@
       "mid": "Medio",
       "cold": "Duro"
     },
-    "locationPrivate": "Solo para el tiempo y las heladas; se queda en este dispositivo."
+    "locationPrivate": "Solo para el tiempo y las heladas; se queda en este dispositivo.",
+    "unlockSun": "Posición del sol",
+    "unlockWeather": "Tiempo a 7 días",
+    "unlockFrost": "Avisos de helada"
   },
   "planner": {
     "title": "Planificador",

@@ -2,7 +2,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { LucideIcon } from "lucide-react";
 import {
-  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck,
+  Sprout, MapPin, Snowflake, Flag, ArrowRight, ArrowLeft, LayoutGrid, Apple, Scale, Square, Upload, Sparkles, Loader2, ShieldCheck, Sun, CloudSun,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -237,8 +237,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   return (
     // Top-anchored, not vertically centred: header and progress bar stay at
     // the same height in every step, only the card below grows or shrinks.
-    <div className="flex min-h-dvh flex-col items-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:py-8 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
-      <div className="flex w-full max-w-lg flex-1 flex-col sm:mt-[min(10vh,6rem)] sm:flex-none">
+    <div className="flex min-h-dvh flex-col items-center bg-gradient-to-b sm:justify-center from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:py-12 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
+      <div className="flex w-full max-w-lg flex-1 flex-col sm:flex-none">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">
@@ -258,7 +258,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
         </div>
 
         {/* Phones: the card fills the screen and the footer sits at the bottom, in thumb reach. */}
-        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[44rem] sm:flex-none">
+        <Card className="flex flex-1 flex-col shadow-sm sm:min-h-[36rem] sm:flex-none">
           {step === "welcome" && (
             <>
               <StepHeader icon={Sprout} title={t("onboarding.welcome")} description={t("onboarding.welcomeDesc")} visual={<GardenVignette />} />
@@ -284,8 +284,17 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             <>
               <StepHeader icon={MapPin} title={t("onboarding.locationTitle")} description={t("onboarding.locationDesc")} />
               <LocationPicker value={location} onChange={setLocationDraft} prominent />
-              <p className="mt-4 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
-                <ShieldCheck size={14} aria-hidden="true" className="mt-px shrink-0 text-garden-600 dark:text-garden-300" />
+              {/* What the location unlocks, so skipping is an informed choice. */}
+              <ul className="mt-6 grid grid-cols-3 gap-2">
+                {([[Sun, "onboarding.unlockSun"], [CloudSun, "onboarding.unlockWeather"], [Snowflake, "onboarding.unlockFrost"]] as const).map(([Icon, key]) => (
+                  <li key={key} className="flex flex-col items-center gap-1.5 rounded-xl bg-garden-50 px-2 py-3 text-center text-xs font-medium text-gray-700 dark:bg-garden-500/10 dark:text-gray-300">
+                    <Icon size={20} aria-hidden="true" className="text-garden-700 dark:text-garden-300" />
+                    {t(key)}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <ShieldCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
                 {t("onboarding.locationPrivate")}
               </p>
             </>
@@ -329,6 +338,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                     options={CLIMATES.map((c) => ({ value: c.value, label: t(`onboarding.climate.${c.value}`) }))}
                     fullWidth
                   />
+                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    {CLIMATES.map((c) => `${t(`onboarding.climate.${c.value}`)} ≈ ${formatDate(`${frostYear}-${c.md}`, "dayMonth")}`).join(" · ")}
+                  </p>
                 </div>
               )}
               <FrostPreview frost={shownFrost} />
@@ -377,7 +389,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
               </Button>
             ) : <span />}
             <div className="flex items-center gap-2">
-              <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "ghost" : "primary"}>
+              <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "secondary" : "primary"}>
                 {busy && <Loader2 size={16} aria-hidden="true" className="animate-spin" />}
                 {primaryLabel}
                 {step !== "start" && <ArrowRight size={16} aria-hidden="true" />}

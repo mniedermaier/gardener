@@ -243,7 +243,7 @@
     "featureSufficiency": "Work out your self-sufficiency from garden and animals",
     "getStarted": "Get started",
     "locationTitle": "Where is your garden?",
-    "locationDesc": "Your location lets us work out sunlight, weather and the typical last frost.",
+    "locationDesc": "Optional – you can add it any time in the settings.",
     "skip": "Continue without location",
     "frostTitle": "When is the last frost?",
     "frostDesc": "Sowing, planting out and harvest dates are based on it. You can change it at any time.",
@@ -283,7 +283,10 @@
       "mid": "Average",
       "cold": "Harsh"
     },
-    "locationPrivate": "Only for weather and frost dates, stays on this device."
+    "locationPrivate": "Only for weather and frost dates, stays on this device.",
+    "unlockSun": "Sun position",
+    "unlockWeather": "7-day weather",
+    "unlockFrost": "Frost alerts"
   },
   "planner": {
     "title": "Planner",

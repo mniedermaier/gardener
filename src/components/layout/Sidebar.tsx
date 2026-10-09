@@ -88,9 +88,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav aria-label={t("shell.mainNavigation")} className="scroll-shadow-y flex-1 overflow-y-auto px-3 pb-4">
+        <nav aria-label={t("shell.mainNavigation")} className="scroll-shadow-y flex-1 overflow-y-auto px-3 pb-6">
           {NAV_GROUPS.map((group) => (
-            <div key={group.id} className={group.labelKey ? "mt-3 lg:mt-4" : "mt-1 hidden lg:block"}>
+            <div key={group.id} className={group.labelKey ? "mt-3 lg:mt-4" : "mt-1"}>
               {group.labelKey && (
                 <h2 className="mb-1 px-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                   {t(group.labelKey)}
