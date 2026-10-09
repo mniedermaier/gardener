@@ -111,7 +111,7 @@ export function SufficiencyDashboard() {
   const gap = result.winterGap;
   const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
   const hasAnimals = result.monthlyFood.some((m) => m.animalKg > 0);
-  // Small shares get a decimal, so "Soll bis heute" late in the year does not
+  // Small shares get a decimal, so "erwartet bis heute" late in the year does not
   // read as the same 4 % as the annual forecast.
   const pct = (r: number) => f.formatPercent(r, r < 0.1 ? 1 : 0);
   const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
@@ -155,7 +155,7 @@ export function SufficiencyDashboard() {
           <Composition />
 
           <Card>
-            <CardHeader title={t("sufficiency.monthlyTitle")} description={t("sufficiency.monthlyDesc", { count: householdSize })} />
+            <CardHeader title={t("sufficiency.monthlyTitle")} description={t(hasStored ? "sufficiency.monthlyDesc" : "sufficiency.monthlyDescFresh", { count: householdSize })} />
             <MonthStrip
               values={coverage}
               monthLabels={monthShort}
@@ -199,7 +199,7 @@ export function SufficiencyDashboard() {
                 formatValue={(v) => f.formatWeight(v * 1000)}
                 formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}
                 marker={{ index: currentMonth, label: t("charts.today") }}
-                caption={t("sufficiency.monthlyKgCaption")}
+                caption={t(hasStored ? "sufficiency.monthlyKgCaption" : "sufficiency.monthlyKgCaptionFresh")}
                 categoryLabel={t("charts.month")}
               />
             </div>
@@ -367,8 +367,8 @@ function Composition() {
       <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
       <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/20" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, digits), animals: f.formatPercent(animals, digits) })}>
         {/* min-w: a share under 1 % still shows as a sliver next to its legend swatch. */}
-        {garden > 0 && <span className="h-full min-w-1 bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />}
-        {animals > 0 && <span className="h-full min-w-1 bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />}
+        {garden > 0 && <span className="h-full min-w-2 border-r-2 border-white bg-garden-600 dark:border-gray-900 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />}
+        {animals > 0 && <span className="h-full min-w-2 bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />}
       </div>
       <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
         <div>

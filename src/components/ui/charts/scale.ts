@@ -64,7 +64,8 @@ export const SERIES_STROKE: Record<SeriesColor, string> = {
   rain: "stroke-water-300 dark:stroke-water-500",
 };
 export const SERIES_TEXT: Record<SeriesColor, string> = {
-  brand: "text-garden-500 dark:text-garden-400",
+  // Lighter than the solid fill in dark mode, so the hatch reads on gray-900.
+  brand: "text-garden-500 dark:text-garden-300",
   earth: "text-earth-300 dark:text-earth-400",
   sky: "text-water-400 dark:text-water-300",
   muted: "text-gray-300 dark:text-gray-600",

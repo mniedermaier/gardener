@@ -132,7 +132,7 @@ export function LivestockPage() {
                 <div>
                   <p id="quick-eggs-label" className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("livestock.quickEggs")}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {t("livestock.eggsSoFarToday", { count: stats.eggsToday })} · {animalLabel(eggAnimal, t)}
+                    {stats.eggsToday === 0 ? t("livestock.noEggsToday") : t("livestock.eggsSoFarToday", { count: stats.eggsToday })} · {animalLabel(eggAnimal, t)}
                   </p>
                 </div>
               </div>

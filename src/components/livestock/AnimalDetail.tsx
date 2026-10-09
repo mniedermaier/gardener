@@ -94,7 +94,8 @@ export function AnimalDetail() {
   const days = acquired ? differenceInCalendarDays(now, acquired) : 0;
 
   const addLabel: Record<Exclude<Tab, "journal">, string> = {
-    production: t("livestock.addProduct"),
+    // Same word as the tab ("Erträge"), not the section name "Produktion".
+    production: t("livestock.addYield"),
     feed: t("livestock.addFeed"),
     health: t("livestock.addHealth"),
   };

@@ -239,7 +239,8 @@
       "task": "Tâche à faire",
       "frost": "Gel pour les cultures sensibles"
     },
-    "mapFrostPlants": "Gel : risque pour {{plants}}"
+    "mapFrostPlants": "Gel : risque pour {{plants}}",
+    "frostDetails": "Détails dans Météo"
   },
   "search": {
     "placeholder": "Rechercher plantes, tâches, journal…",
@@ -1416,7 +1417,6 @@
     "produced": "Produit / Objectif",
     "area": "Surface des cultures du plan",
     "deficits": "Cultures en déficit",
-    "deficitsTitle": "Là où il manque le plus",
     "needMore": "-{{kg}} kg (besoin de +{{m2}} m²)",
     "cropPlan": "Plan de culture",
     "animalProducts": "Produits animaux",
@@ -1428,14 +1428,9 @@
     "ofCrops_one": "sur {{count}} culture du plan",
     "ofCrops_other": "sur {{count}} cultures du plan",
     "ofCrops_many": "sur {{count}} cultures du plan",
-    "deficitsDesc": "Manque selon la prévision et la surface qui le comblerait.",
-    "missing": "il manque {{kg}}",
-    "extraArea": "+{{area}} de surface",
     "target": "Objectif annuel",
     "covered": "Couvert",
     "meterLabel": "{{plant}} : enregistré {{actual}}, prévision {{forecast}}, objectif {{target}}",
-    "emptyTitle": "Rien de planté pour l’instant",
-    "emptyText": "Votre foyer a besoin d’environ {{kg}} de légumes et de fruits par an. Voici la quantité par culture – ajoutez des planches et le plan montrera ce qui manque.",
     "howTargets": "Objectif annuel : consommation moyenne par personne en Europe centrale (p. ex. 30 kg de pommes de terre, 15 kg de tomates) × taille du foyer.",
     "howCoverage": "Objectif de quantité : somme par culture de min(quantité, objectif) divisée par la somme des objectifs. Un surplus de pommes de terre ne remplace pas des tomates manquantes.",
     "howVsCalories": "Ce n’est pas une valeur calorique : l’autonomie de la page « Autonomie » compte les calories et inclut les produits animaux. Les deux chiffres diffèrent donc.",
@@ -1445,7 +1440,6 @@
     "animalSurplus": "surplus {{amount}}",
     "surplusBadge": "Surplus",
     "animalIntro_many": "Rendement annuel typique de tes animaux et consommation habituelle de {{count}} personnes.",
-    "rowActualOfTarget": "{{actual}} sur {{target}} enregistrés",
     "rowForecast": "Prévision {{forecast}}",
     "unplanted": "Pas encore plantées",
     "unplantedTitle_one": "{{count}} culture pas encore plantée",
@@ -1453,7 +1447,19 @@
     "unplantedTitle_many": "{{count}} cultures pas encore plantées",
     "unplantedDesc": "Ensemble, elles demanderaient {{area}}.",
     "targetShort": "Objectif {{target}}",
-    "neededShort": "{{area}} nécessaires"
+    "neededShort": "{{area}} nécessaires",
+    "annualNeed": "Besoin annuel",
+    "annualNeedHint_one": "Légumes et fruits pour {{count}} personne",
+    "annualNeedHint_other": "Légumes et fruits pour {{count}} personnes",
+    "annualNeedHint_many": "Légumes et fruits pour {{count}} personnes",
+    "areaNeededLabel": "Surface nécessaire",
+    "areaNeededHint": "pour toutes les cultures du plan",
+    "grownShare": "Cultivé",
+    "grownShareHint": "aucune planche plantée pour l’instant",
+    "cropPlanDesc": "Trié par le plus grand manque prévu.",
+    "bigGap": "Gros manque",
+    "rowOfTarget": "{{actual}} / {{target}}",
+    "rowGap": "{{kg}} manquants (+{{area}})"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -1530,7 +1536,11 @@
     "surplus": "surplus {{amount}}",
     "emptyText_one": "Une personne a besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
     "emptyText_other": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
-    "emptyText_many": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent."
+    "emptyText_many": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
+    "monthlyDescFresh_one": "Part des besoins caloriques de {{count}} personne (prévision). La récolte ne suffit pas encore pour faire des réserves.",
+    "monthlyDescFresh_other": "Part des besoins caloriques de {{count}} personnes (prévision). La récolte ne suffit pas encore pour faire des réserves.",
+    "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). La récolte ne suffit pas encore pour faire des réserves.",
+    "monthlyKgCaptionFresh": "Aliments disponibles par mois en kg : frais du jardin et des animaux"
   },
   "pests": {
     "title": "Ravageurs",
@@ -1827,7 +1837,9 @@
     "tabYields": "Rendements",
     "tabFeedings": "Rations",
     "tabTreatments": "Soins",
-    "costPerUnit": "Coût par unité"
+    "costPerUnit": "Coût par unité",
+    "noEggsToday": "Aucun œuf noté aujourd’hui",
+    "addYield": "Noter un rendement"
   },
   "seeds": {
     "title": "Semences",
@@ -2464,10 +2476,10 @@
     "howNeed": "Autonomie = part du besoin calorique de ton foyer ({{kcal}} kcal par personne et par jour) couverte en un an par le jardin et les animaux (100 % au maximum).",
     "meterLegend": "Barre pleine = enregistré, hachurée = prévision.",
     "pricesEditable": "Vous pouvez ajuster le prix par œuf, kg ou litre dans Coûts.",
-    "expectedToDate": "objectif à ce jour : {{value}}",
-    "actualVsToDateShort": "enregistré {{actual}} · objectif à ce jour {{expected}}",
+    "expectedToDate": "attendu à ce jour : {{value}}",
+    "actualVsToDateShort": "enregistré {{actual}} · attendu à ce jour {{expected}}",
     "howCap": "Les produits animaux ne comptent que jusqu’à la consommation habituelle (par personne et par an environ 240 œufs, 1 kg de miel, 52 kg de viande, 300 l de lait). Le miel est calorique mais n’est pas un aliment de base : deux ruches donnent environ 40 kg, un foyer en mange 1 à 2 kg. Le reste est un surplus à échanger ou vendre et ne te nourrit pas. Légumes et fruits comptent en entier.",
-    "howToDate": "Objectif à ce jour : la part de la prévision annuelle qui devrait déjà être rentrée – pour chaque culture sa fenêtre de récolte depuis la dernière gelée, le miel de mai à août, les œufs répartis sur l’année. Si l’enregistré est bien en dessous, il manque souvent des entrées.",
+    "howToDate": "Attendu à ce jour : la part de la prévision annuelle qui devrait déjà être rentrée – pour chaque culture sa fenêtre de récolte depuis la dernière gelée, le miel de mai à août, les œufs répartis sur l’année. Si l’enregistré est bien en dessous, il manque souvent des entrées.",
     "howVsFoodPlan": "Le plan alimentaire mesure autre chose : des kilos face à un objectif de quantité pour 20 légumes et fruits, sans produits animaux. Son « objectif de quantité » diffère donc de cette valeur calorique.",
     "compositionTitle": "De quoi se compose la prévision",
     "compositionDesc": "Part du besoin calorique annuel, par origine.",

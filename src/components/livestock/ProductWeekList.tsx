@@ -1,6 +1,6 @@
 import { Fragment, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { endOfWeek, getISOWeek, startOfWeek } from "date-fns";
 import { useFormat } from "@/hooks/useFormat";
 import { toDate, toISODate } from "@/lib/format";
@@ -90,7 +90,6 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
             const present = PRODUCT_TYPES.filter((ty) => w.totals[ty] > 0);
             const sums = present.map((ty) => formatProductAmount(ty, w.totals[ty], f, t) + (typeCount > 1 && ty !== "eggs" ? ` ${t(`livestock.products.${ty}`)}` : ""));
             const weekTitle = `${t("livestock.weekShort", { week: w.week })} · ${sums.join(" · ")}`;
-            const Chevron = open ? ChevronDown : ChevronRight;
             return (
               <Fragment key={w.key}>
                 <ListRow
@@ -99,7 +98,8 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
                   meta={[`${f.formatDate(w.from, "short")} – ${f.formatDate(w.to, "short")}`, t("livestock.entriesHint", { count: w.items.length })]}
                   clickLabel={`${weekTitle} – ${t(open ? "livestock.hideEntries" : "livestock.showEntries")}`}
                   onClick={() => toggle(w.key)}
-                  trailing={<Chevron size={18} aria-hidden="true" className="text-gray-400 dark:text-gray-500" />}
+                  // A disclosure, not a link: the week folds open to its single entries.
+                  trailing={<ChevronDown size={18} aria-hidden="true" className={`text-gray-400 transition-transform dark:text-gray-500 ${open ? "rotate-180" : ""}`} />}
                 />
                 {open && w.items.map((p) => (
                   <ListRow

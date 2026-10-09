@@ -37,11 +37,13 @@ export interface KeyFiguresProps {
 }
 
 const CARD = "overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900";
-const LINK = "block transition-colors hover:bg-gray-50 focus-visible:outline-offset-[-2px] dark:hover:bg-white/5";
+const LINK = "transition-colors hover:bg-gray-50 focus-visible:outline-offset-[-2px] dark:hover:bg-white/5";
 
 function Wrap({ to, label, className, children }: { to?: string; label?: string; className: string; children: ReactNode }) {
+  // A link is a block unless the caller lays it out as flex.
+  const display = /(^|\s)flex(\s|$)/.test(className) ? "" : "block";
   return to
-    ? <Link to={to} aria-label={label} className={`${LINK} ${className}`}>{children}</Link>
+    ? <Link to={to} aria-label={label} className={`${display} ${LINK} ${className}`}>{children}</Link>
     : <div className={className}>{children}</div>;
 }
 
@@ -102,18 +104,26 @@ export const KeyFigures = memo(function KeyFigures({ hero, items = [], layout = 
       <Wrap to={hero.to} label={hero.linkLabel} className="p-4 sm:w-2/5 sm:shrink-0 sm:p-5 lg:w-1/3">{heroBody}</Wrap>
       {items.length > 0 && (
         <div className="grid grid-cols-2 border-t border-gray-100 sm:flex sm:flex-1 sm:border-t-0 sm:border-l dark:border-white/5">
-          {items.map((it, i) => (
-            <Wrap
-              key={i}
-              to={it.to}
-              label={it.linkLabel}
-              className={`min-w-0 p-4 sm:flex-1 sm:p-5 ${i === items.length - 1 && i % 2 === 0 ? "col-span-2" : ""} ${i % 2 === 1 ? "border-l border-gray-100 dark:border-white/5" : ""} ${i >= 2 ? "border-t border-gray-100 sm:border-t-0 dark:border-white/5" : ""} ${i > 0 ? "sm:border-l sm:border-gray-100 sm:dark:border-white/5" : ""}`}
-            >
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{it.label}</p>
-              <p className="mt-1 text-xl font-semibold tracking-tight text-gray-900 tabular-nums dark:text-gray-50">{it.value}</p>
-              {it.hint && <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{it.hint}</p>}
-            </Wrap>
-          ))}
+          {items.map((it, i) => {
+            // An odd last figure on the 2-column phone grid spans the row; laid out
+            // as label left / value right so it does not leave an empty half.
+            const lone = i === items.length - 1 && i % 2 === 0;
+            return (
+              <Wrap
+                key={i}
+                to={it.to}
+                label={it.linkLabel}
+                className={`min-w-0 p-4 sm:flex-1 sm:p-5 ${lone ? "col-span-2 flex items-center justify-between gap-3 sm:block" : ""} ${i % 2 === 1 ? "border-l border-gray-100 dark:border-white/5" : ""} ${i >= 2 ? "border-t border-gray-100 sm:border-t-0 dark:border-white/5" : ""} ${i > 0 ? "sm:border-l sm:border-gray-100 sm:dark:border-white/5" : ""}`}
+              >
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{it.label}</p>
+                  {lone && it.hint && <p className="mt-0.5 text-xs text-gray-500 sm:hidden dark:text-gray-400">{it.hint}</p>}
+                </div>
+                <p className={`text-xl font-semibold tracking-tight text-gray-900 tabular-nums dark:text-gray-50 ${lone ? "shrink-0 sm:mt-1" : "mt-1"}`}>{it.value}</p>
+                {it.hint && <p className={`mt-0.5 text-xs text-gray-500 dark:text-gray-400 ${lone ? "hidden sm:block" : ""}`}>{it.hint}</p>}
+              </Wrap>
+            );
+          })}
         </div>
       )}
     </div>

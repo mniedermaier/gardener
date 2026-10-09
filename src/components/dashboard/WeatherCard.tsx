@@ -129,14 +129,14 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
             <Snowflake size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
             <span>
               <span className="font-medium">{frost.title}.</span> {affected}
-              {related.map((g) => {
-                const text = alertText(g.alerts[0]);
-                return (
-                  <span key={g.id} className="mt-1.5 block text-gray-700 dark:text-gray-300">
-                    <span className="font-medium text-gray-800 dark:text-gray-200">{text.title}:</span> {text.description}
-                  </span>
-                );
-              })}
+              {/* Only the headline of the greenhouse warning here; its reasoning
+                  (outside low, assumed buffer) lives on the weather page. */}
+              {related.length > 0 && (
+                <span className="mt-1.5 block text-gray-700 dark:text-gray-300">
+                  {related.map((g) => alertText(g.alerts[0]).title).join(" · ")}.{" "}
+                  <Link to="/weather" className="font-medium text-garden-700 hover:underline dark:text-garden-300">{t("dashboard.frostDetails")}</Link>
+                </span>
+              )}
             </span>
           </p>
           <FrostTaskButton summary={frost.summary} className="mt-2 ml-6 bg-white dark:bg-gray-900" />

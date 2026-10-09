@@ -77,6 +77,8 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
               {name}
               <span className="font-normal text-gray-500 dark:text-gray-400">· {t("livestock.chartUnit", { unit: t(`livestock.unitPerMonth.${type}`) })}</span>
             </h3>
+            {/* Few months: a capped width instead of three bars stretched over a wide card. */}
+            <div className={shown < 6 ? "max-w-xl" : undefined}>
             <BarChart
               data={buckets.map((b, i) => ({
                 key: b.key,
@@ -92,6 +94,7 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
               categoryLabel={t("charts.month")}
               height={150}
             />
+            </div>
           </div>
         );
       })}

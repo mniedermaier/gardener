@@ -227,7 +227,8 @@
       "task": "Aufgabe fällig",
       "frost": "Frost für empfindliche Kulturen"
     },
-    "mapFrostPlants": "Frost: {{plants}} gefährdet"
+    "mapFrostPlants": "Frost: {{plants}} gefährdet",
+    "frostDetails": "Details im Wetter"
   },
   "onboarding": {
     "stepOf": "Schritt {{current}} von {{total}}",
@@ -1359,7 +1360,6 @@
     "produced": "Produziert / Ziel",
     "area": "Fläche der Plan-Kulturen",
     "deficits": "Kulturen mit Lücke",
-    "deficitsTitle": "Hier fehlt am meisten",
     "needMore": "-{{kg}} kg (brauche +{{m2}} m²)",
     "cropPlan": "Anbauplan",
     "animalProducts": "Tierische Produkte",
@@ -1370,14 +1370,9 @@
     "areaNeeded": "{{area}} wären nötig",
     "ofCrops_one": "von {{count}} Kultur im Plan",
     "ofCrops_other": "von {{count}} Kulturen im Plan",
-    "deficitsDesc": "Fehlmenge laut Prognose und die Fläche, die sie schließen würde.",
-    "missing": "{{kg}} fehlen",
-    "extraArea": "+{{area}} Fläche",
     "target": "Jahresziel",
     "covered": "Gedeckt",
     "meterLabel": "{{plant}}: erfasst {{actual}}, Prognose {{forecast}}, Ziel {{target}}",
-    "emptyTitle": "Noch nichts gepflanzt",
-    "emptyText": "Dein Haushalt braucht rund {{kg}} Gemüse und Obst im Jahr. Unten steht, wie viel je Kultur – lege Beete an, dann zeigt der Plan, was noch fehlt.",
     "howTargets": "Jahresziel: durchschnittlicher Verbrauch pro Person in Mitteleuropa (z. B. 30 kg Kartoffeln, 15 kg Tomaten) × Haushaltsgröße.",
     "howCoverage": "Mengenziel: Summe je Kultur von min(Menge, Ziel) geteilt durch die Summe aller Ziele. Ein Überschuss bei Kartoffeln gleicht also keine fehlenden Tomaten aus.",
     "howVsCalories": "Das ist kein Kalorienwert: Die Selbstversorgung auf der Seite „Selbstversorgung“ rechnet in Kalorien und schließt Tierprodukte ein. Beide Zahlen weichen deshalb voneinander ab.",
@@ -1386,14 +1381,24 @@
     "animalNeed": "Verbrauch {{amount}}",
     "animalSurplus": "Überschuss {{amount}}",
     "surplusBadge": "Überschuss",
-    "rowActualOfTarget": "{{actual}} von {{target}} erfasst",
     "rowForecast": "Prognose {{forecast}}",
     "unplanted": "Noch nicht angebaut",
     "unplantedTitle_one": "{{count}} Kultur noch nicht angebaut",
     "unplantedTitle_other": "{{count}} Kulturen noch nicht angebaut",
     "unplantedDesc": "Zusammen bräuchten sie {{area}}.",
     "targetShort": "Ziel {{target}}",
-    "neededShort": "{{area}} nötig"
+    "neededShort": "{{area}} nötig",
+    "annualNeed": "Jahresbedarf",
+    "annualNeedHint_one": "Gemüse und Obst für {{count}} Person",
+    "annualNeedHint_other": "Gemüse und Obst für {{count}} Personen",
+    "areaNeededLabel": "Fläche nötig",
+    "areaNeededHint": "für alle Kulturen im Plan",
+    "grownShare": "Angebaut",
+    "grownShareHint": "noch keine Beete bepflanzt",
+    "cropPlanDesc": "Sortiert nach der größten Lücke laut Prognose.",
+    "bigGap": "Große Lücke",
+    "rowOfTarget": "{{actual}} / {{target}}",
+    "rowGap": "fehlen {{kg}} (+{{area}})"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1465,7 +1470,10 @@
     "kcalCounted": "{{kcal}} kcal angerechnet",
     "surplus": "Überschuss {{amount}}",
     "emptyText_one": "Eine Person braucht rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
-    "emptyText_other": "{{count}} Personen brauchen rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken."
+    "emptyText_other": "{{count}} Personen brauchen rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
+    "monthlyDescFresh_one": "Anteil des Kalorienbedarfs von {{count}} Person laut Prognose. Zum Einlagern reicht die Ernte noch nicht.",
+    "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Zum Einlagern reicht die Ernte noch nicht.",
+    "monthlyKgCaptionFresh": "Verfügbare Lebensmittel pro Monat in kg: frisch aus dem Garten und von den Tieren"
   },
   "pests": {
     "title": "Schädlinge",
@@ -1746,7 +1754,9 @@
     "tabYields": "Erträge",
     "tabFeedings": "Fütterungen",
     "tabTreatments": "Behandlungen",
-    "costPerUnit": "Kosten je Einheit"
+    "costPerUnit": "Kosten je Einheit",
+    "noEggsToday": "Heute noch keine Eier erfasst",
+    "addYield": "Ertrag erfassen"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2355,10 +2365,10 @@
     "howNeed": "Selbstversorgung = Anteil des Kalorienbedarfs deines Haushalts ({{kcal}} kcal pro Person und Tag), den Garten und Tiere im Jahr decken (höchstens 100 %).",
     "meterLegend": "Voller Balken = erfasst, schraffiert = Prognose.",
     "pricesEditable": "Die Preise pro Ei, kg oder Liter kannst du unter Kosten anpassen.",
-    "expectedToDate": "Soll bis heute: {{value}}",
-    "actualVsToDateShort": "erfasst {{actual}} · Soll bis heute {{expected}}",
+    "expectedToDate": "erwartet bis heute: {{value}}",
+    "actualVsToDateShort": "erfasst {{actual}} · erwartet bis heute {{expected}}",
     "howCap": "Tierprodukte zählen nur bis zum üblichen Verbrauch (pro Person und Jahr etwa 240 Eier, 1 kg Honig, 52 kg Fleisch, 300 l Milch). Honig ist kalorienreich, aber kein Grundnahrungsmittel: Zwei Völker liefern rund 40 kg, ein Haushalt isst davon 1–2 kg. Was darüber liegt, ist Überschuss zum Tauschen oder Verkaufen und macht dich nicht satter. Gemüse und Obst zählen voll.",
-    "howToDate": "Soll bis heute: der Teil der Jahresprognose, der bis heute hereinkommen sollte – je Kultur ihr Erntefenster ab dem letzten Frost, Honig Mai bis August, Eier gleichmäßig übers Jahr. Liegt „bisher erfasst“ deutlich darunter, fehlen meist Einträge.",
+    "howToDate": "Erwartet bis heute: der Teil der Jahresprognose, der bis heute hereinkommen sollte – je Kultur ihr Erntefenster ab dem letzten Frost, Honig Mai bis August, Eier gleichmäßig übers Jahr. Liegt „bisher erfasst“ deutlich darunter, fehlen meist Einträge.",
     "howVsFoodPlan": "Der Ernährungsplan misst etwas anderes: Kilogramm gegen ein Mengenziel für 20 Gemüse- und Obstkulturen, ohne Tierprodukte. Sein „Mengenziel“ weicht deshalb von diesem Kalorienwert ab.",
     "compositionTitle": "Woraus die Prognose besteht",
     "compositionDesc": "Anteil am Kalorienbedarf des Jahres, nach Herkunft.",

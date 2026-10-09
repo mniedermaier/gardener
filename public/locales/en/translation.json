@@ -227,7 +227,8 @@
       "task": "Task due",
       "frost": "Frost for tender crops"
     },
-    "mapFrostPlants": "Frost: {{plants}} at risk"
+    "mapFrostPlants": "Frost: {{plants}} at risk",
+    "frostDetails": "Details in Weather"
   },
   "search": {
     "placeholder": "Search plants, tasks, journal…",
@@ -1359,7 +1360,6 @@
     "produced": "Produced / target",
     "area": "Area of plan crops",
     "deficits": "Crops with a gap",
-    "deficitsTitle": "Biggest shortfalls",
     "needMore": "-{{kg}} kg (need +{{m2}} m²)",
     "cropPlan": "Crop plan",
     "animalProducts": "Animal products",
@@ -1370,14 +1370,9 @@
     "areaNeeded": "{{area}} needed",
     "ofCrops_one": "of {{count}} crop in the plan",
     "ofCrops_other": "of {{count}} crops in the plan",
-    "deficitsDesc": "Shortfall according to the forecast and the area that would close it.",
-    "missing": "{{kg}} short",
-    "extraArea": "+{{area}} area",
     "target": "Annual target",
     "covered": "Covered",
     "meterLabel": "{{plant}}: recorded {{actual}}, forecast {{forecast}}, target {{target}}",
-    "emptyTitle": "Nothing planted yet",
-    "emptyText": "Your household needs about {{kg}} of vegetables and fruit per year. Below is how much per crop – add beds and the plan shows what's missing.",
     "howTargets": "Annual target: average consumption per person in central Europe (e.g. 30 kg potatoes, 15 kg tomatoes) × household size.",
     "howCoverage": "Quantity target: the sum of min(amount, target) per crop divided by the sum of all targets. A potato surplus doesn't make up for missing tomatoes.",
     "howVsCalories": "This is not a calorie figure: self-sufficiency on the “Self-sufficiency” page counts calories and includes animal products. The two numbers therefore differ.",
@@ -1386,14 +1381,24 @@
     "animalNeed": "consumption {{amount}}",
     "animalSurplus": "surplus {{amount}}",
     "surplusBadge": "Surplus",
-    "rowActualOfTarget": "{{actual}} of {{target}} recorded",
     "rowForecast": "Forecast {{forecast}}",
     "unplanted": "Not planted yet",
     "unplantedTitle_one": "{{count}} crop not planted yet",
     "unplantedTitle_other": "{{count}} crops not planted yet",
     "unplantedDesc": "Together they would need {{area}}.",
     "targetShort": "Target {{target}}",
-    "neededShort": "{{area}} needed"
+    "neededShort": "{{area}} needed",
+    "annualNeed": "Annual need",
+    "annualNeedHint_one": "Vegetables and fruit for {{count}} person",
+    "annualNeedHint_other": "Vegetables and fruit for {{count}} people",
+    "areaNeededLabel": "Area needed",
+    "areaNeededHint": "for all crops in the plan",
+    "grownShare": "Grown",
+    "grownShareHint": "no beds planted yet",
+    "cropPlanDesc": "Sorted by the largest forecast gap.",
+    "bigGap": "Large gap",
+    "rowOfTarget": "{{actual}} / {{target}}",
+    "rowGap": "{{kg}} short (+{{area}})"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1465,7 +1470,10 @@
     "kcalCounted": "{{kcal}} kcal counted",
     "surplus": "surplus {{amount}}",
     "emptyText_one": "One person needs about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
-    "emptyText_other": "{{count}} people need about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover."
+    "emptyText_other": "{{count}} people need about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
+    "monthlyDescFresh_one": "Share of the calorie needs of {{count}} person (forecast). The harvest is not yet large enough to store.",
+    "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). The harvest is not yet large enough to store.",
+    "monthlyKgCaptionFresh": "Food available per month in kg: fresh from the garden and from the animals"
   },
   "pests": {
     "title": "Pests",
@@ -1746,7 +1754,9 @@
     "tabYields": "Yields",
     "tabFeedings": "Feedings",
     "tabTreatments": "Treatments",
-    "costPerUnit": "Cost per unit"
+    "costPerUnit": "Cost per unit",
+    "noEggsToday": "No eggs logged today yet",
+    "addYield": "Log yield"
   },
   "seeds": {
     "title": "Seeds",
@@ -2355,10 +2365,10 @@
     "howNeed": "Self-sufficiency = the share of your household's calorie need ({{kcal}} kcal per person per day) that garden and animals cover in a year (at most 100%).",
     "meterLegend": "Solid bar = recorded, hatched = forecast.",
     "pricesEditable": "You can adjust the price per egg, kg or litre on the Costs page.",
-    "expectedToDate": "target to date: {{value}}",
-    "actualVsToDateShort": "recorded {{actual}} · target to date {{expected}}",
+    "expectedToDate": "expected by today: {{value}}",
+    "actualVsToDateShort": "recorded {{actual}} · expected by today {{expected}}",
     "howCap": "Animal products count only up to typical consumption (per person and year about 240 eggs, 1 kg honey, 52 kg meat, 300 l milk). Honey is calorie-dense but not a staple: two colonies give about 40 kg, a household eats 1–2 kg of it. Anything above is surplus to swap or sell and does not feed you. Vegetables and fruit count in full.",
-    "howToDate": "Target to date: the part of the annual forecast that should be in by now – each crop's harvest window from the last frost, honey May to August, eggs evenly over the year. If “recorded so far” is well below it, entries are usually missing.",
+    "howToDate": "Expected by today: the part of the annual forecast that should be in by now – each crop's harvest window from the last frost, honey May to August, eggs evenly over the year. If “recorded so far” is well below it, entries are usually missing.",
     "howVsFoodPlan": "The food plan measures something else: kilograms against a quantity target for 20 vegetable and fruit crops, without animal products. Its “quantity target” therefore differs from this calorie figure.",
     "compositionTitle": "What the forecast is made of",
     "compositionDesc": "Share of the annual calorie need, by source.",

@@ -10,12 +10,10 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { ANNUAL_CONSUMPTION_KG_PER_PERSON, EGG_WEIGHT_KG, getCropPlan, getForecastProducts, PRODUCT_TYPES } from "@/lib/metrics";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { List, ListRow } from "@/components/ui/List";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { HowCalculated, KeyFigures, Legend, Meter } from "@/components/ui/charts";
 import { HouseholdSizeField } from "@/components/sufficiency/HouseholdSizeField";
 import { PRODUCT_ICON } from "@/components/livestock/icons";
@@ -61,15 +59,21 @@ export function FoodPlan() {
         {/* Nothing planted yet: the targets per crop are the useful part, so they stay;
             only the 0 % figures give way to a slim hint. */}
         {empty ? (
-          <Card>
-            <EmptyState
-              compact
-              icon={Target}
-              title={t("foodplan.emptyTitle")}
-              description={t("foodplan.emptyText", { kg: kg(plan.targetKg) })}
-              action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
-            />
-          </Card>
+          // The need is known before anything grows: it is the page's figure.
+          // The one way forward is the planner button in the crop list below.
+          <KeyFigures
+            hero={{
+              label: t("foodplan.annualNeed"),
+              value: kg(plan.targetKg),
+              icon: Target,
+              tone: "brand",
+              hint: t("foodplan.annualNeedHint", { count: householdSize }),
+            }}
+            items={[
+              { label: t("foodplan.areaNeededLabel"), value: f.formatArea(plan.neededAreaM2), hint: t("foodplan.areaNeededHint") },
+              { label: t("foodplan.grownShare"), value: f.formatPercent(0), hint: t("foodplan.grownShareHint") },
+            ]}
+          />
         ) : (
           <div>
             <KeyFigures
@@ -108,30 +112,12 @@ export function FoodPlan() {
           </div>
         )}
 
-          {!empty && deficits.length > 0 && (
-            <Card padding="none">
-              <div className="px-4 pt-4 sm:px-6 sm:pt-5"><CardHeader title={t("foodplan.deficitsTitle")} description={t("foodplan.deficitsDesc")} /></div>
-              <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
-                {deficits.slice(0, 5).map((r) => {
-                  const p = plantMap.get(r.plantId)!;
-                  return (
-                    <li key={r.plantId} className="flex items-center gap-3 px-4 py-2.5 sm:px-6">
-                      <PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />
-                      <span className="flex-1 text-sm font-medium text-gray-900 dark:text-gray-100">{plantName(p.id)}</span>
-                      <span className="text-right text-sm tabular-nums text-gray-700 dark:text-gray-300">
-                        {t("foodplan.missing", { kg: kg(r.deficitKg) })}
-                        <span className="block text-xs text-gray-500 dark:text-gray-400">{t("foodplan.extraArea", { area: f.formatArea(r.extraAreaM2) })}</span>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </Card>
-          )}
-
           <section aria-labelledby="crop-plan" className="space-y-3">
             <div className="flex flex-wrap items-end justify-between gap-2">
-              <h2 id="crop-plan" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.cropPlan")}</h2>
+              <div>
+                <h2 id="crop-plan" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.cropPlan")}</h2>
+                {grown.length > 0 && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("foodplan.cropPlanDesc")}</p>}
+              </div>
               {grown.length > 0 && (
                 <Legend
                   items={[
@@ -144,20 +130,27 @@ export function FoodPlan() {
               )}
             </div>
             {grown.length > 0 && (
+              // Rows come sorted by the largest gap (getCropPlan), so the top of the
+              // list is "where it is missing most" — no separate card repeating it.
               <List label={t("foodplan.cropPlan")}>
-                {grown.map((r) => {
+                {grown.map((r, i) => {
                   const p = plantMap.get(r.plantId)!;
                   const covered = r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg;
+                  const gap = r.deficitKg > 0.05;
                   return (
                     <ListRow
                       key={r.plantId}
                       leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
                       title={plantName(p.id)}
-                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : undefined}
-                      meta={[t("foodplan.rowActualOfTarget", { actual: kg(r.actualKg), target: kg(r.targetKg) }), t("foodplan.rowForecast", { forecast: kg(r.forecastKg) })]}
+                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : gap && i < 5 ? <Badge tone="warning">{t("foodplan.bigGap")}</Badge> : undefined}
+                      trailing={t("foodplan.rowOfTarget", { actual: f.formatNumber(r.actualKg, { maximumFractionDigits: 1 }), target: kg(r.targetKg) })}
+                      meta={[
+                        t("foodplan.rowForecast", { forecast: kg(r.forecastKg) }),
+                        gap ? t("foodplan.rowGap", { kg: kg(r.deficitKg), area: f.formatArea(r.extraAreaM2) }) : null,
+                      ]}
                       description={
                         <Meter
-                          className="mt-1.5"
+                          className="mt-1.5 max-w-md"
                           size={6}
                           actual={r.actualKg}
                           forecast={r.forecastKg}

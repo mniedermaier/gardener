@@ -239,7 +239,8 @@
       "task": "Tarea pendiente",
       "frost": "Helada para cultivos sensibles"
     },
-    "mapFrostPlants": "Helada: riesgo para {{plants}}"
+    "mapFrostPlants": "Helada: riesgo para {{plants}}",
+    "frostDetails": "Detalles en el tiempo"
   },
   "search": {
     "placeholder": "Buscar plantas, tareas, diario…",
@@ -1416,7 +1417,6 @@
     "produced": "Producido / Objetivo",
     "area": "Superficie de los cultivos del plan",
     "deficits": "Cultivos con déficit",
-    "deficitsTitle": "Donde más falta",
     "needMore": "-{{kg}} kg (necesitas +{{m2}} m²)",
     "cropPlan": "Plan de cultivo",
     "animalProducts": "Productos animales",
@@ -1428,14 +1428,9 @@
     "ofCrops_one": "de {{count}} cultivo del plan",
     "ofCrops_other": "de {{count}} cultivos del plan",
     "ofCrops_many": "de {{count}} cultivos del plan",
-    "deficitsDesc": "Déficit según la previsión y la superficie que lo cubriría.",
-    "missing": "faltan {{kg}}",
-    "extraArea": "+{{area}} de superficie",
     "target": "Objetivo anual",
     "covered": "Cubierto",
     "meterLabel": "{{plant}}: registrado {{actual}}, previsión {{forecast}}, objetivo {{target}}",
-    "emptyTitle": "Aún no hay nada plantado",
-    "emptyText": "Tu hogar necesita unos {{kg}} de verdura y fruta al año. Abajo ves cuánto por cultivo – añade bancales y el plan te mostrará lo que falta.",
     "howTargets": "Objetivo anual: consumo medio por persona en Europa central (p. ej. 30 kg de patatas, 15 kg de tomates) × tamaño del hogar.",
     "howCoverage": "Objetivo de cantidad: suma por cultivo de mín(cantidad, objetivo) dividida por la suma de objetivos. Un excedente de patatas no compensa tomates que faltan.",
     "howVsCalories": "No es un valor calórico: la autosuficiencia de la página «Autosuficiencia» cuenta calorías e incluye productos animales. Por eso ambas cifras difieren.",
@@ -1445,7 +1440,6 @@
     "animalSurplus": "excedente {{amount}}",
     "surplusBadge": "Excedente",
     "animalIntro_many": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas.",
-    "rowActualOfTarget": "{{actual}} de {{target}} registrados",
     "rowForecast": "Previsión {{forecast}}",
     "unplanted": "Aún sin plantar",
     "unplantedTitle_one": "{{count}} cultivo aún sin plantar",
@@ -1453,7 +1447,19 @@
     "unplantedTitle_many": "{{count}} cultivos aún sin plantar",
     "unplantedDesc": "Juntos necesitarían {{area}}.",
     "targetShort": "Objetivo {{target}}",
-    "neededShort": "{{area}} necesarios"
+    "neededShort": "{{area}} necesarios",
+    "annualNeed": "Necesidad anual",
+    "annualNeedHint_one": "Verdura y fruta para {{count}} persona",
+    "annualNeedHint_other": "Verdura y fruta para {{count}} personas",
+    "annualNeedHint_many": "Verdura y fruta para {{count}} personas",
+    "areaNeededLabel": "Superficie necesaria",
+    "areaNeededHint": "para todos los cultivos del plan",
+    "grownShare": "Cultivado",
+    "grownShareHint": "aún no hay bancales plantados",
+    "cropPlanDesc": "Ordenado por el mayor déficit previsto.",
+    "bigGap": "Gran déficit",
+    "rowOfTarget": "{{actual}} / {{target}}",
+    "rowGap": "faltan {{kg}} (+{{area}})"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1530,7 +1536,11 @@
     "surplus": "excedente {{amount}}",
     "emptyText_one": "Una persona necesita unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
     "emptyText_other": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
-    "emptyText_many": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales."
+    "emptyText_many": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
+    "monthlyDescFresh_one": "Parte de las calorías que necesita {{count}} persona (previsión). La cosecha aún no alcanza para guardar.",
+    "monthlyDescFresh_other": "Parte de las calorías que necesitan {{count}} personas (previsión). La cosecha aún no alcanza para guardar.",
+    "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). La cosecha aún no alcanza para guardar.",
+    "monthlyKgCaptionFresh": "Alimentos disponibles por mes en kg: frescos del huerto y de los animales"
   },
   "pests": {
     "title": "Plagas",
@@ -1827,7 +1837,9 @@
     "tabYields": "Rendimientos",
     "tabFeedings": "Raciones",
     "tabTreatments": "Tratamientos",
-    "costPerUnit": "Coste por unidad"
+    "costPerUnit": "Coste por unidad",
+    "noEggsToday": "Hoy aún no hay huevos registrados",
+    "addYield": "Registrar rendimiento"
   },
   "seeds": {
     "title": "Semillas",
@@ -2464,10 +2476,10 @@
     "howNeed": "Autosuficiencia = parte de la necesidad calórica de tu hogar ({{kcal}} kcal por persona y día) que huerto y animales cubren en un año (como máximo 100 %).",
     "meterLegend": "Barra llena = registrado, rayada = previsión.",
     "pricesEditable": "Puedes ajustar el precio por huevo, kg o litro en Costes.",
-    "expectedToDate": "objetivo a la fecha: {{value}}",
-    "actualVsToDateShort": "registrado {{actual}} · objetivo a la fecha {{expected}}",
+    "expectedToDate": "esperado hasta hoy: {{value}}",
+    "actualVsToDateShort": "registrado {{actual}} · esperado hasta hoy {{expected}}",
     "howCap": "Los productos animales cuentan solo hasta el consumo habitual (por persona y año unos 240 huevos, 1 kg de miel, 52 kg de carne, 300 l de leche). La miel es muy calórica, pero no es un alimento básico: dos colmenas dan unos 40 kg y un hogar consume 1–2 kg. Lo que excede es excedente para intercambiar o vender y no te alimenta. Hortalizas y fruta cuentan por completo.",
-    "howToDate": "Objetivo a la fecha: la parte de la previsión anual que debería haber llegado ya – para cada cultivo su ventana de cosecha desde la última helada, miel de mayo a agosto, huevos repartidos en el año. Si lo registrado queda muy por debajo, suelen faltar registros.",
+    "howToDate": "Esperado hasta hoy: la parte de la previsión anual que debería haber llegado ya – para cada cultivo su ventana de cosecha desde la última helada, miel de mayo a agosto, huevos repartidos en el año. Si lo registrado queda muy por debajo, suelen faltar registros.",
     "howVsFoodPlan": "El plan de alimentación mide otra cosa: kilos frente a un objetivo de cantidad para 20 hortalizas y frutas, sin productos animales. Por eso su «objetivo de cantidad» difiere de este valor calórico.",
     "compositionTitle": "De qué se compone la previsión",
     "compositionDesc": "Parte de la necesidad calórica anual, según su origen.",

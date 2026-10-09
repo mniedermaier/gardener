@@ -30,7 +30,10 @@ export const Meter = memo(function Meter({ actual, forecast, max, target, label,
   // A non-zero value never shrinks below a sliver (~2 %), or 0,4 of 6 kg would vanish.
   const sliver = (p: number) => (p > 0 ? Math.max(p, 2) : 0);
   const a = sliver(pct(actual));
-  const f = sliver(pct(forecast));
+  // A forecast just above the actual value would hide under the solid bar:
+  // keep at least a few percent of hatching visible beyond it.
+  const fRaw = sliver(pct(forecast));
+  const f = forecast !== undefined && actual !== undefined && forecast > actual && a > 0 ? Math.min(100, Math.max(fRaw, a + 3)) : fRaw;
   const t = target !== undefined ? pct(target) : null;
   return (
     <div
