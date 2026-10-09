@@ -17,7 +17,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   { to: "/harvest", icon: Apple, labelKey: "quickAdd.harvest", hintKey: "quickAdd.harvestHint", tone: "brand" },
   { to: "/livestock/production", icon: Egg, labelKey: "quickAdd.production", hintKey: "quickAdd.productionHint", tone: "brand" },
   { to: "/water-log", icon: Droplets, labelKey: "quickAdd.water", hintKey: "quickAdd.waterHint", tone: "info" },
-  { to: "/tasks", icon: ClipboardList, labelKey: "quickAdd.task", hintKey: "quickAdd.taskHint", tone: "info" },
+  { to: "/tasks", icon: ClipboardList, labelKey: "quickAdd.task", hintKey: "quickAdd.taskHint", tone: "neutral" },
   { to: "/journal", icon: BookOpen, labelKey: "quickAdd.journal", hintKey: "quickAdd.journalHint", tone: "neutral" },
   { to: "/pests", icon: Bug, labelKey: "quickAdd.pest", hintKey: "quickAdd.pestHint", tone: "warning" },
 ];

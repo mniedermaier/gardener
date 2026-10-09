@@ -94,7 +94,11 @@ export function SeasonTimeline() {
           // Planted this season: the harvest bar follows the real planting dates
           // (as the bed list and the harvest log do), not the frost-date estimate.
           const year = frostDate.getFullYear();
-          const planted = plantedHarvestWindow(plant, bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!));
+          const planted = plantedHarvestWindow(
+            plant,
+            bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!),
+            { lastFrostDate, now: today, protectionWeeks: protection },
+          );
           if (planted) phases.harvest = planted;
           const autumn = autumnPhaseWindows(plantId, frostDate.getFullYear(), protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
           result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn });
@@ -102,7 +106,7 @@ export function SeasonTimeline() {
       }
     }
     return result;
-  }, [gardens, plantMap, frostDate, filter]);
+  }, [gardens, plantMap, frostDate, filter, lastFrostDate, today]);
 
   // Mobile list: what is running now, and what starts within the next 4 weeks.
   const agenda = useMemo(() => {

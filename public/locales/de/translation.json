@@ -980,7 +980,7 @@
     "addTask": "Aufgabe hinzufügen",
     "taskTitle": "Titel",
     "taskType": "Typ",
-    "taskDate": "Datum",
+    "taskDate": "Fällig am",
     "generate": "Aufgaben vorschlagen",
     "generated_one": "{{count}} Aufgabe generiert",
     "generated_other": "{{count}} Aufgaben generiert",
@@ -1012,7 +1012,7 @@
     "bedFrom": "{{beds}} ab {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "nach den Frostnächten",
-    "pageSubtitleNoBeds": "Was du jetzt säen und pflanzen kannst – mit Beeten wird daraus dein Saisonplan.",
+    "pageSubtitleNoBeds": "Was du jetzt säen und pflanzen kannst.",
     "dueRelative": "{{date}} fällig",
     "emptyTextNoBeds": "Lege Aufgaben an – oder ein Beet, dann erzeugt Gardener Aussaat- und Pflanztermine daraus."
   },
@@ -1529,7 +1529,7 @@
     "emptyNeedShort_other": "{{count}} Personen brauchen rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst.",
     "typicalYearTitle": "Typisches Jahr (Prognose)",
     "seasonKgTitle": "Saison {{year}}: erfasst, ab heute Prognose",
-    "seasonKgDesc": "Erträge in kg: bis heute erfasst, danach Prognose."
+    "seasonKgDesc": "Erträge in kg (nicht Kalorien): bis heute erfasst, danach Prognose."
   },
   "pests": {
     "title": "Schädlinge",

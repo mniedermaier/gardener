@@ -122,14 +122,27 @@ export interface HarvestReadyItem {
 
 /**
  * Harvest window from real planting dates: earliest planting + min days to
- * the latest + max days. Null without dates or for perennials — callers then
- * fall back to the season windows from the frost date.
+ * the latest + max days. Continuous croppers (tomato, chard …) stay open
+ * until the autumn frost, shifted by the bed's frost protection — the same
+ * rule as getHarvestReady, so "Heute", calendar and bed list agree. Null
+ * without dates or for perennials — callers then fall back to the season
+ * windows from the frost date.
  */
-export function plantedHarvestWindow(plant: Plant, plantedDates: string[]): { start: Date; end: Date } | null {
+export function plantedHarvestWindow(
+  plant: Plant,
+  plantedDates: string[],
+  season?: { lastFrostDate: string; now: Date; protectionWeeks: number },
+): { start: Date; end: Date } | null {
   if (plant.harvestDaysMax >= 365) return null;
   const times = plantedDates.flatMap((d) => toDate(d)?.getTime() ?? []);
   if (times.length === 0) return null;
-  return { start: addDays(Math.min(...times), plant.harvestDaysMin), end: addDays(Math.max(...times), plant.harvestDaysMax) };
+  const start = addDays(Math.min(...times), plant.harvestDaysMin);
+  let end = addDays(Math.max(...times), plant.harvestDaysMax);
+  if (season && isContinuousCropper(plant)) {
+    const seasonEnd = addWeeks(estimateFirstFrost(seasonFrost(season.lastFrostDate, season.now)), season.protectionWeeks);
+    if (isAfter(seasonEnd, end)) end = seasonEnd;
+  }
+  return { start, end };
 }
 
 /**

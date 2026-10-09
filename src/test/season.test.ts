@@ -3,7 +3,7 @@ import plantsData from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
 import type { Bed, Garden } from "@/types/garden";
 import { getPhaseWindows, getHarvestReady, plantedHarvestWindow, seasonFrost, suitsEnvironment } from "@/lib/season";
-import { agendaRowsByPlant, getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda, groupAgendaBedsByDate } from "@/lib/advisor";
+import { agendaRowsByPlant, autumnPhaseWindows, getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda, groupAgendaBedsByDate } from "@/lib/advisor";
 import { recommendBedPlanting } from "@/lib/bedRecommendation";
 import { groupTasksByDue, nextDue, taskGroup } from "@/lib/tasks";
 import type { Task } from "@/types/task";
@@ -298,5 +298,25 @@ describe("plantedHarvestWindow", () => {
   });
   it("is null without planting dates", () => {
     expect(plantedHarvestWindow(carrot, [])).toBeNull();
+  });
+});
+
+describe("plantedHarvestWindow with the season", () => {
+  const tomato = (plantsData as Plant[]).find((p) => p.id === "tomato")!;
+  it("keeps a continuous cropper open until the autumn frost (+ protection)", () => {
+    const plain = plantedHarvestWindow(tomato, ["2026-05-08"])!;
+    const season = plantedHarvestWindow(tomato, ["2026-05-08"], { lastFrostDate: "2026-05-15", now: new Date(2026, 9, 9), protectionWeeks: 3 })!;
+    expect(season.end.getTime()).toBeGreaterThan(plain.end.getTime());
+    expect(season.end.getMonth()).toBeGreaterThanOrEqual(9);
+  });
+});
+
+describe("autumnPhaseWindows", () => {
+  const byId = (id: string) => (plantsData as Plant[]).find((p) => p.id === id)!;
+  it("gives autumn-planted onions no harvest this season (they overwinter)", () => {
+    expect(autumnPhaseWindows("onion", 2026, 0, "outdoor_bed", byId("onion")).some((w) => w.phase === "harvest")).toBe(false);
+  });
+  it("keeps the winter harvest of an autumn sowing", () => {
+    expect(autumnPhaseWindows("lambs_lettuce", 2026, 0, "outdoor_bed", byId("lambs_lettuce")).some((w) => w.phase === "harvest")).toBe(true);
   });
 });

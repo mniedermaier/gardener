@@ -116,6 +116,8 @@ function autumnWindows(plantId: string, year: number, protection: number, env?: 
   return result;
 }
 
+const OVERWINTERING_BULBS = new Set(["onion", "garlic"]);
+
 /**
  * Autumn sowing/planting windows as season phases (autumn sowing = direct
  * sowing, autumn planting = planting out), so the season chart can draw them
@@ -137,7 +139,9 @@ export function autumnPhaseWindows(
   // The autumn sowing has its own harvest: days to maturity counted from that
   // window (wrapping into next year), so lamb's lettuce sown in September is
   // harvested in autumn/winter, not in the spring window's May–July.
-  if (plant && windows.length > 0 && plant.harvestDaysMax < 200) {
+  // Bulbs planted in autumn (onion sets, garlic) rest over winter and are
+  // harvested next summer: no harvest bar in this season's December.
+  if (plant && windows.length > 0 && plant.harvestDaysMax < 200 && !OVERWINTERING_BULBS.has(plantId)) {
     const first = Math.min(...windows.map((w) => w.start.getTime()));
     const last = Math.max(...windows.map((w) => w.end.getTime()));
     out.push({ phase: "harvest", start: addDays(new Date(first), plant.harvestDaysMin), end: addDays(new Date(last), plant.harvestDaysMax) });

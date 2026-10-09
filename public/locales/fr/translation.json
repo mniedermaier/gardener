@@ -1009,7 +1009,7 @@
     "addTask": "Ajouter une tâche",
     "taskTitle": "Titre",
     "taskType": "Type",
-    "taskDate": "Date",
+    "taskDate": "Échéance",
     "generate": "Proposer des tâches",
     "generated_one": "{{count}} tâche générée",
     "generated_many": "{{count}} tâches générées",
@@ -1044,7 +1044,7 @@
     "bedFrom": "{{beds}} à partir du {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "après les nuits de gel",
-    "pageSubtitleNoBeds": "Ce que vous pouvez semer et planter maintenant – avec des planches, cela devient votre plan de saison.",
+    "pageSubtitleNoBeds": "Ce que vous pouvez semer et planter maintenant.",
     "dueRelative": "prévue {{dateInline}}",
     "emptyTextNoBeds": "Ajoutez des tâches – ou une planche, et Gardener en tirera les dates de semis et de plantation."
   },
@@ -1600,7 +1600,7 @@
     "emptyNeedShort_many": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
     "typicalYearTitle": "Année type (prévision)",
     "seasonKgTitle": "Saison {{year}} : saisi, prévision à partir d’aujourd’hui",
-    "seasonKgDesc": "Récoltes en kg : saisies jusqu’à aujourd’hui, prévision ensuite."
+    "seasonKgDesc": "Récoltes en kg (pas en calories) : saisies jusqu’à aujourd’hui, prévision ensuite."
   },
   "pests": {
     "title": "Ravageurs",

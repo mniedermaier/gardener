@@ -45,7 +45,7 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
       .map((r) => {
         // Real planting dates win (the harvest log follows them, as does the
         // sufficiency forecast): earliest planting + min days … latest + max days.
-        const planted = plantedHarvestWindow(r.plant, r.planted);
+        const planted = plantedHarvestWindow(r.plant, r.planted, { lastFrostDate, now: today, protectionWeeks: frostProtectionWeeks });
         if (planted) return { ...r, window: planted };
         // Spring harvest and, for autumn-sown crops, the autumn harvest: show the
         // one still ahead or running (lamb's lettuce in October → autumn/winter).

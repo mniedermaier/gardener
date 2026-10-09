@@ -1009,7 +1009,7 @@
     "addTask": "Añadir tarea",
     "taskTitle": "Título",
     "taskType": "Tipo",
-    "taskDate": "Fecha",
+    "taskDate": "Vence el",
     "generate": "Sugerir tareas",
     "generated_one": "Se generó {{count}} tarea",
     "generated_many": "Se generaron {{count}} tareas",
@@ -1044,7 +1044,7 @@
     "bedFrom": "{{beds}} desde el {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "tras las noches de helada",
-    "pageSubtitleNoBeds": "Lo que puedes sembrar y plantar ahora: con bancales se convierte en tu plan de temporada.",
+    "pageSubtitleNoBeds": "Lo que puedes sembrar y plantar ahora.",
     "dueRelative": "vence {{dateInline}}",
     "emptyTextNoBeds": "Añade tareas, o un bancal y Gardener creará a partir de él las fechas de siembra y plantación."
   },
@@ -1600,7 +1600,7 @@
     "emptyNeedShort_many": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
     "typicalYearTitle": "Año típico (previsión)",
     "seasonKgTitle": "Temporada {{year}}: registrado, desde hoy previsión",
-    "seasonKgDesc": "Rendimientos en kg: registrados hasta hoy, luego previsión."
+    "seasonKgDesc": "Rendimientos en kg (no calorías): registrados hasta hoy, luego previsión."
   },
   "pests": {
     "title": "Plagas",

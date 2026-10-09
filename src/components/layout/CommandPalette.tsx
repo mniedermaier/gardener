@@ -358,8 +358,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         </div>
 
         <div className="hidden items-center gap-4 border-t border-gray-200 px-4 py-2 text-xs text-gray-500 sm:flex dark:border-white/10 dark:text-gray-400">
-          <span><kbd className="font-sans">↑↓</kbd> {t("shell.command.navigate")}</span>
-          <span><kbd className="font-sans">↵</kbd> {t("shell.command.open")}</span>
+          <span><kbd className="rounded border border-gray-200 px-1.5 py-0.5 font-sans text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">↑↓</kbd> {t("shell.command.navigate")}</span>
+          <span><kbd className="rounded border border-gray-200 px-1.5 py-0.5 font-sans text-xs text-gray-500 dark:border-white/15 dark:text-gray-400">↵</kbd> {t("shell.command.open")}</span>
         </div>
       </div>
     </dialog>

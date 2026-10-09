@@ -6,6 +6,7 @@ import { PRODUCT_NUTRITION } from "@/types/animal";
 import { bedPlantAreas, capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
 import { addWeeks, addDays, parseISO, getMonth } from "date-fns";
 import { getFrostProtectionWeeks } from "@/types/garden";
+import { plantedHarvestWindow } from "@/lib/season";
 
 // --- Types ---
 
@@ -204,17 +205,13 @@ function getHarvestMonths(
   return Array.from(months).sort((a, b) => a - b);
 }
 
-/** Months (0-11) of the harvest windows that start from real planting dates. */
-function getPlantedHarvestMonths(plant: Plant, plantedDates: string[]): number[] {
-  if (plant.harvestDaysMax >= 365) return [];
+/** Months (0-11) of the harvest window from real planting dates (see plantedHarvestWindow). */
+function getPlantedHarvestMonths(plant: Plant, plantedDates: string[], season: { lastFrostDate: string; now: Date; protectionWeeks: number }): number[] {
+  const window = plantedHarvestWindow(plant, plantedDates, season);
+  if (!window) return [];
   const months = new Set<number>();
-  for (const iso of plantedDates) {
-    const base = parseISO(iso);
-    if (Number.isNaN(base.getTime())) continue;
-    const end = addDays(base, plant.harvestDaysMax);
-    for (let d = addDays(base, plant.harvestDaysMin); d <= end; d = addDays(d, 15)) months.add(getMonth(d));
-    months.add(getMonth(end));
-  }
+  for (let d = window.start; d <= window.end; d = addDays(d, 15)) months.add(getMonth(d));
+  months.add(getMonth(window.end));
   return Array.from(months).sort((a, b) => a - b);
 }
 
@@ -257,7 +254,7 @@ export function calculateSufficiency(
     // in winter, as the calendar shows); otherwise the spring sowing from the
     // frost date, with the bed's best frost protection.
     yield_.harvestMonths = planted.size > 0
-      ? getPlantedHarvestMonths(plant, [...planted])
+      ? getPlantedHarvestMonths(plant, [...planted], { lastFrostDate, now, protectionWeeks: Math.max(...protections) })
       : getHarvestMonths(plant, lastFrostDate, Math.max(...protections));
     plantYields.push(yield_);
   }

@@ -122,6 +122,22 @@ export function BarChart({
               </text>
             </g>
           ))}
+          {/* "today" marker behind the bars, so it never crosses a segment */}
+          {marker && marker.index >= 0 && marker.index < data.length && (
+            <g>
+              <line
+                x1={left + band * marker.index + band / 2}
+                x2={left + band * marker.index + band / 2}
+                y1={M.top - 4}
+                y2={M.top + plotH}
+                className="stroke-gray-900/40 dark:stroke-white/40"
+                strokeDasharray="2 2"
+              />
+              <text x={left + band * marker.index + band / 2} y={M.top - 7} textAnchor="middle" className="fill-gray-900 text-[11px] font-semibold dark:fill-gray-100">
+                {marker.label}
+              </text>
+            </g>
+          )}
           {/* bars */}
           {data.map((d, i) => {
             const cx = left + band * i + band / 2;
@@ -164,21 +180,6 @@ export function BarChart({
           {target && target.value <= top && (
             <g>
               <line x1={left} x2={left + plotW} y1={y(target.value)} y2={y(target.value)} strokeDasharray="4 3" className="stroke-gray-700 dark:stroke-gray-300" strokeWidth={1.5} />
-            </g>
-          )}
-          {marker && marker.index >= 0 && marker.index < data.length && (
-            <g>
-              <line
-                x1={left + band * marker.index + band / 2}
-                x2={left + band * marker.index + band / 2}
-                y1={M.top - 4}
-                y2={M.top + plotH}
-                className="stroke-gray-900/40 dark:stroke-white/40"
-                strokeDasharray="2 2"
-              />
-              <text x={left + band * marker.index + band / 2} y={M.top - 7} textAnchor="middle" className="fill-gray-900 text-[11px] font-semibold dark:fill-gray-100">
-                {marker.label}
-              </text>
             </g>
           )}
         </svg>

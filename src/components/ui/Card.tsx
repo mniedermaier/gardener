@@ -32,12 +32,14 @@ interface CardHeaderProps {
 /** Title row inside a Card: Title level (16 px semibold). */
 export function CardHeader({ title, description, actions, className = "" }: CardHeaderProps) {
   return (
-    <div className={`mb-4 flex items-start justify-between gap-3 ${className}`}>
+    // Without a description the actions centre on the title, and their 44 px
+    // touch target does not push the content down (negative margin).
+    <div className={`mb-4 flex justify-between gap-3 ${description ? "items-start" : "items-center"} ${className}`}>
       <div className="min-w-0">
         <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
         {description && <p className="mt-0.5 max-w-prose text-sm text-gray-500 dark:text-gray-400">{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className={`flex shrink-0 items-center gap-2 ${description ? "" : "-my-2.5"}`}>{actions}</div>}
     </div>
   );
 }

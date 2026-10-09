@@ -980,7 +980,7 @@
     "addTask": "Add task",
     "taskTitle": "Title",
     "taskType": "Type",
-    "taskDate": "Date",
+    "taskDate": "Due",
     "generate": "Suggest tasks",
     "generated_one": "Generated {{count}} task",
     "generated_other": "Generated {{count}} tasks",
@@ -1012,7 +1012,7 @@
     "bedFrom": "{{beds}} from {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "after the frost nights",
-    "pageSubtitleNoBeds": "What you can sow and plant now – add beds and it becomes your season plan.",
+    "pageSubtitleNoBeds": "What you can sow and plant now.",
     "dueRelative": "due {{dateInline}}",
     "emptyTextNoBeds": "Add tasks – or a bed, and Gardener creates sowing and planting dates from it."
   },
@@ -1529,7 +1529,7 @@
     "emptyNeedShort_other": "{{count}} people need about {{kg}} a year. Add beds or animals to see how much of it you cover yourself.",
     "typicalYearTitle": "Typical year (forecast)",
     "seasonKgTitle": "Season {{year}}: logged, forecast from today",
-    "seasonKgDesc": "Yields in kg: logged up to today, forecast after."
+    "seasonKgDesc": "Yields in kg (not calories): logged up to today, forecast after."
   },
   "pests": {
     "title": "Pests",
