@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Download, LayoutGrid, Link2Off, Share2, Upload } from "lucide-react";
+import { Download, Eye, LayoutGrid, Link2Off, Share2, Upload } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { decodeGardenFromUrl, importTemplateToStore } from "@/lib/sharing";
@@ -13,11 +13,63 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
 
 const MAX_ICONS = 5;
+
+/** The template part of a pasted share link: the `t` parameter of a full URL, or the bare token. */
+export function shareTokenFromText(text: string): string | null {
+  const s = text.trim();
+  if (!s) return null;
+  const m = s.match(/[?&]t=([^&\s#]+)/);
+  if (m) {
+    try {
+      return decodeURIComponent(m[1]);
+    } catch {
+      return m[1];
+    }
+  }
+  return /\s/.test(s) ? null : s;
+}
+
+/** Paste a share link someone sent you: validates it and opens the same preview as following the link. */
+function PasteLink() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [text, setText] = useState("");
+  const [error, setError] = useState(false);
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const token = shareTokenFromText(text);
+    if (!token || !decodeGardenFromUrl(token)) {
+      setError(true);
+      return;
+    }
+    navigate(`/import?t=${encodeURIComponent(token)}`);
+  };
+  return (
+    <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+      <Input
+        wrapperClassName="min-w-0 flex-1"
+        label={t("importPage.pasteLabel")}
+        placeholder={t("importPage.pastePlaceholder")}
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          setError(false);
+        }}
+        error={error ? t("importPage.pasteInvalid") : undefined}
+        inputMode="url"
+        autoComplete="off"
+      />
+      <Button type="submit" className="sm:mt-6" disabled={!text.trim()}>
+        <Eye size={16} aria-hidden="true" />
+        {t("importPage.preview")}
+      </Button>
+    </form>
+  );
+}
 
 /** Landing page of a shared garden link (#/import?t=…): preview, name, import. */
 export function ImportPage() {
@@ -38,34 +90,37 @@ export function ImportPage() {
   const [name, setName] = useState(template?.name ?? "");
 
   // Opened without a link (e.g. from the menu): explain the page instead of reporting a broken link.
-  if (!encoded) {
-    return (
-      <div className="mx-auto max-w-2xl">
-        <PageHeader title={t("importPage.title")} description={t("importPage.noLinkSubtitle")} />
-        <Card>
-          <EmptyState
-            icon={Share2}
-            title={t("importPage.noLinkTitle")}
-            description={t("importPage.noLinkText")}
-            action={<Button onClick={() => navigate("/settings")}><Upload size={16} aria-hidden="true" />{t("importPage.restoreBackup")}</Button>}
-          />
-        </Card>
-      </div>
-    );
-  }
+  // Restoring your own data is a different task: a quiet link straight to the backup section.
+  const restoreLink = (
+    <Button variant="ghost" className="-ml-3 self-start" onClick={() => navigate("/settings?section=data")}>
+      <Upload size={16} aria-hidden="true" />
+      {t("importPage.restoreBackup")}
+    </Button>
+  );
 
-  if (!template) {
+  // Opened without a link (e.g. from the menu) or with a broken one: paste a link here instead of a dead end.
+  if (!encoded || !template) {
+    const broken = Boolean(encoded);
+    const Icon = broken ? Link2Off : Share2;
     return (
-      <div className="mx-auto max-w-2xl">
+      <div>
         <PageHeader title={t("importPage.title")} description={t("importPage.noLinkSubtitle")} />
-        <Card>
-          <EmptyState
-            icon={Link2Off}
-            title={t("importPage.invalidTitle")}
-            description={t("importPage.invalidText")}
-            action={<Button onClick={() => navigate("/planner")}>{t("importPage.toPlanner")}</Button>}
-            secondaryAction={<Button variant="ghost" onClick={() => navigate("/settings")}>{t("importPage.restoreBackup")}</Button>}
-          />
+        <Card className="max-w-3xl">
+          <div className="flex items-start gap-3">
+            <span className={`inline-flex size-10 shrink-0 items-center justify-center rounded-lg ${broken ? "bg-warning/10 text-warning" : "bg-garden-50 text-garden-700 dark:bg-garden-500/15 dark:text-garden-300"}`} aria-hidden="true">
+              <Icon size={20} />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t(broken ? "importPage.invalidTitle" : "importPage.noLinkTitle")}</h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{t(broken ? "importPage.invalidText" : "importPage.noLinkText")}</p>
+            </div>
+          </div>
+          <div className="mt-5">
+            <PasteLink />
+          </div>
+          <div className="mt-4 flex flex-col border-t border-gray-100 pt-3 dark:border-white/10">
+            {restoreLink}
+          </div>
         </Card>
       </div>
     );
@@ -90,9 +145,9 @@ export function ImportPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div>
       <PageHeader title={t("importPage.title")} description={t("importPage.subtitle")} />
-      <div className="space-y-6">
+      <div className="max-w-3xl space-y-6">
         <Card>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{template.name}</h2>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">

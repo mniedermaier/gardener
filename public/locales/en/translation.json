@@ -79,7 +79,7 @@
       "sufficiency": "Self-sufficiency",
       "expenses": "Costs",
       "settings": "Settings",
-      "import": "Import"
+      "import": "Import garden"
     },
     "group": {
       "garden": "Garden",
@@ -974,9 +974,10 @@
     },
     "reopenNamed": "Reopen “{{title}}”",
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
-    "untilRange": "until {{first}} – {{last}}, by bed",
-    "fromRange": "from {{first}} – {{last}}, by bed",
-    "upNextFrom": "Coming up next · from {{date}}"
+    "untilRange": "until {{first}}–{{last}}, by bed",
+    "fromRange": "from {{first}}–{{last}}, by bed",
+    "upNextFrom": "Coming up next · from {{date}}",
+    "alsoAction": "also: {{action}}"
   },
   "settings": {
     "title": "Settings",
@@ -1140,7 +1141,9 @@
     "frostGroupTitleMixed_other": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
     "frostHardNights_one": "Frost on {{count}} night",
     "frostHardNights_other": "Frost on {{count}} nights",
-    "frostAdviceNoPlants": "Hold off on planting out until the frost nights are over."
+    "frostAdviceNoPlants": "Hold off on planting out until the frost nights are over.",
+    "frostAdviceAutumn": "Bring in the last harvests and move tender pots indoors.",
+    "frostAdviceAutumnNoPlants": "Keep fleece ready for winter vegetables."
   },
   "harvest": {
     "title": "Harvest",
@@ -2121,7 +2124,9 @@
     "weeks": "weeks",
     "sowings": "Sowings",
     "sowing": "Sowing",
-    "generateTasks": "Add to calendar"
+    "generateTasks": "Add to calendar",
+    "nextSpring": "This year's sowing windows have closed. You are planning the successions for spring {{year}}.",
+    "pickNextSpring": "Pick a crop for next spring"
   },
   "guilds": {
     "title": "Plant guilds",
@@ -2324,9 +2329,8 @@
     "title": "Import garden",
     "subtitle": "Someone shared a garden plan with you. Check the preview and add it as a new garden.",
     "invalidTitle": "This link does not work",
-    "invalidText": "The share link is incomplete or damaged. Ask the sender to send it again.",
-    "toPlanner": "Go to planner",
-    "restoreBackup": "Restore a backup",
+    "invalidText": "The share link is incomplete or damaged. Paste it here again or ask the sender to send it once more.",
+    "restoreBackup": "Restore your own backup",
     "summary": "{{beds}} · {{plantings}}",
     "beds_one": "{{count}} bed",
     "beds_other": "{{count}} beds",
@@ -2340,7 +2344,12 @@
     "done": "“{{name}}” was created",
     "noLinkSubtitle": "Take over garden plans from a share link.",
     "noLinkTitle": "Take over a garden from a link",
-    "noLinkText": "Has someone shared a garden plan with you? Open the link and the preview appears here. Your own data comes back from a backup."
+    "noLinkText": "Has someone shared a garden plan with you? Paste the link here or open it directly to see the preview.",
+    "pasteLabel": "Paste share link",
+    "pastePlaceholder": "https://…#/import?t=…",
+    "pasteInvalid": "This is not a valid share link.",
+    "preview": "Preview",
+    "toPlanner": "Go to planner"
   },
   "charts": {
     "month": "Month",

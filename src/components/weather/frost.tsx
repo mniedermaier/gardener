@@ -72,6 +72,18 @@ export function useFrostRisk(summary: FrostSummary | null | undefined): { byBed:
 }
 
 /**
+ * General frost advice when no tender crop is in reach. Spring (Jan–Jun):
+ * wait with planting out. From July on that would be wrong — the frost nights
+ * will not be over until next May — so autumn advice: bring in the last
+ * harvests and tender pots, keep fleece ready for winter vegetables.
+ */
+export function frostAdviceKey(planted: boolean, today: Date): string {
+  const autumn = today.getMonth() >= 6;
+  if (autumn) return planted ? "alerts.frostAdviceAutumn" : "alerts.frostAdviceAutumnNoPlants";
+  return planted ? "alerts.frostAdvice" : "alerts.frostAdviceNoPlants";
+}
+
+/**
  * The one sentence naming what the frost hurts, on "Heute" and on the weather
  * page: "Betroffen: Kürbis, Buschbohne, Mais (Kartoffelacker). Mit Vlies …".
  * Without tender crops in reach it falls back to the general advice.
@@ -81,11 +93,12 @@ export function useFrostAffectedText(summary: FrostSummary | null | undefined): 
   const plantName = usePlantName();
   const gardens = useStore((s) => s.gardens);
   const { byBed, plantIds } = useFrostRisk(summary);
+  const today = useToday();
   return useMemo(() => {
     if (plantIds.length === 0) {
-      // Nothing planted yet: no fleece advice for plants that do not exist.
+      // Nothing planted yet: no fleece advice for plants that do not exist; the season picks the wording.
       const planted = gardens.some((g) => g.beds.some((b) => b.cells.some((c) => c.plantId)));
-      return t(planted ? "alerts.frostAdvice" : "alerts.frostAdviceNoPlants");
+      return t(frostAdviceKey(planted, today));
     }
     // Open beds first: they get the full frost, a greenhouse only part of it.
     const beds = gardens.flatMap((g) => g.beds).filter((b) => byBed.has(b.id))
@@ -96,7 +109,7 @@ export function useFrostAffectedText(summary: FrostSummary | null | undefined): 
     }
     const parts = beds.map((b) => `${byBed.get(b.id)!.plantIds.map(plantName).join(", ")} (${b.name})`);
     return t("alerts.frostAffectedAll", { plants: parts.join("; ") });
-  }, [byBed, plantIds, gardens, plantName, t]);
+  }, [byBed, plantIds, gardens, plantName, t, today]);
 }
 
 /**

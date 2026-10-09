@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { IconButton } from "@/components/ui/IconButton";
 import { useToast } from "@/components/ui/Toast";
+import { useToday } from "@/hooks/useToday";
 import {
-  SUCCESSION_PRESETS,
+  defaultSuccessionConfig,
   generateSuccessionSchedule,
-  isSuccessionCandidate,
+  successionSeason,
   type SuccessionConfig,
 } from "@/lib/succession";
 
@@ -32,22 +33,17 @@ export function SuccessionPlanner() {
   const plants = usePlants();
   const getPlantName = usePlantName();
 
-  const candidates = useMemo(() => plants.filter(isSuccessionCandidate), [plants]);
+  const today = useToday();
+  // Only crops with a sowing still ahead this season; in autumn the plan is for next spring.
+  const season = useMemo(() => successionSeason(plants, lastFrostDate, today), [plants, lastFrostDate, today]);
+  const candidates = season.open;
   const [configs, setConfigs] = useState<SuccessionConfig[]>([]);
 
   const addConfig = (plantId: string) => {
-    const preset = SUCCESSION_PRESETS[plantId];
     const plant = plants.find((p) => p.id === plantId);
-    if (!preset || !plant) return;
-    setConfigs((prev) => [
-      ...prev,
-      {
-        plantId,
-        intervalWeeks: preset.intervalWeeks,
-        numberOfSowings: preset.sowings,
-        startWeeksRelativeToFrost: plant.sowOutdoorsWeeks ?? plant.sowIndoorsWeeks ?? -4,
-      },
-    ]);
+    const config = plant ? defaultSuccessionConfig(plant) : null;
+    if (!config) return;
+    setConfigs((prev) => [...prev, config]);
   };
 
   const updateConfig = (idx: number, updates: Partial<SuccessionConfig>) =>
@@ -55,8 +51,8 @@ export function SuccessionPlanner() {
   const removeConfig = (idx: number) => setConfigs((prev) => prev.filter((_, i) => i !== idx));
 
   const allTasks = useMemo(
-    () => configs.flatMap((config) => generateSuccessionSchedule(config, lastFrostDate)),
-    [configs, lastFrostDate],
+    () => configs.flatMap((config) => generateSuccessionSchedule(config, season.frostISO)),
+    [configs, season.frostISO],
   );
 
   const handleGenerateTasks = () => {
@@ -84,9 +80,14 @@ export function SuccessionPlanner() {
     <Card>
       <CardHeader title={t("succession.title")} description={t("succession.desc")} />
 
+      {season.nextYear && (
+        <p className="mb-3 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600 dark:bg-white/5 dark:text-gray-400">
+          {t("succession.nextSpring", { year: Number(season.frostISO.slice(0, 4)) })}
+        </p>
+      )}
       {unusedCandidates.length > 0 && (
         <div className="mb-4">
-          <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("succession.pick")}</p>
+          <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t(season.nextYear ? "succession.pickNextSpring" : "succession.pick")}</p>
           <div className="flex flex-wrap gap-1.5">
             {unusedCandidates.map((p) => (
               <button
@@ -110,7 +111,7 @@ export function SuccessionPlanner() {
             {configs.map((config, idx) => {
               const plant = plants.find((p) => p.id === config.plantId);
               if (!plant) return null;
-              const schedule = generateSuccessionSchedule(config, lastFrostDate);
+              const schedule = generateSuccessionSchedule(config, season.frostISO);
               const name = getPlantName(plant.id);
               return (
                 <li key={config.plantId} className="p-3 sm:p-4">

@@ -23,6 +23,7 @@ import { DataManagement } from "./DataManagement";
 import { LocationPicker, type PickedLocation } from "./LocationPicker";
 import { useToday } from "@/hooks/useToday";
 import { useBackendAvailable } from "@/hooks/useBackendAvailable";
+import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 
 type Locale = "de" | "en" | "es" | "fr";
 type Theme = "light" | "dark" | "system";
@@ -86,6 +87,15 @@ export function SettingsPage() {
     })),
   );
   const [elevation, setElevation] = useState<number | undefined>(undefined);
+
+  // Deep link to a section (`#/settings?section=data`, e.g. "Backup wiederherstellen" on the import page).
+  useOpenFromParam("section", (id) => {
+    const heading = document.getElementById(`settings-${id}`);
+    if (!heading) return false;
+    heading.scrollIntoView({ block: "start" });
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  });
 
   // "Gespeichert" flash whenever one of the settings changes.
   const [savedFlash, setSavedFlash] = useState(false);
