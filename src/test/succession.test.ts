@@ -75,6 +75,18 @@ describe("successionSeason", () => {
     expect(s.open).toHaveLength(2);
   });
 
+  it("offers only spring sowings for next year", () => {
+    // Bush bean: first sowing 2 weeks after the frost (end of May) — not spring.
+    const bean: Plant = { ...lettuce, id: "bean", sowIndoorsWeeks: null, sowOutdoorsWeeks: 2, transplantWeeks: null };
+    const s = successionSeason([lettuce, radish, bean], "2026-05-15", new Date(2026, 9, 9));
+    expect(s.nextYear).toBe(true);
+    expect(s.open.map((p) => p.id).sort()).toEqual(["lettuce", "radish"]);
+  });
+
+  it("does not treat kale as a succession crop", () => {
+    expect(isSuccessionCandidate({ ...lettuce, id: "kale" })).toBe(false);
+  });
+
   it("ignores a stale year in the stored frost date", () => {
     const s = successionSeason([lettuce], "2023-05-15", new Date(2026, 5, 1));
     expect(s.frostISO).toBe("2026-05-15");

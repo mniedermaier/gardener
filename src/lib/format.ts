@@ -113,6 +113,24 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
   }
 }
 
+/**
+ * A date span in one style everywhere (calendar, plant year plan, week rows):
+ * a repeated month is written once ("15.–31. Okt.", "Oct 15–31"), otherwise
+ * "10. Okt.–15. Nov."; the en dash without spaces (DESIGN_SYSTEM §13). The
+ * year appears only when the span is not in `now`'s year.
+ */
+export function formatDateRange(from: DateInput, to: DateInput, opts: FormatOptions & { now?: Date; month?: "short" | "long" } = {}): string {
+  const a = toDate(from);
+  const b = toDate(to);
+  if (!a || !b) return a ? formatDate(a, "short", opts) : b ? formatDate(b, "short", opts) : "";
+  const [start, end] = a <= b ? [a, b] : [b, a];
+  const now = opts.now ?? new Date();
+  const sameYear = start.getFullYear() === now.getFullYear() && end.getFullYear() === now.getFullYear();
+  const fmt = new Intl.DateTimeFormat(intlLocale(opts.locale), { day: "numeric", month: opts.month ?? "short", ...(sameYear ? {} : { year: "numeric" }) });
+  // formatRange spaces the dash (" – ", often with thin spaces); the design system wants it tight.
+  return nonBreaking(fmt.formatRange(start, end).replace(/[\s  ]*[–-][\s  ]*/u, "–"));
+}
+
 /** Compact dates wrap as a whole ("15. Sept."), never between day and month. */
 function nonBreaking(text: string): string {
   return text.replace(/ /g, "\u00a0");
@@ -226,6 +244,7 @@ export function createFormatter(lang?: string) {
   return {
     locale,
     formatDate: (value: DateInput, style: DateStyle = "short", now?: Date) => formatDate(value, style, { locale, now }),
+    formatDateRange: (from: DateInput, to: DateInput, o: { now?: Date; month?: "short" | "long" } = {}) => formatDateRange(from, to, { ...o, locale }),
     formatNumber: (value: number, o: Omit<NumberOptions, "locale"> = {}) => formatNumber(value, { ...o, locale }),
     formatWeight: (grams: number, unit?: "g" | "kg") => formatWeight(grams, { locale, unit }),
     formatCurrency: (amount: number, o: { currency?: string; maximumFractionDigits?: number } = {}) => formatCurrency(amount, { ...o, locale }),

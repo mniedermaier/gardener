@@ -793,7 +793,6 @@
     },
     "detail": {
       "today": "Hoy",
-      "window": "{{from}} – {{to}}",
       "lastFrost": "Última helada: {{date}}",
       "rowSpacing": "Distancia entre filas {{value}} cm",
       "harvestAfter": "Lista para cosechar tras",
@@ -831,9 +830,13 @@
       "seasonFor": "Fechas para",
       "seasonDescProtected_one": "Fechas para {{place}}: {{count}} semana antes que al aire libre.",
       "seasonDescProtected_other": "Fechas para {{place}}: {{count}} semanas antes que al aire libre.",
-      "seasonDescProtected_many": "Fechas para {{place}}: {{count}} semanas antes que al aire libre."
+      "seasonDescProtected_many": "Fechas para {{place}}: {{count}} semanas antes que al aire libre.",
+      "sowNow": "Siembra ahora, hasta el {{date}}",
+      "nextSowing": "Próxima siembra desde el {{date}}",
+      "hatchLegend": "Rayado: bajo cubierta"
     },
-    "createBedFirst": "Crea primero un bancal"
+    "createBedFirst": "Crea primero un bancal",
+    "sowNowFilter": "Sembrar ahora"
   },
   "weather": {
     "title": "Tiempo",
@@ -1003,10 +1006,9 @@
     },
     "reopenNamed": "Reabrir «{{title}}»",
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
-    "untilRange": "hasta {{first}}–{{last}}, según bancal",
-    "fromRange": "desde {{first}}–{{last}}, según bancal",
+    "untilRange": "hasta el {{range}} según el bancal",
+    "fromRange": "desde el {{range}} según el bancal",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
-    "alsoAction": "también: {{action}}",
     "notesPlaceholder": "p. ej. herramientas, avisos…"
   },
   "settings": {
@@ -1131,8 +1133,7 @@
       "expenses_other": "{{count}} gastos",
       "expenses_many": "{{count}} gastos"
     },
-    "backupStale": "Tiene más de dos semanas: conviene hacer una copia nueva.",
-    "csvEmpty": "Cuando registres cosechas o gastos, podrás exportarlos aquí como CSV."
+    "backupStale": "Tiene más de dos semanas: conviene hacer una copia nueva."
   },
   "alerts": {
     "frostTitle": "Aviso de helada: {{temp}}",
@@ -1183,7 +1184,7 @@
     "frostHardNights_many": "Helada en {{count}} noches",
     "frostAdviceNoPlants": "Espera a trasplantar hasta que pasen las noches de helada.",
     "frostAdviceAutumn": "Recoge las últimas cosechas y pon a cubierto las macetas sensibles.",
-    "frostAdviceAutumnNoPlants": "Ten preparada manta térmica para las hortalizas de invierno."
+    "frostAdviceAutumnNoPlants": "Guarda macetas y herramientas a salvo de la helada."
   },
   "harvest": {
     "title": "Cosecha",
@@ -2231,8 +2232,9 @@
     "sowings": "Siembras",
     "sowing": "Siembra",
     "generateTasks": "Agregar al calendario",
-    "nextSpring": "Las ventanas de siembra de este año ya han pasado. Planificas las siembras escalonadas para la primavera de {{year}}.",
-    "pickNextSpring": "Elige un cultivo para la próxima primavera"
+    "nextSpring": "Este año ya es tarde para siembras escalonadas: las siembras de otoño sueltas están arriba, en «Sembrar y plantar ahora». Aquí planificas para la primavera de {{year}}.",
+    "pickNextSpring": "Elige un cultivo para la próxima primavera",
+    "noBeds": "Planifica siembras escalonadas en cuanto tengas un bancal."
   },
   "guilds": {
     "title": "Asociaciones de plantas",
@@ -2500,7 +2502,6 @@
     "meterLegend": "Barra llena = registrado, rayada = previsión.",
     "pricesEditable": "Puedes ajustar el precio por huevo, kg o litro en Costes.",
     "expectedToDate": "esperado hasta hoy: {{value}}",
-    "actualVsToDateShort": "registrado {{actual}} · esperado hasta hoy {{expected}}",
     "howCap": "Los productos animales cuentan solo hasta el consumo habitual (por persona y año unos 240 huevos, 1 kg de miel, 52 kg de carne, 300 l de leche). La miel es muy calórica, pero no es un alimento básico: dos colmenas dan unos 40 kg y un hogar consume 1–2 kg. Lo que excede es excedente para intercambiar o vender y no te alimenta. Hortalizas y fruta cuentan por completo.",
     "howToDate": "Esperado hasta hoy: la parte de la previsión anual que debería haber llegado ya – para cada cultivo su ventana de cosecha desde la última helada, miel de mayo a agosto, huevos repartidos en el año. Si lo registrado queda muy por debajo, suelen faltar registros.",
     "howVsFoodPlan": "El plan de alimentación mide otra cosa: kilos frente a un objetivo de cantidad para 20 hortalizas y frutas, sin productos animales. Por eso su «objetivo de cantidad» difiere de este valor calórico.",

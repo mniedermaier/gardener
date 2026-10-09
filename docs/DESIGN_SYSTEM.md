@@ -78,7 +78,8 @@ covered here, copy the pattern from the reference page
     English uses sentence case ("Add task", not "Add Task"). French addresses
     the user with *vous*, German and Spanish with *du*/*tú*. Negative numbers
     and temperatures use the minus sign "−" (the formatters do this), ranges the
-    en dash without spaces ("60–85 Tage"), asides the spaced en dash (" – ").
+    en dash without spaces ("60–85 Tage"; date spans via `formatDateRange`:
+    "5.–11. Okt."), asides the spaced en dash (" – ").
 14. **Glossary.** One term per thing, in every place it appears (legend,
     detail page, planner, warnings):
 
@@ -285,6 +286,7 @@ const { formatDate, formatNumber, formatWeight, formatCurrency, formatVolume,
 | `formatDate(d, "weekdayDate")` | | `Mo., 12. Okt.` — the coming week; one date format per list group | `Mon 12 Oct` |
 | `formatDate(d, "long")` | | `Montag, 5. Oktober 2026` | |
 | `formatDate(d, "numeric" \| "monthYear" \| "month" \| "weekday")` | | `03.10.2026` · `Oktober 2026` · `Okt.` · `Mo.` | |
+| `formatDateRange(from, to)` | two dates | `5.–11. Okt.` (month once), `10. Okt.–15. Nov.`; en dash without spaces, year only outside the current year. The one style for every date span (calendar, plant year plan, week rows) — never hand-join two dates with " – " | `5–11 Oct` |
 | `formatNumber(n, { maximumFractionDigits = 1, minimumFractionDigits })` | | `1.234,6` | `1,234.6` |
 | `formatWeight(grams, unit?)` | **grams** | `750 g`, `1,9 kg`, `252 kg` | `1.9 kg` |
 | `formatCurrency(euros, { currency, maximumFractionDigits })` | **euros** | `473,10 €` | `€473.10` |

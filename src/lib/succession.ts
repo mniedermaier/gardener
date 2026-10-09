@@ -27,7 +27,7 @@ export const SUCCESSION_PRESETS: Record<string, { intervalWeeks: number; sowings
   beetroot: { intervalWeeks: 4, sowings: 3 },
   chard: { intervalWeeks: 4, sowings: 3 },
   turnip: { intervalWeeks: 3, sowings: 4 },
-  kale: { intervalWeeks: 4, sowings: 3 },
+  // No kale: it is sown once (May–June) and harvested over the winter, not in succession.
 };
 
 export function generateSuccessionSchedule(
@@ -103,5 +103,13 @@ export function successionSeason(plants: Plant[], lastFrostDate: string, today: 
     return schedule.some((t) => parseISO(t.date) >= day);
   });
   if (open.length > 0) return { frostISO: thisISO, nextYear: false, open };
-  return { frostISO: format(addYears(thisFrost, 1), "yyyy-MM-dd"), nextYear: true, open: candidates };
+  // Next spring: only crops whose first sowing really falls in spring (before May).
+  const nextFrost = addYears(thisFrost, 1);
+  const nextISO = format(nextFrost, "yyyy-MM-dd");
+  const spring = candidates.filter((p) => {
+    const config = defaultSuccessionConfig(p);
+    const first = config ? generateSuccessionSchedule(config, nextISO)[0] : undefined;
+    return !!first && parseISO(first.date).getMonth() < 4;
+  });
+  return { frostISO: nextISO, nextYear: true, open: spring };
 }

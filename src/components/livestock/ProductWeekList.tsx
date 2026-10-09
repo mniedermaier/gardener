@@ -95,7 +95,7 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
                 <ListRow
                   leading={<IconTile icon={PRODUCT_ICON[present[0] ?? "eggs"]} />}
                   title={weekTitle}
-                  meta={[`${f.formatDate(w.from, "short")} – ${f.formatDate(w.to, "short")}`, t("livestock.entriesHint", { count: w.items.length })]}
+                  meta={[f.formatDateRange(w.from, w.to), t("livestock.entriesHint", { count: w.items.length })]}
                   clickLabel={`${weekTitle} – ${t(open ? "livestock.hideEntries" : "livestock.showEntries")}`}
                   onClick={() => toggle(w.key)}
                   // A disclosure, not a link: the week folds open to its single entries.

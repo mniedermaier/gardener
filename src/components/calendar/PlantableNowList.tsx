@@ -17,7 +17,7 @@ import { PhaseBadge, actionPhase } from "@/components/ui/phase";
 export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limit = 6 }: { now: PlantableNow[]; soon: PlantableSoon[]; limit?: number }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { formatDate } = useFormat();
+  const { formatDate, formatDateRange } = useFormat();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [expanded, setExpanded] = useState(false);
@@ -28,25 +28,21 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   /**
    * Always two short parts: the date and the beds. One date for all beds:
    * "bis 17. Okt. · Hochbeet Süd". Dates that differ per bed (glass closes
-   * later): the span, "bis 10. Okt.–31. Okt., je nach Beet · 4 Beete".
-   * A second action ("auch Auspflanzen") leads the meta: one badge per row, so
-   * the title line never wraps.
+   * later): "je nach Beet bis 10. Okt.–15. Nov. · 4 Beete" (formatDateRange,
+   * one range style app-wide). Every action is a badge, never a meta part.
    */
   const meta = (item: AgendaPlantRow): string[] => {
     const key = item.kind === "now" ? "until" : "from";
     const groups = groupAgendaBedsByDate(item);
     const beds = bedLabel(groups.flatMap((g) => g.beds));
-    const also = item.actions.slice(1).map((a) => t("calendar.alsoAction", { action: t(`advisor.actions.${a}`) }));
     let when: string;
     if (groups.length === 1) {
       when = t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") });
     } else {
       const dates = groups.map((g) => g.date.getTime());
-      const first = formatDate(new Date(Math.min(...dates)), "short");
-      const last = formatDate(new Date(Math.max(...dates)), "short");
-      when = t(`calendar.${key}Range`, { first, last });
+      when = t(`calendar.${key}Range`, { range: formatDateRange(new Date(Math.min(...dates)), new Date(Math.max(...dates))) });
     }
-    return [...also, when, beds].filter((x): x is string => !!x);
+    return [when, beds].filter((x): x is string => !!x);
   };
 
   const items = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);
@@ -63,7 +59,11 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
             key={`${item.kind}-${item.plantId}`}
             leading={<PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />}
             title={getPlantName(item.plantId)}
-            badges={item.actions.length > 0 ? <PhaseBadge phase={actionPhase(item.actions[0])} label={t(`advisor.actions.${item.actions[0]}`)} /> : undefined}
+            badges={item.actions.length > 0 ? (
+              <>
+                {item.actions.map((a) => <PhaseBadge key={a} phase={actionPhase(a)} label={t(`advisor.actions.${a}`)} />)}
+              </>
+            ) : undefined}
             meta={meta(item)}
             onClick={() => {
               // With beds: straight to placing it (one bed: that bed; several: pick one). Indoors: the plant.
