@@ -74,18 +74,22 @@ covered here, copy the pattern from the reference page
      watering) starts empty ("Beet wählen …"); prefill only from a deep link,
      the last entry or a single option. A choice may start on its most likely
      value when that value is the common case and harmless if kept (expense
-     category, task type "Sonstiges", health "Kontrolle"). A choice that
+     category, task type "Sonstiges", health "Kontrolle"). A wrong value that
+     would be a silent data error never starts preselected (the species of a new
+     animal). A choice that
      depends on an earlier field appears only once that field is set (pantry
      method after the plant).
    - **Prefilled numbers** only where the default is a real, typical value the
-     user usually keeps (custom plant days, seed packets 1 and this year, a new
-     bed 1,2 × 2,4 m); every other numeric field starts empty with a
-     "z. B." placeholder.
+     user usually keeps (custom plant spacing 30 cm and days 60/90, seed packets
+     1 and this year, a new bed 1,2 × 2,4 m); every other numeric field starts
+     empty with a "z. B." placeholder (an animal count starts empty, "z. B. 6").
    - Paired fields align on their inputs (`items-end`), so a label that wraps
      never pushes its field below its neighbour.
    - Placeholders that list examples end in a typographic ellipsis "…" (German
      with a space before it): "z. B. Aussaat, Frost, Ernte …". A single example
      value needs none: "z. B. Ingwer", "z. B. 4,00".
+   - An optional cost field sits on its own full-width row after the amounts,
+     with the shared hint `common.costHint` ("Fließt in die Bilanz …").
    - Save stays disabled until the required fields are valid.
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation
@@ -98,7 +102,7 @@ covered here, copy the pattern from the reference page
 
     | Concept | de | en | es | fr |
     |---|---|---|---|---|
-    | record something that happened (harvest, watering, feed, product, soil test, expense, health event, preserves) | erfassen | Log … | Registrar … | Noter … |
+    | record something that happened (harvest, watering, feed, product, soil test, expense, health event, preserves, journal entry) | erfassen | Log … | Registrar … | Noter … |
     | add a thing you keep (bed, task, animal, plant, seeds, photo) | hinzufügen | Add … | Añadir … | Ajouter … |
     | report a problem (pests, diseases) | melden | Report … | Registrar … | Signaler … |
     | save a dialog | Speichern | Save | Guardar | Enregistrer |

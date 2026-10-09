@@ -298,7 +298,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
         <div className="flex items-end gap-2">
           <Input
             wrapperClassName="min-w-0 flex-1"
-            label={t("livestock.quantity")}
+            label={t("livestock.quantityIn", { unit: t(`livestock.units.${unit === "liters" ? "litersShort" : unit}`) })}
             inputMode="decimal"
             value={qty}
             onChange={(e) => setQty(e.target.value)}
@@ -404,9 +404,10 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
   const s = useStore(useShallow((st) => ({
     addAnimal: st.addAnimal, updateAnimal: st.updateAnimal, deleteAnimal: st.deleteAnimal, restoreAnimal: st.restoreAnimal,
   })));
-  const [type, setType] = useState<AnimalType>("chicken");
+  // A new animal starts without a species: a wrong default would be a silent data error (rule 9).
+  const [type, setType] = useState<AnimalType | "">("");
   const [name, setName] = useState("");
-  const [count, setCount] = useState("1");
+  const [count, setCount] = useState("");
   const [notes, setNotes] = useState("");
   const [acquired, setAcquired] = useState(todayISO());
 
@@ -417,16 +418,16 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      setType(animal?.type ?? "chicken");
+      setType(animal?.type ?? "");
       setName(animal?.name ?? "");
-      setCount(String(animal?.count ?? 1));
+      setCount(animal ? String(animal.count) : "");
       setNotes(animal?.notes ?? "");
       setAcquired(animal?.acquiredDate ?? todayISO());
     }
   }
 
   const n = parseNum(count);
-  const canSave = Number.isInteger(n) && n >= (animal ? 0 : 1);
+  const canSave = type !== "" && Number.isInteger(n) && n >= (animal ? 0 : 1);
 
   const save = () => {
     if (!canSave) return;
@@ -468,7 +469,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
         {!animal && (
           <fieldset>
             <legend className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.animalType")}</legend>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <div className="grid grid-cols-3 gap-2">
               {ANIMAL_TYPES.map((ty) => {
                 const Icon = ANIMAL_ICON[ty];
                 const selected = type === ty;
@@ -478,7 +479,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
                     type="button"
                     aria-pressed={selected}
                     onClick={() => setType(ty)}
-                    className={`flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                    className={`flex min-h-11 min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2 text-left text-sm transition-colors sm:gap-2 sm:px-3 ${
                       selected
                         ? "border-garden-600 bg-garden-50 font-medium text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
                         : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
@@ -486,7 +487,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
                   >
                     {/* Fixed icon box: every tile starts its label at the same x, whatever the glyph's width. */}
                     <span className="inline-flex size-5 shrink-0 items-center justify-center" aria-hidden="true"><Icon size={18} /></span>
-                    <span className="min-w-0 truncate">{t(`livestock.types.${ty}`)}</span>
+                    <span className="min-w-0 leading-tight break-words">{t(`livestock.types.${ty}`)}</span>
                   </button>
                 );
               })}
@@ -496,7 +497,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
         <Input label={t("livestock.animalName")} optional value={name} onChange={(e) => setName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
         {/* The count is short, the date long ("9. Oktober 2026"): give the date the room. */}
         <div className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-3">
-          <Input label={t("livestock.count")} inputMode="numeric" value={count} onChange={(e) => setCount(e.target.value)} />
+          <Input label={t("livestock.count")} inputMode="numeric" value={count} onChange={(e) => setCount(e.target.value)} placeholder={t("common.examplePlaceholder", { value: 6 })} />
           <DatePicker label={t("livestock.acquired")} value={acquired} onChange={(e) => setAcquired(e.target.value)} />
         </div>
         <Textarea label={t("harvest.notes")} optional placeholder={t("livestock.notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />

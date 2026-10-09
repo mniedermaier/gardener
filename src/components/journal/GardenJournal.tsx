@@ -427,18 +427,21 @@ export function GardenJournal() {
           <div>
             <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} hint={t("journal.tagsHint")} />
             {suggestedTags.length > 0 && (
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
+              // Label on its own line, chips in one scrolling row: no single chip left alone on a line.
+              <div className="mt-2">
+                <span className="mb-1 block text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
+                <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
                 {suggestedTags.map((tag) => (
                   <button
                     key={tag}
                     type="button"
                     onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
-                    className="inline-flex min-h-11 items-center rounded-full bg-gray-100 px-2.5 text-xs sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                    className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-gray-100 px-2.5 text-xs whitespace-nowrap sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
                   >
                     + #{tag}
                   </button>
                 ))}
+                </div>
               </div>
             )}
           </div>

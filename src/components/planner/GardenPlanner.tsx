@@ -641,7 +641,8 @@ export function GardenPlanner() {
           actions={
             <>
               {canUndo && <IconButton icon={Undo2} label={t("planner.undo")} onClick={undo} />}
-              {gardenMenu}
+              {/* A brand-new garden: no lone "…" row; the empty state offers its two useful items. */}
+              {(activeGarden?.beds.length || gardens.length > 1) ? gardenMenu : null}
               {/* Not while a bed is open (it would add a sibling, not edit this one) or while the empty state offers the same button. */}
               {activeGarden && !openBed && activeGarden.beds.length > 0 ? (
                 <Button onClick={() => setBedDialog({ open: true })}>
@@ -789,6 +790,12 @@ export function GardenPlanner() {
                   title={t("planner.emptyBedsTitle")}
                   description={pointerFine ? t("planner.emptyBedsTextClick") : t("planner.emptyBedsText")}
                   action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
+                  secondaryAction={gardens.length > 1 ? undefined : (
+                    <span className="flex flex-wrap justify-center gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => setNewGardenOpen(true)}><Plus size={16} aria-hidden="true" />{t("planner.newGarden")}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}><Upload size={16} aria-hidden="true" />{t("planner.importFile")}</Button>
+                    </span>
+                  )}
                 />
               </Card>
             ) : (

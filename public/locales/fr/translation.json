@@ -837,7 +837,9 @@
       "sowNow": "Semer maintenant, jusqu’au {{date}}",
       "nextSowing": "Prochain semis dès le {{date}}",
       "hatchLegend": "Hachuré : sous abri",
-      "bedFirstHint": "Ajoute une planche, puis place {{plant}} directement."
+      "bedFirstHint": "Ajoute une planche, puis place {{plant}} directement.",
+      "sowNoteBedFirst": "{{note}} – ajoutez une planche d’ici là",
+      "yieldPerPlant": "≈ {{value}} par plante"
     },
     "sowNowFilter": "À semer"
   },
@@ -1259,7 +1261,7 @@
   },
   "journal": {
     "title": "Journal",
-    "add": "Ajouter une entrée",
+    "add": "Noter une entrée",
     "entryTitle": "Titre",
     "text": "Que s’est-il passé au jardin aujourd’hui ?",
     "tags": "Mots-clés",
@@ -1381,7 +1383,6 @@
     "unitLabel": "Unité",
     "unitLabelPlaceholder": "p. ex. seaux",
     "storedDate": "Stocké le",
-    "supplyCostHint": "Bocaux, couvercles, sachets. Compte dans le bilan sous Coûts.",
     "withinDays_many": "dans les {{count}} prochains jours",
     "daysLeft_many": "encore {{count}} jours",
     "monthsCount_many": "{{count}} mois",
@@ -1568,7 +1569,6 @@
     "active": "Actifs",
     "resolvedLabel": "Résolus",
     "name": "Nom",
-    "namePlaceholder": "ex : Pucerons, Mildiou de la tomate, Oïdium…",
     "severity": "Gravité",
     "description": "Description",
     "organicOnly": "Traitement bio",
@@ -1601,7 +1601,11 @@
     "treatmentOrganic": "Traitement (bio)",
     "descriptionPlaceholder": "p. ex. feuilles enroulées, revers collant…",
     "treatmentPlaceholder": "p. ex. rincé au jet, purin d’ortie…",
-    "kindLabel": "Type"
+    "kindLabel": "Type",
+    "namePlaceholders": {
+      "pest": "ex : Pucerons, limaces…",
+      "disease": "ex : Oïdium, mildiou…"
+    }
   },
   "livestock": {
     "title": "Animaux",
@@ -1865,16 +1869,17 @@
     "monthAvgLabel": "Moyenne par mois",
     "bestMonth": "Meilleur mois",
     "healthDescPlaceholders": {
-      "vaccination": "p. ex. Newcastle (ND), eau de boisson",
-      "deworming": "p. ex. Flubenvet, 7 jours",
-      "illness": "p. ex. rhume, diarrhée",
+      "vaccination": "p. ex. Newcastle (ND), eau de boisson…",
+      "deworming": "p. ex. Flubenvet, 7 jours…",
+      "illness": "p. ex. rhume, diarrhée…",
       "injury": "p. ex. blessure à la crête",
-      "checkup": "p. ex. plumage, fientes, poids",
+      "checkup": "p. ex. plumage, fientes, poids…",
       "treatment": "p. ex. traitement anti-acariens",
-      "death": "p. ex. renard, vieillesse",
+      "death": "p. ex. renard, vieillesse…",
       "other": "p. ex. parage des onglons"
     },
-    "ofExpectedSince": "sur ~{{amount}} attendus depuis le {{date}}"
+    "ofExpectedSince": "sur ~{{amount}} attendus depuis le {{date}}",
+    "quantityIn": "Quantité ({{unit}})"
   },
   "seeds": {
     "title": "Semences",
@@ -2455,7 +2460,7 @@
     "title": "Saisie rapide",
     "harvest": "Noter une récolte",
     "task": "Ajouter une tâche",
-    "journal": "Ajouter une entrée au journal",
+    "journal": "Noter une entrée au journal",
     "harvestHint": "Quoi, combien, de quelle planche",
     "taskHint": "Un rappel avec échéance",
     "journalHint": "Observation, note ou photo",

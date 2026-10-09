@@ -322,11 +322,12 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         actions={
           // Phones: primary first, stacked at full width so no label breaks onto two lines.
           <>
-            <Button variant={sowNote?.offSeason ? "secondary" : "primary"} className="w-full sm:w-auto" onClick={goPlanner}>
+            {/* Off-season both actions are secondary and small, side by side: neither is the likely next step in October. */}
+            <Button variant={sowNote?.offSeason ? "secondary" : "primary"} size={sowNote?.offSeason ? "sm" : undefined} className={sowNote?.offSeason ? undefined : "w-full sm:w-auto"} onClick={goPlanner}>
               {hasBeds ? <LayoutGrid size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
               {hasBeds ? t("plants.placeInPlanner") : t("planner.addBed")}
             </Button>
-            <Button variant="secondary" className="w-full sm:w-auto" onClick={goSeeds}>
+            <Button variant="secondary" size={sowNote?.offSeason ? "sm" : undefined} className={sowNote?.offSeason ? undefined : "w-full sm:w-auto"} onClick={goSeeds}>
               <Package size={16} aria-hidden="true" />
               {t("plants.addSeeds")}
             </Button>
@@ -345,10 +346,11 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           {sowNote && (
             <p className="mb-2 inline-flex items-center gap-1.5 font-medium text-garden-700 dark:text-garden-300">
               <CalendarClock size={14} aria-hidden="true" />
-              {sowNote.text}
+              {/* No bed yet: one clause on the sowing line instead of a third "add a bed" prompt. */}
+              {hasBeds ? sowNote.text : t("plants.detail.sowNoteBedFirst", { note: sowNote.text })}
             </p>
           )}
-          {!hasBeds && <p className="mb-2 text-gray-600 dark:text-gray-400">{t("plants.detail.bedFirstHint", { plant: getPlantName(plant.id) })}</p>}
+          {!hasBeds && !sowNote && <p className="mb-2 text-gray-600 dark:text-gray-400">{t("plants.detail.bedFirstHint", { plant: getPlantName(plant.id) })}</p>}
           {description && <p className="text-gray-700 dark:text-gray-300">{description}</p>}
           {plant.caloriesPer100g ? (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) })}</p>
@@ -380,6 +382,9 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           label={t("plants.detail.yield")}
           value={plant.expectedYieldKgPerM2 ? formatNumber(plant.expectedYieldKgPerM2) : "–"}
           unit={plant.expectedYieldKgPerM2 ? t("plants.detail.yieldUnit") : undefined}
+          hint={plant.expectedYieldKgPerM2
+            ? t("plants.detail.yieldPerPlant", { value: formatWeight(plant.expectedYieldKgPerM2 * (plant.spacingCm / 100) * (plant.rowSpacingCm / 100) * 1000) })
+            : undefined}
         />
         <StatCard
           icon={Sun}
@@ -467,7 +472,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               />
             )) : (
               // Every row of this list is tappable (chevron), so none looks disabled.
-              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} onClick={goPlanner} />
+              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} onClick={hasBeds ? goPlanner : undefined} />
             )}
             <ListRow
               muted={harvestStats.count === 0}

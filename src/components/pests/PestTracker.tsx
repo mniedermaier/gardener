@@ -288,8 +288,7 @@ export function PestTracker() {
               ]}
             />
           </div>
-          <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("pests.namePlaceholder")} />
-          <DateField label={t("pests.date")} value={draft.date} onChange={(date) => patch({ date })} />
+          <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t(`pests.namePlaceholders.${draft.type}`)} />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("pests.severity")}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span>
@@ -306,6 +305,8 @@ export function PestTracker() {
               <span>{t("pests.severityLevel.5")}</span>
             </div>
           </div>
+          {/* Rule 9: details, then the date, then the free text. */}
+          <DateField label={t("pests.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <Textarea label={t("pests.description")} optional value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
           <Textarea label={t("pests.treatment")} optional hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
           {draft.treatment.trim() && (

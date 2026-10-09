@@ -329,7 +329,7 @@ export function WaterTracker() {
             </div>
           </div>
           {/* A short pair: side by side on phones too (design system rule 9). */}
-          <div className="grid grid-cols-[3fr_2fr] items-end gap-4">
+          <div className="grid grid-cols-2 items-end gap-4 sm:grid-cols-[3fr_2fr]">
             <Select label={t("water.method")} value={draft.method} onChange={(e) => patch({ method: e.target.value as Method })} options={METHODS.map((m) => ({ value: m, label: t(`water.methods.${m}`) }))} />
             <Input label={t("water.durationLabel")} optional inputMode="numeric" value={draft.duration} onChange={(e) => patch({ duration: e.target.value })} placeholder={t("common.examplePlaceholder", { value: 15 })} error={errors.duration} />
           </div>

@@ -813,7 +813,9 @@
       "sowNow": "Jetzt säen, bis {{date}}",
       "nextSowing": "Nächste Aussaat ab {{date}}",
       "hatchLegend": "Schraffiert: unter Glas",
-      "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein."
+      "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein.",
+      "sowNoteBedFirst": "{{note}} – lege bis dahin ein Beet an",
+      "yieldPerPlant": "≈ {{value}} pro Pflanze"
     },
     "sowNowFilter": "Jetzt säen"
   },
@@ -1214,7 +1216,7 @@
   },
   "journal": {
     "title": "Tagebuch",
-    "add": "Eintrag hinzufügen",
+    "add": "Eintrag erfassen",
     "entryTitle": "Titel",
     "text": "Was ist heute im Garten passiert?",
     "tags": "Tags",
@@ -1335,7 +1337,6 @@
     "unitLabel": "Einheit",
     "unitLabelPlaceholder": "z. B. Eimer",
     "storedDate": "Eingelagert am",
-    "supplyCostHint": "Gläser, Deckel, Beutel. Fließt in die Bilanz unter Kosten ein.",
     "unitOther": "Andere …",
     "unitOtherLabel": "Eigene Einheit",
     "unitNames": {
@@ -1500,7 +1501,6 @@
     "active": "Aktiv",
     "resolvedLabel": "Gelöst",
     "name": "Name",
-    "namePlaceholder": "z. B. Blattläuse, Tomatenfäule, Mehltau …",
     "severity": "Schweregrad",
     "description": "Beschreibung",
     "organicOnly": "Biologisch behandelt",
@@ -1533,7 +1533,11 @@
     "treatmentOrganic": "Behandlung (bio)",
     "descriptionPlaceholder": "z. B. Blätter rollen sich ein, klebrige Unterseiten …",
     "treatmentPlaceholder": "z. B. Mit Wasser abgespritzt, Brennnesseljauche …",
-    "kindLabel": "Art"
+    "kindLabel": "Art",
+    "namePlaceholders": {
+      "pest": "z. B. Blattläuse, Schnecken …",
+      "disease": "z. B. Mehltau, Krautfäule …"
+    }
   },
   "livestock": {
     "title": "Tiere",
@@ -1781,16 +1785,17 @@
     "monthAvgLabel": "Ø pro Monat",
     "bestMonth": "Bester Monat",
     "healthDescPlaceholders": {
-      "vaccination": "z. B. Newcastle (ND), Trinkwasser",
-      "deworming": "z. B. Flubenvet, 7 Tage",
-      "illness": "z. B. Schnupfen, Durchfall",
+      "vaccination": "z. B. Newcastle (ND), Trinkwasser …",
+      "deworming": "z. B. Flubenvet, 7 Tage …",
+      "illness": "z. B. Schnupfen, Durchfall …",
       "injury": "z. B. Hackwunde am Kamm",
-      "checkup": "z. B. Gefieder, Kot, Gewicht",
+      "checkup": "z. B. Gefieder, Kot, Gewicht …",
       "treatment": "z. B. Milbenmittel",
-      "death": "z. B. Fuchs, Alter",
+      "death": "z. B. Fuchs, Alter …",
       "other": "z. B. Klauenpflege"
     },
-    "ofExpectedSince": "von ~{{amount}} seit {{date}} erwartet"
+    "ofExpectedSince": "von ~{{amount}} seit {{date}} erwartet",
+    "quantityIn": "Menge ({{unit}})"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2347,7 +2352,7 @@
     "title": "Schnell erfassen",
     "harvest": "Ernte erfassen",
     "task": "Aufgabe hinzufügen",
-    "journal": "Tagebucheintrag hinzufügen",
+    "journal": "Tagebucheintrag erfassen",
     "harvestHint": "Was, wie viel, aus welchem Beet",
     "taskHint": "Erinnerung mit Fälligkeit",
     "journalHint": "Beobachtung, Notiz oder Foto",

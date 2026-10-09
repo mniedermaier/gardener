@@ -360,8 +360,9 @@ export function SeedInventory() {
           </div>
           {/* Shop and price only matter for bought seed. */}
           {draft.source === "shop" && (
-          <div className="grid grid-cols-2 gap-4">
-              <Input label={t("seeds.shopName")} optional value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
+          <>
+            <Input label={t("seeds.shopName")} optional value={draft.shopName} onChange={(e) => patch({ shopName: e.target.value })} placeholder={t("seeds.shopPlaceholder")} />
+            {/* Rule 9: an optional cost field gets its own full-width row with the shared hint. */}
             <Input
               label={t("seeds.cost")} optional
               inputMode="decimal"
@@ -371,7 +372,7 @@ export function SeedInventory() {
               hint={t("common.costHint")}
               error={errors.cost}
             />
-          </div>
+          </>
           )}
           <Textarea label={t("harvest.notes")} optional placeholder={t("seeds.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
