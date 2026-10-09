@@ -53,6 +53,10 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
   // label ("Anderes Datum", "Alle 2 Wochen") must never push past the edge.
   const segment = inline ? "whitespace-nowrap" : fullWidth ? "min-w-0 flex-1 text-center leading-tight" : size === "md" ? "flex-1 whitespace-nowrap sm:flex-none" : "whitespace-nowrap";
 
+  // Nothing chosen yet (a required choice that starts unset): every segment
+  // looks like a white field, so the control never reads as disabled.
+  const unset = !options.some((x) => x.value === value);
+
   return (
     <div role="radiogroup" aria-label={label} className={`${width} gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-white/5 ${className}`}>
       {options.map((o, i) => {
@@ -73,7 +77,9 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
             className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1 font-medium transition-colors ${o.compact ? "flex-none whitespace-nowrap sm:flex-1" : segment} ${box} ${
               selected
                 ? "bg-white text-gray-900 shadow-xs dark:bg-gray-700 dark:text-gray-50"
-                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                : unset
+                  ? "bg-white text-gray-700 ring-1 ring-gray-200 hover:text-gray-900 dark:bg-white/10 dark:text-gray-200 dark:ring-white/10"
+                  : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             }`}
           >
             {Icon && <Icon size={14} aria-hidden="true" className="shrink-0" />}

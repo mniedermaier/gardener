@@ -294,7 +294,7 @@
       "mid": "Moyen",
       "cold": "Rude"
     },
-    "locationPrivate": "Uniquement pour la météo et les gelées, reste sur cet appareil.",
+    "locationPrivate": "Utilisé uniquement pour la météo, enregistré sur cet appareil.",
     "unlockSun": "Course du soleil",
     "unlockWeather": "Météo à 7 jours",
     "unlockFrost": "Alertes gel",
@@ -1204,9 +1204,9 @@
     "frostGroupTitle_one": "{{count}} nuit avec risque de gel – jusqu’à {{temp}} ({{day}})",
     "frostGroupTitle_other": "{{count}} nuits avec risque de gel – jusqu’à {{temp}} ({{day}})",
     "frostGroupTitle_many": "{{count}} nuits avec risque de gel – jusqu’à {{temp}} ({{day}})",
-    "frostAffected_one": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
-    "frostAffected_other": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
-    "frostAffected_many": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
+    "frostAffected_one": "Concerné : {{plants}}. Couvrir d’un voile, récolter avant ce qui est mûr.",
+    "frostAffected_other": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile, récolter avant ce qui est mûr.",
+    "frostAffected_many": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile, récolter avant ce qui est mûr.",
     "frostAdvice": "Couvre les plantes sensibles d’un voile et attends avant de repiquer.",
     "greenhouseFrostDesc": "Jour le plus froid : {{date}}, {{outside}} dehors. Même la serre non chauffée risque de geler (environ {{temp}}). Doubler le voile sur les plantes sensibles ou chauffer hors gel. Hypothèse : environ {{buffer}} de plus qu'à l'extérieur.",
     "fleeceTask": "Ajouter la tâche voile",
@@ -1214,7 +1214,7 @@
     "fleeceTaskDesc": "Nuits de gel prévues : {{nights}}. Couvrez les cultures sensibles le soir, découvrez-les le matin.",
     "fleeceTaskAdded": "Tâche « Poser le voile d’hivernage » ajoutée pour {{day}}",
     "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}",
-    "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
+    "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile, récolter avant ce qui est mûr.",
     "frostGroupTitleMixed_one": "{{hard}}, {{count}} autre avec risque de gel – jusqu’à {{temp}} ({{day}})",
     "frostGroupTitleMixed_other": "{{hard}}, {{count}} autres avec risque de gel – jusqu’à {{temp}} ({{day}})",
     "frostGroupTitleMixed_many": "{{hard}}, {{count}} autres avec risque de gel – jusqu’à {{temp}} ({{day}})",
@@ -2432,7 +2432,8 @@
     "notesPlaceholder": "p. ex. observations, variété, météo…",
     "costHint": "Compte dans le bilan sous Coûts.",
     "more": "Plus",
-    "optionalWord": "facultatif"
+    "optionalWord": "facultatif",
+    "stillMissing": "Reste à remplir : {{fields}}"
   },
   "companions": {
     "title": "Associations",

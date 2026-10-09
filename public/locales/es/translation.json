@@ -294,7 +294,7 @@
       "mid": "Medio",
       "cold": "Duro"
     },
-    "locationPrivate": "Solo para el tiempo y las heladas; se queda en este dispositivo.",
+    "locationPrivate": "Solo se usa para consultar el tiempo; se guarda en este dispositivo.",
     "unlockSun": "Posición del sol",
     "unlockWeather": "Tiempo a 7 días",
     "unlockFrost": "Avisos de helada",
@@ -1204,9 +1204,9 @@
     "frostGroupTitle_one": "{{count}} noche con riesgo de helada – hasta {{temp}} ({{day}})",
     "frostGroupTitle_other": "{{count}} noches con riesgo de helada – hasta {{temp}} ({{day}})",
     "frostGroupTitle_many": "{{count}} noches con riesgo de helada – hasta {{temp}} ({{day}})",
-    "frostAffected_one": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
-    "frostAffected_other": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
-    "frostAffected_many": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
+    "frostAffected_one": "Afectado: {{plants}}. Cubre con manta térmica y cosecha antes lo maduro.",
+    "frostAffected_other": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica y cosecha antes lo maduro.",
+    "frostAffected_many": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica y cosecha antes lo maduro.",
     "frostAdvice": "Cubre las plantas sensibles con manta térmica y espera para trasplantar.",
     "greenhouseFrostDesc": "Día más frío: {{date}}, {{outside}} fuera. Incluso en el invernadero sin calefacción puede helar (unos {{temp}}). Cubre las plantas sensibles con doble manta térmica o calienta para evitar heladas. Supuesto: unos {{buffer}} más que fuera.",
     "fleeceTask": "Añadir tarea: manta térmica",
@@ -1214,7 +1214,7 @@
     "fleeceTaskDesc": "Noches de helada previstas: {{nights}}. Cubre los cultivos sensibles por la tarde y destápalos por la mañana.",
     "fleeceTaskAdded": "Tarea «Cubrir con manta térmica» añadida para {{day}}",
     "fleeceTaskPlanned": "Tarea de manta térmica para {{day}}",
-    "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
+    "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica y cosecha antes lo maduro.",
     "frostGroupTitleMixed_one": "{{hard}}, {{count}} más con riesgo de helada – hasta {{temp}} ({{day}})",
     "frostGroupTitleMixed_other": "{{hard}}, {{count}} más con riesgo de helada – hasta {{temp}} ({{day}})",
     "frostGroupTitleMixed_many": "{{hard}}, {{count}} más con riesgo de helada – hasta {{temp}} ({{day}})",
@@ -2432,7 +2432,8 @@
     "notesPlaceholder": "p. ej. observaciones, variedad, tiempo…",
     "costHint": "Cuenta en el balance de Costes.",
     "more": "Más",
-    "optionalWord": "opcional"
+    "optionalWord": "opcional",
+    "stillMissing": "Falta: {{fields}}"
   },
   "companions": {
     "title": "Asociaciones",

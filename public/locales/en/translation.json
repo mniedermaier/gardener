@@ -282,7 +282,7 @@
       "mid": "Average",
       "cold": "Harsh"
     },
-    "locationPrivate": "Only for weather and frost dates, stays on this device.",
+    "locationPrivate": "Used only for weather requests, stored on this device.",
     "unlockSun": "Sun position",
     "unlockWeather": "7-day weather",
     "unlockFrost": "Frost alerts",
@@ -1165,8 +1165,8 @@
     },
     "frostGroupTitle_one": "{{count}} night at risk of frost – down to {{temp}} ({{day}})",
     "frostGroupTitle_other": "{{count}} nights at risk of frost – down to {{temp}} ({{day}})",
-    "frostAffected_one": "Affected: {{plants}}. Cover with fleece or bring indoors.",
-    "frostAffected_other": "{{count}} crops affected ({{beds}}), e.g. {{plants}}. Cover with fleece or bring indoors.",
+    "frostAffected_one": "Affected: {{plants}}. Cover with fleece, pick what is ripe first.",
+    "frostAffected_other": "{{count}} crops affected ({{beds}}), e.g. {{plants}}. Cover with fleece, pick what is ripe first.",
     "frostAdvice": "Cover tender plants with fleece and hold off on transplanting.",
     "greenhouseFrostDesc": "Coldest day: {{date}}, {{outside}} outside. Even the unheated house will likely freeze (about {{temp}}). Cover tender plants with a double layer of fleece or heat frost-free. Assumption: about {{buffer}} warmer than outside.",
     "fleeceTask": "Add fleece task",
@@ -1174,7 +1174,7 @@
     "fleeceTaskDesc": "Frost nights in the forecast: {{nights}}. Cover tender crops in the evening, uncover in the morning.",
     "fleeceTaskAdded": "Task “Cover with fleece” added for {{day}}",
     "fleeceTaskPlanned": "Fleece task planned for {{day}}",
-    "frostAffectedAll": "Affected: {{plants}}. Cover with fleece or bring indoors.",
+    "frostAffectedAll": "Affected: {{plants}}. Cover with fleece, pick what is ripe first.",
     "frostGroupTitleMixed_one": "{{hard}}, {{count}} more at risk of frost – down to {{temp}} ({{day}})",
     "frostGroupTitleMixed_other": "{{hard}}, {{count}} more at risk of frost – down to {{temp}} ({{day}})",
     "frostHardNights_one": "{{count}} frost night",
@@ -2322,7 +2322,8 @@
     "notesPlaceholder": "e.g. observations, variety, weather…",
     "costHint": "Counts towards the balance under Costs.",
     "more": "More",
-    "optionalWord": "optional"
+    "optionalWord": "optional",
+    "stillMissing": "Still needed: {{fields}}"
   },
   "companions": {
     "title": "Companions",

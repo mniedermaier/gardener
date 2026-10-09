@@ -96,6 +96,18 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
   const valid = name.length > 0 && !harvestError && draft.spacingCm > 0 && draft.harvestMin > 0
     && draft.category !== "" && draft.sun !== "" && draft.water !== "" && timingSet;
 
+  // Save stays disabled until every required field is set: name what is still open.
+  const plain = (label: string) => label.replace(/\s*\(.*?\)/g, "");
+  const missing = [
+    !name && t("plants.customName"),
+    !draft.category && t("plants.form.category"),
+    !timingSet && t("plants.form.sowMode"),
+    !(draft.harvestMin > 0) && t("plants.form.harvestMin"),
+    !(draft.spacingCm > 0) && t("plants.form.spacingCm"),
+    !draft.sun && t("plants.details.sun"),
+    !draft.water && t("plants.details.water"),
+  ].filter((x): x is string => !!x).map(plain);
+
   const handleSave = () => {
     if (!valid || !draft.category || !draft.sun || !draft.water) return;
     const fields = {
@@ -149,6 +161,11 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
               <Trash2 size={16} aria-hidden="true" />
               {t("common.delete")}
             </Button>
+          )}
+          {!valid && missing.length > 0 && (
+            <p className={`min-w-0 basis-full text-xs text-gray-500 sm:basis-0 sm:flex-1 dark:text-gray-400 ${plant ? "" : "mr-auto"}`}>
+              {t("common.stillMissing", { fields: missing.join(", ") })}
+            </p>
           )}
           <Button variant="secondary" onClick={onClose}>{t("common.cancel")}</Button>
           <Button onClick={handleSave} disabled={!valid}>{t("common.save")}</Button>

@@ -70,7 +70,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           open ? "translate-x-0 shadow-lg" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-14 shrink-0 items-center justify-between gap-2 px-4 lg:h-16">
+        <div className="flex h-13 shrink-0 items-center justify-between gap-2 px-4 lg:h-16">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">
               <Sprout size={18} />
@@ -88,9 +88,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav aria-label={t("shell.mainNavigation")} className="scroll-shadow-y flex-1 overflow-y-auto px-3 pb-2 lg:pb-6">
+        <nav aria-label={t("shell.mainNavigation")} className="scroll-shadow-y flex-1 overflow-y-auto px-3 pb-1 lg:pb-6">
           {NAV_GROUPS.map((group) => (
-            <div key={group.id} className={group.labelKey ? "mt-3 lg:mt-4" : "mt-1"}>
+            <div key={group.id} className={group.labelKey ? "mt-2.5 lg:mt-4" : "mt-1"}>
               {group.labelKey && (
                 <h2 className="mb-1 px-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                   {t(group.labelKey)}

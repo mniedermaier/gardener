@@ -278,7 +278,7 @@
       "mid": "Mittel",
       "cold": "Rau"
     },
-    "locationPrivate": "Nur für Wetter und Frosttermine, bleibt auf diesem Gerät.",
+    "locationPrivate": "Nur für Wetterabfragen genutzt, gespeichert auf diesem Gerät.",
     "unlockSun": "Sonnenstand",
     "unlockWeather": "7-Tage-Wetter",
     "unlockFrost": "Frostwarnungen",
@@ -1165,8 +1165,8 @@
     },
     "frostGroupTitle_one": "{{count}} Nacht mit Frostgefahr – bis {{temp}} ({{day}})",
     "frostGroupTitle_other": "{{count}} Nächte mit Frostgefahr – bis {{temp}} ({{day}})",
-    "frostAffected_one": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
-    "frostAffected_other": "Betroffen sind {{count}} Kulturen ({{beds}}), z. B. {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
+    "frostAffected_one": "Betroffen: {{plants}}. Mit Vlies abdecken, Reifes vorher ernten.",
+    "frostAffected_other": "Betroffen sind {{count}} Kulturen ({{beds}}), z. B. {{plants}}. Mit Vlies abdecken, Reifes vorher ernten.",
     "frostAdvice": "Empfindliche Pflanzen mit Vlies abdecken und mit dem Auspflanzen warten.",
     "greenhouseFrostDesc": "Kältester Tag: {{date}}, draußen {{outside}}. Auch im unbeheizten Haus droht dann Frost (etwa {{temp}}). Empfindliche Pflanzen doppelt mit Vlies abdecken oder frostfrei heizen. Annahme: rund {{buffer}} wärmer als draußen.",
     "fleeceTask": "Vlies-Aufgabe anlegen",
@@ -1174,7 +1174,7 @@
     "fleeceTaskDesc": "Frostnächte laut Vorhersage: {{nights}}. Empfindliche Kulturen am Abend abdecken, morgens lüften.",
     "fleeceTaskAdded": "Aufgabe „Vlies auflegen“ für {{day}} angelegt",
     "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant",
-    "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
+    "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken, Reifes vorher ernten.",
     "frostGroupTitleMixed_one": "{{hard}}, {{count}} weitere mit Frostgefahr – bis {{temp}} ({{day}})",
     "frostGroupTitleMixed_other": "{{hard}}, {{count}} weitere mit Frostgefahr – bis {{temp}} ({{day}})",
     "frostHardNights_one": "{{count}} Frostnacht",
@@ -1883,7 +1883,7 @@
     "edit": "Saatgut bearbeiten",
     "testRecommended": "Keimprobe empfohlen",
     "testHintShort": "Ältere Samen vor der Aussaat testen",
-    "testExplain": "{{name}} ist meist {{years}} keimfähig. Lege 10 Samen auf feuchtes Küchenpapier: Keimen weniger als 7, dichter säen oder neu kaufen.",
+    "testExplain": "Meist {{years}} keimfähig. Probe: 10 Samen auf feuchtes Papier – keimen weniger als 7, dichter säen.",
     "years_one": "{{count}} Jahr",
     "years_other": "{{count}} Jahre",
     "plantingStock": "Pflanzgut",
@@ -2322,7 +2322,8 @@
     "notesPlaceholder": "z. B. Beobachtungen, Sorte, Wetter …",
     "costHint": "Fließt in die Bilanz unter Kosten ein.",
     "more": "Mehr",
-    "optionalWord": "optional"
+    "optionalWord": "optional",
+    "stillMissing": "Noch offen: {{fields}}"
   },
   "companions": {
     "title": "Pflanzpartner",
