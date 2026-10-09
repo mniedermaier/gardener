@@ -67,7 +67,7 @@ function usedKeys(): Map<string, string> {
 describe("Translations", () => {
   it("never ends a sentence on a short date ('17. Okt.' + '.' → double period)", () => {
     for (const lang of LOCALES) {
-      const bad = flattenValues(loadLocale(lang)).filter(([, v]) => /\{\{date\}\}\.$/.test(v)).map(([k]) => k);
+      const bad = flattenValues(loadLocale(lang)).filter(([, v]) => v.endsWith("{{date}}.")).map(([k]) => k);
       expect(bad, lang).toEqual([]);
     }
   });
