@@ -135,8 +135,10 @@ export function SeasonTimeline() {
   if (plantedBeds.length === 0) {
     return (
       <div className="space-y-6">
-      <Card>
+      {/* Compact: the sowing list below is the useful part for a garden without beds. */}
+      <Card padding="sm">
         <EmptyState
+          compact
           icon={CalendarRange}
           title={t("calendar.timelineEmptyTitle")}
           description={t("calendar.timelineEmptyText")}
@@ -167,14 +169,18 @@ export function SeasonTimeline() {
     />
   );
 
-  const agendaRow = ({ tl, phase, range }: { tl: PlantTimeline; phase: Phase; range: Range }, kind: "now" | "next") => {
+  // A phase badge only where a list mixes phases; one phase moves into the header ("Jetzt dran · Ernte · 11").
+  const onePhase = (items: { phase: Phase }[]) => (items.length > 0 && new Set(items.map((a) => a.phase)).size === 1 ? items[0].phase : null);
+  const nowPhase = onePhase(agenda.now);
+  const nextPhase = onePhase(agenda.next);
+  const agendaRow = ({ tl, phase, range }: { tl: PlantTimeline; phase: Phase; range: Range }, kind: "now" | "next", showPhase = true) => {
     const plant = plantMap.get(tl.plantId);
     return (
       <ListRow
         key={`${tl.bedId}-${tl.plantId}-${phase}`}
         leading={plant ? <PlantIconDisplay plantId={tl.plantId} emoji={plant.icon} size={28} /> : undefined}
         title={getPlantName(tl.plantId)}
-        badges={<PhaseBadge phase={phase} />}
+        badges={showPhase ? <PhaseBadge phase={phase} /> : undefined}
         meta={[
           tl.bedName,
           kind === "now"
@@ -190,16 +196,19 @@ export function SeasonTimeline() {
       {/* Mobile: agenda list instead of an unreadable Gantt */}
       <div className="space-y-4 sm:hidden">
         {filterSelect}
-        <List headingLevel={2} header={`${t("calendar.nowDue")} · ${agenda.now.length}`}>
+        <List headingLevel={2} header={[t("calendar.nowDue"), nowPhase && phaseLabel(nowPhase), agenda.now.length].filter((x) => x !== null).join(" · ")}>
           {agenda.now.length > 0
-            ? agenda.now.map((a) => agendaRow(a, "now"))
+            ? agenda.now.map((a) => agendaRow(a, "now", nowPhase === null))
             : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNow")}</li>}
         </List>
-        <List headingLevel={2} header={`${t("calendar.next4Weeks")} · ${agenda.next.length}`}>
-          {agenda.next.length > 0
-            ? agenda.next.map((a) => agendaRow(a, "next"))
-            : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{plantableCount > 0 ? t("calendar.nothingNextPlanted", { count: plantableCount }) : t("calendar.nothingNext")}</li>}
-        </List>
+        {/* Nothing starts soon: one line, not a whole card saying "0". */}
+        {agenda.next.length > 0 ? (
+          <List headingLevel={2} header={[t("calendar.next4Weeks"), nextPhase && phaseLabel(nextPhase), agenda.next.length].filter((x) => x !== null).join(" · ")}>
+            {agenda.next.map((a) => agendaRow(a, "next", nextPhase === null))}
+          </List>
+        ) : (
+          <p className="px-1 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNextLine")}</p>
+        )}
         {sowingList}
         {agenda.later.length > 0 && (
           <List headingLevel={2} header={t("calendar.upNext")}>

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, Receipt, Scale, Sprout, Stethoscope, Trash2, Wheat,
+  ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat,
   type LucideIcon,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
@@ -160,7 +160,7 @@ export function ExpenseDashboard() {
 
       {!hasAnything ? (
         <Card>
-          <EmptyState icon={Receipt} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest")}>{t("expenses.toHarvest")}</Button>} />
+          <EmptyState icon={ReceiptText} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest")}>{t("expenses.toHarvest")}</Button>} />
         </Card>
       ) : (
         <div className="space-y-6">
@@ -174,75 +174,78 @@ export function ExpenseDashboard() {
             ]}
           />
 
-          <KeyFigures
-            hero={{
-              label: t("expenses.net"),
-              value: f.formatCurrency(net),
-              icon: Scale,
-              visualPlacement: "below",
-              visual: (
-                <CompareBars
-                  rows={[
-                    { label: t("expenses.yieldValue"), value: balance.totalValue, color: "brand" },
-                    { label: t("expenses.totalCosts"), value: balance.costs.total, color: "earth" },
-                  ]}
-                />
-              ),
-              hint: (
-                <span className="inline-flex flex-wrap items-center gap-2">
-                  <Badge tone={net >= 0 ? "positive" : "warning"} icon={net > 0 ? ArrowUpRight : net < 0 ? ArrowDownRight : undefined}>{net >= 0 ? t("expenses.surplus") : t("expenses.deficit")}</Badge>
-                  {balance.roi === null ? t("expenses.roiNoCosts") : t("dashboard.roiValue", { value: f.formatPercent(balance.roi) })}
-                </span>
-              ),
-            }}
-            items={[
-              {
-                label: t("expenses.totalCosts"),
-                value: f.formatCurrency(balance.costs.total),
-                hint: balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined,
-              },
-              {
-                label: t("expenses.yieldValue"),
-                value: f.formatCurrency(balance.totalValue),
-                hint: t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) }),
-              },
-            ]}
-          />
+          {/* The disclosure explains the figures: attached below them, not a section of its own. */}
+          <div>
+            <KeyFigures
+              hero={{
+                label: t("expenses.net"),
+                value: f.formatCurrency(net),
+                icon: Scale,
+                visualPlacement: "below",
+                visual: (
+                  <CompareBars
+                    rows={[
+                      { label: t("expenses.yieldValue"), value: balance.totalValue, color: "brand" },
+                      { label: t("expenses.totalCosts"), value: balance.costs.total, color: "earth" },
+                    ]}
+                  />
+                ),
+                hint: (
+                  <span className="inline-flex flex-wrap items-center gap-2">
+                    <Badge tone={net >= 0 ? "positive" : "warning"} icon={net > 0 ? ArrowUpRight : net < 0 ? ArrowDownRight : undefined}>{net >= 0 ? t("expenses.surplus") : t("expenses.deficit")}</Badge>
+                    {balance.roi === null ? t("expenses.roiNoCosts") : t("dashboard.roiValue", { value: f.formatPercent(balance.roi) })}
+                  </span>
+                ),
+              }}
+              items={[
+                {
+                  label: t("expenses.totalCosts"),
+                  value: f.formatCurrency(balance.costs.total),
+                  hint: balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined,
+                },
+                {
+                  label: t("expenses.yieldValue"),
+                  value: f.formatCurrency(balance.totalValue),
+                  hint: t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) }),
+                },
+              ]}
+            />
 
-          <HowCalculated>
-              <p>{t("expenses.howCosts")}</p>
-              {balance.costs.animals > 0 && (
-                <p>
-                  {t("expenses.howAnimals", {
-                    total: f.formatCurrency(balance.costs.animals),
-                    expenses: f.formatCurrency((balance.costs.expenseByCategory.animal_feed ?? 0) + (balance.costs.expenseByCategory.veterinary ?? 0)),
-                    log: f.formatCurrency(balance.costs.feed + balance.costs.veterinary),
-                  })}
-                  {balance.costs.duplicatesSkipped > 0 && <> {t("expenses.duplicatesSkipped", { count: balance.costs.duplicatesSkipped })}</>}
-                </p>
-              )}
-              <p>{t("expenses.howValue")}</p>
-              <p>{t("expenses.howRoi")}</p>
-              <div>
-                <p className="mb-2 font-medium text-gray-800 dark:text-gray-200">{t("expenses.productPrices")}</p>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {PRODUCT_TYPES.map((type: ProductType) => (
-                    <Input
-                      key={type}
-                      label={t(`expenses.pricePer.${type}`)}
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      step={0.05}
-                      value={productPrices[type] ?? ""}
-                      placeholder={f.formatNumber(DEFAULT_PRODUCT_PRICES[type], { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      onChange={(e) => setProductPrice(type, e.target.value === "" ? null : Number(e.target.value))}
-                    />
-                  ))}
+            <HowCalculated className="mt-1">
+                <p>{t("expenses.howCosts")}</p>
+                {balance.costs.animals > 0 && (
+                  <p>
+                    {t("expenses.howAnimals", {
+                      total: f.formatCurrency(balance.costs.animals),
+                      expenses: f.formatCurrency((balance.costs.expenseByCategory.animal_feed ?? 0) + (balance.costs.expenseByCategory.veterinary ?? 0)),
+                      log: f.formatCurrency(balance.costs.feed + balance.costs.veterinary),
+                    })}
+                    {balance.costs.duplicatesSkipped > 0 && <> {t("expenses.duplicatesSkipped", { count: balance.costs.duplicatesSkipped })}</>}
+                  </p>
+                )}
+                <p>{t("expenses.howValue")}</p>
+                <p>{t("expenses.howRoi")}</p>
+                <div>
+                  <p className="mb-2 font-medium text-gray-800 dark:text-gray-200">{t("expenses.productPrices")}</p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {PRODUCT_TYPES.map((type: ProductType) => (
+                      <Input
+                        key={type}
+                        label={t(`expenses.pricePer.${type}`)}
+                        type="number"
+                        inputMode="decimal"
+                        min={0}
+                        step={0.05}
+                        value={productPrices[type] ?? ""}
+                        placeholder={f.formatNumber(DEFAULT_PRODUCT_PRICES[type], { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        onChange={(e) => setProductPrice(type, e.target.value === "" ? null : Number(e.target.value))}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-2">{t("expenses.priceHint")}</p>
                 </div>
-                <p className="mt-2">{t("expenses.priceHint")}</p>
-              </div>
-          </HowCalculated>
+            </HowCalculated>
+          </div>
 
           {categoryRows.length > 0 && (
             <Card>
@@ -279,7 +282,7 @@ export function ExpenseDashboard() {
             <h2 id="expense-list" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("expenses.entries")}</h2>
             {visible.length === 0 ? (
               <Card>
-                <EmptyState compact icon={Receipt} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
+                <EmptyState compact icon={ReceiptText} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
               </Card>
             ) : groups.map((g) => (
               <List key={g.key} header={`${f.formatDate(`${g.key}-01`, "monthYear")} · ${f.formatCurrency(g.sum)}`}>

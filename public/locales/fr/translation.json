@@ -213,7 +213,8 @@
       "old_many": "Dernière sauvegarde il y a {{count}} jours",
       "why": "Vos données ne sont que dans ce navigateur. Une sauvegarde les protège et facilite le changement d’appareil.",
       "action": "Télécharger la sauvegarde",
-      "later": "Plus tard"
+      "later": "Plus tard",
+      "whyApp": "Vos données ne sont que dans cette app, sur cet appareil. Une sauvegarde les protège et facilite le changement d’appareil."
     },
     "forecastValue": "Prévision {{value}}",
     "roiValue": "Rentabilité {{value}}",
@@ -941,7 +942,6 @@
     "nowDue": "En ce moment",
     "next4Weeks": "4 prochaines semaines",
     "nothingNow": "Aucune fenêtre de semis, plantation ou récolte n'est ouverte en ce moment.",
-    "nothingNext": "Rien de nouveau ne commence dans les 4 prochaines semaines.",
     "until": "jusqu'au {{date}}",
     "from": "à partir du {{date}}",
     "bedsUntil": "{{beds}} jusqu'au {{date}}",
@@ -980,10 +980,8 @@
       "soil_test": "Analyse du sol",
       "custom": "Personnalisée"
     },
-    "nothingNextPlanted_one": "Rien de nouveau ne commence pour vos cultures en place. {{count}} culture peut être semée ou plantée maintenant (voir ci-dessous).",
-    "nothingNextPlanted_many": "Rien de nouveau ne commence pour vos cultures en place. {{count}} cultures peuvent être semées ou plantées maintenant (voir ci-dessous).",
-    "nothingNextPlanted_other": "Rien de nouveau ne commence pour vos cultures en place. {{count}} cultures peuvent être semées ou plantées maintenant (voir ci-dessous).",
-    "reopenNamed": "Rouvrir « {{title}} »"
+    "reopenNamed": "Rouvrir « {{title}} »",
+    "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches."
   },
   "settings": {
     "title": "Paramètres",
@@ -1139,9 +1137,12 @@
     "fleeceTaskAdded": "Tâche « Poser le voile d’hivernage » ajoutée pour {{day}}",
     "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}",
     "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
-    "frostGroupTitleMixed_one": "Risque de gel {{count}} nuit, dont {{hard}} avec gel, jusqu’à {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "Risque de gel {{count}} nuits, dont {{hard}} avec gel, jusqu’à {{temp}} ({{day}})",
-    "frostGroupTitleMixed_many": "Risque de gel {{count}} nuits, dont {{hard}} avec gel, jusqu’à {{temp}} ({{day}})"
+    "frostGroupTitleMixed_one": "{{hard}}, risque de gel {{count}} autre nuit, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, risque de gel {{count}} autres nuits, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitleMixed_many": "{{hard}}, risque de gel {{count}} autres nuits, jusqu’à {{temp}} ({{day}})",
+    "frostHardNights_one": "Gel {{count}} nuit",
+    "frostHardNights_other": "Gel {{count}} nuits",
+    "frostHardNights_many": "Gel {{count}} nuits"
   },
   "harvest": {
     "title": "Récolte",
@@ -1398,15 +1399,11 @@
     "extraArea": "+{{area}} de surface",
     "target": "Objectif annuel",
     "covered": "Couvert",
-    "notPlanted": "Non planté",
-    "rowMeta": "Enregistré {{actual}} · prévision {{forecast}} · objectif {{target}} · {{area}} sur {{needed}}",
     "meterLabel": "{{plant}} : enregistré {{actual}}, prévision {{forecast}}, objectif {{target}}",
     "emptyTitle": "Planifiez vos besoins annuels",
     "emptyText": "Votre foyer a besoin d’environ {{kg}} de légumes et de fruits par an. Plantez des planches et le plan vous montrera ce qui manque.",
     "howTargets": "Objectif annuel : consommation moyenne par personne en Europe centrale (p. ex. 30 kg de pommes de terre, 15 kg de tomates) × taille du foyer.",
     "howCoverage": "Objectif de quantité : somme par culture de min(quantité, objectif) divisée par la somme des objectifs. Un surplus de pommes de terre ne remplace pas des tomates manquantes.",
-    "pctActual": "{{percent}} enregistré",
-    "pctForecast": "{{percent}} prévu",
     "howVsCalories": "Ce n’est pas une valeur calorique : l’autonomie de la page « Autonomie » compte les calories et inclut les produits animaux. Les deux chiffres diffèrent donc.",
     "animalIntro_one": "Rendement annuel typique de tes animaux et consommation habituelle de {{count}} personne.",
     "animalIntro_other": "Rendement annuel typique de tes animaux et consommation habituelle de {{count}} personnes.",
@@ -1414,10 +1411,15 @@
     "animalSurplus": "surplus {{amount}}",
     "surplusBadge": "Surplus",
     "animalIntro_many": "Rendement annuel typique de tes animaux et consommation habituelle de {{count}} personnes.",
-    "biggestGap": "Plus gros déficit",
-    "biggestGapHint_one": "{{kg}} manquants · {{count}} culture sous l’objectif",
-    "biggestGapHint_other": "{{kg}} manquants · {{count}} cultures sous l’objectif",
-    "biggestGapHint_many": "{{kg}} manquants · {{count}} cultures sous l’objectif"
+    "rowActualOfTarget": "{{actual}} sur {{target}} enregistrés",
+    "rowForecast": "Prévision {{forecast}}",
+    "unplanted": "Pas encore plantées",
+    "unplantedTitle_one": "{{count}} culture pas encore plantée",
+    "unplantedTitle_other": "{{count}} cultures pas encore plantées",
+    "unplantedTitle_many": "{{count}} cultures pas encore plantées",
+    "unplantedDesc": "Leurs objectifs demanderaient {{area}} au total.",
+    "targetShort": "Objectif {{target}}",
+    "neededShort": "{{area}} nécessaires"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -2140,7 +2142,7 @@
     "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés."
   },
   "succession": {
-    "pick": "Ajouter une culture",
+    "pick": "Choisir une culture",
     "taskTitle": "Semis {{n}} : {{plant}}",
     "added_one": "{{count}} date de semis ajoutée aux tâches",
     "added_many": "{{count}} dates de semis ajoutées aux tâches",
@@ -2157,7 +2159,7 @@
     "generateCount_many": "Ajouter {{count}} dates aux tâches",
     "generateCount_other": "Ajouter {{count}} dates aux tâches",
     "title": "Semis échelonnés",
-    "desc": "Étalez vos semis pour une récolte continue tout au long de la saison.",
+    "desc": "Semez plusieurs fois à quelques semaines d’écart pour que la récolte n’arrive pas d’un coup. Choisissez une culture : l’intervalle et le nombre sont proposés et deviennent des tâches de semis.",
     "interval": "Tous les",
     "weeks": "semaines",
     "sowings": "Semis",

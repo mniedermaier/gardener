@@ -6,6 +6,7 @@ import {
   formatDate,
   formatNumber,
   formatPercent,
+  roundShares,
   formatTemperature,
   formatVolume,
   formatWeight,
@@ -121,5 +122,18 @@ describe("createFormatter", () => {
     expect(n(f.formatWeight(1900))).toBe("1,9 kg");
     expect(f.formatDate("2026-10-05", "relative", NOW)).toBe("Heute");
     expect(n(f.formatCurrency(5))).toBe("5,00 €");
+  });
+});
+
+describe("roundShares", () => {
+  it("rounds parts so they add up to the rounded total", () => {
+    // 0,84 % + 3,46 % = 4,3 %; rounding each alone would give 0,8 + 3,5.
+    const [garden, animals] = roundShares([0.0084, 0.0346], 1);
+    expect(garden + animals).toBeCloseTo(0.043, 6);
+    expect(roundShares([0.0076, 0.0346], 1).reduce((a, b) => a + b)).toBeCloseTo(0.042, 6);
+  });
+
+  it("keeps exact values unchanged", () => {
+    expect(roundShares([0.25, 0.5], 0)).toEqual([0.25, 0.5]);
   });
 });

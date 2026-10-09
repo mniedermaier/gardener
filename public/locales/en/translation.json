@@ -204,7 +204,8 @@
       "old_other": "Last backup {{count}} days ago",
       "why": "Your data lives only in this browser. A backup protects it and helps when you switch devices.",
       "action": "Download backup",
-      "later": "Later"
+      "later": "Later",
+      "whyApp": "Your data lives only in this app on this device. A backup protects it and helps when you switch devices."
     },
     "forecastValue": "Forecast {{value}}",
     "roiValue": "Return {{value}}",
@@ -916,7 +917,6 @@
     "nowDue": "Happening now",
     "next4Weeks": "Next 4 weeks",
     "nothingNow": "No sowing, planting or harvest window is open right now.",
-    "nothingNext": "Nothing new starts in the next 4 weeks.",
     "until": "until {{date}}",
     "from": "from {{date}}",
     "bedsUntil": "{{beds}} until {{date}}",
@@ -952,9 +952,8 @@
       "soil_test": "Soil test",
       "custom": "Custom"
     },
-    "nothingNextPlanted_one": "Nothing new starts for your planted crops. {{count}} crop can be sown or planted now (see below).",
-    "nothingNextPlanted_other": "Nothing new starts for your planted crops. {{count}} crops can be sown or planted now (see below).",
-    "reopenNamed": "Reopen “{{title}}”"
+    "reopenNamed": "Reopen “{{title}}”",
+    "nothingNextLine": "Next 4 weeks: nothing new for your beds."
   },
   "settings": {
     "title": "Settings",
@@ -1102,8 +1101,10 @@
     "fleeceTaskAdded": "Task “Cover with fleece” added for {{day}}",
     "fleeceTaskPlanned": "Fleece task planned for {{day}}",
     "frostAffectedAll": "Affected: {{plants}}. Cover with fleece or bring indoors.",
-    "frostGroupTitleMixed_one": "Frost risk on {{count}} night, {{hard}} of them freezing, down to {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "Frost risk on {{count}} nights, {{hard}} of them freezing, down to {{temp}} ({{day}})"
+    "frostGroupTitleMixed_one": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
+    "frostHardNights_one": "Frost on {{count}} night",
+    "frostHardNights_other": "Frost on {{count}} nights"
   },
   "harvest": {
     "title": "Harvest",
@@ -1342,24 +1343,25 @@
     "extraArea": "+{{area}} area",
     "target": "Annual target",
     "covered": "Covered",
-    "notPlanted": "Not planted",
-    "rowMeta": "Recorded {{actual}} · forecast {{forecast}} · target {{target}} · {{area}} of {{needed}}",
     "meterLabel": "{{plant}}: recorded {{actual}}, forecast {{forecast}}, target {{target}}",
     "emptyTitle": "Plan your annual needs",
     "emptyText": "Your household needs about {{kg}} of vegetables and fruit per year. Plant some beds and the plan shows what's missing.",
     "howTargets": "Annual target: average consumption per person in central Europe (e.g. 30 kg potatoes, 15 kg tomatoes) × household size.",
     "howCoverage": "Quantity target: the sum of min(amount, target) per crop divided by the sum of all targets. A potato surplus doesn't make up for missing tomatoes.",
-    "pctActual": "{{percent}} recorded",
-    "pctForecast": "{{percent}} forecast",
     "howVsCalories": "This is not a calorie figure: self-sufficiency on the “Self-sufficiency” page counts calories and includes animal products. The two numbers therefore differ.",
     "animalIntro_one": "Typical annual yield of your animals and the typical consumption of {{count}} person.",
     "animalIntro_other": "Typical annual yield of your animals and the typical consumption of {{count}} people.",
     "animalNeed": "consumption {{amount}}",
     "animalSurplus": "surplus {{amount}}",
     "surplusBadge": "Surplus",
-    "biggestGap": "Biggest gap",
-    "biggestGapHint_one": "{{kg}} short · {{count}} crop below target",
-    "biggestGapHint_other": "{{kg}} short · {{count}} crops below target"
+    "rowActualOfTarget": "{{actual}} of {{target}} recorded",
+    "rowForecast": "Forecast {{forecast}}",
+    "unplanted": "Not planted yet",
+    "unplantedTitle_one": "{{count}} crop not planted yet",
+    "unplantedTitle_other": "{{count}} crops not planted yet",
+    "unplantedDesc": "Their targets would need {{area}} in total.",
+    "targetShort": "Target {{target}}",
+    "neededShort": "{{area}} needed"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -2050,7 +2052,7 @@
     "fromHealthLog": "incl. {{amount}} from health records"
   },
   "succession": {
-    "pick": "Add a crop",
+    "pick": "Pick a crop",
     "taskTitle": "Sowing {{n}}: {{plant}}",
     "added_one": "{{count}} sowing date added to tasks",
     "added_other": "{{count}} sowing dates added to tasks",
@@ -2063,7 +2065,7 @@
     "generateCount_one": "Add {{count}} date to tasks",
     "generateCount_other": "Add {{count}} dates to tasks",
     "title": "Succession planting",
-    "desc": "Stagger your sowings for continuous harvest throughout the season.",
+    "desc": "Sow several times a few weeks apart so the harvest doesn't come all at once. Pick a crop: interval and number are suggested and become sowing tasks.",
     "interval": "Every",
     "weeks": "weeks",
     "sowings": "Sowings",

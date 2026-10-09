@@ -40,7 +40,7 @@ function weatherIcon(code: string): LucideIcon {
 
 type FetchError = "auth" | "network";
 
-function AlertCallout({ group, frost }: { group: AlertGroup; frost: { summary: FrostSummary; title: string } | null }) {
+function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost: { summary: FrostSummary; title: string } | null; related?: AlertGroup[] }) {
   const { t } = useTranslation();
   const f = useFormat();
   const dayLabel = useDayLabel();
@@ -54,18 +54,32 @@ function AlertCallout({ group, frost }: { group: AlertGroup; frost: { summary: F
   if (group.type === "frost") {
     // Same sentence as on "Heute" (one source: summarizeFrost).
     title = frost?.title ?? "";
+    // Colour carries meaning once (the severity badge): neutral day chips. When
+    // the headline splits frost from mere risk, the chips list the freezing nights.
+    const nights = group.alerts.map((a) => ({ a, temp: Number(a.titleParams?.temp ?? 0) }));
+    const freezing = nights.filter((n) => n.temp <= 0);
+    const chips = freezing.length > 0 && freezing.length < nights.length ? freezing : nights;
     body = (
       <>
         <span className="flex flex-wrap gap-1.5">
-          {group.alerts.map((a) => (
-            <Badge key={a.id} variant="outline" tone={a.severity === "danger" ? "danger" : "warning"}>
-              {dayLabel(a.date ?? "")} {f.formatTemperature(Number(a.titleParams?.temp ?? 0))}
+          {chips.map(({ a, temp }) => (
+            <Badge key={a.id} variant="outline" size="sm" className="tabular-nums">
+              {dayLabel(a.date ?? "")} {f.formatTemperature(temp)}
             </Badge>
           ))}
         </span>
         <span className="mt-1.5 block">
           {affected}
         </span>
+        {/* The greenhouse cold warning belongs to the same nights: a line here, not a second "Akut" card. */}
+        {related.map((g) => {
+          const text = alertText(g.alerts[0]);
+          return (
+            <span key={g.id} className="mt-2 block border-t border-gray-100 pt-2 dark:border-white/10">
+              <span className="font-medium text-gray-800 dark:text-gray-200">{text.title}:</span> {text.description}
+            </span>
+          );
+        })}
         {frost && <FrostTaskButton summary={frost.summary} className="mt-2.5" />}
       </>
     );
@@ -168,7 +182,10 @@ export function WeatherDashboard() {
     );
   }
 
-  const [primary, ...rest] = groups;
+  // With a frost card, the greenhouse cold warning becomes a line inside it.
+  const hasFrost = groups.some((g) => g.type === "frost");
+  const related = hasFrost ? groups.filter((g) => g.type === "greenhouse_cold") : [];
+  const [primary, ...rest] = groups.filter((g) => !related.includes(g));
   const visible = [primary, rest[0]].filter(Boolean) as AlertGroup[];
   const hidden = rest.slice(1);
   // The API's first day can be yesterday (UTC buckets) — only show today onwards.
@@ -186,13 +203,16 @@ export function WeatherDashboard() {
       />
 
       {fallback && weather && (
-        <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-info/10 px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
-          <Info size={16} aria-hidden="true" className="shrink-0 text-info" />
-          <span className="min-w-0 flex-1">{t(fallback === "auth" ? "weather.fallbackAuth" : "weather.fallbackUnavailable")}</span>
-          <button type="button" onClick={() => navigate("/settings")} className="inline-flex min-h-11 items-center font-medium text-garden-700 underline-offset-2 hover:underline sm:min-h-0 dark:text-garden-300">
-            {t("weather.toSettings")}
-          </button>
-        </p>
+        // Phones: the action sits under the text instead of squeezing it into a narrow column.
+        <div className="mb-4 flex items-start gap-2 rounded-lg bg-info/10 px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
+          <Info size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-info" />
+          <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between sm:gap-3">
+            <p>{t(fallback === "auth" ? "weather.fallbackAuth" : "weather.fallbackUnavailable")}</p>
+            <button type="button" onClick={() => navigate("/settings")} className="inline-flex min-h-11 shrink-0 items-center font-medium text-garden-700 underline-offset-2 hover:underline sm:min-h-0 dark:text-garden-300">
+              {t("weather.toSettings")}
+            </button>
+          </div>
+        </div>
       )}
 
       {error && (
@@ -210,7 +230,7 @@ export function WeatherDashboard() {
 
       {visible.length > 0 && (
         <section aria-label={t("weather.alertsLabel")} className="mb-6 space-y-2">
-          {visible.map((g) => <AlertCallout key={g.id} group={g} frost={frost} />)}
+          {visible.map((g) => <AlertCallout key={g.id} group={g} frost={frost} related={g.type === "frost" ? related : undefined} />)}
           {hidden.length > 0 && (
             <details className="group">
               <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-md px-1 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 [&::-webkit-details-marker]:hidden">

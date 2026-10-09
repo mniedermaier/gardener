@@ -25,16 +25,18 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const bedLabel = (beds?: AgendaBed[]) =>
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
-  /** "bis 10. Okt. · 2 Beete · Hochbeet Süd bis 17. Okt.": one date per group of beds, never a date wrong for a bed it names. */
-  const meta = (item: AgendaPlantRow) => {
+  /**
+   * One date for all beds: "bis 17. Okt. · Hochbeet Süd". Different dates: each
+   * group names its beds with its own date ("Kartoffelacker, Kräuterkübel bis
+   * 10. Okt. · Hochbeet Süd bis 17. Okt."), so no date stands without its beds.
+   */
+  const meta = (item: AgendaPlantRow): string[] => {
     const key = item.kind === "now" ? "until" : "from";
     const groups = groupAgendaBedsByDate(item);
-    return groups.flatMap((g, i) => {
-      const date = formatDate(g.date, "short");
-      // With exceptions after it, the lead group is just counted: the line stays short, the exceptions carry the names.
-      if (i === 0) return [t(`calendar.${key}`, { date }), groups.length > 1 && g.beds.length > 1 ? t("advisor.bedCount", { count: g.beds.length }) : bedLabel(g.beds)];
-      return [t(`calendar.${key === "until" ? "bedsUntil" : "bedsFrom"}`, { beds: bedLabel(g.beds), date })];
-    }).filter(Boolean).join(" · ");
+    if (groups.length === 1) {
+      return [t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") }), bedLabel(groups[0].beds)].filter((x): x is string => !!x);
+    }
+    return groups.map((g) => t(`calendar.${key === "until" ? "bedsUntil" : "bedsFrom"}`, { beds: bedLabel(g.beds), date: formatDate(g.date, "short") }));
   };
 
   const items = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);

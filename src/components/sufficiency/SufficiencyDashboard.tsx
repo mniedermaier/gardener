@@ -27,6 +27,7 @@ import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { HouseholdSizeField } from "./HouseholdSizeField";
 import { PreservationGuide } from "./PreservationGuide";
 import { useToday } from "@/hooks/useToday";
+import { roundShares } from "@/lib/format";
 
 type View = "overview" | "crops" | "animals" | "preserve";
 const NUTRIENTS = ["calories", "protein", "vitaminC", "fiber"] as const;
@@ -120,32 +121,35 @@ export function SufficiencyDashboard() {
 
       {view === "overview" && (
         <div className="space-y-6">
-          <KeyFigures
-            hero={{
-              label: t("metrics.selfSufficiencyForecast"),
-              value: pct(ss.forecastRatio),
-              icon: Target,
-              tone: "brand",
-              hint: t("metrics.caloriesFor", { count: householdSize }),
-            }}
-            items={[
-              {
-                label: t("metrics.selfSufficiencyActual"),
-                value: pct(ss.actualRatio),
-                hint: ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: pct(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year }),
-              },
-              { label: t("metrics.yieldForecast"), value: f.formatWeight(metrics.harvest.forecast.totalGrams), hint: t("metrics.plantsOnly") },
-              { label: t("metrics.yieldActual"), value: f.formatWeight(metrics.harvest.actual.totalGrams), hint: t("metrics.harvestEntries", { count: metrics.harvest.entryCount }), to: "/harvest" },
-            ]}
-          />
-          <HowCalculated>
-            <p>{t("metrics.howNeed", { kcal: f.formatNumber(DAILY_KCAL_PER_PERSON, { maximumFractionDigits: 0 }) })}</p>
-            <p>{t("metrics.howForecast")}</p>
-            <p>{t("metrics.howCap")}</p>
-            <p>{t("metrics.howActual")}</p>
-            <p>{t("metrics.howToDate")}</p>
-            <p>{t("metrics.howVsFoodPlan")}</p>
-          </HowCalculated>
+          {/* The disclosure explains the figures: attached below them, not a section of its own. */}
+          <div>
+            <KeyFigures
+              hero={{
+                label: t("metrics.selfSufficiencyForecast"),
+                value: pct(ss.forecastRatio),
+                icon: Target,
+                tone: "brand",
+                hint: t("metrics.caloriesFor", { count: householdSize }),
+              }}
+              items={[
+                {
+                  label: t("metrics.selfSufficiencyActual"),
+                  value: pct(ss.actualRatio),
+                  hint: ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: pct(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year }),
+                },
+                { label: t("metrics.yieldForecast"), value: f.formatWeight(metrics.harvest.forecast.totalGrams), hint: t("metrics.plantsOnly") },
+                { label: t("metrics.yieldActual"), value: f.formatWeight(metrics.harvest.actual.totalGrams), hint: t("metrics.harvestEntries", { count: metrics.harvest.entryCount }), to: "/harvest" },
+              ]}
+            />
+            <HowCalculated className="mt-1">
+              <p>{t("metrics.howNeed", { kcal: f.formatNumber(DAILY_KCAL_PER_PERSON, { maximumFractionDigits: 0 }) })}</p>
+              <p>{t("metrics.howForecast")}</p>
+              <p>{t("metrics.howCap")}</p>
+              <p>{t("metrics.howActual")}</p>
+              <p>{t("metrics.howToDate")}</p>
+              <p>{t("metrics.howVsFoodPlan")}</p>
+            </HowCalculated>
+          </div>
 
           <Composition />
 
@@ -157,6 +161,7 @@ export function SufficiencyDashboard() {
               monthNames={monthLong}
               formatValue={(r) => f.formatPercent(Math.min(1, r))}
               current={currentMonth}
+              currentLabel={t("charts.now")}
               caption={t("sufficiency.monthlyCaption")}
             />
             <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
@@ -242,7 +247,7 @@ export function SufficiencyDashboard() {
                     {result.gaps.map((g) => (
                       <li key={g.nutrient} className="text-gray-700 dark:text-gray-300">
                         <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100)}</span>
-                        {" — "}
+                        {" – "}
                         {g.suggestion.split(",").filter((id) => plantMap.has(id)).map((id) => plantName(id)).join(", ")}
                       </li>
                     ))}
@@ -342,31 +347,33 @@ function Composition() {
   const f = useFormat();
   const { selfSufficiency: ss } = useGardenMetrics();
   if (ss.forecastKcal <= 0) return null;
-  const garden = ss.forecastPlantKcal / ss.needKcal;
-  const animals = ss.forecastAnimalKcal / ss.needKcal;
-  // On the scale of the whole year's need (100 %), so 4 % looks like 4 % — not like a full bar.
+  // Same precision as the hero (a decimal below 10 %), and parts rounded so
+  // they add up to it: "Garten + Tierprodukte" must equal the forecast above.
+  const digits = ss.forecastKcal / ss.needKcal < 0.1 ? 1 : 0;
+  const [garden, animals] = roundShares([ss.forecastPlantKcal / ss.needKcal, ss.forecastAnimalKcal / ss.needKcal], digits);
+  // On the scale of the whole year's need (100 %), so 4 % looks like 4 % – not like a full bar.
   const scale = Math.max(garden + animals, 1);
   const open = Math.max(0, 1 - garden - animals);
   const surplus = surplusItems(ss.forecastSurplusKg, f, t);
   return (
     <Card>
       <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/15" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, 1), animals: f.formatPercent(animals, 1) })}>
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/15" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, digits), animals: f.formatPercent(animals, digits) })}>
         <span className="h-full bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />
         <span className="h-full bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />
       </div>
       <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-garden-600 dark:bg-garden-400" />{t("metrics.fromGarden")}</dt>
-          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(garden, 1)}</dd>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(garden, digits)}</dd>
         </div>
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-earth-400 dark:bg-earth-300" />{t("metrics.fromAnimals")}</dt>
-          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, 1)}</dd>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, digits)}</dd>
         </div>
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-gray-200 dark:bg-white/15" />{t("metrics.notCovered")}</dt>
-          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(open, 1)}</dd>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(open, digits)}</dd>
         </div>
       </dl>
       {surplus.length > 0 && <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { items: surplus.join(", ") })}</p>}

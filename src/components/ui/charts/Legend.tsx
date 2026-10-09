@@ -37,7 +37,7 @@ export const Legend = memo(function Legend({ items, className = "" }: { items: L
         <li key={it.label} className="inline-flex items-center gap-1.5">
           {it.swatch === "hatched" || it.swatch === "dotted" ? (
             <svg width="12" height="12" aria-hidden="true" className={SERIES_TEXT[it.color]}>
-              <defs>{it.swatch === "dotted" ? <DotPattern id={`${pid}-${i}`} /> : <HatchPattern id={`${pid}-${i}`} />}</defs>
+              <defs>{it.swatch === "dotted" ? <DotPattern id={`${pid}-${i}`} className={SERIES_TEXT[it.color]} /> : <HatchPattern id={`${pid}-${i}`} className={SERIES_TEXT[it.color]} />}</defs>
               <rect width="12" height="12" rx="2" fill={`url(#${pid}-${i})`} />
             </svg>
           ) : it.swatch === "line" ? (

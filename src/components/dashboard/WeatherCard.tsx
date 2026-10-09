@@ -50,7 +50,10 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
   const affected = useFrostAffectedText(frost?.summary);
   // The weather page's alerts (one source): warnings beyond the frost sentence, e.g. the greenhouse cold warning.
   const { groups } = useWeatherAlerts(glance.status === "ready" ? glance.data.days : undefined);
-  const warnings = groups.filter((g) => g.type !== "frost" && g.severity !== "info");
+  // With a frost hint, the greenhouse cold warning is a line inside it (same
+  // nights) instead of a second warning box.
+  const related = frost ? groups.filter((g) => g.type === "greenhouse_cold") : [];
+  const warnings = groups.filter((g) => g.type !== "frost" && g.severity !== "info" && !related.includes(g));
   const alertText = useAlertText();
 
   const more = (
@@ -122,6 +125,14 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
             <Snowflake size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
             <span>
               <span className="font-medium">{frost.title}.</span> {affected}
+              {related.map((g) => {
+                const text = alertText(g.alerts[0]);
+                return (
+                  <span key={g.id} className="mt-1.5 block text-gray-700 dark:text-gray-300">
+                    <span className="font-medium text-gray-800 dark:text-gray-200">{text.title}:</span> {text.description}
+                  </span>
+                );
+              })}
             </span>
           </p>
           <FrostTaskButton summary={frost.summary} className="mt-2 ml-6 bg-white dark:bg-gray-900" />
@@ -139,7 +150,7 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
               <span className="min-w-0">
                 <span className="font-medium">{title}</span>{" "}
                 <Badge tone={tone} size="sm" className="align-text-bottom">{t(`alerts.severity.${g.severity}`)}</Badge>
-                <span className="mt-0.5 line-clamp-2 text-gray-600 dark:text-gray-300">{description}</span>
+                <span className="mt-0.5 block text-gray-600 dark:text-gray-300">{description}</span>
               </span>
             </p>
           </div>

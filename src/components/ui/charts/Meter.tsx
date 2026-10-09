@@ -41,7 +41,7 @@ export const Meter = memo(function Meter({ actual, forecast, max, target, label,
       style={{ height: size }}
     >
       <svg width="100%" height={size} aria-hidden="true" className="block">
-        <defs><HatchPattern id={pid} /></defs>
+        <defs><HatchPattern id={pid} className={SERIES_TEXT[color]} /></defs>
         <rect width="100%" height={size} rx={size / 2} className="fill-gray-100 dark:fill-white/10" />
         {f > 0 && <rect width={`${f}%`} height={size} rx={size / 2} fill={`url(#${pid})`} className={SERIES_TEXT[color]} />}
         {a > 0 && <rect width={`${a}%`} height={size} rx={size / 2} className={SERIES_FILL[color]} />}
