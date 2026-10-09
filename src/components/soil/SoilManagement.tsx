@@ -60,6 +60,15 @@ interface AmendDraft { bedId: string; date: string; type: AmendmentType; materia
 const emptyTest = (bedId = ""): TestDraft => ({ bedId, date: todayISO(), ph: "", n: "", p: "", k: "", om: "", notes: "" });
 const emptyAmend = (bedId = ""): AmendDraft => ({ bedId, date: todayISO(), type: "compost", material: "", kg: "", cost: "", notes: "" });
 
+/** A soil test older than this many months should be repeated. */
+const STALE_MONTHS = 5;
+const staleTest = (date: string) => {
+  const d = new Date(`${date}T00:00:00`);
+  const limit = new Date();
+  limit.setMonth(limit.getMonth() - STALE_MONTHS);
+  return d < limit;
+};
+
 export function SoilManagement() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -198,12 +207,12 @@ export function SoilManagement() {
         actions={
           tab === "tests" && sortedTests.length > 0 ? (
             <Button onClick={openAddTest}>
-              <Beaker size={16} aria-hidden="true" />
+              <Plus size={16} aria-hidden="true" />
               {t("soil.addTest")}
             </Button>
           ) : tab === "amendments" && sortedAmendments.length > 0 ? (
             <Button onClick={openAddAmend}>
-              <Leaf size={16} aria-hidden="true" />
+              <Plus size={16} aria-hidden="true" />
               {t("soil.addAmendment")}
             </Button>
           ) : undefined
@@ -256,6 +265,8 @@ export function SoilManagement() {
                       </h2>
                       <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-gray-500 dark:text-gray-400">
                         <time dateTime={s.date}>{formatDate(s.date)}</time>
+                        {/* Values drift over a season: an old test says so. */}
+                        {staleTest(s.date) && <Badge tone="warning" size="sm">{t("soil.staleTest")}</Badge>}
                         {beds.byId.has(s.bedId) && (
                           <>
                             <span aria-hidden="true">·</span>

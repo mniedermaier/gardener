@@ -4,7 +4,6 @@ import * as SunCalc from "suncalc";
 import { useFormat } from "@/hooks/useFormat";
 
 const W = 300;
-const H = 86;
 const PAD_X = 20;
 const BASE = 66;
 const PEAK = 12;
@@ -58,18 +57,21 @@ export const DayArc = memo(function DayArc({ lat, lon, className = "" }: { lat: 
       : t("weather.beforeSunrise", { time: time(info.rise) });
   const label = t("weather.dayArcLabel", { sunrise: time(info.rise), sunset: time(info.set), hours });
 
+  // Labels are HTML, not SVG text: the arc scales with its column, the text must stay ≥ 12 px.
   return (
     <figure className={className}>
-      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={label}>
-        <line x1={6} x2={W - 6} y1={BASE} y2={BASE} className="stroke-gray-200 dark:stroke-white/10" />
-        <path d={path(1)} fill="none" strokeDasharray="3 4" strokeLinecap="round" className="stroke-gray-300 dark:stroke-white/15" strokeWidth={1.5} />
+      <svg viewBox={`0 0 ${W} ${BASE + 6}`} className="block h-auto w-full" role="img" aria-label={label}>
+        <line x1={6} x2={W - 6} y1={BASE} y2={BASE} className="stroke-gray-200 dark:stroke-white/15" />
+        <path d={path(1)} fill="none" strokeDasharray="3 4" strokeLinecap="round" className="stroke-gray-300 dark:stroke-white/30" strokeWidth={1.5} />
         {day && <path d={path(p)} fill="none" strokeLinecap="round" className="stroke-earth-300 dark:stroke-earth-400" strokeWidth={2.5} />}
         <circle cx={sx} cy={day ? sy : BASE} r={day ? 9 : 6} className={day ? "fill-earth-300/30 dark:fill-earth-400/25" : "fill-transparent"} />
-        <circle cx={sx} cy={day ? sy : BASE} r={day ? 5 : 4} className={day ? "fill-earth-400 dark:fill-earth-300" : "fill-gray-300 dark:fill-gray-600"} />
-        <text x={PAD_X} y={H - 4} textAnchor="middle" className="fill-gray-500 text-[11px] tabular-nums dark:fill-gray-400">{time(info.rise)}</text>
-        <text x={W - PAD_X} y={H - 4} textAnchor="middle" className="fill-gray-500 text-[11px] tabular-nums dark:fill-gray-400">{time(info.set)}</text>
-        <text x={W / 2} y={BASE - 6} textAnchor="middle" className="fill-gray-700 text-[12px] font-medium tabular-nums dark:fill-gray-200">{hours}</text>
+        <circle cx={sx} cy={day ? sy : BASE} r={day ? 5 : 4} className={day ? "fill-earth-400 dark:fill-earth-300" : "fill-gray-300 dark:fill-gray-500"} />
       </svg>
+      <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400" aria-hidden="true">
+        <span>{time(info.rise)}</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{hours}</span>
+        <span>{time(info.set)}</span>
+      </div>
       <figcaption className="mt-1 text-center text-xs text-gray-600 dark:text-gray-400">{status}</figcaption>
     </figure>
   );

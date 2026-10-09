@@ -243,7 +243,8 @@ export function PantryPage() {
     const kg = active.reduce((s, p) => s + p.quantityKg, 0);
     const soon = active.filter((p) => { const d = daysLeft(p); return d >= 0 && d <= SOON_DAYS; }).length;
     const expired = active.filter((p) => daysLeft(p) < 0).length;
-    return { kg, soon, expired };
+    const methods = new Set(active.map((p) => p.method)).size;
+    return { kg, soon, expired, methods };
   }, [active, daysLeft]);
   const stock = useMemo(
     () => active.filter((p) => !filterMethod || p.method === filterMethod).sort((a, b) => a.expiresDate.localeCompare(b.expiresDate)),
@@ -302,7 +303,7 @@ export function PantryPage() {
               // Only figures that say something: no "Abgelaufen 0".
               items={[
                 // Items, not a sum of jars + bags + pieces (which would mean nothing).
-                { label: t("pantry.totalItems"), value: formatNumber(active.length) },
+                { label: t("pantry.totalItems"), value: formatNumber(active.length), hint: t("pantry.methodsHint", { count: stats.methods }) },
                 ...(stats.soon > 0 ? [{ label: t("pantry.expiringSoon"), value: formatNumber(stats.soon), hint: t("pantry.withinDays", { count: SOON_DAYS }) }] : []),
                 ...(stats.expired > 0 ? [{ label: t("pantry.expired"), value: formatNumber(stats.expired) }] : []),
               ]}
@@ -318,7 +319,7 @@ export function PantryPage() {
             <section className="space-y-3">
               {/* Same list header as the livestock records: heading left, filter right. */}
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("pantry.stockTab")}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("pantry.itemsHeading")}</h2>
                 {active.length > 3 && (
                   <Select
                     aria-label={t("pantry.method")}

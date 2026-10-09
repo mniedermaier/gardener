@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Download, Eye, LayoutGrid, Link2Off, Share2, Upload } from "lucide-react";
+import { Download, Eye, LayoutGrid, Link2Off, Share2, Upload, Check, X } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { decodeGardenFromUrl, importTemplateToStore } from "@/lib/sharing";
@@ -92,10 +92,13 @@ export function ImportPage() {
   // Opened without a link (e.g. from the menu): explain the page instead of reporting a broken link.
   // Restoring your own data is a different task: a quiet link straight to the backup section.
   const restoreLink = (
-    <Button variant="ghost" className="-ml-3 self-start" onClick={() => navigate("/settings?section=data")}>
-      <Upload size={16} aria-hidden="true" />
-      {t("importPage.restoreBackup")}
-    </Button>
+    <div>
+      <Button variant="ghost" className="-ml-3 self-start" onClick={() => navigate("/settings?section=data")}>
+        <Upload size={16} aria-hidden="true" />
+        {t("importPage.restoreBackup")}
+      </Button>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{t("importPage.restoreBackupHint")}</p>
+    </div>
   );
 
   // Opened without a link (e.g. from the menu) or with a broken one: paste a link here instead of a dead end.
@@ -122,6 +125,17 @@ export function ImportPage() {
             {restoreLink}
           </div>
         </Card>
+        {/* What a shared link brings, before anyone pastes one. */}
+        <ul className="mt-4 max-w-3xl space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
+          <li className="flex items-start gap-2">
+            <Check size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
+            {t("importPage.includes")}
+          </li>
+          <li className="flex items-start gap-2">
+            <X size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-400 dark:text-gray-500" />
+            {t("importPage.excludes")}
+          </li>
+        </ul>
       </div>
     );
   }

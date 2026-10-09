@@ -206,7 +206,7 @@ export function SufficiencyDashboard() {
                   { label: t("sufficiency.freshForecast"), color: "brand", hatched: true },
                   // Legend only for a series that is actually drawn.
                   ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const }] : []),
-                  ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const }] : []),
+                  ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const, muted: true }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
                 formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}

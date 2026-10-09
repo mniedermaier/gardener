@@ -115,9 +115,9 @@ export const SECTIONS: Record<string, SectionTab[]> = {
 export function sectionIdForPath(pathname: string): string | null {
   const p = pathname.replace(/\/+$/, "") || "/";
   if (p === "/" || p === "/weather") return "today";
-  if (p.startsWith("/planner")) return "planner";
-  // A shared-garden link is not the planner: no sidebar entry is highlighted.
-  if (p.startsWith("/import")) return null;
+  // Importing a shared garden ends in the planner: the sidebar keeps "Planer"
+  // active (the top bar still says "Import", see TopBar).
+  if (p.startsWith("/planner") || p.startsWith("/import")) return "planner";
   if (p.startsWith("/plants") || p === "/companions") return "plants";
   if (p === "/calendar" || p === "/tasks") return "calendar";
   if (p.startsWith("/livestock")) return "livestock";

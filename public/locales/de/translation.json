@@ -985,7 +985,7 @@
     "fromRange": "Start je nach Beet: {{range}}",
     "upNextFrom": "Als Nächstes · ab {{date}}",
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
-    "afterFrostWindow": "nach dem Frost: {{range}}",
+    "afterFrostWindow": "nach den Frostnächten: {{range}}",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet."
   },
   "settings": {
@@ -1212,7 +1212,8 @@
     "showLess": "Weniger anzeigen",
     "log": "Protokoll",
     "showOlder": "Ältere Monate anzeigen",
-    "weightIn": "Gewicht ({{unit}})"
+    "weightIn": "Gewicht ({{unit}})",
+    "prev30": "30 Tage davor: {{weight}}"
   },
   "journal": {
     "title": "Tagebuch",
@@ -1354,7 +1355,10 @@
       "piece_other": "Stück"
     },
     "totalItems": "Posten im Vorrat",
-    "notesPlaceholder": "z. B. Rezept, Lagerort …"
+    "notesPlaceholder": "z. B. Rezept, Lagerort …",
+    "methodsHint_one": "in {{count}} Lagerart",
+    "methodsHint_other": "in {{count}} Lagerarten",
+    "itemsHeading": "Posten"
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1627,7 +1631,7 @@
       "lastEntry": "Letzter Eintrag: {{date}}",
       "noLosses": "keine Verluste erfasst",
       "vaccContext": {
-        "chicken": "Hühner: Die Impfung gegen die Newcastle-Krankheit (ND) ist in Deutschland Pflicht. Den Abstand gibt der Impfstoff vor – Küken aus der Brüterei sind oft schon gegen Marek geimpft.",
+        "chicken": "Hühner: Die Impfung gegen die Newcastle-Krankheit (ND) ist in Deutschland Pflicht. Den Abstand gibt der Impfstoff vor. Küken aus der Brüterei sind oft schon gegen Marek geimpft.",
         "poultry": "Enten und Wachteln: keine Impfpflicht, ND-Impfung wird aber empfohlen. Den Abstand gibt der Impfstoff vor.",
         "rabbit": "Kaninchen: RHD (Chinaseuche) und Myxomatose, je nach Impfstoff halbjährlich bis jährlich.",
         "ruminant": "Ziegen und Schafe: Clostridien-Schutz, Auffrischung meist jährlich – mit dem Tierarzt abstimmen.",
@@ -1640,7 +1644,10 @@
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Impfungen, Entwurmungen und Tierarztbesuche und siehst, was fällig ist.",
       "emptyTitle": "Impfungen und Behandlungen im Blick",
       "notesPlaceholder": "z. B. Tierarzt, nächster Termin …",
-      "vaccCoverageScoped": "Impfpflichtige Gruppen mit Schutz"
+      "vaccCoverageScoped": "Impfschutz",
+      "vaccScopeHint": "Tiergruppen mit Impfpflicht",
+      "vaccDueBadge": "fällig",
+      "addEntry": "Eintrag erfassen"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1712,7 +1719,7 @@
     "eggsThisYear": "Eier dieses Jahr",
     "feedEntriesCount_one": "{{count}} Futtereintrag",
     "feedEntriesCount_other": "{{count}} Futtereinträge",
-    "chartDesc12": "Eier pro Monat; Honig und Wachs als Liste darunter.",
+    "chartDesc12": "Eier pro Monat, Honig und Wachs als Einzeleinträge.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "Stück pro Monat",
@@ -1776,7 +1783,6 @@
     "productThisYear": "{{product}} dieses Jahr",
     "eggWeeksLabel": "Eier je 7 Tage, letzte 8 Wochen, Ø {{avg}}",
     "eggWeeksAvg": "Ø {{avg}}/Woche · 8 Wochen",
-    "singleHarvests": "Einzelne Einträge (letzte {{months}} Monate)",
     "tabYields": "Erträge",
     "tabFeedings": "Fütterungen",
     "tabTreatments": "Behandlungen",
@@ -1795,7 +1801,10 @@
       "other": "z. B. Klauenpflege"
     },
     "ofExpectedSince": "von ~{{amount}} seit {{date}} erwartet",
-    "quantityIn": "Menge ({{unit}})"
+    "quantityIn": "Menge ({{unit}})",
+    "singleEntries": "Einzeleinträge",
+    "singleEntriesRange_one": "letzter Monat",
+    "singleEntriesRange_other": "letzte {{count}} Monate"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1913,7 +1922,7 @@
       "optimal": "Im Zielbereich der Kulturen (pH {{range}}). Weder Kalk noch Schwefel nötig – für den pH ist nichts zu tun.",
       "noLime": "Etwas über dem Zielbereich (pH {{range}}). Nicht kalken und keine Holzasche. Laub- oder Rindenkompost und Nadelstreu senken den pH langsam; normaler Gartenkompost ist eher neutral bis basisch, also sparsam einsetzen. Schwefel ist nicht nötig.",
       "sulfur": "Deutlich über dem Zielbereich (pH {{range}}). Elementaren Schwefel in kleinen Gaben einarbeiten, keinen Kalk und keine Holzasche ausbringen.",
-      "limeVeto": "Nicht kalken: Für {{crops}} passt pH {{ph}} (Ziel {{range}}). {{reason}} Die übrigen Kulturen im Beet kommen damit zurecht; Kalk erst nach der Ernte für die Folgekultur.",
+      "limeVeto": "Nicht kalken: Für {{crops}} passt pH {{ph}} (Ziel {{range}}). {{reason}} Die übrigen Kulturen im Beet kommen meist zurecht; Kalk erst nach der Ernte für die Folgekultur.",
       "averseHigh": "Für {{crops}} etwas zu hoch (Ziel {{range}}). {{reason}} Nicht kalken, keine Holzasche; Laub- oder Rindenkompost senkt den pH langsam.",
       "acidify": "Für {{crops}} viel zu hoch (Ziel {{range}}). Beet oder Pflanzloch mit saurem Substrat füllen (Rhododendronerde, Rindenhumus) oder mit elementarem Schwefel langsam absenken. Mit Regenwasser gießen, Leitungswasser ist oft kalkhaltig."
     },
@@ -1972,7 +1981,8 @@
     "moreMeasures_one": "{{count}} weitere Maßnahme",
     "moreMeasures_other": "{{count}} weitere Maßnahmen",
     "notesPlaceholder": "z. B. Wetter, eingearbeitet …",
-    "testNotesPlaceholder": "z. B. Probenahme, Labor …"
+    "testNotesPlaceholder": "z. B. Probenahme, Labor …",
+    "staleTest": "Älter als 5 Monate – neu beproben"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2396,7 +2406,10 @@
     "pastePlaceholder": "https://…#/import?t=…",
     "pasteInvalid": "Das ist kein gültiger Teilen-Link.",
     "preview": "Vorschau",
-    "toPlanner": "Zum Planer"
+    "toPlanner": "Zum Planer",
+    "restoreBackupHint": "Für deine eigene Sicherung (.json) – ersetzt oder ergänzt alle Daten.",
+    "includes": "Übernommen werden Beete und Bepflanzung.",
+    "excludes": "Nicht enthalten: Ernten, Tiere, Notizen und Ausgaben."
   },
   "charts": {
     "month": "Monat",

@@ -27,10 +27,11 @@ interface MonthStripProps {
 /** Sequential single-hue ramp, light → dark; text switches for contrast. */
 const STEPS = [
   "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300",
-  // Steps 1–2: below the threshold, muted tints.
-  "bg-garden-50 text-garden-900 dark:bg-garden-500/10 dark:text-garden-200",
-  "bg-garden-100 text-garden-900 dark:bg-garden-500/20 dark:text-garden-100",
-  // Steps 3–4: the threshold is reached — bright fill, dark text on the top step in dark mode.
+  // Steps 1–3: below the threshold, muted tints that still tell 3 % from 7 %.
+  "bg-garden-50 text-garden-900 dark:bg-garden-500/[0.08] dark:text-garden-200",
+  "bg-garden-100 text-garden-900 dark:bg-garden-500/[0.16] dark:text-garden-100",
+  "bg-garden-200 text-garden-900 dark:bg-garden-500/[0.26] dark:text-garden-100",
+  // Steps 4–5: the threshold is reached — bright fill, dark text on the top step in dark mode.
   "bg-garden-400 text-white dark:bg-garden-500 dark:text-gray-950",
   "bg-garden-600 text-white dark:bg-garden-300 dark:text-gray-950",
 ];
@@ -41,8 +42,8 @@ const STEPS = [
  */
 const step = (v: number, threshold: number) => {
   if (v <= 0.005) return 0;
-  if (v < threshold) return v < threshold / 2 ? 1 : 2;
-  return v < Math.min(1, threshold * 2.5) ? 3 : 4;
+  if (v < threshold) return v < threshold / 4 ? 1 : v < threshold / 2 ? 2 : 3;
+  return v < Math.min(1, threshold * 2.5) ? 4 : 5;
 };
 
 /**

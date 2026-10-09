@@ -183,14 +183,16 @@ export function HarvestLog() {
 
   // ---------------------------------------------------------------- stats
   const stats = useMemo(() => {
-    let total = 0, last30 = 0, qualitySum = 0;
+    let total = 0, last30 = 0, prev30 = 0, qualitySum = 0;
     const byPlant = new Map<string, { grams: number; count: number; entries: number }>();
     for (const h of harvests) {
       const g = h.weightGrams ?? 0;
       total += g;
       qualitySum += h.quality;
       const d = toDate(h.date);
-      if (d && differenceInCalendarDays(now, d) < 30) last30 += g;
+      const ago = d ? differenceInCalendarDays(now, d) : -1;
+      if (ago >= 0 && ago < 30) last30 += g;
+      else if (ago >= 30 && ago < 60) prev30 += g;
       const p = byPlant.get(h.plantId) ?? { grams: 0, count: 0, entries: 0 };
       p.grams += g;
       p.count += h.count ?? 0;
@@ -211,7 +213,7 @@ export function HarvestLog() {
       if (perMonth.has(key)) perMonth.set(key, (perMonth.get(key) ?? 0) + (h.weightGrams ?? 0));
     }
     return {
-      total, last30, ranking,
+      total, last30, prev30, ranking,
       avgQuality: harvests.length ? qualitySum / harvests.length : 0,
       months: months.map((m) => {
         const key = toISODate(m).slice(0, 7);
@@ -273,7 +275,8 @@ export function HarvestLog() {
               tone: "brand",
             }}
             items={[
-              { label: t("harvest.last30"), value: formatWeight(stats.last30) },
+              // A bare number says little: the 30 days before give the trend.
+              { label: t("harvest.last30"), value: formatWeight(stats.last30), hint: t("harvest.prev30", { weight: formatWeight(stats.prev30) }) },
               {
                 label: t("harvest.avgQuality"),
                 value: <>{formatNumber(stats.avgQuality)} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{t("harvest.outOfFive")}</span></>,
