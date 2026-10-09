@@ -2343,7 +2343,7 @@
     "viewLabel": "Ansicht",
     "byPlant": "Nach Pflanze",
     "focusLabel": "Pflanze hervorheben",
-    "focusNone": "Pflanze hervorheben …",
+    "focusNone": "Pflanze wählen …",
     "emptyFilter": "Keine Pflanze passt zur Suche.",
     "scrollForMore_one": "Seitlich scrollen für alle {{count}} Pflanze",
     "scrollForMore_other": "Seitlich scrollen für alle {{count}} Pflanzen",
