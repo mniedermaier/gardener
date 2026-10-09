@@ -107,7 +107,14 @@ export function ProductionPage() {
       }]
     : [];
   // Wax and wool are listed as single entries under the chart: no second figure for them.
-  const yearFigures = [...weekFigure, ...herdTypes.slice(1).filter((ty) => ty !== "wax" && ty !== "wool").map(yearFigure)];
+  // Every secondary figure has a sub-line like its neighbours: the expectation so far.
+  const yearFigures = [...weekFigure, ...herdTypes.slice(1).filter((ty) => ty !== "wax" && ty !== "wool").map((ty) => {
+    const expected = expectedToDate(ty);
+    return {
+      ...yearFigure(ty),
+      hint: expected > 0 ? t("livestock.ofExpectedToDate", { amount: formatProductAmount(ty, expected, f, t) }) : undefined,
+    };
+  })];
 
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
 

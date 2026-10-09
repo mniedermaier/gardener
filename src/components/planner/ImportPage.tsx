@@ -114,8 +114,9 @@ export function ImportPage() {
               <Icon size={20} />
             </span>
             <div className="min-w-0">
-              <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t(broken ? "importPage.invalidTitle" : "importPage.noLinkTitle")}</h2>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{t(broken ? "importPage.invalidText" : "importPage.noLinkText")}</p>
+              {/* Without a link the page title already says it: only a broken link gets its own heading. */}
+              {broken && <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("importPage.invalidTitle")}</h2>}
+              <p className={`${broken ? "mt-1" : "mt-2"} text-sm text-gray-600 dark:text-gray-400`}>{t(broken ? "importPage.invalidText" : "importPage.noLinkText")}</p>
             </div>
           </div>
           <div className="mt-5">

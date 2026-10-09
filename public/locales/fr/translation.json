@@ -520,7 +520,8 @@
       "rosaceae": "Rosacées",
       "ericaceae": "Éricacées",
       "grossulariaceae": "Grossulariacées",
-      "other": "Autres"
+      "other": "Autres",
+      "caprifoliaceae": "Valérianacées"
     },
     "sheetMore": "Détails, variété et notes",
     "sheetLess": "Afficher moins",
@@ -1036,7 +1037,10 @@
     "notesPlaceholder": "p. ex. outils, rappels…",
     "afterFrostWindow": "{{range}} (après les nuits de gel)",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
-    "bedPlus": "{{bed}} et {{more}} autres planches"
+    "bedUntil": "{{beds}} jusqu’au {{date}}",
+    "bedFrom": "{{beds}} à partir du {{date}}",
+    "bedRange": "{{beds}} {{range}}",
+    "afterFrostShort": "après les nuits de gel"
   },
   "settings": {
     "title": "Paramètres",
@@ -1553,7 +1557,6 @@
     "monthlyDesc_one": "Part des besoins caloriques de {{count}} personne : en frais selon la prévision et en réserve.",
     "monthlyDesc_other": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
-    "monthlyKgTitle": "Quantité disponible par mois",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
     "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
     "ofNeed": "{{produced}} sur {{needed}}",
@@ -1588,7 +1591,9 @@
     "animalForecast": "Produits animaux prévus",
     "emptyNeedShort_one": "Une personne a besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
     "emptyNeedShort_other": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
-    "emptyNeedShort_many": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même."
+    "emptyNeedShort_many": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
+    "typicalYearTitle": "Année type (prévision)",
+    "seasonKgTitle": "Saison {{year}} : saisi, prévision à partir d’aujourd’hui"
   },
   "pests": {
     "title": "Ravageurs",
@@ -1716,7 +1721,7 @@
     "health": {
       "title": "Santé",
       "totalEvents": "Total entrées",
-      "totalCost": "Frais de santé, toutes les saisies",
+      "totalCost": "Coûts de santé au total",
       "losses": "Pertes",
       "overdueWarning": "Vaccination possiblement en retard",
       "daysSince": "il y a {{days}} jours",
@@ -1745,9 +1750,11 @@
       "emptyTitle": "Vaccins et soins en un coup d’œil",
       "notesPlaceholder": "p. ex. vétérinaire, prochain rendez-vous…",
       "vaccCoverageScoped": "Vaccination",
-      "vaccScopeHint": "Groupes soumis à vaccination",
       "addEntry": "Saisir une entrée de santé",
-      "lossesHint": "depuis le début"
+      "lossesHint": "depuis le début",
+      "vaccScopeHint_one": "{{count}} groupe à vacciner",
+      "vaccScopeHint_other": "{{count}} groupes à vacciner",
+      "vaccScopeHint_many": "{{count}} groupes à vacciner"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1921,7 +1928,8 @@
     "eggTrend": "{{value}} par rapport à la semaine moyenne",
     "chooseAnimal": "Choisir un animal…",
     "expectedBasis": "depuis la première saisie le {{date}}",
-    "valueHint": "{{amount}} × {{price}}"
+    "valueHint": "{{amount}} × {{price}}",
+    "firstEntry": "Première saisie"
   },
   "seeds": {
     "title": "Semences",
@@ -1964,8 +1972,6 @@
     "plantingStock": "Plants",
     "plantingStockExplain": "Se multiplie par tubercules, caïeux ou boutures : pas de test de germination. Conserver au frais, au sec et à l’obscurité.",
     "vegetativeHint": "{{name}} se multiplie par tubercules, caïeux ou boutures. Notez les plants, p. ex. en grammes.",
-    "missingStat": "Manque pour les planches",
-    "missingStatHint": "Planté mais pas en stock",
     "shoppingListHint": "Cultures annuelles de vos planches sans semences ni plants en stock. Les vivaces comme le romarin ou les petits fruits n’y figurent pas.",
     "addFor": "Ajouter {{name}}",
     "emptyTitle": "Aucune semence ajoutée",
@@ -2111,7 +2117,10 @@
     "staleHint_one": "{{count}} analyse date de plus de 5 mois – à refaire au printemps.",
     "staleHint_other": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps.",
     "staleHint_many": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps.",
-    "nutrientsPpm": "Nutriments (ppm)"
+    "nutrientsPpm": "Nutriments (ppm)",
+    "staleHintPlanned_one": "{{count}} analyse date de plus de 5 mois – la prochaine est prévue le {{date}}.",
+    "staleHintPlanned_other": "{{count}} analyses datent de plus de 5 mois – la prochaine est prévue le {{date}}.",
+    "staleHintPlanned_many": "{{count}} analyses datent de plus de 5 mois – la prochaine est prévue le {{date}}."
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -2286,16 +2295,14 @@
     "howAnimals": "Animaux {{total}} : {{expenses}} saisis en dépenses, {{log}} issus du carnet d’alimentation et du suivi santé. Une facture saisie aux deux endroits (même montant, au plus 3 jours d’écart) compte une fois.",
     "duplicatesSkipped_one": "{{count}} doublon n’a pas été compté.",
     "duplicatesSkipped_other": "{{count}} doublons n’ont pas été comptés.",
-    "fromFeedLog": "dont {{amount}} seulement dans le carnet d’alimentation",
-    "fromHealthLog": "{{amount}} saisis sous santé",
+    "fromFeedLog": "dont {{amount}} du carnet d’alimentation",
+    "fromHealthLog": "dont {{amount}} de santé",
     "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés.",
-    "fromFeedBook": "du carnet d’alimentation",
-    "fromHealthBook": "de santé",
     "openFeedBook": "Ouvrir dans le carnet d’alimentation",
     "openHealthBook": "Ouvrir dans la santé",
     "notesPlaceholder": "p. ex. magasin, numéro de facture…",
-    "alsoInFeedBook": "aussi dans le carnet d’alimentation",
-    "alsoInHealthBook": "aussi sous santé"
+    "sourceFeed": "Alimentation",
+    "sourceHealth": "Santé"
   },
   "succession": {
     "pick": "Choisir une culture",
@@ -2561,7 +2568,6 @@
     "beds_many": "{{count}} planches",
     "plantings_many": "{{count}} plantations",
     "noLinkSubtitle": "Reprendre des plans de jardin depuis un lien de partage.",
-    "noLinkTitle": "Reprendre un jardin depuis un lien",
     "noLinkText": "Quelqu’un a partagé un plan de jardin avec vous ? Collez le lien ici ou ouvrez-le directement pour voir l’aperçu.",
     "pasteLabel": "Coller le lien de partage",
     "pastePlaceholder": "https://…#/import?t=…",
@@ -2608,7 +2614,10 @@
     "compositionLabel": "Jardin {{garden}}, produits animaux {{animals}} du besoin annuel",
     "fromGarden": "Jardin",
     "fromAnimals": "Produits animaux",
-    "surplusNote": "Excédent prévu (rendement annuel type), non compté : {{items}}.",
-    "notCovered": "Non couvert"
+    "notCovered": "Non couvert",
+    "compositionHint": "Les légumes sont peu caloriques – pommes de terre et courges augmentent le plus la part du jardin (voir leviers).",
+    "surplusNote_one": "Plus que ce que consomme une personne – non compté : {{items}}.",
+    "surplusNote_other": "Plus que ce que consomment {{count}} personnes – non compté : {{items}}.",
+    "surplusNote_many": "Plus que ce que consomment {{count}} personnes – non compté : {{items}}."
   }
 }

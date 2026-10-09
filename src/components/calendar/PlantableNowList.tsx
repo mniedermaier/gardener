@@ -59,35 +59,32 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
   /**
-   * Always two short parts: the date and the beds. One date for all beds:
-   * "bis 17. Okt. · Hochbeet Süd". Dates that differ per bed (glass closes
-   * later): the outer date with the qualifier, "bis 15. Nov. (je nach Beet) · 4 Beete"
-   * — the last chance for "now", the first for "soon".
+   * One date for all beds: "bis 17. Okt. · Hochbeet Süd". Dates that differ
+   * per bed (glass closes later): one part per bed group, each with its own
+   * date — "Gewächshaus bis 15. Nov. · Hochbeet Süd, Acker bis 17. Okt." — the
+   * same dates the planner palette shows for each bed.
    */
   const meta = (item: AgendaPlantRow, afterFrost: boolean): string[] => {
     const key = item.kind === "now" ? "until" : "from";
-    const groups = groupAgendaBedsByDate(item);
+    // Latest first for "now" (the last chance leads), earliest first for "soon".
+    const groups = [...groupAgendaBedsByDate(item)].sort((x, y) => (key === "until" ? y.date.getTime() - x.date.getTime() : x.date.getTime() - y.date.getTime()));
     const allBeds = groups.flatMap((g) => g.beds);
-    // Two parts, glossary style: the date, then the beds. When beds differ, the
-    // bed that sets the date leads ("bis 15. Nov. · Gewächshaus +3"), so the
-    // row never names one bed and "4 Beete" at once.
-    const bedsWith = (setter?: string) => {
-      if (!setter || allBeds.length < 2) return bedLabel(allBeds);
-      return t("calendar.bedPlus", { bed: setter, more: allBeds.length - 1 });
-    };
-    if (afterFrost && lastFrostNight) {
-      // Only the days between the last frost night and the window's end count.
-      const end = windowEnd(item);
-      const setter = groups.length > 1 ? groups.find((g) => g.date.getTime() === end.getTime())?.beds[0]?.name : undefined;
-      return [t("calendar.afterFrostWindow", { range: formatDateRange(addDays(lastFrostNight, 1), end) }), bedsWith(setter)].filter((x): x is string => !!x);
+    const after = afterFrost && lastFrostNight ? addDays(lastFrostNight, 1) : null;
+    if (groups.length <= 1) {
+      const when = after
+        ? t("calendar.afterFrostWindow", { range: formatDateRange(after, windowEnd(item)) })
+        : t(`calendar.${key}`, { date: formatDate(groups[0]?.date ?? new Date(), "short") });
+      return [when, bedLabel(allBeds)].filter((x): x is string => !!x);
     }
-    if (groups.length === 1) {
-      return [t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") }), bedLabel(allBeds)].filter((x): x is string => !!x);
-    }
-    const dates = groups.map((g) => g.date.getTime());
-    const outer = key === "until" ? Math.max(...dates) : Math.min(...dates);
-    const setter = groups.find((g) => g.date.getTime() === outer)?.beds[0]?.name;
-    return [t(`calendar.${key}`, { date: formatDate(new Date(outer), "short") }), bedsWith(setter)].filter((x): x is string => !!x);
+    // At most two groups keep the row short: the outer date and the other end.
+    const shownGroups = groups.length > 2 ? [groups[0], groups[groups.length - 1]] : groups;
+    const parts = shownGroups.map((g) => {
+      const beds = bedLabel(g.beds) ?? "";
+      return after
+        ? t("calendar.bedRange", { beds, range: formatDateRange(after, g.date) })
+        : t(`calendar.bed${key === "until" ? "Until" : "From"}`, { beds, date: formatDate(g.date, "short") });
+    });
+    return after ? [t("calendar.afterFrostShort"), ...parts] : parts;
   };
 
   const items = useVisibleAgendaRows(now, soon);

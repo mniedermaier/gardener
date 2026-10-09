@@ -30,6 +30,12 @@ export interface MonthlyFood {
   storedKg: number;
   totalKg: number;
   calories: number;
+  /**
+   * Calories of a typical year: fresh produce plus the simulated preserved
+   * surplus, without today's real pantry stock — the basis of the annual
+   * forecast, so the month strip averages to the headline figure.
+   */
+  typicalCalories: number;
   caloriesNeeded: number;
   coveragePercent: number;
 }
@@ -391,6 +397,7 @@ export function calculateSufficiency(
       storedKg: Math.round(storedKg[month] * 10) / 10,
       totalKg: Math.round((Math.max(0, monthlyKg[month]) + animalKg[month] + storedKg[month]) * 10) / 10,
       calories: Math.round(freshCal + storedCal),
+      typicalCalories: Math.round(freshCal + simulatedStoredCal[month]),
       caloriesNeeded: Math.round(monthlyCalNeed),
       coveragePercent: Math.min(100, Math.round(((freshCal + storedCal) / monthlyCalNeed) * 100)),
     };

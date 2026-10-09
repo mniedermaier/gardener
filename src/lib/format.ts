@@ -47,7 +47,7 @@ function noNegativeZero(value: number, maximumFractionDigits: number): number {
  * - weekday:   "Sa."                                     — weather strips
  * - weekdayDate: "Mo., 12. Okt."                          — the coming week (one format per group)
  */
-export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday" | "weekdayDate" | "dayMonth" | "date";
+export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday" | "weekdayDate" | "dayMonth" | "date" | "monthYearShort";
 
 export interface FormatOptions {
   locale?: string;
@@ -97,6 +97,9 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
     case "dayMonth":
       // A date that recurs every year (last frost): "15. Mai", no weekday or year.
       return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(d));
+    case "monthYearShort":
+      // Compact "since" dates in card subtitles: "Dez. 2025".
+      return nonBreaking(new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(d));
     case "monthYear":
       return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(d);
     case "month":

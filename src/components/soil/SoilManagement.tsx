@@ -70,6 +70,7 @@ const staleTest = (date: string) => {
 };
 
 export function SoilManagement() {
+  const soilTasks = useStore(useShallow((st) => st.tasks.filter((tk) => tk.type === "soil_test")));
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -203,6 +204,7 @@ export function SoilManagement() {
   const tab = blocked ? "tests" : tabState;
   const toPlanner = <Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>;
 
+  const plannedTest = soilTasks.filter((tk) => !tk.completedDate).map((tk) => tk.dueDate.slice(0, 10)).sort()[0];
   return (
     <div>
       <PageHeader
@@ -253,7 +255,10 @@ export function SoilManagement() {
               // Old tests are said once for the page, not as a badge on every card.
               <p className="flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
                 <CalendarClock size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
-                {t("soil.staleHint", { count: sortedTests.filter((s) => staleTest(s.date)).length })}
+                {/* An open soil-test task already answers "neu beproben": name its date instead of "im Frühjahr". */}
+                {plannedTest
+                  ? t("soil.staleHintPlanned", { count: sortedTests.filter((s) => staleTest(s.date)).length, date: formatDate(plannedTest, "short") })
+                  : t("soil.staleHint", { count: sortedTests.filter((s) => staleTest(s.date)).length })}
               </p>
             )}
             {sortedTests.map((s) => {
