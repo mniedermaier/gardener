@@ -2519,7 +2519,7 @@
     "almostFull": "Stockage rempli à {{percent}} %. Exportez une sauvegarde et supprimez d'anciennes entrées."
   },
   "quickAdd": {
-    "title": "Saisie rapide",
+    "title": "Nouveau",
     "harvest": "Noter une récolte",
     "task": "Ajouter une tâche",
     "journal": "Noter une entrée au journal",

@@ -2404,7 +2404,7 @@
     "almostFull": "Storage is {{percent}}% full. Export a backup and remove old entries to free space."
   },
   "quickAdd": {
-    "title": "Quick add",
+    "title": "New",
     "harvest": "Log harvest",
     "task": "Add task",
     "journal": "Log journal entry",

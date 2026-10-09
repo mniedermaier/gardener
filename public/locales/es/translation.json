@@ -2519,7 +2519,7 @@
     "almostFull": "Almacenamiento al {{percent}} %. Exporta una copia y elimina entradas antiguas."
   },
   "quickAdd": {
-    "title": "Añadir rápido",
+    "title": "Nuevo",
     "harvest": "Registrar cosecha",
     "task": "Añadir tarea",
     "journal": "Registrar entrada en el diario",

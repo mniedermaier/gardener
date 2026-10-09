@@ -2404,7 +2404,7 @@
     "almostFull": "Speicher zu {{percent}} % belegt. Ein Backup und das Aufräumen alter Einträge schaffen Platz."
   },
   "quickAdd": {
-    "title": "Schnell erfassen",
+    "title": "Neu",
     "harvest": "Ernte erfassen",
     "task": "Aufgabe hinzufügen",
     "journal": "Tagebucheintrag erfassen",

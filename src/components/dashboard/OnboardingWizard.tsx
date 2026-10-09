@@ -118,8 +118,8 @@ function FrostPreview({ frost }: { frost: string }) {
   const base = toDate(frost);
   if (!base) return null;
   const rows = [
-    { id: "lettuce", key: "onboarding.previewSowIndoors", weeks: -6 },
-    { id: "tomato", key: "onboarding.previewTransplant", weeks: 2 },
+    { id: "lettuce", key: "onboarding.previewTransplant", weeks: -2 },
+    { id: "tomato", key: "onboarding.previewSowIndoors", weeks: -8 },
     { id: "bean", key: "onboarding.previewSowOutdoors", weeks: 2 },
   ];
   return (
