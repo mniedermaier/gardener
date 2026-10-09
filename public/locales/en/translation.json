@@ -775,11 +775,11 @@
       "namePlaceholder": "e.g. Ginger",
       "daysAfterSowing": "Both counted from sowing.",
       "family": "Plant family",
-      "familyUnknown": "Choose a family…",
+      "familyUnknown": "Choose…",
       "sowMode": "Sowing",
       "sowDirect": "Direct in the bed",
       "sowIndoors": "Start indoors",
-      "sowWhen": "Sow from",
+      "sowWhen": "Timing",
       "indoorsWhen": "Start indoors",
       "transplantWhen": "Plant out",
       "atFrost": "At the last frost",
@@ -2424,7 +2424,6 @@
     "plantedNow": "In your beds",
     "allPlants": "All plants",
     "tomorrow": "Tomorrow",
-    "inAWeek": "+1 week",
     "otherDateShort": "Date…"
   },
   "importPage": {

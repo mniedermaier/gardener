@@ -425,13 +425,13 @@ export function GardenJournal() {
           <Input label={t("journal.entryTitle")} optional value={draft.title} onChange={(e) => patch({ title: e.target.value })} placeholder={t("journal.titlePlaceholder")} autoFocus />
           {/* The observation is the record (required unless a title is given). */}
           <Textarea label={t("journal.bodyLabel")} value={draft.text} onChange={(e) => patch({ text: e.target.value })} rows={4} placeholder={t("journal.text")} error={contentError} />
-          {/* Tags right after the text: always visible, never pushed under the footer by photos or links. */}
+          {/* Datum right under the observation (when it happened), then tags. */}
+          <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <div>
             <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} hint={t("journal.tagsHint")} />
             {suggestedTags.length > 0 && (
-              // Label on its own line, at most the four most used chips (one row on a phone): Datum and Fotos stay in view.
-              <div className="mt-2">
-                <span className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">{t("journal.suggestedTags")}</span>
+              // At most the four most used chips (one row on a phone); the "+ #tag" chips explain themselves.
+              <div className="mt-2" role="group" aria-label={t("journal.suggestedTags")}>
                 <div className="flex flex-wrap gap-1.5">
                 {suggestedTags.slice(0, 4).map((tag) => (
                   <button
@@ -447,7 +447,6 @@ export function GardenJournal() {
               </div>
             )}
           </div>
-          <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
           {/* Photos */}
           <div>
             <p className={LABEL_CLASS}>{t("journal.photos")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>

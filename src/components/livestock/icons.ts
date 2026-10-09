@@ -1,16 +1,18 @@
-import { Bandage, Beef, Bird, ClipboardList, Egg, Flame, HeartCrack, Hexagon, Milk, PawPrint, Pill, Rabbit, Spool, Stethoscope, Syringe, Thermometer, Worm, type LucideIcon } from "lucide-react";
+import { Bandage, Beef, Bird, ClipboardList, Egg, Feather, Flame, HeartCrack, Hexagon, Milk, Pill, Rabbit, Spool, Stethoscope, Syringe, Thermometer, Worm, type LucideIcon } from "lucide-react";
 import type { AnimalType, HealthEventType, ProductType } from "@/types/animal";
 import type { Tone } from "@/components/ui/tone";
 
 /** One icon language: Lucide for animals, products and health events (no UI emoji). */
 export const ANIMAL_ICON: Record<AnimalType, LucideIcon> = {
+  // One glyph per species so the tiles can be told apart; where lucide has no
+  // animal, the species' main product stands in (quail eggs, goat milk, wool).
   chicken: Bird,
-  duck: Bird,
-  quail: Bird,
+  duck: Feather,
+  quail: Egg,
   rabbit: Rabbit,
   bee: Hexagon,
-  goat: PawPrint,
-  sheep: PawPrint,
+  goat: Milk,
+  sheep: Spool,
 };
 
 export const PRODUCT_ICON: Record<ProductType, LucideIcon> = {

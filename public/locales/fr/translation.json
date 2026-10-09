@@ -795,11 +795,11 @@
       "namePlaceholder": "p. ex. gingembre",
       "daysAfterSowing": "Les deux comptés à partir du semis.",
       "family": "Famille botanique",
-      "familyUnknown": "Choisir une famille…",
+      "familyUnknown": "Choisir…",
       "sowMode": "Semis",
       "sowDirect": "Direct en pleine terre",
       "sowIndoors": "À l’abri",
-      "sowWhen": "Semer dès",
+      "sowWhen": "Moment",
       "indoorsWhen": "Semis à l’abri dès",
       "transplantWhen": "Repiquer",
       "atFrost": "À la dernière gelée",
@@ -2539,7 +2539,6 @@
     "plantedNow": "Dans vos planches",
     "allPlants": "Toutes les plantes",
     "tomorrow": "Demain",
-    "inAWeek": "+1 semaine",
     "otherDateShort": "Date…"
   },
   "importPage": {
