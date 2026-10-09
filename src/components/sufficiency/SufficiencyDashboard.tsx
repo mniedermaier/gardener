@@ -109,15 +109,8 @@ export function SufficiencyDashboard() {
           <EmptyState
             icon={Target}
             title={t("sufficiency.emptyTitle")}
-            description={
-              <>
-                {need && t("sufficiency.emptyNeed", { count: householdSize, kg: f.formatWeight(need.targetKg * 1000, "kg"), area: f.formatArea(need.neededAreaM2) })}{" "}
-                {t("sufficiency.emptyMissing")}{" "}
-                <button type="button" onClick={() => navigate("/foodplan")} className="inline-flex min-h-11 items-center font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
-                  {t("sufficiency.emptyFoodplanLink")}
-                </button>
-              </>
-            }
+            // Two short lines: the need in kg (the food plan tab has the details) and what is missing.
+            description={need ? t("sufficiency.emptyNeedShort", { count: householdSize, kg: f.formatWeight(need.targetKg * 1000, "kg") }) : t("sufficiency.emptyMissing")}
             // Same first step as every page without beds: "Beet hinzufügen" opens the planner's dialog.
             action={<Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
             secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock", { state: { openAdd: true } })}>{t("livestock.addAnimal")}</Button>}

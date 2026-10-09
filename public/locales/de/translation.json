@@ -1478,7 +1478,7 @@
       "animals": "Tiere",
       "preserve": "Haltbarmachen & Saatgut"
     },
-    "emptyTitle": "Dein Bedarf steht – die Deckung fehlt noch",
+    "emptyTitle": "Noch keine Deckung berechnet",
     "toPlanner": "Zum Planer",
     "toLivestock": "Tiere hinzufügen",
     "coverageDesc_one": "Prognose für ein Jahr, Bedarf von {{count}} Person.",
@@ -1511,14 +1511,13 @@
     "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Im Vorrat liegt noch nichts.",
     "harvested": "Geerntet",
     "freshForecast": "Prognose frisch",
-    "emptyNeed_one": "Eine Person braucht rund {{kg}} Gemüse und Obst im Jahr, dafür wären etwa {{area}} Beetfläche nötig.",
-    "emptyNeed_other": "{{count}} Personen brauchen rund {{kg}} Gemüse und Obst im Jahr, dafür wären etwa {{area}} Beetfläche nötig.",
     "emptyMissing": "Es fehlen noch Beete oder Tiere, um zu zeigen, wie viel davon du selbst deckst.",
-    "emptyFoodplanLink": "Bedarf im Ernährungsplan ansehen",
     "monthlyKgCaptionLogged": "Bis heute erfasst, danach Prognose (schraffiert): Ernte aus der Beetbelegung, Vorrat und Tierprodukte.",
     "monthlyCaptionTypical": "Typisches Jahr (Prognose): Kalorienabdeckung pro Monat",
     "animalLogged": "Tierprodukte erfasst",
-    "animalForecast": "Tierprodukte Prognose"
+    "animalForecast": "Tierprodukte Prognose",
+    "emptyNeedShort_one": "Eine Person braucht rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst.",
+    "emptyNeedShort_other": "{{count}} Personen brauchen rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst."
   },
   "pests": {
     "title": "Schädlinge",

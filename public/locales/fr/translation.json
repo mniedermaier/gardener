@@ -1544,7 +1544,7 @@
       "animals": "Animaux",
       "preserve": "Conserves et semences"
     },
-    "emptyTitle": "Ton besoin est connu – il manque la couverture",
+    "emptyTitle": "Pas encore de couverture calculée",
     "toPlanner": "Ouvrir le planificateur",
     "toLivestock": "Ajouter des animaux",
     "coverageDesc_one": "Prévision sur un an, besoins de {{count}} personne.",
@@ -1581,15 +1581,14 @@
     "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
     "harvested": "Récolté",
     "freshForecast": "Prévision frais",
-    "emptyNeed_one": "Une personne a besoin d’environ {{kg}} de légumes et fruits par an, soit environ {{area}} de planches.",
-    "emptyNeed_other": "{{count}} personnes ont besoin d’environ {{kg}} de légumes et fruits par an, soit environ {{area}} de planches.",
-    "emptyNeed_many": "{{count}} personnes ont besoin d’environ {{kg}} de légumes et fruits par an, soit environ {{area}} de planches.",
     "emptyMissing": "Il manque des planches ou des animaux pour montrer ce que tu couvres toi-même.",
-    "emptyFoodplanLink": "Voir le besoin dans le plan",
     "monthlyKgCaptionLogged": "Saisi jusqu’à aujourd’hui, prévision ensuite (hachuré) : récolte selon les planches, réserve et produits animaux.",
     "monthlyCaptionTypical": "Année type (prévision) : couverture calorique par mois",
     "animalLogged": "Produits animaux saisis",
-    "animalForecast": "Produits animaux prévus"
+    "animalForecast": "Produits animaux prévus",
+    "emptyNeedShort_one": "Une personne a besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
+    "emptyNeedShort_other": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
+    "emptyNeedShort_many": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même."
   },
   "pests": {
     "title": "Ravageurs",

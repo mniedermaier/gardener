@@ -1478,7 +1478,7 @@
       "animals": "Animals",
       "preserve": "Preserving & seeds"
     },
-    "emptyTitle": "Your need is known – coverage is still missing",
+    "emptyTitle": "No coverage calculated yet",
     "toPlanner": "Open planner",
     "toLivestock": "Add animals",
     "coverageDesc_one": "Forecast for one year, needs of {{count}} person.",
@@ -1511,14 +1511,13 @@
     "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). Nothing in storage yet.",
     "harvested": "Harvested",
     "freshForecast": "Fresh forecast",
-    "emptyNeed_one": "One person needs about {{kg}} of vegetables and fruit a year, which takes roughly {{area}} of beds.",
-    "emptyNeed_other": "{{count}} people need about {{kg}} of vegetables and fruit a year, which takes roughly {{area}} of beds.",
     "emptyMissing": "Add beds or animals to see how much of it you cover yourself.",
-    "emptyFoodplanLink": "See the need in the food plan",
     "monthlyKgCaptionLogged": "Logged up to today, forecast after (hatched): harvest from the current beds, stored food and animal products.",
     "monthlyCaptionTypical": "Typical year (forecast): calorie coverage per month",
     "animalLogged": "Animal products logged",
-    "animalForecast": "Animal products forecast"
+    "animalForecast": "Animal products forecast",
+    "emptyNeedShort_one": "One person needs about {{kg}} a year. Add beds or animals to see how much of it you cover yourself.",
+    "emptyNeedShort_other": "{{count}} people need about {{kg}} a year. Add beds or animals to see how much of it you cover yourself."
   },
   "pests": {
     "title": "Pests",

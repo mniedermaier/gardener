@@ -1544,7 +1544,7 @@
       "animals": "Animales",
       "preserve": "Conservas y semillas"
     },
-    "emptyTitle": "Tu necesidad está calculada; falta la cobertura",
+    "emptyTitle": "Aún no hay cobertura calculada",
     "toPlanner": "Ir al planificador",
     "toLivestock": "Añadir animales",
     "coverageDesc_one": "Previsión para un año, necesidad de {{count}} persona.",
@@ -1581,15 +1581,14 @@
     "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
     "harvested": "Cosechado",
     "freshForecast": "Previsión fresco",
-    "emptyNeed_one": "Una persona necesita unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
-    "emptyNeed_other": "{{count}} personas necesitan unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
-    "emptyNeed_many": "{{count}} personas necesitan unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
     "emptyMissing": "Faltan bancales o animales para mostrar cuánto cubres tú.",
-    "emptyFoodplanLink": "Ver la necesidad en el plan",
     "monthlyKgCaptionLogged": "Registrado hasta hoy, después previsión (rayado): cosecha según los bancales, despensa y productos animales.",
     "monthlyCaptionTypical": "Año típico (previsión): cobertura calórica por mes",
     "animalLogged": "Productos animales registrados",
-    "animalForecast": "Productos animales previstos"
+    "animalForecast": "Productos animales previstos",
+    "emptyNeedShort_one": "Una persona necesita unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
+    "emptyNeedShort_other": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
+    "emptyNeedShort_many": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú."
   },
   "pests": {
     "title": "Plagas",
