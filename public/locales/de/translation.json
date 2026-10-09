@@ -121,7 +121,7 @@
         "journal": "Tagebuch"
       },
       "logHarvestFor": "{{name}} · Ernte erfassen",
-      "plantInBed": "{{plant}} im Beet {{bed}}",
+      "plantInBed": "{{plant}} · {{cells}}",
       "cellCount_one": "{{count}} Feld",
       "cellCount_other": "{{count}} Felder"
     },
@@ -913,7 +913,7 @@
   },
   "calendar": {
     "subtitle": "Was im Garten ansteht – nach Fälligkeit sortiert.",
-    "pageSubtitle": "Saisonübersicht deiner Beete und Staffelaussaaten.",
+    "pageSubtitle": "Was in deinen Beeten jetzt und als Nächstes ansteht.",
     "toTasks": "Zu den Aufgaben",
     "generatedTitle": "{{action}}: {{plant}}",
     "generateHint": "Erstellt Aussaat- und Pflanztermine aus der Beetbelegung. Eigene und erledigte Aufgaben bleiben erhalten.",
@@ -961,7 +961,7 @@
     "overdueCount_one": "{{count}} überfällig",
     "overdueCount_other": "{{count}} überfällig",
     "timeline": "Saisonübersicht {{year}}",
-    "timelineDesc": "Aussaat-, Pflanz- und Erntefenster je Beet, berechnet ab dem letzten Frost ({{date}}).",
+    "timelineDesc": "Aussaat-, Pflanz- und Erntefenster je Beet – nach deinen Pflanzterminen, sonst ab dem letzten Frost ({{date}}).",
     "bedFilter": "Beet",
     "allBeds": "Alle Beete",
     "today": "Heute",
@@ -1883,7 +1883,7 @@
     "edit": "Saatgut bearbeiten",
     "testRecommended": "Keimprobe empfohlen",
     "testHintShort": "Ältere Samen vor der Aussaat testen",
-    "testExplain": "Meist {{years}} keimfähig. Probe: 10 Samen auf feuchtes Papier – keimen weniger als 7, dichter säen.",
+    "testExplain": "Meist {{years}} keimfähig – vor dem Säen eine Keimprobe machen.",
     "years_one": "{{count}} Jahr",
     "years_other": "{{count}} Jahre",
     "plantingStock": "Pflanzgut",
@@ -2323,7 +2323,9 @@
     "costHint": "Fließt in die Bilanz unter Kosten ein.",
     "more": "Mehr",
     "optionalWord": "optional",
-    "stillMissing": "Noch offen: {{fields}}"
+    "stillMissing": "Noch offen: {{fields}}",
+    "stillMissingCount_one": "Noch {{count}} Angabe offen",
+    "stillMissingCount_other": "Noch {{count}} Angaben offen"
   },
   "companions": {
     "title": "Pflanzpartner",
@@ -2360,7 +2362,9 @@
     "quickPick": "Häufige Kulturen",
     "quickInGarden": "Im Garten",
     "quickCommon": "Häufig",
-    "sameBed": "Im selben Beet"
+    "sameBed": "Im selben Beet",
+    "exampleHint": "Beispiel – wähle deine Pflanze.",
+    "sameFamilyReason": "Gleiche Familie – teilen Krankheiten"
   },
   "water": {
     "title": "Bewässerung",

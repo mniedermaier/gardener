@@ -37,6 +37,8 @@ interface PlantTimeline {
   phases: Partial<Record<Phase, Range>>;
   /** Autumn sowing/planting windows, drawn in the lane of their phase. */
   autumn: Array<{ phase: Phase; range: Range }>;
+  /** A phase that already happened (real planting date): drawn, never "due". */
+  done?: Phase;
 }
 
 /** Rows of "Jetzt dran" before "n weitere anzeigen" — the same cap as the sowing list. */
@@ -98,6 +100,7 @@ export function SeasonTimeline() {
           const plantedDates = bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!);
           let autumn = autumnPhaseWindows(plantId, year, protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
           const times = plantedDates.flatMap((d) => toDate(d)?.getTime() ?? []);
+          let done: Phase | undefined;
           if (times.length > 0) {
             const first = new Date(Math.min(...times));
             // Sown in place unless the crop is planted out (or has no sowing at all, like garlic cloves).
@@ -106,12 +109,13 @@ export function SeasonTimeline() {
             if (phases.sowIndoors && phases.sowIndoors.end > first) delete phases.sowIndoors;
             if (phase === "sowOutdoors") delete phases.sowIndoors;
             phases[phase] = { start: first, end: addDays(new Date(Math.max(...times)), 7) };
+            done = phase;
             delete phases.harvest;
             const planted = plantedHarvestWindow(plant, plantedDates, { lastFrostDate, now: today, protectionWeeks: protection });
             if (planted) phases.harvest = planted;
             autumn = [];
           }
-          result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn });
+          result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn, done });
         }
       }
     }
@@ -126,7 +130,8 @@ export function SeasonTimeline() {
     for (const tl of timelines) {
       for (const phase of PHASES) {
         const range = tl.phases[phase];
-        if (!range) continue;
+        // A planting that already happened is history, not something to do.
+        if (!range || phase === tl.done) continue;
         // A harvest stays "now" three weeks past its window, as on "Heute" (getHarvestReady).
         const openUntil = phase === "harvest" ? addDays(range.end, HARVEST_GRACE_DAYS) : range.end;
         if (range.start <= today && openUntil >= today) now.push({ tl, phase, range });
@@ -141,6 +146,7 @@ export function SeasonTimeline() {
       for (const tl of timelines) {
         for (const phase of PHASES) {
           const r = tl.phases[phase];
+          if (phase === tl.done) continue;
           if (!r || r.start <= today) {
             if (r && r.end < today) later.push({ tl, phase, range: { start: addYears(r.start, 1), end: addYears(r.end, 1) } });
             continue;
@@ -316,10 +322,13 @@ export function SeasonTimeline() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-600 dark:text-gray-300">
           <PhaseLegend phases={PHASES} />
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-1.5 w-4 rounded-sm bg-garden-600 opacity-35 dark:bg-garden-400" aria-hidden="true" />
-            {t("calendar.autumnPossibleLegend")}
-          </span>
+          {/* Only when such a bar is drawn. */}
+          {timelines.some((tl) => tl.autumn.length > 0) && (
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-4 rounded-sm bg-garden-600 opacity-35 dark:bg-garden-400" aria-hidden="true" />
+              {t("calendar.autumnPossibleLegend")}
+            </span>
+          )}
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-0.5 bg-garden-600 dark:bg-garden-400" aria-hidden="true" />
             {t("calendar.today")}

@@ -164,7 +164,8 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           )}
           {!valid && missing.length > 0 && (
             <p className={`min-w-0 basis-full text-xs text-gray-500 sm:basis-0 sm:flex-1 dark:text-gray-400 ${plant ? "" : "mr-auto"}`}>
-              {t("common.stillMissing", { fields: missing.join(", ") })}
+              {/* Names only when few are left; a fresh form gets a count, so the line stays short. */}
+              {missing.length > 3 ? t("common.stillMissingCount", { count: missing.length }) : t("common.stillMissing", { fields: missing.join(", ") })}
             </p>
           )}
           <Button variant="secondary" onClick={onClose}>{t("common.cancel")}</Button>

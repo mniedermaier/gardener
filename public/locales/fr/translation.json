@@ -121,7 +121,7 @@
         "journal": "Journal"
       },
       "logHarvestFor": "{{name}} · Noter une récolte",
-      "plantInBed": "{{plant}} dans la planche {{bed}}",
+      "plantInBed": "{{plant}} · {{cells}}",
       "cellCount_one": "{{count}} case",
       "cellCount_many": "{{count}} cases",
       "cellCount_other": "{{count}} cases"
@@ -940,7 +940,7 @@
   },
   "calendar": {
     "subtitle": "Ce qui est à faire au jardin, trié par échéance.",
-    "pageSubtitle": "Vue de saison de vos planches et semis échelonnés.",
+    "pageSubtitle": "Ce qui est à faire dans vos planches maintenant et ensuite.",
     "toTasks": "Voir les tâches",
     "generatedTitle": "{{action}} : {{plant}}",
     "generateHint": "Crée les dates de semis et de plantation à partir de vos planches. Les tâches personnelles et terminées sont conservées.",
@@ -990,7 +990,7 @@
     "overdueCount_many": "{{count}} en retard",
     "overdueCount_other": "{{count}} en retard",
     "timeline": "Vue de saison {{year}}",
-    "timelineDesc": "Fenêtres de semis, plantation et récolte par planche, à partir des dernières gelées ({{date}}).",
+    "timelineDesc": "Fenêtres de semis, plantation et récolte par planche – selon vos dates de plantation, sinon à partir des dernières gelées ({{date}}).",
     "bedFilter": "Planche",
     "allBeds": "Toutes les planches",
     "today": "Aujourd'hui",
@@ -2433,7 +2433,10 @@
     "costHint": "Compte dans le bilan sous Coûts.",
     "more": "Plus",
     "optionalWord": "facultatif",
-    "stillMissing": "Reste à remplir : {{fields}}"
+    "stillMissing": "Reste à remplir : {{fields}}",
+    "stillMissingCount_one": "Encore {{count}} champ à remplir",
+    "stillMissingCount_many": "Encore {{count}} champs à remplir",
+    "stillMissingCount_other": "Encore {{count}} champs à remplir"
   },
   "companions": {
     "title": "Associations",
@@ -2473,7 +2476,9 @@
     "quickPick": "Cultures courantes",
     "quickInGarden": "Au jardin",
     "quickCommon": "Courantes",
-    "sameBed": "Même planche"
+    "sameBed": "Même planche",
+    "exampleHint": "Un exemple – choisissez votre plante.",
+    "sameFamilyReason": "Même famille – partagent les maladies"
   },
   "water": {
     "title": "Arrosage",

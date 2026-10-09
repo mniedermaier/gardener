@@ -121,7 +121,7 @@
         "journal": "Diario"
       },
       "logHarvestFor": "{{name}} · Registrar cosecha",
-      "plantInBed": "{{plant}} en el bancal {{bed}}",
+      "plantInBed": "{{plant}} · {{cells}}",
       "cellCount_one": "{{count}} casilla",
       "cellCount_many": "{{count}} casillas",
       "cellCount_other": "{{count}} casillas"
@@ -940,7 +940,7 @@
   },
   "calendar": {
     "subtitle": "Lo que toca en el huerto, ordenado por fecha.",
-    "pageSubtitle": "Resumen de temporada de tus bancales y siembras escalonadas.",
+    "pageSubtitle": "Lo que toca en tus bancales ahora y a continuación.",
     "toTasks": "Ir a tareas",
     "generatedTitle": "{{action}}: {{plant}}",
     "generateHint": "Crea fechas de siembra y trasplante a partir de tus bancales. Las tareas propias y completadas se conservan.",
@@ -990,7 +990,7 @@
     "overdueCount_many": "{{count}} atrasadas",
     "overdueCount_other": "{{count}} atrasadas",
     "timeline": "Resumen de temporada {{year}}",
-    "timelineDesc": "Ventanas de siembra, trasplante y cosecha por bancal, desde la última helada ({{date}}).",
+    "timelineDesc": "Ventanas de siembra, trasplante y cosecha por bancal: según tus fechas de plantación o, si no, desde la última helada ({{date}}).",
     "bedFilter": "Bancal",
     "allBeds": "Todos los bancales",
     "today": "Hoy",
@@ -2433,7 +2433,10 @@
     "costHint": "Cuenta en el balance de Costes.",
     "more": "Más",
     "optionalWord": "opcional",
-    "stillMissing": "Falta: {{fields}}"
+    "stillMissing": "Falta: {{fields}}",
+    "stillMissingCount_one": "Falta {{count}} dato",
+    "stillMissingCount_many": "Faltan {{count}} datos",
+    "stillMissingCount_other": "Faltan {{count}} datos"
   },
   "companions": {
     "title": "Asociaciones",
@@ -2473,7 +2476,9 @@
     "quickPick": "Cultivos habituales",
     "quickInGarden": "En tu huerto",
     "quickCommon": "Habituales",
-    "sameBed": "Mismo bancal"
+    "sameBed": "Mismo bancal",
+    "exampleHint": "Un ejemplo: elige tu planta.",
+    "sameFamilyReason": "Misma familia: comparten enfermedades"
   },
   "water": {
     "title": "Riego",

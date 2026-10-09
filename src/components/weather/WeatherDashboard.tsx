@@ -56,15 +56,14 @@ function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost
   if (group.type === "frost") {
     // Same sentence as on "Heute" (one source: summarizeFrost).
     title = frost?.title ?? "";
-    // Every night of the headline in date order: frost nights (≤ 0 °C) in the
-    // frost tone with a snowflake, as in "Nächste Tage"; nights only at risk
-    // stay neutral, so "2 weitere mit Frostgefahr" has a visible anchor.
+    // Every night of the headline in date order, in the same tones as
+    // "Nächste Tage": frost (≤ 0 °C) info, frost risk neutral, both with a snowflake.
     const nights = group.alerts.map((a) => ({ a, temp: Number(a.titleParams?.temp ?? 0) }));
     body = (
       <>
         <span className="flex flex-wrap gap-1.5">
           {nights.map(({ a, temp }) => (
-            <Badge key={a.id} variant={temp > 0 ? "outline" : "soft"} tone={temp > 0 ? "neutral" : "info"} icon={temp > 0 ? undefined : Snowflake} size="sm" className="tabular-nums">
+            <Badge key={a.id} tone={frostTone(temp)} icon={Snowflake} size="sm" className="tabular-nums">
               {dayLabel(a.date ?? "")} {f.formatTemperature(temp)}
             </Badge>
           ))}

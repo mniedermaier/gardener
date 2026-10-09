@@ -294,8 +294,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <ShieldCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
+              {/* A separate meta note (not a fourth benefit), on the list's icon column. */}
+              <p className="mt-5 flex items-start gap-3 border-t border-gray-100 pt-4 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
+                <ShieldCheck size={18} aria-hidden="true" className="shrink-0 text-gray-400" />
                 {t("onboarding.locationPrivate")}
               </p>
             </>

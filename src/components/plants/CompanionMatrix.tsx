@@ -16,6 +16,7 @@ import { List, ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlants } from "@/hooks/usePlants";
 import type { Plant } from "@/types/plant";
+import { familyOf } from "@/data/plantFamilies";
 
 type Relation = "good" | "bad" | null;
 type View = "matrix" | "plant";
@@ -255,7 +256,9 @@ const DEFAULT_PLANT = "tomato";
 /** Quick picks above the full list: the crops people look up most. */
 const QUICK_PICKS = ["tomato", "potato", "carrot", "lettuce", "bean", "zucchini"];
 
-function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPlant }: {
+function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPlant, isExample }: {
+  /** Nothing picked yet: the default plant is shown as an example. */
+  isExample?: boolean;
   plants: Plant[];
   names: Map<string, string>;
   /** Bed names per planted crop: partners already in the garden say where. */
@@ -315,9 +318,10 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
             key={p.id}
             leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={26} />}
             title={names.get(p.id)}
-            // The meta slot always means the category; garden context (with its beds) is the badge.
+            // The meta slot gives the category, or for a bad neighbour of the same
+            // family the reason; garden context (with its beds) is the badge.
             badges={gardenBadge(p.id, kind)}
-            meta={[t(`plants.category.${p.category}`)]}
+            meta={[kind === "bad" && familyOf(p.id, p) === familyOf(selected.id, selected) ? t("companions.sameFamilyReason") : t(`plants.category.${p.category}`)]}
             onClick={() => onSelect(p.id)}
           />
         ))
@@ -333,6 +337,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
           <Select
             wrapperClassName="min-w-0 flex-1"
             label={t("companions.choosePlant")}
+            hint={isExample ? t("companions.exampleHint") : undefined}
             value={selected.id}
             onChange={(e) => onSelect(e.target.value)}
             options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
@@ -507,6 +512,7 @@ export function CompanionMatrix() {
           relation={relation}
           // Tomato, not the alphabetical first (Aubergine): the crop most people look up first.
           selectedId={focusId ?? (names.has(DEFAULT_PLANT) ? DEFAULT_PLANT : sorted[0]?.id ?? "")}
+          isExample={!focusId}
           onSelect={(id) => { setFocus(id); document.querySelector("main")?.scrollTo({ top: 0 }); }}
           bedsByPlant={bedsByPlant}
         />

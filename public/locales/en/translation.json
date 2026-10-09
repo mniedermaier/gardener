@@ -121,7 +121,7 @@
         "journal": "Journal"
       },
       "logHarvestFor": "{{name}} · Log harvest",
-      "plantInBed": "{{plant}} in bed {{bed}}",
+      "plantInBed": "{{plant}} · {{cells}}",
       "cellCount_one": "{{count}} cell",
       "cellCount_other": "{{count}} cells"
     },
@@ -913,7 +913,7 @@
   },
   "calendar": {
     "subtitle": "What's coming up in the garden, sorted by due date.",
-    "pageSubtitle": "Season overview of your beds and succession sowings.",
+    "pageSubtitle": "What is due in your beds now and next.",
     "toTasks": "Go to tasks",
     "generatedTitle": "{{action}}: {{plant}}",
     "generateHint": "Creates sowing and planting dates from your bed plan. Custom and completed tasks are kept.",
@@ -961,7 +961,7 @@
     "overdueCount_one": "{{count}} overdue",
     "overdueCount_other": "{{count}} overdue",
     "timeline": "Season overview {{year}}",
-    "timelineDesc": "Sowing, planting and harvest windows per bed, counted from the last frost ({{date}}).",
+    "timelineDesc": "Sowing, planting and harvest windows per bed – from your planting dates, otherwise from the last frost ({{date}}).",
     "bedFilter": "Bed",
     "allBeds": "All beds",
     "today": "Today",
@@ -2323,7 +2323,9 @@
     "costHint": "Counts towards the balance under Costs.",
     "more": "More",
     "optionalWord": "optional",
-    "stillMissing": "Still needed: {{fields}}"
+    "stillMissing": "Still needed: {{fields}}",
+    "stillMissingCount_one": "{{count}} field still needed",
+    "stillMissingCount_other": "{{count}} fields still needed"
   },
   "companions": {
     "title": "Companions",
@@ -2360,7 +2362,9 @@
     "quickPick": "Common crops",
     "quickInGarden": "In your garden",
     "quickCommon": "Common",
-    "sameBed": "Same bed"
+    "sameBed": "Same bed",
+    "exampleHint": "An example – pick your plant.",
+    "sameFamilyReason": "Same family – share diseases"
   },
   "water": {
     "title": "Watering",

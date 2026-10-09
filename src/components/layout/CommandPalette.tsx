@@ -208,9 +208,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             for (const b of g.beds) {
               const count = b.cells.filter((c) => c.plantId === p.id).length;
               if (!count || !cap("beds")) continue;
+              const cells = t("shell.command.cellCount", { count });
               out.push({
-                id: `bedplant:${b.id}:${p.id}`, group: "beds", label: t("shell.command.plantInBed", { plant: name, bed: b.name }),
-                hint: t("shell.command.cellCount", { count }), icon: LayoutGrid,
+                id: `bedplant:${b.id}:${p.id}`, group: "beds", // The bed leads (free text, never glued into a sentence, DS §14);
+                // the plant and its cell count are the hint.
+                label: b.name,
+                hint: t("shell.command.plantInBed", { plant: name, cells }), icon: LayoutGrid,
                 run: () => { setActiveGarden(g.id); go(`/planner?bed=${encodeURIComponent(b.id)}`); },
               });
             }
