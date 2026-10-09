@@ -863,7 +863,7 @@
       "stockEmpty": "{{plant}} aún no está en ningún bancal y no hay cosechas ni semillas.",
       "sameBedConflict": "Mismo bancal · {{plants}}"
     },
-    "sowNowFilter": "Sembrar ahora",
+    "sowNowFilter": "Sembrar y plantar ahora",
     "waterCaption": "Agua: {{level}}",
     "spacingCaption": "Marco {{value}}"
   },

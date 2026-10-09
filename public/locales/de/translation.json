@@ -837,7 +837,7 @@
       "stockEmpty": "{{plant}} steht noch in keinem Beet, Ernten und Saatgut fehlen noch.",
       "sameBedConflict": "Im selben Beet · {{plants}}"
     },
-    "sowNowFilter": "Jetzt säen",
+    "sowNowFilter": "Jetzt säen & pflanzen",
     "waterCaption": "Wasser: {{level}}",
     "spacingCaption": "Abstand {{value}}"
   },

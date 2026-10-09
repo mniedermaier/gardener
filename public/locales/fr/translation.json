@@ -863,7 +863,7 @@
       "stockEmpty": "{{plant}} n’est encore dans aucune planche, sans récolte ni semences.",
       "sameBedConflict": "Même planche · {{plants}}"
     },
-    "sowNowFilter": "À semer",
+    "sowNowFilter": "Semer et planter maintenant",
     "waterCaption": "Eau : {{level}}",
     "spacingCaption": "Espacement {{value}}"
   },

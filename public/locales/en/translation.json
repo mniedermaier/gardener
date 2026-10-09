@@ -837,7 +837,7 @@
       "stockEmpty": "{{plant}} isn't in a bed yet, and there are no harvests or seeds.",
       "sameBedConflict": "Same bed · {{plants}}"
     },
-    "sowNowFilter": "Sow now",
+    "sowNowFilter": "Sow & plant now",
     "waterCaption": "Water: {{level}}",
     "spacingCaption": "Spacing {{value}}"
   },
