@@ -21,6 +21,8 @@ interface MonthStripProps {
    * get the bright fill.
    */
   threshold?: number;
+  /** No month reaches the threshold: plain tiles, the numbers carry it (colour would mean nothing). */
+  neutral?: boolean;
   className?: string;
 }
 
@@ -52,7 +54,7 @@ const step = (raw: number, threshold: number) => {
  * 12-month heatmap strip (one hue, five steps). The value is printed in each
  * cell, so the colour only reinforces it. Wraps to 2 rows of 6 on phones.
  */
-export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthNames, formatValue, current, currentLabel, caption, threshold = 0.25, className = "" }: MonthStripProps) {
+export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthNames, formatValue, current, currentLabel, caption, threshold = 0.25, neutral = false, className = "" }: MonthStripProps) {
   return (
     <figure className={className}>
       <ol className="grid grid-cols-6 gap-1 sm:grid-cols-12" aria-hidden="true">
@@ -63,7 +65,7 @@ export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthN
               <span className="h-4 text-[11px] leading-4 font-semibold text-gray-900 dark:text-gray-100">{i === current ? currentLabel : ""}</span>
             )}
             <span
-              className={`flex h-10 w-full items-center justify-center rounded-md text-xs font-medium tabular-nums ${STEPS[step(v, threshold)]} ${
+              className={`flex h-10 w-full items-center justify-center rounded-md text-xs font-medium tabular-nums ${STEPS[neutral ? 0 : step(v, threshold)]} ${
                 i === current ? "outline-1 outline-offset-2 outline-dashed outline-gray-900/50 dark:outline-white/50" : ""
               }`}
             >

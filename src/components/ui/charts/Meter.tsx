@@ -50,7 +50,7 @@ export const Meter = memo(function Meter({ actual, forecast, max, target, label,
         <rect width="100%" height={size} rx={size / 2} className="fill-gray-100 dark:fill-white/10" />
         {/* Forecast: a light tint of the series colour under the hatch, so a few
             percent stay visible on the track (dark mode especially). */}
-        {f > 0 && <rect width={`${f}%`} height={size} rx={size / 2} fill="currentColor" className={`${SERIES_TEXT[color]} [fill-opacity:0.3] dark:[fill-opacity:0.6]`} />}
+        {f > 0 && <rect width={`${f}%`} height={size} rx={size / 2} fill="currentColor" className={`${SERIES_TEXT[color]} [fill-opacity:0.3] dark:[fill-opacity:0.75]`} />}
         {f > 0 && <rect width={`${f}%`} height={size} rx={size / 2} fill={`url(#${pid})`} className={SERIES_TEXT[color]} />}
         {a > 0 && <rect width={`${a}%`} height={size} rx={size / 2} className={SERIES_FILL[color]} />}
       </svg>

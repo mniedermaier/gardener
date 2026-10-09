@@ -185,6 +185,7 @@ export function SufficiencyDashboard() {
               current={currentMonth}
               currentLabel={t("charts.today")}
               threshold={LOW_COVERAGE_PERCENT / 100}
+              neutral={coverage.every((c) => c < LOW_COVERAGE_PERCENT / 100)}
               caption={t("sufficiency.monthlyCaptionTypical")}
             />
             <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
@@ -404,7 +405,7 @@ function Composition() {
       <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
       <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/20" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, digits), animals: f.formatPercent(animals, digits) })}>
         {/* min-w: a share under 1 % still shows as a sliver next to its legend swatch. */}
-        {garden > 0 && <span className="h-full min-w-2 border-r-2 border-white bg-garden-600 dark:border-gray-900 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />}
+        {garden > 0 && <span className={`h-full min-w-3 bg-garden-600 dark:bg-garden-400 ${garden >= 0.02 ? "border-r-2 border-white dark:border-gray-900" : ""}`} style={{ width: `${(garden / scale) * 100}%` }} />}
         {animals > 0 && <span className="h-full min-w-2 bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />}
       </div>
       <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">

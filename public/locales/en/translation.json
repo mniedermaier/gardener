@@ -2502,7 +2502,7 @@
     "fromAnimals": "Animal products",
     "notCovered": "Not covered",
     "compositionHint": "Vegetables are low in calories – potatoes and squash raise the garden share most (see biggest levers).",
-    "surplusNote_one": "More than one person eats – not counted: {{items}}.",
-    "surplusNote_other": "More than {{count}} people eat – not counted: {{items}}."
+    "surplusNote_one": "Beyond what one person needs, not counted: {{items}}.",
+    "surplusNote_other": "Beyond what {{count}} people need, not counted: {{items}}."
   }
 }

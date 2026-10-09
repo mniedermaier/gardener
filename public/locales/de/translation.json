@@ -2502,7 +2502,7 @@
     "fromAnimals": "Tierprodukte",
     "notCovered": "Nicht gedeckt",
     "compositionHint": "Gemüse ist kalorienarm – Kartoffeln und Kürbis heben den Garten-Anteil am stärksten (siehe Größte Hebel).",
-    "surplusNote_one": "Mehr als eine Person verbraucht – nicht eingerechnet: {{items}}.",
-    "surplusNote_other": "Mehr als {{count}} Personen verbrauchen – nicht eingerechnet: {{items}}."
+    "surplusNote_one": "Über den Bedarf einer Person hinaus, nicht eingerechnet: {{items}}.",
+    "surplusNote_other": "Über den Bedarf von {{count}} Personen hinaus, nicht eingerechnet: {{items}}."
   }
 }

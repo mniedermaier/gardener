@@ -2623,8 +2623,8 @@
     "fromAnimals": "Produits animaux",
     "notCovered": "Non couvert",
     "compositionHint": "Les légumes sont peu caloriques – pommes de terre et courges augmentent le plus la part du jardin (voir leviers).",
-    "surplusNote_one": "Plus que ce que consomme une personne – non compté : {{items}}.",
-    "surplusNote_other": "Plus que ce que consomment {{count}} personnes – non compté : {{items}}.",
-    "surplusNote_many": "Plus que ce que consomment {{count}} personnes – non compté : {{items}}."
+    "surplusNote_one": "Au-delà des besoins d’une personne, non compté : {{items}}.",
+    "surplusNote_other": "Au-delà des besoins de {{count}} personnes, non compté : {{items}}.",
+    "surplusNote_many": "Au-delà des besoins de {{count}} personnes, non compté : {{items}}."
   }
 }

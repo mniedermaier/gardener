@@ -2623,8 +2623,8 @@
     "fromAnimals": "Productos animales",
     "notCovered": "Sin cubrir",
     "compositionHint": "Las hortalizas tienen pocas calorías: patatas y calabazas elevan más la parte del huerto (ver mayores palancas).",
-    "surplusNote_one": "Más de lo que consume una persona; no contabilizado: {{items}}.",
-    "surplusNote_other": "Más de lo que consumen {{count}} personas; no contabilizado: {{items}}.",
-    "surplusNote_many": "Más de lo que consumen {{count}} personas; no contabilizado: {{items}}."
+    "surplusNote_one": "Por encima de lo que necesita una persona, sin contar: {{items}}.",
+    "surplusNote_other": "Por encima de lo que necesitan {{count}} personas, sin contar: {{items}}.",
+    "surplusNote_many": "Por encima de lo que necesitan {{count}} personas, sin contar: {{items}}."
   }
 }
