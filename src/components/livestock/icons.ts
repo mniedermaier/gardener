@@ -1,4 +1,4 @@
-import { Bandage, Beef, Bird, ClipboardList, Egg, Flame, HeartCrack, Hexagon, Milk, PawPrint, Pill, PillBottle, Rabbit, Spool, Stethoscope, Syringe, Thermometer } from "lucide-react";
+import { Bandage, Beef, Bird, ClipboardList, Egg, Flame, HeartCrack, Hexagon, Milk, PawPrint, Pill, PillBottle, Rabbit, Spool, Stethoscope, Syringe, Thermometer, type LucideIcon } from "lucide-react";
 import type { AnimalType, HealthEventType, ProductType } from "@/types/animal";
 import type { Tone } from "@/components/ui/tone";
 
