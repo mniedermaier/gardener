@@ -333,7 +333,7 @@ theme-aware, use tabular figures and ship a text alternative.
 | `CompareBars` | 2–3 amounts of one unit as thin bars on one scale ("Ertragswert" vs "Kosten"); a hero visual, the numbers stay in text. |
 | `Meter` | Horizontal progress: `actual` solid, `forecast` hatched, `target` tick. Brand colour only, the number next to it says how good it is. |
 | `MonthStrip` | 12-month heatmap (one hue, 5 steps) with the value printed in each cell; outlines the current month. |
-| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are `earth`; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. |
+| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are `earth`; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. A night only below the threshold ("Frostgefahr") is `neutral`, so emphasis rises with the danger. |
 | `Sparkline` | Tiny trend line for stat tiles (`label` = summary for screen readers). |
 | `Legend`, `HatchPattern`, `DotPattern` | Swatches: solid = recorded, hatched = forecast, dotted = a second measured series of the same family (rain beside watering, `rain` colour), line = target. |
 | `HowCalculated` | `<details>` "Wie berechnet?" under a metric. Every KPI that is computed gets one. |

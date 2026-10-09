@@ -157,7 +157,7 @@ export function FoodPlan() {
                       key={r.plantId}
                       leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
                       title={plantName(p.id)}
-                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : bigGap ? <Badge tone="warning">{t("foodplan.bigGap")}</Badge> : undefined}
+                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : bigGap ? <Badge tone="neutral">{t("foodplan.bigGap")}</Badge> : undefined}
                       meta={[
                         t("foodplan.rowForecast", { forecast: kg(r.forecastKg) }),
                         gap ? t("foodplan.rowGap", { kg: kg(r.deficitKg), area: f.formatArea(r.extraAreaM2) }) : null,

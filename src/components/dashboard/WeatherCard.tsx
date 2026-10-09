@@ -124,7 +124,7 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
       )}
 
       {frost && (
-        <div className={`mt-3 rounded-lg px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200 ${frostTone(frost.summary) === "info" ? "bg-info/10" : "bg-warning/10"}`}>
+        <div className={`mt-3 rounded-lg px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200 ${frostTone(frost.summary) === "info" ? "bg-info/10" : "bg-gray-100 dark:bg-white/5"}`}>
           <p className="flex items-start gap-2">
             <Snowflake size={16} aria-hidden="true" className={`mt-0.5 shrink-0 ${TONE_TEXT[frostTone(frost.summary)]}`} />
             <span>

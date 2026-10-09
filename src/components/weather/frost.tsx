@@ -17,13 +17,14 @@ import type { Tone } from "@/components/ui/tone";
 
 /**
  * One frost tone everywhere (DESIGN_SYSTEM: frost = `info`, the cold tone,
- * always with a text badge): a night at or below 0 °C is "Frost" (info), a
- * night only below the threshold is "Frostgefahr" (warning). Used by the
- * weather page card and day rows and by the frost box on "Heute".
+ * always with a text badge). Emphasis rises with the danger: a night at or
+ * below 0 °C is "Frost" (info), a night only below the threshold is
+ * "Frostgefahr" (neutral) — the milder night must never stand out more.
+ * Used by the weather page card and day rows and by the frost box on "Heute".
  */
 export function frostTone(tempOrSummary: number | Pick<FrostSummary, "severity">): Tone {
   const hard = typeof tempOrSummary === "number" ? tempOrSummary <= 0 : tempOrSummary.severity === "danger";
-  return hard ? "info" : "warning";
+  return hard ? "info" : "neutral";
 }
 
 /** Badge text matching `frostTone`. */
