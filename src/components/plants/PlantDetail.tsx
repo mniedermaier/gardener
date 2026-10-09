@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
 import {
-  ArrowLeft, Check, X, Ruler, CalendarClock, Scale, Sun, LayoutGrid, Package, Apple, Pencil, Network, Leaf,
+  ArrowLeft, Check, TriangleAlert, Ruler, CalendarClock, Scale, Sun, LayoutGrid, Package, Apple, Pencil, Network, Leaf,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -175,7 +175,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
 function PartnerChips({ ids, kind, onSelect }: { ids: string[]; kind: "good" | "bad"; onSelect: (id: string) => void }) {
   const getPlantName = usePlantName();
   const plantMap = usePlantMap();
-  const Icon = kind === "good" ? Check : X;
+  const Icon = kind === "good" ? Check : TriangleAlert;
   return (
     <div className="flex flex-wrap gap-2">
       {ids.map((id) => (
@@ -184,10 +184,10 @@ function PartnerChips({ ids, kind, onSelect }: { ids: string[]; kind: "good" | "
           type="button"
           onClick={() => onSelect(id)}
           className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border py-1 pl-2 pr-3 text-sm text-gray-800 transition-colors hover:bg-gray-50 sm:min-h-9 dark:text-gray-100 dark:hover:bg-white/5 ${
-            kind === "good" ? "border-positive/40" : "border-danger/40"
+            kind === "good" ? "border-positive/40" : "border-warning/40"
           }`}
         >
-          <span className={`inline-flex size-5 items-center justify-center rounded-full ${kind === "good" ? "bg-positive/15 text-positive" : "bg-danger/15 text-danger"}`} aria-hidden="true">
+          <span className={`inline-flex size-5 items-center justify-center rounded-full ${kind === "good" ? "bg-positive/15 text-positive" : "bg-warning/15 text-warning"}`} aria-hidden="true">
             <Icon size={13} strokeWidth={3} />
           </span>
           <PlantIconDisplay plantId={id} emoji={plantMap.get(id)?.icon ?? ""} size={18} />

@@ -173,8 +173,10 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             : t("onboarding.finish");
 
   return (
-    <div className="grid min-h-dvh place-items-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-8 pt-safe dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
-      <div className="w-full max-w-lg">
+    // Top-anchored, not vertically centred: header and progress bar stay at
+    // the same height in every step, only the card below grows or shrinks.
+    <div className="flex min-h-dvh justify-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-8 pt-safe dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
+      <div className="mt-[min(10vh,6rem)] w-full max-w-lg">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">

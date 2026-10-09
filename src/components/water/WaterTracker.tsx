@@ -19,10 +19,9 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatCard } from "@/components/ui/StatCard";
 import { useToast } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
-import { BarChart } from "@/components/ui/charts";
+import { BarChart, KeyFigures, Sparkline } from "@/components/ui/charts";
 import { useBeds } from "@/components/records/useBeds";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 import { useToday } from "@/hooks/useToday";
@@ -41,7 +40,7 @@ export function WaterTracker() {
   const now = useToday();
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
-  const { formatDate, formatVolume, formatNumber, locale } = useFormat();
+  const { formatDate, formatVolume, locale } = useFormat();
   const { waterEntries, addWaterEntry, updateWaterEntry, deleteWaterEntry } = useStore(
     useShallow((s) => ({ waterEntries: s.waterEntries, addWaterEntry: s.addWaterEntry, updateWaterEntry: s.updateWaterEntry, deleteWaterEntry: s.deleteWaterEntry })),
   );
@@ -119,7 +118,7 @@ export function WaterTracker() {
   const data = useMemo(() => {
     const thisWeek = weekStart(now);
     const thisMonth = startOfMonth(now);
-    let week = 0, weekRain = 0, month = 0;
+    let week = 0, weekRain = 0, month = 0, monthRain = 0;
     const firstChartWeek = subWeeks(thisWeek, CHART_WEEKS - 1);
     const perWeek = new Map<number, { water: number; rain: number }>();
     for (let i = 0; i < CHART_WEEKS; i++) perWeek.set(addWeeks(firstChartWeek, i).getTime(), { water: 0, rain: 0 });
@@ -130,7 +129,7 @@ export function WaterTracker() {
       const ws = weekStart(d).getTime();
       const rain = e.method === "rain";
       if (ws === thisWeek.getTime()) { if (rain) weekRain += e.liters; else week += e.liters; }
-      if (d >= thisMonth && !rain) month += e.liters;
+      if (d >= thisMonth) { if (rain) monthRain += e.liters; else month += e.liters; }
       const bucket = perWeek.get(ws);
       if (bucket) { if (rain) bucket.rain += e.liters; else bucket.water += e.liters; }
       groups.set(ws, [...(groups.get(ws) ?? []), e]);
@@ -140,10 +139,11 @@ export function WaterTracker() {
     const weeks = [...groups.entries()]
       .sort((a, b) => b[0] - a[0])
       .map(([ws, entries]) => [new Date(ws), entries.sort((a, b) => b.date.localeCompare(a.date))] as const);
-    return { week, weekRain, month, avg, chart, weeks };
+    return { week, weekRain, month, monthRain, avg, chart, weeks };
   }, [now, waterEntries]);
 
   const [weeksShown, setWeeksShown] = useState(4);
+  const monthName = new Intl.DateTimeFormat(locale, { month: "long" }).format(now);
   const editing = editingId ? waterEntries.find((e) => e.id === editingId) : undefined;
   const weekRange = (ws: Date) => `${formatDate(ws)} – ${formatDate(endOfWeek(ws, { weekStartsOn: 1 }))}`;
 
@@ -173,12 +173,32 @@ export function WaterTracker() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("water.thisWeek")} value={formatVolume(data.week)} icon={Droplets} tone="info" hint={data.weekRain ? t("water.plusRain", { amount: formatVolume(data.weekRain) }) : undefined} />
-            <StatCard label={t("water.thisMonth")} value={formatVolume(data.month)} />
-            <StatCard label={t("water.avgPerWeek")} value={formatVolume(data.avg)} hint={t("water.lastWeeks", { count: CHART_WEEKS })} />
-            <StatCard label={t("water.entriesStat")} value={formatNumber(waterEntries.length)} />
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("water.wateredThisWeek"),
+              value: formatVolume(data.week),
+              icon: Droplets,
+              tone: "info",
+              visual: (
+                <Sparkline
+                  values={data.chart.map((w) => w.water)}
+                  color="sky"
+                  width={160}
+                  height={32}
+                  label={t("water.sparkLabel", { count: CHART_WEEKS, amount: formatVolume(data.week) })}
+                />
+              ),
+              hint: data.weekRain ? t("water.plusRain", { amount: formatVolume(data.weekRain) }) : t("water.onlyWatering"),
+            }}
+            items={[
+              {
+                label: t("water.wateredInMonth", { month: monthName }),
+                value: formatVolume(data.month),
+                hint: data.monthRain ? t("water.rainSeparate", { amount: formatVolume(data.monthRain) }) : t("water.onlyWatering"),
+              },
+              { label: t("water.avgPerWeek"), value: formatVolume(data.avg), hint: t("water.lastWeeks", { count: CHART_WEEKS }) },
+            ]}
+          />
 
           <Card>
             <CardHeader title={t("water.perWeek")} description={t("water.perWeekHint", { count: CHART_WEEKS })} />

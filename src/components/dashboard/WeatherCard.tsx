@@ -12,8 +12,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { useFormat } from "@/hooks/useFormat";
-import { useWeatherGlance } from "@/hooks/useWeatherGlance";
+import type { GlanceState } from "@/hooks/useWeatherGlance";
 import { todayISO } from "@/lib/format";
+import { FrostTaskButton, useFrostSummary } from "@/components/weather/frost";
 
 const ICONS: Record<string, LucideIcon> = {
   "01": Sun, "02": CloudSun, "03": Cloud, "04": Cloud, "09": CloudDrizzle, "10": CloudRain, "11": CloudLightning, "13": CloudSnow, "50": CloudFog,
@@ -34,13 +35,14 @@ function WeatherIcon({ code, size, className, label }: { code: string; size: num
 const capitalize = (s: string) => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s);
 
 /** Today plus three days, with a frost hint for the gardener. */
-export const WeatherCard = memo(function WeatherCard() {
+export const WeatherCard = memo(function WeatherCard({ glance }: { glance: GlanceState }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { formatDate, formatTemperature } = useFormat();
   const { threshold, locationName } = useStore(useShallow((s) => ({ threshold: s.alerts.frostThresholdC, locationName: s.locationName })));
-  const glance = useWeatherGlance();
   const [today] = useState(todayISO);
+  // Same summary as the weather page (lib/weatherAlerts summarizeFrost).
+  const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
 
   const more = (
     <Link to="/weather" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
@@ -77,7 +79,6 @@ export const WeatherCard = memo(function WeatherCard() {
 
   const { data } = glance;
   const upcoming = data.days.filter((d) => d.date > today).slice(0, 3);
-  const frostDays = upcoming.filter((d) => d.tempMin <= threshold);
 
   return (
     <Card padding="sm">
@@ -106,16 +107,16 @@ export const WeatherCard = memo(function WeatherCard() {
         </ul>
       )}
 
-      {frostDays.length > 0 && (
-        <p className="mt-3 flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
-          <Snowflake size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
-          <span>
-            {t("dashboard.frostHint", {
-              days: frostDays.map((d) => formatDate(d.date, "weekday")).join(", "),
-              temp: formatTemperature(Math.min(...frostDays.map((d) => d.tempMin))),
-            })}
-          </span>
-        </p>
+      {frost && (
+        <div className="mt-3 rounded-lg bg-warning/10 px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200">
+          <p className="flex items-start gap-2">
+            <Snowflake size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+            <span>
+              <span className="font-medium">{frost.title}.</span> {t("dashboard.frostAdvice")}
+            </span>
+          </p>
+          <FrostTaskButton summary={frost.summary} className="mt-2 ml-6 bg-white dark:bg-gray-900" />
+        </div>
       )}
     </Card>
   );

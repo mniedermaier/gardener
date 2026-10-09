@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Bird, Coins, Pencil, Plus, Scale, Trash2, Wheat } from "lucide-react";
+import { Bird, Coins, Pencil, Plus, Trash2, Wheat } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
@@ -11,12 +11,11 @@ import type { FeedEntry } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
 import { Select } from "@/components/ui/Select";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Meter } from "@/components/ui/charts";
+import { KeyFigures, Meter } from "@/components/ui/charts";
 import { ANIMAL_ICON } from "./icons";
 import { FeedDialog, IconTile, animalLabel, formatFeedAmount, useRecordActions } from "./shared";
 import { groupByMonth } from "./groupByMonth";
@@ -71,24 +70,19 @@ export function FeedPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              label={t("livestock.feedCost30")}
-              value={f.formatCurrency(stats.last30Days)}
-              icon={Coins}
-              tone="neutral"
-              hint={t("livestock.feedEntriesCount", { count: stats.entriesLast30Days })}
-            />
-            <StatCard
-              label={t("livestock.feed.perMonth")}
-              value={f.formatCurrency(stats.perMonth)}
-              icon={Coins}
-              tone="neutral"
-              hint={t("livestock.feed.perMonthHint", { count: Math.round(stats.months) })}
-            />
-            <StatCard label={t("livestock.feed.totalCost")} value={f.formatCurrency(stats.total)} icon={Coins} tone="neutral" />
-            <StatCard label={t("livestock.feed.totalKg")} value={f.formatWeight(stats.totalKg * 1000)} icon={Scale} tone="neutral" />
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("livestock.feedCost30"),
+              value: f.formatCurrency(stats.last30Days),
+              icon: Coins,
+              hint: t("livestock.feedEntriesCount", { count: stats.entriesLast30Days }),
+            }}
+            items={[
+              { label: t("livestock.feed.perMonth"), value: f.formatCurrency(stats.perMonth), hint: t("livestock.feed.perMonthHint", { count: Math.round(stats.months) }) },
+              { label: t("livestock.feed.totalCost"), value: f.formatCurrency(stats.total) },
+              { label: t("livestock.feed.totalKg"), value: f.formatWeight(stats.totalKg * 1000) },
+            ]}
+          />
 
           {stats.perAnimal.length > 1 && (
             <Card>

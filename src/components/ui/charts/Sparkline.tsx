@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { SERIES_FILL, type SeriesColor } from "./scale";
+import { SERIES_FILL, SERIES_STROKE, type SeriesColor } from "./scale";
 
 interface SparklineProps {
   values: number[];
@@ -22,7 +22,7 @@ export const Sparkline = memo(function Sparkline({ values, label, width = 96, he
   const [lx, ly] = pts[pts.length - 1];
   return (
     <svg width={width} height={height} role="img" aria-label={label} className={className}>
-      <path d={d} fill="none" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" className="stroke-garden-500 dark:stroke-garden-400" />
+      <path d={d} fill="none" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" className={SERIES_STROKE[color]} />
       <circle cx={lx} cy={ly} r={3} className={SERIES_FILL[color]} />
     </svg>
   );

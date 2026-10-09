@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { LayoutGrid, Ruler, Scale, ShoppingBasket, Target } from "lucide-react";
+import { LayoutGrid, Target } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -13,11 +13,10 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
 import { List, ListRow } from "@/components/ui/List";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { HowCalculated, Legend, Meter } from "@/components/ui/charts";
+import { HowCalculated, KeyFigures, Legend, Meter } from "@/components/ui/charts";
 import { HouseholdSizeField } from "@/components/sufficiency/HouseholdSizeField";
 import { PRODUCT_ICON } from "@/components/livestock/icons";
 import { IconTile, formatProductAmount } from "@/components/livestock/shared";
@@ -60,12 +59,28 @@ export function FoodPlan() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("foodplan.coverageForecast")} value={f.formatPercent(plan.forecastCoverage)} icon={Target} tone="brand" hint={t("foodplan.ofTarget", { kg: kg(plan.targetKg) })} />
-            <StatCard label={t("foodplan.coverageActual")} value={f.formatPercent(plan.actualCoverage)} icon={Scale} tone="neutral" hint={t("foodplan.actualKg", { kg: kg(plan.actualKg) })} />
-            <StatCard label={t("foodplan.area")} value={f.formatArea(plan.areaM2)} icon={Ruler} tone="neutral" hint={t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) })} />
-            <StatCard label={t("foodplan.deficits")} value={f.formatNumber(deficits.length, { maximumFractionDigits: 0 })} icon={ShoppingBasket} tone="neutral" hint={t("foodplan.ofCrops", { count: plan.rows.length })} />
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("foodplan.coverageForecast"),
+              value: f.formatPercent(plan.forecastCoverage),
+              icon: Target,
+              tone: "brand",
+              visual: (
+                <Meter
+                  actual={Math.min(1, plan.actualCoverage)}
+                  forecast={Math.min(1, plan.forecastCoverage)}
+                  max={1}
+                  label={t("metrics.actualVsForecast", { actual: f.formatPercent(plan.actualCoverage), forecast: f.formatPercent(plan.forecastCoverage) })}
+                />
+              ),
+              hint: t("foodplan.ofTarget", { kg: kg(plan.targetKg) }),
+            }}
+            items={[
+              { label: t("foodplan.coverageActual"), value: f.formatPercent(plan.actualCoverage), hint: t("foodplan.actualKg", { kg: kg(plan.actualKg) }) },
+              { label: t("foodplan.area"), value: f.formatArea(plan.areaM2), hint: t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) }) },
+              { label: t("foodplan.deficits"), value: f.formatNumber(deficits.length, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) },
+            ]}
+          />
           <HowCalculated>
             <p>{t("foodplan.howTargets")}</p>
             <p>{t("foodplan.howCoverage")}</p>

@@ -66,12 +66,13 @@ export const ListRow = memo(function ListRow({ leading, title, meta, description
               type="button"
               onClick={onClick}
               aria-label={clickLabel}
-              className="truncate text-left text-sm font-medium text-gray-900 after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-lg focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-focus dark:text-gray-100"
+              className="min-w-0 text-left text-sm font-medium text-gray-900 after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-lg focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-focus dark:text-gray-100"
             >
-              {title}
+              {/* Up to two lines on narrow screens instead of an ellipsis after a few words. */}
+              <span className="line-clamp-2 break-words">{title}</span>
             </button>
           ) : (
-            <span className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{title}</span>
+            <span className="line-clamp-2 min-w-0 break-words text-sm font-medium text-gray-900 dark:text-gray-100">{title}</span>
           )}
           {badges}
         </div>

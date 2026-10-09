@@ -38,6 +38,35 @@ export function detectFrostAlerts(
   return alerts;
 }
 
+/** The frost nights of a forecast, summarised once for every place that mentions them. */
+export interface FrostSummary {
+  /** Nights at or below the threshold, by date. */
+  nights: { date: string; tempMin: number }[];
+  /** The coldest of them (first one on a tie). */
+  coldest: { date: string; tempMin: number };
+  /** "danger" as soon as one night reaches 0 °C, else "warning". */
+  severity: "danger" | "warning";
+}
+
+/**
+ * Single source of the frost summary shown on "Heute" and on the weather page
+ * ("Frostgefahr in 5 Nächten, bis −6 °C (Mi)"): same days (today onwards),
+ * same threshold, same coldest night. Returns null when no night qualifies.
+ */
+export function summarizeFrost(
+  forecast: Pick<WeatherForecastItem, "date" | "tempMin">[],
+  threshold: number,
+  fromISO: string,
+): FrostSummary | null {
+  const nights = forecast
+    .filter((d) => d.date >= fromISO && d.tempMin <= threshold)
+    .map((d) => ({ date: d.date, tempMin: d.tempMin }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (nights.length === 0) return null;
+  const coldest = nights.reduce((a, b) => (b.tempMin < a.tempMin ? b : a));
+  return { nights, coldest, severity: coldest.tempMin <= 0 ? "danger" : "warning" };
+}
+
 /**
  * How much warmer an **unheated** greenhouse stays than outside at the
  * coldest point of the night (°C). Deliberately conservative: on clear,

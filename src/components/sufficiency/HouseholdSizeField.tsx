@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Minus, Plus } from "lucide-react";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -13,7 +13,12 @@ export function HouseholdSizeField() {
   const size = useAnalysisPrefs((s) => s.householdSize);
   const setSize = useAnalysisPrefs((s) => s.setHouseholdSize);
   const [text, setText] = useState(String(size));
-  useEffect(() => setText(String(size)), [size]);
+  // Follow outside changes (the other page's stepper) without an effect.
+  const [shown, setShown] = useState(size);
+  if (shown !== size) {
+    setShown(size);
+    setText(String(size));
+  }
 
   return (
     <div className="flex items-center gap-2">

@@ -120,7 +120,7 @@
         "journal": "Journal"
       },
       "logHarvestFor": "Noter une récolte : {{name}}",
-      "plantInBed": "{{plant}} dans {{bed}}",
+      "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} case",
       "cellCount_many": "{{count}} cases",
       "cellCount_other": "{{count}} cases"
@@ -161,7 +161,6 @@
     "nowSubtitle": "Ce qui est prêt à récolter et ce qu’il faut semer ou planter",
     "tabHarvest": "Récolter",
     "tabSow": "Semer et planter",
-    "harvestReady": "Prêt",
     "harvestSoon": "À récolter vite",
     "plantCount_one": "{{count}} plant",
     "plantCount_other": "{{count}} plants",
@@ -177,7 +176,6 @@
     "weatherErrorTitle": "Météo indisponible",
     "weatherErrorText": "Les données météo sont injoignables pour le moment. Vérifiez la connexion internet.",
     "openSettings": "Ouvrir les paramètres",
-    "frostHint": "Gel possible ({{days}}, jusqu’à {{temp}}). Protège les cultures sensibles.",
     "seasonTitle": "Saison jusqu’ici",
     "plantings": "Plantations",
     "typesInBeds_one": "{{types}} cultures · {{count}} planche",
@@ -218,7 +216,27 @@
       "later": "Plus tard"
     },
     "forecastValue": "Prévision {{value}}",
-    "roiValue": "Rentabilité {{value}}"
+    "roiValue": "Rentabilité {{value}}",
+    "frostAdvice": "Couvrez les cultures sensibles.",
+    "mapSummary_one": "{{count}} planche · {{plants}} plantes",
+    "mapSummary_other": "{{count}} planches · {{plants}} plantes",
+    "mapSummary_many": "{{count}} planches · {{plants}} plantes",
+    "mapPlants_one": "{{count}} plante",
+    "mapPlants_other": "{{count}} plantes",
+    "mapPlants_many": "{{count}} plantes",
+    "mapTasks_one": "{{count}} tâche à faire",
+    "mapTasks_other": "{{count}} tâches à faire",
+    "mapTasks_many": "{{count}} tâches à faire",
+    "mapOpenPlanner": "Planificateur",
+    "mapLabel": "Planches du jardin",
+    "mapLegend": "Légende",
+    "mapRipe": "prêt à récolter : {{plants}}",
+    "mapFrost": "gel attendu",
+    "mapPin": {
+      "harvest": "Prêt à récolter",
+      "task": "Tâche à faire",
+      "frost": "Gel attendu"
+    }
   },
   "search": {
     "placeholder": "Rechercher plantes, tâches, journal...",
@@ -298,8 +316,8 @@
     "importTemplate": "Importer un modèle de jardin",
     "importNow": "Importer",
     "importError": "Lien de partage invalide ou expiré.",
-    "companions": "Bons compagnons",
-    "antagonists": "Mauvais voisins",
+    "companions": "Bons voisins",
+    "antagonists": "Voisins défavorables",
     "environment": "Environnement",
     "environmentTypes": {
       "outdoor_bed": "Parcelle extérieure",
@@ -509,8 +527,8 @@
       "rowSpacing": "Espacement des rangs",
       "sun": "Soleil",
       "water": "Eau",
-      "companions": "Bons compagnons",
-      "antagonists": "À éviter à côté de",
+      "companions": "Bons voisins",
+      "antagonists": "Voisins défavorables",
       "plantedIn": "Actuellement plantée dans",
       "weeksBeforeFrost": "{{weeks}} semaines avant le dernier gel",
       "weeksAfterFrost": "{{weeks}} semaines après le dernier gel",
@@ -836,7 +854,11 @@
       "96": "Orage avec grêle",
       "99": "Violent orage avec grêle",
       "unknown": "Sans description"
-    }
+    },
+    "fallbackAuth": "OpenWeatherMap a refusé votre clé API. En attendant que vous la vérifiiez, les données météo viennent d’Open-Meteo.",
+    "fallbackUnavailable": "OpenWeatherMap ne répond pas pour le moment. Les données météo viennent d’Open-Meteo en attendant.",
+    "dayArcTitle": "Le soleil aujourd’hui",
+    "dayArcLabel": "Lever {{sunrise}}, coucher {{sunset}}, {{hours}} de jour"
   },
   "calendar": {
     "subtitle": "Ce qui est à faire au jardin, trié par échéance.",
@@ -865,7 +887,7 @@
       "done": "Terminées",
       "next7": "7 prochains jours"
     },
-    "overdueSince": "prévue {{date}}",
+    "overdueSince": "prévue {{dateInline}}",
     "recurrence": "Répéter",
     "recurring": {
       "none": "Jamais",
@@ -1075,14 +1097,19 @@
       "warning": "Attention",
       "info": "Info"
     },
-    "frostGroupTitle_one": "Risque de gel {{count}} nuit, jusqu'à {{temp}}",
-    "frostGroupTitle_other": "Risque de gel {{count}} nuits, jusqu'à {{temp}}",
-    "frostGroupTitle_many": "Gel {{count}} nuits, jusqu’à {{temp}}",
+    "frostGroupTitle_one": "Risque de gel {{count}} nuit, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitle_other": "Risque de gel {{count}} nuits, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitle_many": "Risque de gel {{count}} nuits, jusqu’à {{temp}} ({{day}})",
     "frostAffected_one": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
     "frostAffected_other": "{{count}} cultures concernées, p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
     "frostAffected_many": "{{count}} cultures concernées, p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
     "frostAdvice": "Couvre les plantes sensibles d’un voile et attends avant de repiquer.",
-    "greenhouseFrostDesc": "Jour le plus froid : {{date}}, {{outside}} dehors. Même la serre non chauffée risque de geler (environ {{temp}}). Doubler le voile sur les plantes sensibles ou chauffer hors gel. Hypothèse : environ {{buffer}} de plus qu'à l'extérieur."
+    "greenhouseFrostDesc": "Jour le plus froid : {{date}}, {{outside}} dehors. Même la serre non chauffée risque de geler (environ {{temp}}). Doubler le voile sur les plantes sensibles ou chauffer hors gel. Hypothèse : environ {{buffer}} de plus qu'à l'extérieur.",
+    "fleeceTask": "Ajouter la tâche voile",
+    "fleeceTaskTitle": "Poser le voile d’hivernage",
+    "fleeceTaskDesc": "Nuits de gel prévues : {{nights}}. Couvrez les cultures sensibles le soir, découvrez-les le matin.",
+    "fleeceTaskAdded": "Tâche « Poser le voile d’hivernage » ajoutée pour {{day}}",
+    "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}"
   },
   "harvest": {
     "title": "Récolte",
@@ -1200,7 +1227,6 @@
     "quantity": "Quantité",
     "unitCount": "Unités (bocaux, sachets …)",
     "unitCountPlaceholder": "ex. 12",
-    "defaultUnit": "pcs",
     "label": "Étiquette",
     "labelPlaceholder": "ex. Sauce tomate août 2026",
     "supplyCost": "Coût des fournitures",
@@ -1271,14 +1297,36 @@
     "invalidNumber": "Saisissez un nombre valide",
     "methodSummary": "Se conserve {{shelf}} · rendement env. {{yield}}",
     "quantityKg": "Quantité (kg)",
-    "unitLabel": "Type d’unité",
-    "unitLabelPlaceholder": "p. ex. bocaux, sachets",
+    "unitLabel": "Unité",
+    "unitLabelPlaceholder": "p. ex. seaux",
     "storedDate": "Stocké le",
     "bestBefore": "À consommer avant le {{date}}",
     "supplyCostHint": "Bocaux, couvercles, sachets (facultatif)",
     "withinDays_many": "dans les {{count}} prochains jours",
     "daysLeft_many": "encore {{count}} jours",
-    "monthsCount_many": "{{count}} mois"
+    "monthsCount_many": "{{count}} mois",
+    "unitOther": "Autre …",
+    "unitOtherLabel": "Unité personnalisée",
+    "unitNames": {
+      "jar_one": "bocal",
+      "jar_other": "bocaux",
+      "bottle_one": "bouteille",
+      "bottle_other": "bouteilles",
+      "bag_one": "sachet",
+      "bag_other": "sachets",
+      "can_one": "boîte",
+      "can_other": "boîtes",
+      "pack_one": "paquet",
+      "pack_other": "paquets",
+      "piece_one": "pièce",
+      "piece_other": "pièces",
+      "jar_many": "bocaux",
+      "bottle_many": "bouteilles",
+      "bag_many": "sachets",
+      "can_many": "boîtes",
+      "pack_many": "paquets",
+      "piece_many": "pièces"
+    }
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1386,7 +1434,6 @@
     "monthlyCaption": "Couverture calorique par mois",
     "monthlyKgTitle": "Quantité disponible par mois",
     "monthlyKgCaption": "Aliments disponibles par mois en kg, frais et stockés",
-    "axisKg": "Axe en kg",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
     "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
     "ofNeed": "{{produced}} sur {{needed}}",
@@ -1456,7 +1503,6 @@
     "added": "{{name}} ajouté",
     "totalAnimals": "Total animaux",
     "eggsThisWeek": "Œufs cette semaine",
-    "honeyThisYear": "Miel cette année",
     "animalsTab": "Animaux",
     "productionTab": "Production",
     "noProducts": "Notez œufs, miel ou lait pour voir l’évolution et la valeur.",
@@ -1523,7 +1569,6 @@
       "totalEvents": "Total entrées",
       "totalCost": "Frais vétérinaires",
       "losses": "Pertes",
-      "overdueVacc": "Vaccination due",
       "overdueWarning": "Vaccination possiblement en retard",
       "daysSince": "il y a {{days}} jours",
       "neverVaccinated": "Aucun vaccin enregistré",
@@ -1534,7 +1579,16 @@
       "dueTitle_many": "Vérifier la vaccination de {{count}} groupes",
       "dueHow": "Volailles, lapins, chèvres et moutons sans vaccin depuis {{days}} jours. Les abeilles ne sont pas vaccinées. Les intervalles dépendent du vaccin et du vétérinaire.",
       "lastVaccination": "Dernier vaccin {{date}}",
-      "logVaccination": "Saisir un vaccin"
+      "logVaccination": "Saisir un vaccin",
+      "lastEntry": "Dernière entrée : {{date}}",
+      "noLosses": "aucune perte enregistrée",
+      "vaccContext": {
+        "chicken": "Poules : en Allemagne, la vaccination contre la maladie de Newcastle (ND) est obligatoire. L’intervalle dépend du vaccin ; les poussins d’écloserie sont souvent déjà vaccinés contre Marek.",
+        "poultry": "Canards et cailles : pas d’obligation, mais le vaccin ND est recommandé. L’intervalle dépend du vaccin.",
+        "rabbit": "Lapins : VHD et myxomatose, tous les six à douze mois selon le vaccin.",
+        "ruminant": "Chèvres et moutons : vaccin contre les clostridies, rappel le plus souvent annuel – voyez avec votre vétérinaire.",
+        "other": "L’intervalle dépend du vaccin – voyez avec votre vétérinaire."
+      }
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1617,7 +1671,6 @@
     "eggsLogged_other": "{{count}} œufs enregistrés",
     "eggsLogged_many": "{{count}} œufs enregistrés",
     "eggsThisYear": "Œufs cette année",
-    "milkThisYear": "Lait cette année",
     "feedEntriesCount_one": "{{count}} entrée d’alimentation",
     "feedEntriesCount_other": "{{count}} entrées d’alimentation",
     "feedEntriesCount_many": "{{count}} entrées d’alimentation",
@@ -1683,7 +1736,10 @@
     "weekShort": "Sem. {{week}}",
     "showEntries": "afficher les entrées",
     "hideEntries": "masquer les entrées",
-    "ofExpectedToDate": "sur ~{{amount}} attendus"
+    "ofExpectedToDate": "sur ~{{amount}} attendus",
+    "productThisYear": "{{product}} cette année",
+    "eggWeeksLabel": "Œufs par semaine sur les 8 dernières semaines, moy. {{avg}}",
+    "eggWeeksAvg": "Moy. {{avg}} par semaine sur les 8 dernières semaines"
   },
   "seeds": {
     "title": "Semences",
@@ -1856,7 +1912,8 @@
         "low": "Humus faible : pailler, semer un engrais vert et apporter 2–3 l de compost par m² chaque année.",
         "high": "Humus très élevé : réduire le compost pendant quelques années."
       }
-    }
+    },
+    "openInPlanner": "Ouvrir dans le planificateur"
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -1976,7 +2033,6 @@
     "category": "Catégorie",
     "totalExpenses": "Dépenses totales",
     "harvestValue": "Valeur de la récolte (prix du marché)",
-    "roi": "Rentabilité",
     "byCategory": "Coûts par poste",
     "noEntries": "Notez graines, terreau ou outils pour voir ce que coûte votre jardin.",
     "categories": {
@@ -2006,7 +2062,6 @@
     "net": "Bilan",
     "surplus": "Excédent",
     "deficit": "Déficit",
-    "roiHint": "Bilan rapporté aux coûts",
     "roiNoCosts": "Aucun coût enregistré",
     "howCosts": "Coûts : dépenses de cette page plus alimentation et vétérinaire de la section Animaux. Les entrées d’alimentation comptent dans Alimentation animale, les frais vétérinaires dans Vétérinaire.",
     "howValue": "Valeur : récolte enregistrée (kg × prix de marché typique de la culture, 1,20–30 €/kg, sinon 3 €/kg) plus produits animaux enregistrés × prix unitaire.",
@@ -2097,7 +2152,9 @@
     "desc": "Heures du soleil aujourd’hui et durée du jour au fil de l’année.",
     "hoursValue": "{{hours}} h",
     "hoursShort": "{{hours}} h",
-    "caption": "Durée du jour par mois : la plus longue en {{longest}} ({{longestHours}}), la plus courte en {{shortest}} ({{shortestHours}})"
+    "caption": "Durée du jour par mois : la plus longue en {{longest}} ({{longestHours}}), la plus courte en {{shortest}} ({{shortestHours}})",
+    "yearlyDesc": "En dessous d’environ 10 heures de jour, presque rien ne pousse : installez les légumes d’hiver avant.",
+    "growthLimit": "10 h"
   },
   "common": {
     "save": "Enregistrer",
@@ -2130,19 +2187,19 @@
     "matrixView": "Matrice",
     "listView": "Liste",
     "companionsLabel": "Bons voisins",
-    "antagonistsLabel": "Mauvais voisins",
+    "antagonistsLabel": "Voisins défavorables",
     "noRelations": "Pas de relations connues",
     "subtitle": "Quelles cultures s’entraident dans une planche – et lesquelles séparer.",
     "legendNone": "Pas de donnée",
     "matrixHint": "Cliquez sur un nom pour le mettre en évidence",
     "relationGood": "{{a}} et {{b}} sont de bons voisins",
-    "relationBad": "{{a}} et {{b}} ne s’entendent pas",
+    "relationBad": "{{a}} et {{b}} sont des voisins défavorables",
     "goodCount_one": "{{count}} bon voisin",
     "goodCount_many": "{{count}} bons voisins",
     "goodCount_other": "{{count}} bons voisins",
-    "badCount_one": "{{count}} mauvais voisin",
-    "badCount_many": "{{count}} mauvais voisins",
-    "badCount_other": "{{count}} mauvais voisins",
+    "badCount_one": "{{count}} voisin défavorable",
+    "badCount_many": "{{count}} voisins défavorables",
+    "badCount_other": "{{count}} voisins défavorables",
     "noneKnown": "Aucun connu.",
     "choosePlant": "Choisir une plante",
     "openDetails": "Détails de la plante",
@@ -2161,8 +2218,6 @@
     "duration": "Durée",
     "minutes": "minutes",
     "noEntries": "Aucun arrosage enregistré.",
-    "thisWeek": "Cette semaine",
-    "thisMonth": "Ce mois",
     "methods": {
       "manual": "Arrosoir",
       "hose": "Tuyau",
@@ -2182,7 +2237,6 @@
     "avgPerWeek": "Moyenne par semaine",
     "lastWeeks_one": "dernière {{count}} semaine",
     "lastWeeks_other": "{{count}} dernières semaines",
-    "entriesStat": "Entrées",
     "perWeek": "Eau par semaine",
     "perWeekHint_one": "Arrosage et pluie de la dernière {{count}} semaine",
     "perWeekHint_other": "Arrosage et pluie des {{count}} dernières semaines",
@@ -2201,7 +2255,14 @@
     "unknownBed": "Planche supprimée",
     "lastWeeks_many": "{{count}} dernières semaines",
     "perWeekHint_many": "Arrosage et pluie des {{count}} dernières semaines",
-    "minutesCount_many": "{{count}} minutes"
+    "minutesCount_many": "{{count}} minutes",
+    "wateredThisWeek": "Arrosé cette semaine",
+    "wateredInMonth": "Arrosé en {{month}}",
+    "rainSeparate": "Pluie comptée à part : {{amount}}",
+    "onlyWatering": "arrosage seul, sans pluie",
+    "sparkLabel_one": "Arrosage de la dernière {{count}} semaine, {{amount}} cette semaine",
+    "sparkLabel_other": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
+    "sparkLabel_many": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine"
   },
   "storage": {
     "full": "Stockage plein — les modifications ne sont plus enregistrées. Exportez une sauvegarde et supprimez d'anciennes entrées.",

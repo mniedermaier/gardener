@@ -96,12 +96,27 @@ describe("fetchWeather", () => {
     expect(r.data.current.description).toBe("Pluie faible");
   });
 
-  it("uses OpenWeatherMap when a key is set and reports a rejected key", async () => {
+  it("uses OpenWeatherMap when a key is set and reports a rejected key when Open-Meteo is down too", async () => {
     const fetchImpl = vi.fn(async () => new Response("{}", { status: 401 }));
     await expect(
       fetchWeather({ lat: 48.1, lon: 11.6, apiKey: "bad", locale: "de", t: tFor("de"), fetchImpl: fetchImpl as unknown as typeof fetch }),
     ).rejects.toBeInstanceOf(WeatherAuthError);
     expect(String((fetchImpl.mock.calls[0] as unknown[])[0])).toContain("api.openweathermap.org");
+  });
+
+  it("falls back to Open-Meteo when OpenWeatherMap rejects the key", async () => {
+    const fetchImpl = vi.fn(async (url: string) =>
+      url.includes("openweathermap") ? new Response("{}", { status: 401 }) : new Response(JSON.stringify(sample), { status: 200 }));
+    const r = await fetchWeather({ lat: 48.1, lon: 11.6, apiKey: "bad", locale: "de", t: tFor("de"), fetchImpl: fetchImpl as unknown as typeof fetch });
+    expect(r.provider).toBe("open-meteo");
+    expect(r.fallback).toBe("auth");
+  });
+
+  it("falls back to Open-Meteo when OpenWeatherMap is unavailable", async () => {
+    const fetchImpl = vi.fn(async (url: string) =>
+      url.includes("openweathermap") ? new Response("", { status: 503 }) : new Response(JSON.stringify(sample), { status: 200 }));
+    const r = await fetchWeather({ lat: 48.1, lon: 11.6, apiKey: "key", locale: "de", t: tFor("de"), fetchImpl: fetchImpl as unknown as typeof fetch });
+    expect(r.fallback).toBe("unavailable");
   });
 
   it("throws on a server error so the page can offer a retry", async () => {

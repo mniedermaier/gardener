@@ -48,6 +48,18 @@
   --color-earth-700: #5c3a1e;
 
   /*
+   * Water: a muted steel blue for water amounts in charts (irrigation) and
+   * the glass of greenhouses on the garden map. Low chroma so it sits next to
+   * garden green and earth without shouting; never used for status.
+   */
+  --color-water-100: #e3ecf3;
+  --color-water-200: #c5d7e5;
+  --color-water-300: #a3bfd4;
+  --color-water-400: #7a9fbd;
+  --color-water-500: #5a82a3;
+  --color-water-600: #456a89;
+
+  /*
    * Semantic tones. One colour per tone; it is readable as text on white and
    * as a tint (`bg-danger/10`). The dark theme swaps in lighter values below,
    * so `bg-danger/15 text-danger` works in both themes without `dark:`.

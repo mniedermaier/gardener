@@ -4,7 +4,7 @@ import type { Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import { useFormat } from "@/hooks/useFormat";
 import { cn } from "@/lib/cn";
-import { X } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 
 interface Props {
@@ -45,7 +45,7 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
       value: (
         <>
           <span>{t("bedStats.goodPairs", { count: companionPairs })}</span>
-          {conflictPairs > 0 && <Badge tone="danger" icon={X} className="ml-1.5 align-middle">{t("bedStats.conflictPairs", { count: conflictPairs })}</Badge>}
+          {conflictPairs > 0 && <Badge tone="warning" icon={TriangleAlert} className="ml-1.5 align-middle">{t("bedStats.conflictPairs", { count: conflictPairs })}</Badge>}
         </>
       ),
     },

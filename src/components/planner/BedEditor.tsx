@@ -76,7 +76,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-center gap-x-2 border-b border-gray-100 px-3 py-3 sm:gap-x-3 sm:px-4 dark:border-white/5">
+      <div data-bed-header className="flex items-center gap-x-2 border-b border-gray-100 px-3 py-3 sm:gap-x-3 sm:px-4 dark:border-white/5">
         <IconButton icon={ArrowLeft} label={t("planner.allBeds")} onClick={onBack} className="-ml-1" />
         {/* Mobile: the bed type is in the meta line; the chip would push the zoom controls into a second row. */}
         <span className="hidden sm:contents"><EnvironmentChip type={envType} /></span>

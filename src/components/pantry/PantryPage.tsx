@@ -12,8 +12,9 @@ import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { toDate, toISODate, todayISO } from "@/lib/format";
 import type { PreservationMethod } from "@/types/plant";
-import type { PantryItem } from "@/types/pantry";
-import { SHELF_LIFE_MONTHS, PRESERVATION_YIELD, PLANT_PRESERVATION_GUIDES } from "@/types/pantry";
+import type { PantryItem, PantryUnit } from "@/types/pantry";
+import { SHELF_LIFE_MONTHS, PRESERVATION_YIELD, PLANT_PRESERVATION_GUIDES, PANTRY_UNITS } from "@/types/pantry";
+import { resolvePantryUnit } from "@/lib/pantryUnits";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -41,6 +42,10 @@ const METHOD_ICON: Record<PreservationMethod, LucideIcon> = {
   canning: CookingPot, freezing: Snowflake, fermenting: FlaskRound, drying: Sun, root_cellar: Warehouse,
 };
 const SOON_DAYS = 30;
+/** Suggested container per method; the user can pick another one. */
+const DEFAULT_UNIT: Record<PreservationMethod, PantryUnit> = {
+  canning: "jar", freezing: "bag", fermenting: "jar", drying: "jar", root_cellar: "piece",
+};
 
 type Tab = "stock" | "consumed" | "guides";
 
@@ -49,6 +54,8 @@ interface Draft {
   method: PreservationMethod;
   quantity: string;
   units: string;
+  unitKind: PantryUnit;
+  /** Free text for unitKind "other". */
   unitLabel: string;
   date: string;
   label: string;
@@ -57,7 +64,7 @@ interface Draft {
 }
 
 const emptyDraft = (plantId = "", method: PreservationMethod = "freezing"): Draft => ({
-  plantId, method, quantity: "", units: "", unitLabel: "", date: todayISO(), label: "", notes: "", supplyCost: "",
+  plantId, method, quantity: "", units: "", unitKind: DEFAULT_UNIT[method], unitLabel: "", date: todayISO(), label: "", notes: "", supplyCost: "",
 });
 const num = (s: string) => Number(s.trim().replace(",", "."));
 
@@ -135,6 +142,11 @@ export function PantryPage() {
   const [submitted, setSubmitted] = useState(false);
   const [draft, setDraft] = useState<Draft>(() => emptyDraft());
   const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
+  /** "5 Gläser", "1 Glas"; free-text units stay as entered. */
+  const unitText = (count: number, item: Pick<PantryItem, "unitKind" | "unitLabel">) => {
+    const unit = resolvePantryUnit(item);
+    return `${formatNumber(count)} ${unit.kind === "other" ? unit.label ?? "" : t(`pantry.unitNames.${unit.kind}`, { count })}`.trim();
+  };
 
   const preservable = useMemo(() => plants.filter((p) => (p.preservationMethods?.length ?? 0) > 0 || PLANT_PRESERVATION_GUIDES[p.id]), [plants]);
   const methodsFor = useCallback(
@@ -159,7 +171,8 @@ export function PantryPage() {
     setSubmitted(false);
     setDraft({
       plantId: item.plantId, method: item.method, quantity: local(item.quantityKg), units: item.units ? String(item.units) : "",
-      unitLabel: item.unitLabel ?? "", date: item.date, label: item.label ?? "", notes: item.notes ?? "",
+      ...(() => { const u = resolvePantryUnit(item); return { unitKind: u.kind, unitLabel: u.label ?? "" }; })(),
+      date: item.date, label: item.label ?? "", notes: item.notes ?? "",
       supplyCost: item.supplyCost ? local(item.supplyCost) : "",
     });
     setDialogOpen(true);
@@ -181,7 +194,9 @@ export function PantryPage() {
     if (!draft.plantId || !(quantityNum > 0) || errors.units || errors.cost) return;
     const fields = {
       plantId: draft.plantId, method: draft.method, quantityKg: quantityNum,
-      units: unitsNum || undefined, unitLabel: draft.unitLabel.trim() || undefined,
+      units: unitsNum || undefined,
+      unitKind: unitsNum ? draft.unitKind : undefined,
+      unitLabel: unitsNum && draft.unitKind === "other" ? draft.unitLabel.trim() || undefined : undefined,
       date: draft.date, expiresDate, label: draft.label.trim() || undefined, notes: draft.notes.trim() || undefined,
       supplyCost: costNum || undefined,
     };
@@ -323,7 +338,7 @@ export function PantryPage() {
                               <MethodIcon method={item.method} />
                               {t(`preservation.methods.${item.method}`)}
                             </span>
-                            {item.units ? <span>· {formatNumber(item.units)} {item.unitLabel || t("pantry.defaultUnit")}</span> : null}
+                            {item.units ? <span>· {unitText(item.units, item)}</span> : null}
                             <span>· {t("pantry.expiresOn")} <time dateTime={item.expiresDate}>{formatDate(item.expiresDate)}</time></span>
                           </span>
                         }
@@ -368,7 +383,7 @@ export function PantryPage() {
                   leading={plant ? <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} /> : <Package size={20} aria-hidden="true" className="text-gray-500" />}
                   title={item.label || getPlantName(item.plantId)}
                   badges={methodBadge(item.method)}
-                  meta={item.consumedDate ? <>{t("pantry.consumedOn")} <time dateTime={item.consumedDate}>{formatDate(item.consumedDate, "relative")}</time></> : undefined}
+                  meta={item.consumedDate ? <>{t("pantry.consumedOn")} <time dateTime={item.consumedDate}>{formatDate(item.consumedDate, "relativeInline")}</time></> : undefined}
                   trailing={formatWeight(item.quantityKg * 1000)}
                   actions={
                     <Menu
@@ -476,7 +491,7 @@ export function PantryPage() {
             {errors.plant && <p className="mt-1 text-xs font-medium text-danger">{errors.plant}</p>}
           </div>
           <div>
-            <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method })} />
+            <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method, unitKind: draft.unitKind === DEFAULT_UNIT[draft.method] ? DEFAULT_UNIT[method] : draft.unitKind })} />
             <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
               {t("pantry.methodSummary", { shelf: shelfText, yield: formatPercent(PRESERVATION_YIELD[draft.method]) })}
             </p>
@@ -486,7 +501,20 @@ export function PantryPage() {
             <Input label={t("pantry.unitCount")} inputMode="numeric" value={draft.units} onChange={(e) => patch({ units: e.target.value })} placeholder={t("pantry.unitCountPlaceholder")} error={errors.units} />
           </div>
           {unitsNum > 0 && (
-            <Input label={t("pantry.unitLabel")} value={draft.unitLabel} onChange={(e) => patch({ unitLabel: e.target.value })} placeholder={t("pantry.unitLabelPlaceholder")} />
+            <div className="grid grid-cols-2 gap-4">
+              <Select
+                label={t("pantry.unitLabel")}
+                value={draft.unitKind}
+                onChange={(e) => patch({ unitKind: e.target.value as PantryUnit })}
+                options={[...PANTRY_UNITS, "other" as const].map((k) => ({
+                  value: k,
+                  label: k === "other" ? t("pantry.unitOther") : t(`pantry.unitNames.${k}`, { count: unitsNum }),
+                }))}
+              />
+              {draft.unitKind === "other" && (
+                <Input label={t("pantry.unitOtherLabel")} value={draft.unitLabel} onChange={(e) => patch({ unitLabel: e.target.value })} placeholder={t("pantry.unitLabelPlaceholder")} />
+              )}
+            </div>
           )}
           <Input label={t("pantry.label")} value={draft.label} onChange={(e) => patch({ label: e.target.value })} placeholder={t("pantry.labelPlaceholder")} />
           <div>

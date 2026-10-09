@@ -412,25 +412,43 @@ const PLANT_SVGS: Record<string, string> = {
     <path d="M8 9Q10 6 12 6T16 9" stroke="#84cc16" stroke-width="0.4" fill="none" opacity="0.4"/>`,
 };
 
-import { memo, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 
-// Cache parsed SVG HTML to avoid re-parsing on every render
-const svgCache = new Map<string, string>();
+// Cache the wrapped SVG markup per plant and size (built once).
+const svgCache = new Map<string, { html: string; hasIds: boolean }>();
 
-function getSvgHtml(plantId: string, size: number): string | null {
+function getSvgHtml(plantId: string, size: number) {
   const svg = PLANT_SVGS[plantId];
   if (!svg) return null;
   const key = `${plantId}-${size}`;
   let cached = svgCache.get(key);
   if (!cached) {
-    cached = `<svg viewBox="0 0 24 24" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
+    cached = {
+      html: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`,
+      hasIds: svg.includes('id="'),
+    };
     svgCache.set(key, cached);
   }
   return cached;
 }
 
+/**
+ * Gradient ids ("pg", "tg" …) must be unique in the document: with the same id
+ * in every instance, all icons resolve url(#pg) to the first one, and if that
+ * one sits in a hidden container the gradient disappears everywhere. Icons
+ * with ids get a per-instance prefix; the others use the cached string as is.
+ */
+function scopeIds(html: string, scope: string): string {
+  return html.replace(/id="([^"]+)"/g, `id="${scope}$1"`).replace(/url\(#([^)]+)\)/g, `url(#${scope}$1)`);
+}
+
 export const PlantIcon = memo(function PlantIcon({ plantId, size = 24, className = "" }: Props) {
-  const html = useMemo(() => getSvgHtml(plantId, size), [plantId, size]);
+  const scope = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const html = useMemo(() => {
+    const svg = getSvgHtml(plantId, size);
+    if (!svg) return null;
+    return svg.hasIds ? scopeIds(svg.html, `pi${scope}-`) : svg.html;
+  }, [plantId, size, scope]);
   if (!html) return null;
 
   return (

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Trash2 } from "lucide-react";
@@ -144,16 +144,22 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
   const [date, setDate] = useState(todayISO());
   const [notes, setNotes] = useState("");
 
-  useEffect(() => {
-    if (!open) return;
-    const first = animalId ?? entry?.animalId ?? animals[0]?.id ?? "";
-    const a = animals.find((x) => x.id === first);
-    setAid(first);
-    setType(entry?.type ?? (a ? PRODUCT_TYPES_BY_ANIMAL[a.type][0] : "eggs"));
-    setQty(entry ? String(entry.quantity) : "");
-    setDate(entry?.date ?? todayISO());
-    setNotes(entry?.notes ?? "");
-  }, [open, entry, animalId, animals]);
+  // Reset the form each time the dialog opens: state adjusted during render
+  // (React's "reset state on prop change" pattern), not in an effect.
+  const openKey = open ? (entry ?? animalId ?? "new") : null;
+  const [openedFor, setOpenedFor] = useState<unknown>(null);
+  if (openKey !== openedFor) {
+    setOpenedFor(openKey);
+    if (open) {
+      const first = animalId ?? entry?.animalId ?? animals[0]?.id ?? "";
+      const a = animals.find((x) => x.id === first);
+      setAid(first);
+      setType(entry?.type ?? (a ? PRODUCT_TYPES_BY_ANIMAL[a.type][0] : "eggs"));
+      setQty(entry ? String(entry.quantity) : "");
+      setDate(entry?.date ?? todayISO());
+      setNotes(entry?.notes ?? "");
+    }
+  }
 
   const animal = animals.find((a) => a.id === aid);
   const types = animal ? PRODUCT_TYPES_BY_ANIMAL[animal.type] : [];
@@ -234,16 +240,22 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
   const [date, setDate] = useState(todayISO());
   const [notes, setNotes] = useState("");
 
-  useEffect(() => {
-    if (!open) return;
-    setAid(animalId ?? entry?.animalId ?? animals[0]?.id ?? "");
-    setFeedType(entry?.feedType ?? "");
-    setQty(entry ? String(entry.quantity) : "");
-    setUnit(entry?.unit ?? "kg");
-    setCost(entry?.cost !== undefined ? String(entry.cost) : "");
-    setDate(entry?.date ?? todayISO());
-    setNotes(entry?.notes ?? "");
-  }, [open, entry, animalId, animals]);
+  // Reset the form each time the dialog opens: state adjusted during render
+  // (React's "reset state on prop change" pattern), not in an effect.
+  const openKey = open ? (entry ?? animalId ?? "new") : null;
+  const [openedFor, setOpenedFor] = useState<unknown>(null);
+  if (openKey !== openedFor) {
+    setOpenedFor(openKey);
+    if (open) {
+      setAid(animalId ?? entry?.animalId ?? animals[0]?.id ?? "");
+      setFeedType(entry?.feedType ?? "");
+      setQty(entry ? String(entry.quantity) : "");
+      setUnit(entry?.unit ?? "kg");
+      setCost(entry?.cost !== undefined ? String(entry.cost) : "");
+      setDate(entry?.date ?? todayISO());
+      setNotes(entry?.notes ?? "");
+    }
+  }
 
   const quantity = parseNum(qty);
   const costNum = parseNum(cost);
@@ -306,15 +318,21 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
   const [date, setDate] = useState(todayISO());
   const [notes, setNotes] = useState("");
 
-  useEffect(() => {
-    if (!open) return;
-    setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? animals[0]?.id ?? "");
-    setType(entry?.type ?? presetType ?? "checkup");
-    setDesc(entry?.description ?? "");
-    setCost(entry?.cost !== undefined ? String(entry.cost) : "");
-    setDate(entry?.date ?? todayISO());
-    setNotes(entry?.notes ?? "");
-  }, [open, entry, animalId, animals, presetAnimalId, presetType]);
+  // Reset the form each time the dialog opens: state adjusted during render
+  // (React's "reset state on prop change" pattern), not in an effect.
+  const openKey = open ? (entry ?? animalId ?? "new") : null;
+  const [openedFor, setOpenedFor] = useState<unknown>(null);
+  if (openKey !== openedFor) {
+    setOpenedFor(openKey);
+    if (open) {
+      setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? animals[0]?.id ?? "");
+      setType(entry?.type ?? presetType ?? "checkup");
+      setDesc(entry?.description ?? "");
+      setCost(entry?.cost !== undefined ? String(entry.cost) : "");
+      setDate(entry?.date ?? todayISO());
+      setNotes(entry?.notes ?? "");
+    }
+  }
 
   const costNum = parseNum(cost);
   const canSave = !!aid && desc.trim() !== "";
@@ -369,14 +387,20 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
   const [notes, setNotes] = useState("");
   const [acquired, setAcquired] = useState(todayISO());
 
-  useEffect(() => {
-    if (!open) return;
-    setType(animal?.type ?? "chicken");
-    setName(animal?.name ?? "");
-    setCount(String(animal?.count ?? 1));
-    setNotes(animal?.notes ?? "");
-    setAcquired(animal?.acquiredDate ?? todayISO());
-  }, [open, animal]);
+  // Reset the form each time the dialog opens: state adjusted during render
+  // (React's "reset state on prop change" pattern), not in an effect.
+  const openKey = open ? (animal ?? "new") : null;
+  const [openedFor, setOpenedFor] = useState<unknown>(null);
+  if (openKey !== openedFor) {
+    setOpenedFor(openKey);
+    if (open) {
+      setType(animal?.type ?? "chicken");
+      setName(animal?.name ?? "");
+      setCount(String(animal?.count ?? 1));
+      setNotes(animal?.notes ?? "");
+      setAcquired(animal?.acquiredDate ?? todayISO());
+    }
+  }
 
   const n = parseNum(count);
   const canSave = Number.isInteger(n) && n >= (animal ? 0 : 1);

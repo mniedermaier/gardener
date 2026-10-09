@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Bird, Droplet, Egg, Milk, Pencil, Plus, Trash2 } from "lucide-react";
+import { Bird, Egg, Pencil, Plus, Trash2 } from "lucide-react";
 import { endOfWeek, startOfWeek } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -9,11 +9,11 @@ import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { toISODate } from "@/lib/format";
 import { getActualProducts } from "@/lib/metrics";
-import type { AnimalProduct, ProductType } from "@/types/animal";
+import { EGG_LAYERS, type AnimalProduct, type ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { Select } from "@/components/ui/Select";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
@@ -22,6 +22,7 @@ import { ProductionChart } from "./ProductionChart";
 import { PRODUCT_ICON } from "./icons";
 import { IconTile, ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
 import { groupByMonth } from "./groupByMonth";
+import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
 
 export function ProductionPage() {
@@ -53,8 +54,29 @@ export function ProductionPage() {
     return {
       eggsWeek: animalProducts.filter((p) => p.type === "eggs" && p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
       year: getActualProducts(animalProducts, year),
+      eggWeeks: weeklyEggs(animalProducts, now),
     };
   }, [now, animalProducts, year]);
+
+  // Only products this herd yields (or that were recorded): no "Milch 0 l" without goats.
+  const herdTypes = herdProductTypes(animals, stats.year);
+  const hasLayers = animals.some((a) => EGG_LAYERS.includes(a.type));
+  const yearFigure = (ty: ProductType) => ({
+    label: ty === "eggs" ? t("livestock.eggsThisYear") : t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
+    value: formatProductAmount(ty, stats.year[ty], f, t),
+  });
+  const eggWeeks = stats.eggWeeks;
+  const eggAvg = eggWeeks.reduce((s, n) => s + n, 0) / eggWeeks.length;
+  const heroFigure = hasLayers
+    ? {
+        label: t("livestock.eggsThisWeek"),
+        value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
+        icon: Egg,
+        visual: <Sparkline values={eggWeeks} color="earth" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
+        hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
+      }
+    : herdTypes[0] ? { ...yearFigure(herdTypes[0]), icon: PRODUCT_ICON[herdTypes[0]] } : null;
+  const yearFigures = (hasLayers ? herdTypes : herdTypes.slice(1)).map(yearFigure);
 
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
   const groups = groupByMonth(filtered);
@@ -76,12 +98,7 @@ export function ProductionPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("livestock.eggsThisWeek")} value={f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.eggsThisYear")} value={f.formatNumber(stats.year.eggs, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.honeyThisYear")} value={f.formatWeight(stats.year.honey * 1000)} icon={Droplet} tone="neutral" />
-            <StatCard label={t("livestock.milkThisYear")} value={f.formatVolume(stats.year.milk)} icon={Milk} tone="neutral" />
-          </div>
+          {heroFigure && <KeyFigures hero={heroFigure} items={yearFigures.slice(0, 3)} />}
 
           {animalProducts.length > 0 && (
             <Card>

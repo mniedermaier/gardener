@@ -50,6 +50,17 @@ covered here, copy the pattern from the reference page
     the user with *vous*, German and Spanish with *du*/*tú*. Negative numbers
     and temperatures use the minus sign "−" (the formatters do this), ranges the
     en dash without spaces ("60–85 Tage"), asides the spaced en dash (" – ").
+14. **Glossary.** One term per thing, in every place it appears (legend,
+    detail page, planner, warnings):
+
+    | Concept | de | en | es | fr | Tone |
+    |---|---|---|---|---|---|
+    | plants that help each other | Gute Nachbarn | Good neighbours | Buenos vecinos | Bons voisins | `positive`, `Check` |
+    | plants that should not stand together | Ungünstige Nachbarn | Unfavourable neighbours | Vecinos desfavorables | Voisins défavorables | `warning`, `TriangleAlert` (never red ✕: placing stays allowed) |
+    | a plant in a bed (free bed name) | „Tomate · Gewächshaus“ | "Tomato · Greenhouse" | | | – |
+
+    Bed names are free text, so never glue them into a sentence with a
+    preposition ("Tomate in Gewächshaus"); use the middle dot.
 
 `src/test/conventions.test.ts` is a ratchet: the counts of `toFixed(`, text
 below 11 px, raw `<select>`/`<textarea>` and `prompt/alert` may only go down.
@@ -62,6 +73,7 @@ When you migrate a page, **lower the baseline numbers** in that file.
 | `gray-50…950` | **Overridden**: warm stone neutrals with a slight moss tint at the dark end. Keep using `gray-*`. |
 | `garden-50…950` | Brand, deep sage/forest green. `garden-600` (#2f6b3a) = primary button, focus ring. Dark text: `garden-300/400`. |
 | `earth-50…700` | Warm accent (sparingly: illustrations, soil). |
+| `water-100…600` | Muted steel blue for water amounts (the `sky` chart series) and greenhouse glass on the garden map. Never a status colour. |
 | `positive` `warning` `danger` `info` | Semantic tones. **One variable each, swapped automatically in `.dark`**. So `bg-danger/10 text-danger` works in both themes without a `dark:` class. |
 | `focus` | Focus ring colour (`outline-focus`). |
 | `shadow-xs` | Default for surfaces. Use `shadow-lg` only for floating things (menus, toasts). |
@@ -193,6 +205,11 @@ row under its `h1`. Never put a pill row inside a page.
   { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void remove(x) },
 ]} />                                                     // trigger defaults to "…"; pass trigger={<>Garten <ChevronDown/></>} for a labelled one
 ```
+The panel is portalled (into the surrounding `<dialog>`, else `<body>`) and
+shown as a popover in the top layer, so no row or sticky header can cover it.
+It opens below the trigger and flips above it when there is no room.
+`e2e/row-menus.spec.ts` clicks "Löschen" for real in every list (first and
+last row, desktop and phone); add new lists with a row menu there.
 
 ```tsx
 <IconButton icon={Check} label={t("pests.resolve")} tone="neutral|brand|danger" size="sm|md" />
@@ -234,7 +251,9 @@ const { formatDate, formatNumber, formatWeight, formatCurrency, formatVolume,
 | Function | Input | de | en (en-GB) |
 |---|---|---|---|
 | `formatDate(d, "short")` | Date \| ISO \| ms | `3. Okt.` (`3. Okt. 2025` for other years) | `3 Oct` |
-| `formatDate(d, "relative")` | | `Heute`, `Gestern`, `Vor 3 Tagen`, `In 2 Tagen`; beyond ±6 days → short | `Yesterday` |
+| `formatDate(d, "relative")` | | `Heute`, `Gestern`, `Vor 3 Tagen`, `In 2 Tagen`; beyond ±6 days → short. Only at the start of a text or cell | `Yesterday` |
+| `formatDate(d, "relativeInline")` | | the same in lower case for the middle of a sentence („erledigt: vor 3 Tagen“, ES „vencía hace 4 días“) | `due yesterday` |
+| `formatDate(d, "weekdayDate")` | | `Mo., 12. Okt.` — the coming week; one date format per list group | `Mon 12 Oct` |
 | `formatDate(d, "long")` | | `Montag, 5. Oktober 2026` | |
 | `formatDate(d, "numeric" \| "monthYear" \| "month" \| "weekday")` | | `03.10.2026` · `Oktober 2026` · `Okt.` · `Mo.` | |
 | `formatNumber(n, { maximumFractionDigits = 1, minimumFractionDigits })` | | `1.234,6` | `1,234.6` |
@@ -278,7 +297,9 @@ theme-aware, use tabular figures and ship a text alternative.
 
 | Component | Use |
 |---|---|
-| `BarChart` | Vertical (optionally stacked) bars over months/weeks: y-grid with 3–4 nice ticks, `formatTick` for units, `marker={{ index, label: t("charts.today") }}`, optional `target` line, hover **and** ←/→ keyboard tooltip, legend for ≥ 2 series, visually hidden `<table>`. |
+| `BarChart` | Vertical (optionally stacked) bars over months/weeks: y-grid with 3–4 nice ticks, `formatTick` for units, `marker={{ index, label: t("charts.today") }}`, optional `target` line, hover **and** ←/→ keyboard tooltip, legend for ≥ 2 series, visually hidden `<table>`. Category labels thin out by their measured width (`axisLabelStep`), anchored on the marker, so "KW 34 KW 35" never collides on a phone. Pass only the series that have data — the legend lists every series. |
+| `KeyFigures` | Page-head metrics: **one hero figure** (large, optional `visual`: `Sparkline`, `Meter`, `CompareBars`) plus 1–3 secondary figures inline, divided by hairlines. `layout="row"` for page heads, `"stack"` for side columns (rows with chevron when `to` is set). |
+| `CompareBars` | 2–3 amounts of one unit as thin bars on one scale ("Ertragswert" vs "Kosten"); a hero visual, the numbers stay in text. |
 | `Meter` | Horizontal progress: `actual` solid, `forecast` hatched, `target` tick. Brand colour only, the number next to it says how good it is. |
 | `MonthStrip` | 12-month heatmap (one hue, 5 steps) with the value printed in each cell; outlines the current month. |
 | `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are `earth`; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. |
@@ -300,6 +321,58 @@ Rules: one unit per chart (different units → small multiples, never one
 stacked axis); series colours in fixed order `brand → earth → sky`, `muted`
 for neutral shares; forecasts are hatched so meaning is not colour-only;
 the caption summarises the finding.
+
+### Key figures instead of a row of tiles
+
+A row of four equal `StatCard`s says "everything is equally important" and
+fills the page with boxes. Use it only when four numbers really are peers.
+Otherwise:
+
+```tsx
+<KeyFigures
+  hero={{ label: t("water.wateredThisWeek"), value: formatVolume(week), icon: Droplets, tone: "info",
+          visual: <Sparkline values={weeks} color="sky" width={160} height={32} label={…} />,
+          hint: t("water.plusRain", { amount }) }}
+  items={[{ label: t("water.wateredInMonth", { month }), value: formatVolume(month), hint: … },
+          { label: t("water.avgPerWeek"), value: formatVolume(avg), hint: … }]}
+/>
+```
+
+- The hero is the number the page is about; its visual shows the trend or
+  proportion (`visualPlacement="below"` for wide visuals like `CompareBars`).
+- Secondary figures qualify the hero. Never show a figure that cannot apply
+  (no "Milch 0 l" without goats — see `livestock/productFigures.ts`).
+- Label says exactly what is counted ("Gegossen im Oktober", rain separate).
+
+Used on: Heute (season, `stack`), Bewässerung, Tiere, Produktion, Gesundheit,
+Selbstversorgung, Ernährungsplan, Kosten.
+
+### Garden map (signature of "Heute")
+
+`dashboard/GardenMap.tsx` draws every bed of the active garden as a small plan:
+true proportions, one cell size for all beds (`packBeds`: shelf rows in planner
+order, centred, common baseline — beds have no real coordinates yet), crops as
+plant icons in their cells (family-colour dots below 18 px per cell), paths as
+light cells. Frames carry the environment: soil texture with an earth border
+(open bed), a thick wooden frame (raised bed), a `water` glass outline
+(greenhouse, polytunnel, cold frame), round pots (container).
+
+Pins (solid semantic tone, white icon, ring in the surface colour) mark what
+needs attention: `positive` Apple = ripe, `warning` clipboard (+count) = task due
+today/overdue, `info` snowflake = forecast frost reaches the bed (open beds at the
+frost threshold, unheated greenhouses below 0 °C inside). The legend lists only
+pins that occur. Every bed is a link to `/planner?bed=<id>` with a full
+accessible name ("Gewächshaus · 20 Pflanzen · erntereif: Tomate · 2 Aufgaben
+fällig").
+
+### Weather: one frost sentence
+
+`summarizeFrost()` (`lib/weatherAlerts.ts`) + `useFrostSummary()`
+(`weather/frost.tsx`) produce the frost summary for **both** "Heute" and the
+weather page: "Frostgefahr in 5 Nächten, bis −6 °C (So)". `FrostTaskButton`
+next to it turns the warning into a "Vlies auflegen" task on the first frost
+night (with undo; once planned it opens the task). `DayArc` shows today's sun
+path (sunrise → sunset, sun position now) in the current-weather card.
 
 **Numbers:** analysis pages and the dashboard take their figures from
 `lib/metrics.ts` / `useGardenMetrics()` — never recompute totals in a

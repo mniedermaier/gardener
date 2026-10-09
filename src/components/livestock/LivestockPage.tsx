@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Bird, Egg, Droplet, Plus, Coins } from "lucide-react";
+import { Bird, Egg, Plus, Coins } from "lucide-react";
 import { endOfWeek, startOfWeek } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -13,12 +13,13 @@ import { EGG_LAYERS, type Animal } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
 import { AnimalCard } from "./AnimalCard";
 import { ProductionChart } from "./ProductionChart";
-import { AnimalDialog, animalLabel, herdSummary } from "./shared";
+import { AnimalDialog, animalLabel, formatProductAmount, herdSummary } from "./shared";
+import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
 
 const QUICK_EGGS = [1, 2, 3, 5, 10];
@@ -53,8 +54,19 @@ export function LivestockPage() {
       eggsWeek: eggs.filter((p) => p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
       year: getActualProducts(animalProducts, year),
       feed: getFeedCostStats(feedEntries, now),
+      eggWeeks: weeklyEggs(animalProducts, now),
     };
   }, [now, animalProducts, feedEntries, today, year]);
+
+  // Key figures only for what this herd yields (no "Honig 0 kg" without bees).
+  const herdTypes = herdProductTypes(animals, stats.year).slice(0, eggAnimal ? 2 : 3);
+  const eggAvg = stats.eggWeeks.reduce((s, n) => s + n, 0) / stats.eggWeeks.length;
+  const feedFigure = {
+    label: t("livestock.feedCost30"),
+    value: f.formatCurrency(stats.feed.last30Days),
+    hint: stats.feed.total > 0 ? t("livestock.feedPerMonthHint", { amount: f.formatCurrency(stats.feed.perMonth) }) : t("livestock.feedEntriesCount", { count: 0 }),
+    to: "/livestock/feed",
+  };
 
   const perAnimal = useMemo(() => {
     const map = new Map<string, { recorded: Partial<ProductTotals>; feedCost: number; lastHealth?: (typeof healthEvents)[number] }>();
@@ -135,18 +147,24 @@ export function LivestockPage() {
             </Card>
           )}
 
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("livestock.eggsThisWeek")} value={f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.eggsThisYear")} value={f.formatNumber(stats.year.eggs, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.honeyThisYear")} value={f.formatWeight(stats.year.honey * 1000)} icon={Droplet} tone="neutral" />
-            <StatCard
-              label={t("livestock.feedCost30")}
-              value={f.formatCurrency(stats.feed.last30Days)}
-              icon={Coins}
-              tone="neutral"
-              hint={stats.feed.total > 0 ? t("livestock.feedPerMonthHint", { amount: f.formatCurrency(stats.feed.perMonth) }) : t("livestock.feedEntriesCount", { count: 0 })}
-            />
-          </div>
+          <KeyFigures
+            hero={eggAnimal ? {
+              label: t("livestock.eggsThisWeek"),
+              value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
+              icon: Egg,
+              visual: <Sparkline values={stats.eggWeeks} color="earth" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
+              hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
+              to: "/livestock/production",
+            } : { ...feedFigure, icon: Coins }}
+            items={[
+              ...herdTypes.map((ty) => ({
+                label: ty === "eggs" ? t("livestock.eggsThisYear") : t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
+                value: formatProductAmount(ty, stats.year[ty], f, t),
+                to: "/livestock/production",
+              })),
+              ...(eggAnimal ? [feedFigure] : []),
+            ].slice(-3)}
+          />
 
           <Card>
             <CardHeader title={t("livestock.chartTitle")} description={t("livestock.chartDesc")} />

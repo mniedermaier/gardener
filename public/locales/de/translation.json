@@ -120,7 +120,7 @@
         "journal": "Tagebuch"
       },
       "logHarvestFor": "Ernte erfassen: {{name}}",
-      "plantInBed": "{{plant}} in {{bed}}",
+      "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} Feld",
       "cellCount_other": "{{count}} Felder"
     },
@@ -157,7 +157,6 @@
     "nowSubtitle": "Was erntereif ist und was du als Nächstes säen oder pflanzen kannst",
     "tabHarvest": "Ernten",
     "tabSow": "Säen & pflanzen",
-    "harvestReady": "Erntereif",
     "harvestSoon": "Bald ernten",
     "plantCount_one": "{{count}} Pflanze",
     "plantCount_other": "{{count}} Pflanzen",
@@ -172,7 +171,6 @@
     "weatherErrorTitle": "Wetter nicht verfügbar",
     "weatherErrorText": "Die Wetterdaten sind gerade nicht erreichbar. Prüfe die Internetverbindung.",
     "openSettings": "Zu den Einstellungen",
-    "frostHint": "Frost möglich ({{days}}, bis {{temp}}). Empfindliche Kulturen abdecken.",
     "seasonTitle": "Saison bisher",
     "plantings": "Pflanzungen",
     "typesInBeds_one": "{{types}} Arten · {{count}} Beet",
@@ -209,7 +207,24 @@
       "later": "Später"
     },
     "forecastValue": "Prognose {{value}}",
-    "roiValue": "Rendite {{value}}"
+    "roiValue": "Rendite {{value}}",
+    "frostAdvice": "Empfindliche Kulturen abdecken.",
+    "mapSummary_one": "{{count}} Beet · {{plants}} Pflanzen",
+    "mapSummary_other": "{{count}} Beete · {{plants}} Pflanzen",
+    "mapPlants_one": "{{count}} Pflanze",
+    "mapPlants_other": "{{count}} Pflanzen",
+    "mapTasks_one": "{{count}} Aufgabe fällig",
+    "mapTasks_other": "{{count}} Aufgaben fällig",
+    "mapOpenPlanner": "Planer",
+    "mapLabel": "Beete im Garten",
+    "mapLegend": "Legende",
+    "mapRipe": "erntereif: {{plants}}",
+    "mapFrost": "Frost erwartet",
+    "mapPin": {
+      "harvest": "Erntereif",
+      "task": "Aufgabe fällig",
+      "frost": "Frost erwartet"
+    }
   },
   "onboarding": {
     "stepOf": "Schritt {{current}} von {{total}}",
@@ -289,7 +304,7 @@
     "importNow": "Importieren",
     "importError": "Ungültiger oder abgelaufener Teilen-Link.",
     "companions": "Gute Nachbarn",
-    "antagonists": "Schlechte Nachbarn",
+    "antagonists": "Ungünstige Nachbarn",
     "environment": "Umgebung",
     "environmentTypes": {
       "outdoor_bed": "Freilandbeet",
@@ -495,7 +510,7 @@
       "sun": "Sonne",
       "water": "Wasser",
       "companions": "Gute Nachbarn",
-      "antagonists": "Nicht neben",
+      "antagonists": "Ungünstige Nachbarn",
       "plantedIn": "Aktuell gepflanzt in",
       "weeksBeforeFrost": "{{weeks}} Wochen vor letztem Frost",
       "weeksAfterFrost": "{{weeks}} Wochen nach letztem Frost",
@@ -816,7 +831,11 @@
       "96": "Gewitter mit Hagel",
       "99": "Schweres Gewitter mit Hagel",
       "unknown": "Keine Angabe"
-    }
+    },
+    "fallbackAuth": "Dein OpenWeatherMap-Schlüssel wurde abgelehnt. Bis du ihn prüfst, kommen die Wetterdaten von Open-Meteo.",
+    "fallbackUnavailable": "OpenWeatherMap ist gerade nicht erreichbar. Die Wetterdaten kommen solange von Open-Meteo.",
+    "dayArcTitle": "Sonne heute",
+    "dayArcLabel": "Sonnenaufgang {{sunrise}}, Sonnenuntergang {{sunset}}, {{hours}} Tageslicht"
   },
   "calendar": {
     "subtitle": "Was im Garten ansteht – nach Fälligkeit sortiert.",
@@ -1043,12 +1062,17 @@
       "warning": "Achtung",
       "info": "Hinweis"
     },
-    "frostGroupTitle_one": "Frostgefahr in {{count}} Nacht, bis {{temp}}",
-    "frostGroupTitle_other": "Frostgefahr in {{count}} Nächten, bis {{temp}}",
+    "frostGroupTitle_one": "Frostgefahr in {{count}} Nacht, bis {{temp}} ({{day}})",
+    "frostGroupTitle_other": "Frostgefahr in {{count}} Nächten, bis {{temp}} ({{day}})",
     "frostAffected_one": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
     "frostAffected_other": "Betroffen sind {{count}} Kulturen, z. B. {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
     "frostAdvice": "Empfindliche Pflanzen mit Vlies abdecken und mit dem Auspflanzen warten.",
-    "greenhouseFrostDesc": "Kältester Tag: {{date}}, draußen {{outside}}. Auch im unbeheizten Haus droht dann Frost (etwa {{temp}}). Empfindliche Pflanzen doppelt mit Vlies abdecken oder frostfrei heizen. Annahme: rund {{buffer}} wärmer als draußen."
+    "greenhouseFrostDesc": "Kältester Tag: {{date}}, draußen {{outside}}. Auch im unbeheizten Haus droht dann Frost (etwa {{temp}}). Empfindliche Pflanzen doppelt mit Vlies abdecken oder frostfrei heizen. Annahme: rund {{buffer}} wärmer als draußen.",
+    "fleeceTask": "Vlies-Aufgabe anlegen",
+    "fleeceTaskTitle": "Vlies auflegen",
+    "fleeceTaskDesc": "Frostnächte laut Vorhersage: {{nights}}. Empfindliche Kulturen am Abend abdecken, morgens lüften.",
+    "fleeceTaskAdded": "Aufgabe „Vlies auflegen“ für {{day}} angelegt",
+    "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant"
   },
   "harvest": {
     "title": "Ernte",
@@ -1161,7 +1185,6 @@
     "quantity": "Menge",
     "unitCount": "Einheiten (Gläser, Beutel …)",
     "unitCountPlaceholder": "z.B. 12",
-    "defaultUnit": "Stk.",
     "label": "Bezeichnung",
     "labelPlaceholder": "z.B. Tomatensauce August 2026",
     "supplyCost": "Zubehörkosten",
@@ -1231,11 +1254,27 @@
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "methodSummary": "Haltbar {{shelf}} · Ausbeute ca. {{yield}}",
     "quantityKg": "Menge (kg)",
-    "unitLabel": "Art der Einheit",
-    "unitLabelPlaceholder": "z. B. Gläser, Beutel",
+    "unitLabel": "Einheit",
+    "unitLabelPlaceholder": "z. B. Eimer",
     "storedDate": "Eingelagert am",
     "bestBefore": "Haltbar bis {{date}}",
-    "supplyCostHint": "Gläser, Deckel, Beutel – optional"
+    "supplyCostHint": "Gläser, Deckel, Beutel – optional",
+    "unitOther": "Andere …",
+    "unitOtherLabel": "Eigene Einheit",
+    "unitNames": {
+      "jar_one": "Glas",
+      "jar_other": "Gläser",
+      "bottle_one": "Flasche",
+      "bottle_other": "Flaschen",
+      "bag_one": "Beutel",
+      "bag_other": "Beutel",
+      "can_one": "Dose",
+      "can_other": "Dosen",
+      "pack_one": "Packung",
+      "pack_other": "Packungen",
+      "piece_one": "Stück",
+      "piece_other": "Stück"
+    }
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1336,7 +1375,6 @@
     "monthlyCaption": "Kalorienabdeckung pro Monat",
     "monthlyKgTitle": "Verfügbare Menge pro Monat",
     "monthlyKgCaption": "Verfügbare Lebensmittel pro Monat in kg, frisch und gelagert",
-    "axisKg": "Achse in kg",
     "noWinterGap": "Von {{from}} bis {{to}} reicht dein geplanter Vorrat für mindestens ein Viertel des Bedarfs.",
     "noMonthCovered": "Dein Garten deckt bisher in keinem Monat {{percent}} des Bedarfs. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
     "ofNeed": "{{produced}} von {{needed}}",
@@ -1405,7 +1443,6 @@
     "added": "{{name}} angelegt",
     "totalAnimals": "Tiere gesamt",
     "eggsThisWeek": "Eier diese Woche",
-    "honeyThisYear": "Honig dieses Jahr",
     "animalsTab": "Bestand",
     "productionTab": "Produktion",
     "noProducts": "Erfasse Eier, Honig oder Milch, um Verlauf und Wert zu sehen.",
@@ -1470,7 +1507,6 @@
       "totalEvents": "Einträge gesamt",
       "totalCost": "Tierarztkosten",
       "losses": "Verluste",
-      "overdueVacc": "Impfung fällig",
       "overdueWarning": "Impfung möglicherweise fällig",
       "daysSince": "vor {{days}} Tagen",
       "neverVaccinated": "Keine Impfung erfasst",
@@ -1480,7 +1516,16 @@
       "dueTitle_other": "Impfung bei {{count}} Tiergruppen prüfen",
       "dueHow": "Geflügel, Kaninchen, Ziegen und Schafe ohne Impfung in den letzten {{days}} Tagen. Bienen werden nicht geimpft. Intervalle hängen von Impfstoff und Tierarzt ab.",
       "lastVaccination": "Letzte Impfung {{date}}",
-      "logVaccination": "Impfung erfassen"
+      "logVaccination": "Impfung erfassen",
+      "lastEntry": "Letzter Eintrag: {{date}}",
+      "noLosses": "keine Verluste erfasst",
+      "vaccContext": {
+        "chicken": "Hühner: Die Impfung gegen die Newcastle-Krankheit (ND) ist in Deutschland Pflicht. Den Abstand gibt der Impfstoff vor – Küken aus der Brüterei sind oft schon gegen Marek geimpft.",
+        "poultry": "Enten und Wachteln: keine Impfpflicht, ND-Impfung wird aber empfohlen. Den Abstand gibt der Impfstoff vor.",
+        "rabbit": "Kaninchen: RHD (Chinaseuche) und Myxomatose, je nach Impfstoff halbjährlich bis jährlich.",
+        "ruminant": "Ziegen und Schafe: Clostridien-Schutz, Auffrischung meist jährlich – mit dem Tierarzt abstimmen.",
+        "other": "Den Abstand gibt der Impfstoff vor – mit dem Tierarzt abstimmen."
+      }
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1551,7 +1596,6 @@
     "eggsLogged_one": "{{count}} Ei erfasst",
     "eggsLogged_other": "{{count}} Eier erfasst",
     "eggsThisYear": "Eier dieses Jahr",
-    "milkThisYear": "Milch dieses Jahr",
     "feedEntriesCount_one": "{{count}} Futtereintrag",
     "feedEntriesCount_other": "{{count}} Futtereinträge",
     "chartDesc": "Letzte 6 Monate, ein Diagramm pro Produkt.",
@@ -1615,7 +1659,10 @@
     "weekShort": "KW {{week}}",
     "showEntries": "Einträge anzeigen",
     "hideEntries": "Einträge ausblenden",
-    "ofExpectedToDate": "von ~{{amount}} erwartet"
+    "ofExpectedToDate": "von ~{{amount}} erwartet",
+    "productThisYear": "{{product}} dieses Jahr",
+    "eggWeeksLabel": "Eier pro Woche, letzte 8 Wochen, Ø {{avg}}",
+    "eggWeeksAvg": "Ø {{avg}} pro Woche in den letzten 8 Wochen"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1783,7 +1830,8 @@
         "low": "Humus niedrig: mulchen, Gründüngung säen und jährlich 2–3 l Kompost pro m² geben.",
         "high": "Humus sehr hoch: Kompostgaben für einige Jahre reduzieren."
       }
-    }
+    },
+    "openInPlanner": "Im Planer öffnen"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -1898,7 +1946,6 @@
     "category": "Kategorie",
     "totalExpenses": "Gesamtausgaben",
     "harvestValue": "Erntewert (Marktpreis)",
-    "roi": "Rendite",
     "byCategory": "Kosten nach Bereich",
     "noEntries": "Erfasse Saatgut, Erde oder Werkzeug, um zu sehen, was dein Garten kostet.",
     "categories": {
@@ -1928,7 +1975,6 @@
     "net": "Bilanz",
     "surplus": "Überschuss",
     "deficit": "Fehlbetrag",
-    "roiHint": "Bilanz im Verhältnis zu den Kosten",
     "roiNoCosts": "Noch keine Kosten erfasst",
     "howCosts": "Kosten: Ausgaben dieser Seite plus Futter- und Tierarztkosten aus dem Bereich Tiere. Futterbuchungen zählen zur Kategorie Tierfutter, Tierarztkosten zur Kategorie Tierarzt.",
     "howValue": "Wert: erfasste Ernte (kg × typischer Marktpreis der Kultur, 1,20–30 €/kg, sonst 3 €/kg) plus erfasste Tierprodukte × Preis pro Einheit.",
@@ -2014,7 +2060,9 @@
     "desc": "Sonnenzeiten heute und Tageslänge im Jahresverlauf.",
     "hoursValue": "{{hours}} h",
     "hoursShort": "{{hours}} h",
-    "caption": "Tageslicht pro Monat: am längsten im {{longest}} ({{longestHours}}), am kürzesten im {{shortest}} ({{shortestHours}})"
+    "caption": "Tageslicht pro Monat: am längsten im {{longest}} ({{longestHours}}), am kürzesten im {{shortest}} ({{shortestHours}})",
+    "yearlyDesc": "Unter etwa 10 Stunden Tageslicht wächst kaum noch etwas – Wintergemüse vorher etablieren.",
+    "growthLimit": "10 h"
   },
   "common": {
     "save": "Speichern",
@@ -2047,17 +2095,17 @@
     "matrixView": "Matrix",
     "listView": "Liste",
     "companionsLabel": "Gute Nachbarn",
-    "antagonistsLabel": "Schlechte Nachbarn",
+    "antagonistsLabel": "Ungünstige Nachbarn",
     "noRelations": "Keine bekannten Beziehungen",
     "subtitle": "Welche Kulturen sich im Beet gegenseitig fördern – und welche du besser trennst.",
     "legendNone": "Keine Angabe",
     "matrixHint": "Namen anklicken zum Hervorheben",
     "relationGood": "{{a}} und {{b}} sind gute Nachbarn",
-    "relationBad": "{{a}} und {{b}} vertragen sich nicht",
+    "relationBad": "{{a}} und {{b}} sind ungünstige Nachbarn",
     "goodCount_one": "{{count}} guter Nachbar",
     "goodCount_other": "{{count}} gute Nachbarn",
-    "badCount_one": "{{count}} schlechter Nachbar",
-    "badCount_other": "{{count}} schlechte Nachbarn",
+    "badCount_one": "{{count}} ungünstiger Nachbar",
+    "badCount_other": "{{count}} ungünstige Nachbarn",
     "noneKnown": "Keine bekannt.",
     "choosePlant": "Pflanze wählen",
     "openDetails": "Pflanzendetails",
@@ -2076,8 +2124,6 @@
     "duration": "Dauer",
     "minutes": "Minuten",
     "noEntries": "Noch keine Bewässerung erfasst.",
-    "thisWeek": "Diese Woche",
-    "thisMonth": "Dieser Monat",
     "methods": {
       "manual": "Gießkanne",
       "hose": "Schlauch",
@@ -2097,7 +2143,6 @@
     "avgPerWeek": "Ø pro Woche",
     "lastWeeks_one": "letzte {{count}} Woche",
     "lastWeeks_other": "letzte {{count}} Wochen",
-    "entriesStat": "Einträge",
     "perWeek": "Wasser pro Woche",
     "perWeekHint_one": "Gießen und Regen der letzten {{count}} Woche",
     "perWeekHint_other": "Gießen und Regen der letzten {{count}} Wochen",
@@ -2113,7 +2158,13 @@
     "needBed": "Bitte ein Beet wählen",
     "needLiters": "Bitte eine Menge in Litern eingeben",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
-    "unknownBed": "Gelöschtes Beet"
+    "unknownBed": "Gelöschtes Beet",
+    "wateredThisWeek": "Gegossen diese Woche",
+    "wateredInMonth": "Gegossen im {{month}}",
+    "rainSeparate": "Regen separat: {{amount}}",
+    "onlyWatering": "nur Gießwasser, ohne Regen",
+    "sparkLabel_one": "Gießwasser der letzten {{count}} Woche, diese Woche {{amount}}",
+    "sparkLabel_other": "Gießwasser der letzten {{count}} Wochen, diese Woche {{amount}}"
   },
   "storage": {
     "full": "Speicher voll — Änderungen werden nicht mehr gesichert. Exportiere ein Backup und lösche alte Einträge.",

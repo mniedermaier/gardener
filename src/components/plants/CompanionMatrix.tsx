@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Check, X, Search, Info, ChevronRight, Grid3x3, ListTree } from "lucide-react";
+import { Check, TriangleAlert, Search, Info, ChevronRight, Grid3x3, ListTree } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -45,8 +45,8 @@ function RelationMark({ relation, size = 14 }: { relation: Exclude<Relation, nul
       <Check size={size} strokeWidth={3} aria-hidden="true" />
     </span>
   ) : (
-    <span className="inline-flex size-6 items-center justify-center rounded-md bg-danger/15 text-danger">
-      <X size={size} strokeWidth={3} aria-hidden="true" />
+    <span className="inline-flex size-6 items-center justify-center rounded-md bg-warning/15 text-warning">
+      <TriangleAlert size={size} strokeWidth={2.5} aria-hidden="true" />
     </span>
   );
 }

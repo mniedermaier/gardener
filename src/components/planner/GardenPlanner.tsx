@@ -44,13 +44,18 @@ import { AutoFillDialog, BedDialog, draftToBed, type BedDraft } from "./PlannerD
 
 type BedDialogState = { open: false } | { open: true; bedId?: string };
 
-/** Initial zoom so a bed fits its column without horizontal scrolling. */
+/**
+ * Initial zoom so a bed uses the width of its column (small beds grow, large
+ * ones shrink to avoid horizontal scrolling) without getting taller than the
+ * visible area below the header and mode bar.
+ */
 function fitZoom(bed: Bed): number {
   if (typeof window === "undefined") return 1;
   const w = window.innerWidth;
-  const available = w >= 768 ? w - (w >= 1024 ? 256 : 0) - 340 - 96 : w - 48;
-  const zoom = available / (bed.width * 52 + 12);
-  return Math.max(0.6, Math.min(1, Math.round(zoom * 10) / 10));
+  const availableW = w >= 768 ? w - (w >= 1024 ? 256 : 0) - 340 - 96 : w - 48;
+  const availableH = window.innerHeight - (w >= 768 ? 300 : 320);
+  const zoom = Math.min(availableW / (bed.width * 52 + 12), availableH / (bed.height * 52 + 12));
+  return Math.max(0.6, Math.min(1.6, Math.floor(zoom * 10) / 10));
 }
 
 export function GardenPlanner() {
@@ -102,7 +107,7 @@ export function GardenPlanner() {
   const [pendingPlant, setPendingPlant] = useState<Plant | null>(singleBed ? null : initialPlant);
   const [activeDragPlant, setActiveDragPlant] = useState<Plant | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(() => (openBed ? fitZoom(openBed) : 1));
   const [sheetOpen, setSheetOpen] = useState(false);
   // Mobile sheet height: "peek" keeps the bed visible (actions only), "full" shows everything.
   const [sheetFull, setSheetFull] = useState(false);
@@ -115,14 +120,18 @@ export function GardenPlanner() {
   const [showPrint, setShowPrint] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Leaving or switching the bed via the URL (browser back) resets the per-bed modes.
+  // Leaving or switching the bed (also via the URL / browser back) resets the
+  // per-bed modes. The plant being placed belongs to the bed it was picked in:
+  // it only survives the step from the overview into a bed (a plant chosen
+  // there, or a deep link), never a switch to another bed.
   const [prevBedParam, setPrevBedParam] = useState(bedParam);
   if (prevBedParam !== bedParam) {
     setPrevBedParam(bedParam);
     setInspectKey(null);
     setPathMode(false);
     setSheetOpen(false);
-    if (!bedParam) setPlacingPlant(null);
+    if (!bedParam || prevBedParam) setPlacingPlant(null);
+    if (openBed) setZoom(fitZoom(openBed));
   }
 
   const mode = pathMode ? "path" : placingPlant ? "place" : "inspect";
@@ -276,7 +285,13 @@ export function GardenPlanner() {
   /** Mobile: after picking a plant, show the bed (the sheet collapses). */
   const revealGrid = useCallback(() => {
     if (window.innerWidth >= 768) return;
-    requestAnimationFrame(() => document.querySelector("[data-bed-grid]")?.scrollIntoView({ block: "start", behavior: "smooth" }));
+    // Scroll <main> only, and keep the bed header (name, mode) in view above the grid.
+    requestAnimationFrame(() => {
+      const main = document.getElementById("main");
+      const anchor = document.querySelector("[data-bed-header]") ?? document.querySelector("[data-bed-grid]");
+      if (!main || !anchor) return;
+      main.scrollBy({ top: anchor.getBoundingClientRect().top - main.getBoundingClientRect().top - 8, behavior: "smooth" });
+    });
   }, []);
 
   // One handler for every cell tap; what it does depends on the mode.
@@ -691,14 +706,15 @@ export function GardenPlanner() {
               </aside>
             </div>
 
-            {/* Mobile: palette / inspector in a bottom sheet. Inspecting opens it as a
+            {/* Mobile: palette / inspector in a bottom sheet that reaches down behind the
+                bottom nav (no strip of page content between them). Inspecting opens it as a
                 peek (actions only, ~30 % height) so the bed and the selected cell stay
                 visible; "Details" pulls it up. The spacer lets the last rows scroll above it. */}
             <div className={sheetOpen && (sheetFull || !inspectedCell) ? "h-[72dvh] md:hidden" : "h-[40dvh] md:hidden"} aria-hidden="true" />
             <section
               data-planner-sheet
               aria-label={inspectedCell ? t("planner.inspectorLabel", { name: inspectedPlant ? getPlantName(inspectedPlant.id) : "" }) : t("planner.paletteTitle")}
-              className="fixed inset-x-0 bottom-safe-nav z-30 rounded-t-2xl border-t border-gray-200 bg-white shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] sm:bottom-0 md:hidden dark:border-white/10 dark:bg-gray-900"
+              className="fixed inset-x-0 bottom-0 z-30 rounded-t-2xl border-t border-gray-200 bg-white pb-[calc(3.5rem+1px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] sm:pb-0 md:hidden dark:border-white/10 dark:bg-gray-900"
             >
               {sheetOpen && inspectedCell && (
                 <button

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, Bird, ClipboardList, Coins, HeartCrack, HeartPulse, Pencil, Plus, Syringe, Trash2 } from "lucide-react";
+import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Syringe, Trash2 } from "lucide-react";
 import { differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -12,13 +12,12 @@ import type { AnimalType, HealthEvent, HealthEventType } from "@/types/animal";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
 import { Select } from "@/components/ui/Select";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { HowCalculated } from "@/components/ui/charts";
+import { HowCalculated, KeyFigures } from "@/components/ui/charts";
 import { HEALTH_ICON, HEALTH_TONE } from "./icons";
 import { HEALTH_EVENT_TYPES, HealthDialog, IconTile, animalLabel, useRecordActions } from "./shared";
 import { groupByMonth } from "./groupByMonth";
@@ -27,6 +26,10 @@ import { useToday } from "@/hooks/useToday";
 /** Animals with common routine vaccinations (poultry: ND; rabbits: RHD/Myxo; goats/sheep: clostridia). Bees have none. */
 const VACCINATED_TYPES: AnimalType[] = ["chicken", "duck", "quail", "rabbit", "goat", "sheep"];
 const VACCINATION_INTERVAL_DAYS = 180;
+/** Which vaccination note applies (livestock.health.vaccContext.*). */
+const VACC_GROUP: Partial<Record<AnimalType, "chicken" | "poultry" | "rabbit" | "ruminant">> = {
+  chicken: "chicken", duck: "poultry", quail: "poultry", rabbit: "rabbit", goat: "ruminant", sheep: "ruminant",
+};
 
 export function HealthPage() {
   const now = useToday();
@@ -68,6 +71,7 @@ export function HealthPage() {
     return {
       cost: healthEvents.reduce((s, h) => s + (h.cost ?? 0), 0),
       losses: healthEvents.filter((h) => h.type === "death").length,
+      last: healthEvents.reduce<string | undefined>((m, h) => (!m || h.date > m ? h.date : m), undefined),
       due,
     };
   }, [now, healthEvents, animals]);
@@ -90,12 +94,20 @@ export function HealthPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("livestock.health.totalEvents")} value={f.formatNumber(healthEvents.length, { maximumFractionDigits: 0 })} icon={ClipboardList} tone="neutral" />
-            <StatCard label={t("livestock.health.totalCost")} value={f.formatCurrency(stats.cost)} icon={Coins} tone="neutral" />
-            <StatCard label={t("livestock.health.losses")} value={f.formatNumber(stats.losses, { maximumFractionDigits: 0 })} icon={HeartCrack} tone={stats.losses > 0 ? "danger" : "neutral"} />
-            <StatCard label={t("livestock.health.overdueVacc")} value={f.formatNumber(stats.due.length, { maximumFractionDigits: 0 })} icon={Syringe} tone={stats.due.length > 0 ? "warning" : "neutral"} />
-          </div>
+          {healthEvents.length > 0 && (
+            <KeyFigures
+              hero={{
+                label: t("livestock.health.totalEvents"),
+                value: f.formatNumber(healthEvents.length, { maximumFractionDigits: 0 }),
+                icon: ClipboardList,
+                hint: stats.last ? t("livestock.health.lastEntry", { date: f.formatDate(stats.last, "relative") }) : undefined,
+              }}
+              items={[
+                { label: t("livestock.health.totalCost"), value: f.formatCurrency(stats.cost) },
+                { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: stats.losses === 0 ? t("livestock.health.noLosses") : undefined },
+              ]}
+            />
+          )}
 
           {stats.due.length > 0 && (
             <Card padding="none">
@@ -111,12 +123,14 @@ export function HealthPage() {
                   const animal = animalMap.get(animalId);
                   if (!animal) return null;
                   return (
-                    <li key={animalId} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
-                      <div className="text-sm">
+                    <li key={animalId} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
+                      <div className="min-w-0 flex-1 basis-full text-sm sm:basis-64">
                         <p className="font-medium text-gray-900 dark:text-gray-100">{animalLabel(animal, t)}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {lastDate ? t("livestock.health.lastVaccination", { date: f.formatDate(lastDate, "short") }) : t("livestock.health.neverVaccinated")}
                         </p>
+                        {/* What is actually due for this species, so a hobby keeper can judge the hint. */}
+                        <p className="mt-1 max-w-prose text-xs text-gray-600 dark:text-gray-300">{t(`livestock.health.vaccContext.${VACC_GROUP[animal.type] ?? "other"}`)}</p>
                       </div>
                       <Button size="sm" variant="secondary" onClick={() => setDialog({ open: true, animalId, type: "vaccination" })}>
                         <Syringe size={14} aria-hidden="true" />

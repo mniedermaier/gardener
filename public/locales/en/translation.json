@@ -120,7 +120,7 @@
         "journal": "Journal"
       },
       "logHarvestFor": "Log harvest: {{name}}",
-      "plantInBed": "{{plant}} in {{bed}}",
+      "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} cell",
       "cellCount_other": "{{count}} cells"
     },
@@ -157,7 +157,6 @@
     "nowSubtitle": "What is ready to pick and what to sow or plant next",
     "tabHarvest": "Harvest",
     "tabSow": "Sow & plant",
-    "harvestReady": "Ready",
     "harvestSoon": "Pick soon",
     "plantCount_one": "{{count}} plant",
     "plantCount_other": "{{count}} plants",
@@ -172,7 +171,6 @@
     "weatherErrorTitle": "Weather unavailable",
     "weatherErrorText": "Weather data is not reachable right now. Check your internet connection.",
     "openSettings": "Open settings",
-    "frostHint": "Frost possible ({{days}}, down to {{temp}}). Cover tender crops.",
     "seasonTitle": "Season so far",
     "plantings": "Plantings",
     "typesInBeds_one": "{{types}} crops · {{count}} bed",
@@ -209,7 +207,24 @@
       "later": "Later"
     },
     "forecastValue": "Forecast {{value}}",
-    "roiValue": "Return {{value}}"
+    "roiValue": "Return {{value}}",
+    "frostAdvice": "Cover tender crops.",
+    "mapSummary_one": "{{count}} bed · {{plants}} plants",
+    "mapSummary_other": "{{count}} beds · {{plants}} plants",
+    "mapPlants_one": "{{count}} plant",
+    "mapPlants_other": "{{count}} plants",
+    "mapTasks_one": "{{count}} task due",
+    "mapTasks_other": "{{count}} tasks due",
+    "mapOpenPlanner": "Planner",
+    "mapLabel": "Beds in the garden",
+    "mapLegend": "Legend",
+    "mapRipe": "ready to harvest: {{plants}}",
+    "mapFrost": "frost expected",
+    "mapPin": {
+      "harvest": "Ready to harvest",
+      "task": "Task due",
+      "frost": "Frost expected"
+    }
   },
   "search": {
     "placeholder": "Search plants, tasks, journal...",
@@ -288,8 +303,8 @@
     "importTemplate": "Import garden template",
     "importNow": "Import",
     "importError": "Invalid or expired share link.",
-    "companions": "Good companions",
-    "antagonists": "Bad neighbors",
+    "companions": "Good neighbours",
+    "antagonists": "Unfavourable neighbours",
     "environment": "Environment",
     "environmentTypes": {
       "outdoor_bed": "Outdoor bed",
@@ -494,8 +509,8 @@
       "rowSpacing": "Row spacing",
       "sun": "Sun",
       "water": "Water",
-      "companions": "Good companions",
-      "antagonists": "Avoid next to",
+      "companions": "Good neighbours",
+      "antagonists": "Unfavourable neighbours",
       "plantedIn": "Currently planted in",
       "weeksBeforeFrost": "{{weeks}} weeks before last frost",
       "weeksAfterFrost": "{{weeks}} weeks after last frost",
@@ -816,7 +831,11 @@
       "96": "Thunderstorm with hail",
       "99": "Severe thunderstorm with hail",
       "unknown": "No description"
-    }
+    },
+    "fallbackAuth": "OpenWeatherMap rejected your API key. Until you check it, weather data comes from Open-Meteo.",
+    "fallbackUnavailable": "OpenWeatherMap is unreachable right now. Weather data comes from Open-Meteo in the meantime.",
+    "dayArcTitle": "Sun today",
+    "dayArcLabel": "Sunrise {{sunrise}}, sunset {{sunset}}, {{hours}} of daylight"
   },
   "calendar": {
     "subtitle": "What's coming up in the garden, sorted by due date.",
@@ -845,7 +864,7 @@
       "done": "Done",
       "next7": "Next 7 days"
     },
-    "overdueSince": "due {{date}}",
+    "overdueSince": "due {{dateInline}}",
     "recurrence": "Repeat",
     "recurring": {
       "none": "Never",
@@ -1043,12 +1062,17 @@
       "warning": "Caution",
       "info": "Note"
     },
-    "frostGroupTitle_one": "Frost risk on {{count}} night, down to {{temp}}",
-    "frostGroupTitle_other": "Frost risk on {{count}} nights, down to {{temp}}",
+    "frostGroupTitle_one": "Frost risk on {{count}} night, down to {{temp}} ({{day}})",
+    "frostGroupTitle_other": "Frost risk on {{count}} nights, down to {{temp}} ({{day}})",
     "frostAffected_one": "Affected: {{plants}}. Cover with fleece or bring indoors.",
     "frostAffected_other": "{{count}} crops affected, e.g. {{plants}}. Cover with fleece or bring indoors.",
     "frostAdvice": "Cover tender plants with fleece and hold off on transplanting.",
-    "greenhouseFrostDesc": "Coldest day: {{date}}, {{outside}} outside. Even the unheated house will likely freeze (about {{temp}}). Cover tender plants with a double layer of fleece or heat frost-free. Assumption: about {{buffer}} warmer than outside."
+    "greenhouseFrostDesc": "Coldest day: {{date}}, {{outside}} outside. Even the unheated house will likely freeze (about {{temp}}). Cover tender plants with a double layer of fleece or heat frost-free. Assumption: about {{buffer}} warmer than outside.",
+    "fleeceTask": "Add fleece task",
+    "fleeceTaskTitle": "Cover with fleece",
+    "fleeceTaskDesc": "Frost nights in the forecast: {{nights}}. Cover tender crops in the evening, uncover in the morning.",
+    "fleeceTaskAdded": "Task “Cover with fleece” added for {{day}}",
+    "fleeceTaskPlanned": "Fleece task planned for {{day}}"
   },
   "harvest": {
     "title": "Harvest",
@@ -1161,7 +1185,6 @@
     "quantity": "Quantity",
     "unitCount": "Units (jars, bags …)",
     "unitCountPlaceholder": "e.g. 12",
-    "defaultUnit": "pcs",
     "label": "Label",
     "labelPlaceholder": "e.g. Tomato Sauce August 2026",
     "supplyCost": "Supply cost",
@@ -1231,11 +1254,27 @@
     "invalidNumber": "Enter a valid number",
     "methodSummary": "Keeps {{shelf}} · yield approx. {{yield}}",
     "quantityKg": "Quantity (kg)",
-    "unitLabel": "Kind of unit",
-    "unitLabelPlaceholder": "e.g. jars, bags",
+    "unitLabel": "Unit",
+    "unitLabelPlaceholder": "e.g. buckets",
     "storedDate": "Stored on",
     "bestBefore": "Best before {{date}}",
-    "supplyCostHint": "Jars, lids, bags – optional"
+    "supplyCostHint": "Jars, lids, bags – optional",
+    "unitOther": "Other …",
+    "unitOtherLabel": "Custom unit",
+    "unitNames": {
+      "jar_one": "jar",
+      "jar_other": "jars",
+      "bottle_one": "bottle",
+      "bottle_other": "bottles",
+      "bag_one": "bag",
+      "bag_other": "bags",
+      "can_one": "can",
+      "can_other": "cans",
+      "pack_one": "pack",
+      "pack_other": "packs",
+      "piece_one": "piece",
+      "piece_other": "pieces"
+    }
   },
   "season": {
     "current": "Season {{year}}",
@@ -1336,7 +1375,6 @@
     "monthlyCaption": "Calorie coverage per month",
     "monthlyKgTitle": "Food available per month",
     "monthlyKgCaption": "Food available per month in kg, fresh and stored",
-    "axisKg": "Axis in kg",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
     "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
     "ofNeed": "{{produced}} of {{needed}}",
@@ -1405,7 +1443,6 @@
     "added": "{{name}} added",
     "totalAnimals": "Total animals",
     "eggsThisWeek": "Eggs this week",
-    "honeyThisYear": "Honey this year",
     "animalsTab": "Animals",
     "productionTab": "Production",
     "noProducts": "Log eggs, honey or milk to see trends and value.",
@@ -1470,7 +1507,6 @@
       "totalEvents": "Total entries",
       "totalCost": "Veterinary costs",
       "losses": "Losses",
-      "overdueVacc": "Vaccination due",
       "overdueWarning": "Vaccination possibly overdue",
       "daysSince": "{{days}} days ago",
       "neverVaccinated": "No vaccination recorded",
@@ -1480,7 +1516,16 @@
       "dueTitle_other": "Check vaccination for {{count}} groups",
       "dueHow": "Poultry, rabbits, goats and sheep without a vaccination in the last {{days}} days. Bees are not vaccinated. Intervals depend on the vaccine and your vet.",
       "lastVaccination": "Last vaccination {{date}}",
-      "logVaccination": "Log vaccination"
+      "logVaccination": "Log vaccination",
+      "lastEntry": "Last entry: {{date}}",
+      "noLosses": "no losses recorded",
+      "vaccContext": {
+        "chicken": "Chickens: in Germany vaccination against Newcastle disease (ND) is mandatory. The interval depends on the vaccine – hatchery chicks are often already vaccinated against Marek’s disease.",
+        "poultry": "Ducks and quail: not mandatory, but ND vaccination is recommended. The interval depends on the vaccine.",
+        "rabbit": "Rabbits: RHD and myxomatosis, every six to twelve months depending on the vaccine.",
+        "ruminant": "Goats and sheep: clostridial vaccine, usually boosted yearly – check with your vet.",
+        "other": "The interval depends on the vaccine – check with your vet."
+      }
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1551,7 +1596,6 @@
     "eggsLogged_one": "{{count}} egg logged",
     "eggsLogged_other": "{{count}} eggs logged",
     "eggsThisYear": "Eggs this year",
-    "milkThisYear": "Milk this year",
     "feedEntriesCount_one": "{{count}} feed entry",
     "feedEntriesCount_other": "{{count}} feed entries",
     "chartDesc": "Last 6 months, one chart per product.",
@@ -1615,7 +1659,10 @@
     "weekShort": "Week {{week}}",
     "showEntries": "show entries",
     "hideEntries": "hide entries",
-    "ofExpectedToDate": "of ~{{amount}} expected"
+    "ofExpectedToDate": "of ~{{amount}} expected",
+    "productThisYear": "{{product}} this year",
+    "eggWeeksLabel": "Eggs per week over the last 8 weeks, avg. {{avg}}",
+    "eggWeeksAvg": "Avg. {{avg}} per week over the last 8 weeks"
   },
   "seeds": {
     "title": "Seeds",
@@ -1783,7 +1830,8 @@
         "low": "Organic matter low: mulch, sow green manure and add 2–3 l of compost per m² every year.",
         "high": "Organic matter very high: cut back on compost for a few years."
       }
-    }
+    },
+    "openInPlanner": "Open in planner"
   },
   "preservation": {
     "title": "Preservation guide",
@@ -1862,8 +1910,8 @@
     "neighbours": "Neighbours",
     "goodPairs_one": "{{count}} good pair",
     "goodPairs_other": "{{count}} good pairs",
-    "conflictPairs_one": "{{count}} unfavourable pair",
-    "conflictPairs_other": "{{count}} unfavourable pairs"
+    "conflictPairs_one": "{{count}} unfavourable neighbour",
+    "conflictPairs_other": "{{count}} unfavourable neighbours"
   },
   "validation": {
     "antagonistDirect": "{{plant}} next to {{neighbor}} – unfavourable neighbours. Better leave a cell between them.",
@@ -1898,7 +1946,6 @@
     "category": "Category",
     "totalExpenses": "Total expenses",
     "harvestValue": "Harvest value (market price)",
-    "roi": "Return",
     "byCategory": "Costs by area",
     "noEntries": "Record seeds, soil or tools to see what your garden costs.",
     "categories": {
@@ -1928,7 +1975,6 @@
     "net": "Balance",
     "surplus": "Surplus",
     "deficit": "Shortfall",
-    "roiHint": "Balance relative to costs",
     "roiNoCosts": "No costs recorded yet",
     "howCosts": "Costs: expenses on this page plus feed and vet costs from Animals. Feed log entries count as Animal feed, vet costs as Veterinary.",
     "howValue": "Value: recorded harvest (kg × typical market price of the crop, €1.20–30/kg, otherwise €3/kg) plus recorded animal products × price per unit.",
@@ -2014,7 +2060,9 @@
     "desc": "Today's sun times and day length through the year.",
     "hoursValue": "{{hours}} h",
     "hoursShort": "{{hours}} h",
-    "caption": "Daylight per month: longest in {{longest}} ({{longestHours}}), shortest in {{shortest}} ({{shortestHours}})"
+    "caption": "Daylight per month: longest in {{longest}} ({{longestHours}}), shortest in {{shortest}} ({{shortestHours}})",
+    "yearlyDesc": "Below about 10 hours of daylight hardly anything grows – get winter crops established before then.",
+    "growthLimit": "10 h"
   },
   "common": {
     "save": "Save",
@@ -2046,18 +2094,18 @@
     "search": "Search plant...",
     "matrixView": "Matrix",
     "listView": "List",
-    "companionsLabel": "Good neighbors",
-    "antagonistsLabel": "Bad neighbors",
+    "companionsLabel": "Good neighbours",
+    "antagonistsLabel": "Unfavourable neighbours",
     "noRelations": "No known relationships",
     "subtitle": "Which crops help each other in a bed – and which you should keep apart.",
     "legendNone": "No data",
     "matrixHint": "Click a name to highlight",
-    "relationGood": "{{a}} and {{b}} are good companions",
-    "relationBad": "{{a}} and {{b}} do not get along",
-    "goodCount_one": "{{count}} good companion",
-    "goodCount_other": "{{count}} good companions",
-    "badCount_one": "{{count}} bad companion",
-    "badCount_other": "{{count}} bad companions",
+    "relationGood": "{{a}} and {{b}} are good neighbours",
+    "relationBad": "{{a}} and {{b}} are unfavourable neighbours",
+    "goodCount_one": "{{count}} good neighbour",
+    "goodCount_other": "{{count}} good neighbours",
+    "badCount_one": "{{count}} unfavourable neighbour",
+    "badCount_other": "{{count}} unfavourable neighbours",
     "noneKnown": "None known.",
     "choosePlant": "Choose a plant",
     "openDetails": "Plant details",
@@ -2076,8 +2124,6 @@
     "duration": "Duration",
     "minutes": "minutes",
     "noEntries": "No watering entries yet.",
-    "thisWeek": "This week",
-    "thisMonth": "This month",
     "methods": {
       "manual": "Watering can",
       "hose": "Hose",
@@ -2097,7 +2143,6 @@
     "avgPerWeek": "Avg. per week",
     "lastWeeks_one": "last {{count}} week",
     "lastWeeks_other": "last {{count}} weeks",
-    "entriesStat": "Entries",
     "perWeek": "Water per week",
     "perWeekHint_one": "Watering and rain over the last {{count}} week",
     "perWeekHint_other": "Watering and rain over the last {{count}} weeks",
@@ -2113,7 +2158,13 @@
     "needBed": "Choose a bed",
     "needLiters": "Enter an amount in litres",
     "invalidNumber": "Enter a valid number",
-    "unknownBed": "Deleted bed"
+    "unknownBed": "Deleted bed",
+    "wateredThisWeek": "Watered this week",
+    "wateredInMonth": "Watered in {{month}}",
+    "rainSeparate": "Rain counted separately: {{amount}}",
+    "onlyWatering": "watering only, no rain",
+    "sparkLabel_one": "Watering over the last {{count}} week, {{amount}} this week",
+    "sparkLabel_other": "Watering over the last {{count}} weeks, {{amount}} this week"
   },
   "storage": {
     "full": "Storage full — changes are no longer being saved. Export a backup and remove old entries.",

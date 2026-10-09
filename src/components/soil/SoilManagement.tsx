@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  Beaker, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
+  Beaker, LayoutGrid, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -60,6 +61,7 @@ const emptyAmend = (bedId = ""): AmendDraft => ({ bedId, date: todayISO(), type:
 
 export function SoilManagement() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { toast, confirm } = useToast();
   const { formatDate, formatNumber, formatWeight, formatCurrency, locale } = useFormat();
   const { soilTests, amendments, addSoilTest, updateSoilTest, deleteSoilTest, addAmendment, updateAmendment, deleteAmendment } = useStore(
@@ -240,13 +242,25 @@ export function SoilManagement() {
                           {bedName(s.bedId)}
                         </button>
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400"><time dateTime={s.date}>{formatDate(s.date)}</time></p>
+                      <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <time dateTime={s.date}>{formatDate(s.date)}</time>
+                        {beds.byId.has(s.bedId) && (
+                          <>
+                            <span aria-hidden="true">·</span>
+                            <Link to={`/planner?bed=${encodeURIComponent(s.bedId)}`} className="relative z-10 inline-flex min-h-11 items-center gap-1 font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
+                              <LayoutGrid size={12} aria-hidden="true" />
+                              {t("soil.openInPlanner")}
+                            </Link>
+                          </>
+                        )}
+                      </p>
                     </div>
                     <div className="relative z-10 -mt-1 -mr-2">
                       <Menu
                         label={t("common.moreActions")}
                         items={[
                           { label: t("common.edit"), icon: Pencil, onSelect: () => openEditTest(s) },
+                          ...(beds.byId.has(s.bedId) ? [{ label: t("soil.openInPlanner"), icon: LayoutGrid, onSelect: () => navigate(`/planner?bed=${encodeURIComponent(s.bedId)}`) }] : []),
                           "separator",
                           { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void removeTest(s) },
                         ]}
@@ -348,6 +362,7 @@ export function SoilManagement() {
                       label={t("common.moreActions")}
                       items={[
                         { label: t("common.edit"), icon: Pencil, onSelect: () => openEditAmend(a) },
+                        ...(beds.byId.has(a.bedId) ? [{ label: t("soil.openInPlanner"), icon: LayoutGrid, onSelect: () => navigate(`/planner?bed=${encodeURIComponent(a.bedId)}`) }] : []),
                         "separator",
                         { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void removeAmend(a) },
                       ]}

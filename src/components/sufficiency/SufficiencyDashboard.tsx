@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Apple, Beef, Citrus, LayoutGrid, Lightbulb, Scale, Sprout, Target, Wheat, Archive } from "lucide-react";
+import { Apple, Beef, Citrus, LayoutGrid, Lightbulb, Sprout, Target, Wheat, Archive } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -17,13 +17,12 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Select } from "@/components/ui/Select";
 import { List, ListRow } from "@/components/ui/List";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
-import { BarChart, HowCalculated, Meter, MonthStrip } from "@/components/ui/charts";
+import { BarChart, HowCalculated, KeyFigures, Meter, MonthStrip } from "@/components/ui/charts";
 import { PRODUCT_ICON } from "@/components/livestock/icons";
 import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { HouseholdSizeField } from "./HouseholdSizeField";
@@ -110,6 +109,7 @@ export function SufficiencyDashboard() {
 
   const lowCount = result.lowMonths.length;
   const gap = result.winterGap;
+  const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
   const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
 
   return (
@@ -118,24 +118,24 @@ export function SufficiencyDashboard() {
 
       {view === "overview" && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              label={t("metrics.selfSufficiencyForecast")}
-              value={f.formatPercent(ss.forecastRatio)}
-              icon={Target}
-              tone="brand"
-              hint={t("metrics.caloriesFor", { count: householdSize })}
-            />
-            <StatCard
-              label={t("metrics.selfSufficiencyActual")}
-              value={f.formatPercent(ss.actualRatio)}
-              icon={Target}
-              tone="neutral"
-              hint={ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: f.formatPercent(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year })}
-            />
-            <StatCard label={t("metrics.yieldForecast")} value={f.formatWeight(metrics.harvest.forecast.totalGrams)} icon={Sprout} tone="neutral" hint={t("metrics.plantsOnly")} />
-            <StatCard label={t("metrics.yieldActual")} value={f.formatWeight(metrics.harvest.actual.totalGrams)} icon={Scale} tone="neutral" hint={t("metrics.harvestEntries", { count: metrics.harvest.entryCount })} />
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("metrics.selfSufficiencyForecast"),
+              value: f.formatPercent(ss.forecastRatio),
+              icon: Target,
+              tone: "brand",
+              hint: t("metrics.caloriesFor", { count: householdSize }),
+            }}
+            items={[
+              {
+                label: t("metrics.selfSufficiencyActual"),
+                value: f.formatPercent(ss.actualRatio),
+                hint: ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: f.formatPercent(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year }),
+              },
+              { label: t("metrics.yieldForecast"), value: f.formatWeight(metrics.harvest.forecast.totalGrams), hint: t("metrics.plantsOnly") },
+              { label: t("metrics.yieldActual"), value: f.formatWeight(metrics.harvest.actual.totalGrams), hint: t("metrics.harvestEntries", { count: metrics.harvest.entryCount }), to: "/harvest" },
+            ]}
+          />
           <HowCalculated>
             <p>{t("metrics.howNeed", { kcal: f.formatNumber(DAILY_KCAL_PER_PERSON, { maximumFractionDigits: 0 }) })}</p>
             <p>{t("metrics.howForecast")}</p>
@@ -176,18 +176,18 @@ export function SufficiencyDashboard() {
             <div className="mt-6">
               <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.monthlyKgTitle")}</h3>
               <BarChart
-                data={result.monthlyFood.map((m) => ({ key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month], values: [m.freshKg, m.storedKg] }))}
+                data={result.monthlyFood.map((m) => ({ key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month], values: hasStored ? [m.freshKg, m.storedKg] : [m.freshKg] }))}
                 series={[
                   { label: t("sufficiency.fresh"), color: "brand" },
-                  { label: t("sufficiency.stored"), color: "earth", hatched: true },
+                  // Legend only for a series that is actually drawn.
+                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "earth" as const, hatched: true }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
-                formatTick={(v) => f.formatNumber(v, { maximumFractionDigits: 0 })}
+                formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}
                 marker={{ index: currentMonth, label: t("charts.today") }}
                 caption={t("sufficiency.monthlyKgCaption")}
                 categoryLabel={t("charts.month")}
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("sufficiency.axisKg")}</p>
             </div>
           </Card>
 

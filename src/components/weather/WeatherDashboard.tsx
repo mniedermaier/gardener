@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown, Cloud, CloudFog, CloudLightning, CloudOff, CloudRain, CloudSnow, CloudSun, Droplets, MapPin, Moon,
-  RefreshCw, Settings, Snowflake, Sprout, Sun, Thermometer, Umbrella, Wind, type LucideIcon,
+  Info, RefreshCw, Settings, Snowflake, Sprout, Sun, Thermometer, Umbrella, Wind, type LucideIcon,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -11,10 +11,10 @@ import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { toDate, todayISO } from "@/lib/format";
-import { differenceInCalendarDays } from "date-fns";
-import { getAllAlerts, groupAlerts, type AlertGroup, type WeatherAlert } from "@/lib/weatherAlerts";
+import { getAllAlerts, groupAlerts, type AlertGroup, type FrostSummary, type WeatherAlert } from "@/lib/weatherAlerts";
 import { fetchWeather as fetchWeather_, getWeatherProvider, isWeatherConfigured, WeatherAuthError } from "@/lib/weather";
 import type { Plant } from "@/types/plant";
+import type { Bed } from "@/types/garden";
 import type { WeatherData } from "@/types/weather";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -26,6 +26,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { TONE_SOFT, type Tone } from "@/components/ui/tone";
 import { RangeBar } from "@/components/ui/charts";
 import { SunlightWidget } from "./SunlightWidget";
+import { DayArc } from "./DayArc";
+import { FrostTaskButton, useDayLabel, useFrostSummary } from "./frost";
 
 const ALERT_ICON: Record<WeatherAlert["type"], LucideIcon> = {
   frost: Snowflake,
@@ -52,26 +54,30 @@ function weatherIcon(code: string): LucideIcon {
 
 type FetchError = "auth" | "network";
 
-/** Same day names as the forecast list: "Heute", "Morgen", then "Mi." … */
-function dayLabel(date: string, f: ReturnType<typeof useFormat>): string {
-  const diff = differenceInCalendarDays(toDate(date) ?? new Date(), new Date());
-  return diff >= 0 && diff < 2 ? f.formatDate(date, "relative") : f.formatDate(date, "weekday");
-}
-
 /** "Mittwoch, 7. Okt." — the day inside an alert sentence. */
 function dayPhrase(date: string, locale: string): string {
   const d = toDate(date);
   return d ? new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "short" }).format(d) : date;
 }
 
-/** Frost-sensitive crops = planted crops normally set out only after the last frost. */
+/** Tender crops sown straight into the bed after the last frost. */
+const TENDER_DIRECT_SOWN = new Set(["bean", "corn", "sunflower"]);
+/** Protected beds get their own greenhouse warning; frost hits the open beds. */
+const PROTECTED: Bed["environmentType"][] = ["greenhouse", "polytunnel", "cold_frame", "windowsill"];
+
+/**
+ * Frost-tender crops = set out only *after* the last frost (transplantWeeks > 0)
+ * or tender direct sowings. Hardy crops planted at the frost date (chard,
+ * leek, celery: transplantWeeks 0) stand a few degrees below zero.
+ */
 function frostSensitive(plants: Plant[]): Plant[] {
-  return plants.filter((p) => p.transplantWeeks !== null && p.transplantWeeks >= 0 && p.harvestDaysMax < 365);
+  return plants.filter((p) => p.harvestDaysMax < 365 && p.id !== "rosemary" && ((p.transplantWeeks ?? -1) > 0 || TENDER_DIRECT_SOWN.has(p.id)));
 }
 
-function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: string[] }) {
+function AlertCallout({ group, sensitive, frost }: { group: AlertGroup; sensitive: string[]; frost: { summary: FrostSummary; title: string } | null }) {
   const { t } = useTranslation();
   const f = useFormat();
+  const dayLabel = useDayLabel();
   const Icon = ALERT_ICON[group.type];
   const tone = SEVERITY_TONE[group.severity];
   const fmtParams = (p?: Record<string, string | number>) => {
@@ -85,20 +91,21 @@ function AlertCallout({ group, sensitive }: { group: AlertGroup; sensitive: stri
   let title: string;
   let body: ReactNode;
   if (group.type === "frost") {
-    const coldest = Math.min(...group.alerts.map((a) => Number(a.titleParams?.temp ?? 0)));
-    title = t("alerts.frostGroupTitle", { count: group.alerts.length, temp: f.formatTemperature(coldest) });
+    // Same sentence as on "Heute" (one source: summarizeFrost).
+    title = frost?.title ?? "";
     body = (
       <>
         <span className="flex flex-wrap gap-1.5">
           {group.alerts.map((a) => (
             <Badge key={a.id} variant="outline" tone={a.severity === "danger" ? "danger" : "warning"}>
-              {dayLabel(a.date ?? "", f)} {f.formatTemperature(Number(a.titleParams?.temp ?? 0))}
+              {dayLabel(a.date ?? "")} {f.formatTemperature(Number(a.titleParams?.temp ?? 0))}
             </Badge>
           ))}
         </span>
         <span className="mt-1.5 block">
           {sensitive.length > 0 ? t("alerts.frostAffected", { plants: sensitive.slice(0, 4).join(", "), count: sensitive.length }) : t("alerts.frostAdvice")}
         </span>
+        {frost && <FrostTaskButton summary={frost.summary} className="mt-2.5" />}
       </>
     );
   } else {
@@ -136,8 +143,10 @@ export function WeatherDashboard() {
       return cached ? JSON.parse(cached) : null;
     } catch { return null; }
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<FetchError | null>(null);
+  /** OpenWeatherMap failed and Open-Meteo stepped in (see lib/weather.ts). */
+  const [fallback, setFallback] = useState<"auth" | "unavailable" | null>(null);
+  const dayLabel = useDayLabel();
 
   const allBeds = useMemo(() => gardens.flatMap((g) => g.beds), [gardens]);
   const plantedPlants = useMemo(() => {
@@ -149,26 +158,42 @@ export function WeatherDashboard() {
   const allAlerts = useMemo(() => (weather ? getAllAlerts(weather.forecast.filter((d) => d.date >= todayISO()), allBeds, plantedPlants, alertConfig) : []), [weather, allBeds, plantedPlants, alertConfig]);
   const groups = useMemo(() => groupAlerts(allAlerts), [allAlerts]);
   const weekly = allAlerts.find((a) => a.type === "weekly");
-  const sensitive = useMemo(() => frostSensitive(plantedPlants).map((p) => plantName(p.id)), [plantedPlants, plantName]);
+  const frost = useFrostSummary(weather?.forecast);
+  const sensitive = useMemo(() => {
+    const ids = new Set<string>();
+    for (const b of allBeds) if (!PROTECTED.includes(b.environmentType)) for (const c of b.cells) ids.add(c.plantId);
+    const open = [...ids].map((id) => plantMap.get(id)).filter((p): p is Plant => !!p);
+    return frostSensitive(open).map((p) => plantName(p.id));
+  }, [allBeds, plantMap, plantName]);
 
-  const provider = getWeatherProvider(weatherApiKey);
-  const fetchWeather = useCallback(async () => {
-    if (!isWeatherConfigured(locationLat, locationLon)) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fetchWeather_({ lat: locationLat!, lon: locationLon!, apiKey: weatherApiKey, locale: i18n.language, locationName, t });
-      addWeatherHistory(result.today);
-      setWeather(result.data);
-      try { sessionStorage.setItem("gardener-weather", JSON.stringify(result.data)); } catch { /* private mode */ }
-    } catch (e) {
-      setError(e instanceof WeatherAuthError ? "auth" : "network");
-    } finally {
-      setLoading(false);
-    }
-  }, [weatherApiKey, locationLat, locationLon, locationName, addWeatherHistory, t, i18n.language]);
+  const provider = fallback ? "open-meteo" : getWeatherProvider(weatherApiKey);
+  // Each request has a key; `loading` is derived (no setState inside the effect body).
+  const [reload, setReload] = useState(0);
+  const configured = isWeatherConfigured(locationLat, locationLon);
+  const requestKey = `${weatherApiKey}|${locationLat}|${locationLon}|${i18n.language}|${reload}`;
+  const [doneKey, setDoneKey] = useState<string | null>(null);
+  const loading = configured && doneKey !== requestKey;
+  const fetchWeather = useCallback(() => setReload((n) => n + 1), []);
 
-  useEffect(() => { void fetchWeather(); }, [fetchWeather]);
+  useEffect(() => {
+    if (locationLat === null || locationLon === null) return;
+    const ctrl = new AbortController();
+    fetchWeather_({ lat: locationLat, lon: locationLon, apiKey: weatherApiKey, locale: i18n.language, locationName, t, signal: ctrl.signal })
+      .then((result) => {
+        addWeatherHistory(result.today);
+        setWeather(result.data);
+        setFallback(result.fallback ?? null);
+        setError(null);
+        try { sessionStorage.setItem("gardener-weather", JSON.stringify(result.data)); } catch { /* private mode */ }
+        setDoneKey(requestKey);
+      })
+      .catch((e: unknown) => {
+        if ((e as Error).name === "AbortError") return;
+        setError(e instanceof WeatherAuthError ? "auth" : "network");
+        setDoneKey(requestKey);
+      });
+    return () => ctrl.abort();
+  }, [requestKey, locationLat, locationLon, weatherApiKey, i18n.language, locationName, t, addWeatherHistory]);
 
   const toSettings = (
     <Button onClick={() => navigate("/settings")}>
@@ -177,7 +202,7 @@ export function WeatherDashboard() {
     </Button>
   );
 
-  if (!isWeatherConfigured(locationLat, locationLon)) {
+  if (!configured) {
     return (
       <div>
         <PageHeader title={t("weather.title")} description={t("weather.subtitle")} />
@@ -213,8 +238,17 @@ export function WeatherDashboard() {
       <PageHeader
         title={t("weather.title")}
         description={weekly ? t(weekly.descriptionKey, { ...weekly.descriptionParams, minTemp: f.formatTemperature(Number(weekly.descriptionParams?.minTemp)), maxTemp: f.formatTemperature(Number(weekly.descriptionParams?.maxTemp)) }) : t("weather.subtitle")}
-        actions={<IconButton icon={RefreshCw} label={t("weather.refresh")} onClick={() => void fetchWeather()} disabled={loading} className={loading ? "[&_svg]:animate-spin" : ""} />}
       />
+
+      {fallback && weather && (
+        <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-info/10 px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
+          <Info size={16} aria-hidden="true" className="shrink-0 text-info" />
+          <span className="min-w-0 flex-1">{t(fallback === "auth" ? "weather.fallbackAuth" : "weather.fallbackUnavailable")}</span>
+          <button type="button" onClick={() => navigate("/settings")} className="inline-flex min-h-11 items-center font-medium text-garden-700 underline-offset-2 hover:underline sm:min-h-0 dark:text-garden-300">
+            {t("weather.toSettings")}
+          </button>
+        </p>
+      )}
 
       {error && (
         <Card className="mb-6">
@@ -231,7 +265,7 @@ export function WeatherDashboard() {
 
       {visible.length > 0 && (
         <section aria-label={t("weather.alertsLabel")} className="mb-6 space-y-2">
-          {visible.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} />)}
+          {visible.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} frost={frost} />)}
           {hidden.length > 0 && (
             <details className="group">
               <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-md px-1 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 [&::-webkit-details-marker]:hidden">
@@ -239,7 +273,7 @@ export function WeatherDashboard() {
                 {t("weather.moreAlerts", { count: hidden.length })}
               </summary>
               <div className="mt-2 space-y-2">
-                {hidden.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} />)}
+                {hidden.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} frost={frost} />)}
               </div>
             </details>
           )}
@@ -254,14 +288,16 @@ export function WeatherDashboard() {
       )}
 
       {weather && (
-        <div className="grid gap-6 lg:grid-cols-5 lg:items-start">
+        // Phones: now → forecast → daylight. Desktop: now and daylight on the left, forecast spans both rows.
+        <div className="grid gap-6 lg:grid-cols-5 lg:grid-rows-[auto_1fr] lg:items-start">
           <Card className="lg:col-span-2">
-            <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-              <MapPin size={14} aria-hidden="true" />
-              {weather.locationName}
+            <div className="-mt-1 -mr-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+              <MapPin size={14} aria-hidden="true" className="shrink-0" />
+              <span className="min-w-0 truncate">{weather.locationName}</span>
               <span aria-hidden="true">·</span>
-              <time dateTime={weather.fetchedAt}>{t("weather.updatedAt", { time: new Intl.DateTimeFormat(f.locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(weather.fetchedAt)) })}</time>
-            </p>
+              <time dateTime={weather.fetchedAt} className="shrink-0">{t("weather.updatedAt", { time: new Intl.DateTimeFormat(f.locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(weather.fetchedAt)) })}</time>
+              <IconButton icon={RefreshCw} size="sm" label={t("weather.refresh")} onClick={() => void fetchWeather()} disabled={loading} className={`ml-auto ${loading ? "[&_svg]:animate-spin" : ""}`} />
+            </div>
             <div className="mt-4 flex items-center gap-4">
               {createElement(weatherIcon(weather.current.icon), { size: 48, strokeWidth: 1.5, "aria-hidden": true, className: "text-gray-700 dark:text-gray-300" })}
               <div>
@@ -283,9 +319,15 @@ export function WeatherDashboard() {
                 <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{t("weather.windValue", { speed: f.formatNumber(weather.current.windSpeed, { maximumFractionDigits: 0 }) })}</dd>
               </div>
             </dl>
+            {locationLat !== null && locationLon !== null && (
+              <div className="mt-4 border-t border-gray-100 pt-3 dark:border-white/5">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{t("weather.dayArcTitle")}</p>
+                <DayArc lat={locationLat} lon={locationLon} className="mx-auto mt-1 max-w-sm" />
+              </div>
+            )}
           </Card>
 
-          <Card padding="none" className="lg:col-span-3">
+          <Card padding="none" className="lg:col-span-3 lg:row-span-2">
             <div className="px-4 pt-4 sm:px-6 sm:pt-5">
               <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })} />
             </div>
@@ -295,7 +337,7 @@ export function WeatherDashboard() {
                 return (
                   <li key={day.date} className="grid grid-cols-[4.5rem_1.5rem_1fr] items-center gap-x-3 gap-y-1 px-4 py-3 sm:grid-cols-[5.5rem_1.5rem_minmax(0,1fr)_3rem_minmax(6rem,10rem)_3rem] sm:px-6">
                     <time dateTime={day.date} className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {dayLabel(day.date, f)}
+                      {dayLabel(day.date)}
                       <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(day.date, "short")}</span>
                     </time>
                     {createElement(weatherIcon(day.icon), { size: 20, "aria-hidden": true, className: "text-gray-600 dark:text-gray-300" })}
@@ -336,10 +378,14 @@ export function WeatherDashboard() {
               )}
             </p>
           </Card>
+
+          <div className="lg:col-span-2">
+            <SunlightWidget compact />
+          </div>
         </div>
       )}
 
-      <SunlightWidget />
+      {!weather && <SunlightWidget />}
     </div>
   );
 }

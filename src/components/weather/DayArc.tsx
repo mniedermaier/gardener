@@ -1,0 +1,68 @@
+import { memo, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import * as SunCalc from "suncalc";
+import { useFormat } from "@/hooks/useFormat";
+
+const W = 300;
+const H = 86;
+const PAD_X = 20;
+const BASE = 66;
+const PEAK = 12;
+
+/** Point on the day arc (half ellipse) for progress 0 (sunrise) … 1 (sunset). */
+function arcPoint(p: number): [number, number] {
+  const a = Math.PI * (1 - p);
+  const rx = (W - 2 * PAD_X) / 2;
+  return [W / 2 + rx * Math.cos(a), BASE - (BASE - PEAK) * Math.sin(a)];
+}
+
+/**
+ * The day at a glance: the sun's path from sunrise to sunset as an arc, the
+ * part already behind us drawn solid, the sun where it stands now. Below the
+ * horizon (night) the sun sits on the horizon at the nearer end, muted.
+ */
+export const DayArc = memo(function DayArc({ lat, lon, className = "" }: { lat: number; lon: number; className?: string }) {
+  const { t } = useTranslation();
+  const f = useFormat();
+  // Fixed when mounted; the page refreshes its data on demand anyway.
+  const [now] = useState(() => new Date());
+
+  const info = useMemo(() => {
+    const times = SunCalc.getTimes(now, lat, lon);
+    if (!times.sunrise || !times.sunset || Number.isNaN(times.sunrise.getTime())) return null;
+    const rise = times.sunrise.getTime();
+    const set = times.sunset.getTime();
+    const progress = (now.getTime() - rise) / (set - rise);
+    return { rise: times.sunrise, set: times.sunset, hours: (set - rise) / 3_600_000, progress };
+  }, [now, lat, lon]);
+
+  if (!info) return null;
+  const time = (d: Date) => new Intl.DateTimeFormat(f.locale, { hour: "2-digit", minute: "2-digit" }).format(d);
+  const p = Math.max(0, Math.min(1, info.progress));
+  const day = info.progress > 0 && info.progress < 1;
+  const [sx, sy] = arcPoint(p);
+  const steps = 48;
+  const path = (to: number) => {
+    const n = Math.max(2, Math.round(steps * to) + 1);
+    return Array.from({ length: n }, (_, i) => arcPoint((i / (n - 1)) * to))
+      .map(([x, y], i) => `${i ? "L" : "M"}${Math.round(x * 10) / 10},${Math.round(y * 10) / 10}`)
+      .join(" ");
+  };
+  const hours = t("sunlight.hoursValue", { hours: f.formatNumber(info.hours, { maximumFractionDigits: 1 }) });
+  const label = t("weather.dayArcLabel", { sunrise: time(info.rise), sunset: time(info.set), hours });
+
+  return (
+    <figure className={className}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={label}>
+        <line x1={6} x2={W - 6} y1={BASE} y2={BASE} className="stroke-gray-200 dark:stroke-white/10" />
+        <path d={path(1)} fill="none" strokeDasharray="3 4" strokeLinecap="round" className="stroke-gray-300 dark:stroke-white/15" strokeWidth={1.5} />
+        {day && <path d={path(p)} fill="none" strokeLinecap="round" className="stroke-earth-300 dark:stroke-earth-400" strokeWidth={2.5} />}
+        <circle cx={sx} cy={day ? sy : BASE} r={day ? 9 : 6} className={day ? "fill-earth-300/30 dark:fill-earth-400/25" : "fill-transparent"} />
+        <circle cx={sx} cy={day ? sy : BASE} r={day ? 5 : 4} className={day ? "fill-earth-400 dark:fill-earth-300" : "fill-gray-300 dark:fill-gray-600"} />
+        <text x={PAD_X} y={H - 4} textAnchor="middle" className="fill-gray-500 text-[11px] tabular-nums dark:fill-gray-400">{time(info.rise)}</text>
+        <text x={W - PAD_X} y={H - 4} textAnchor="middle" className="fill-gray-500 text-[11px] tabular-nums dark:fill-gray-400">{time(info.set)}</text>
+        <text x={W / 2} y={BASE - 6} textAnchor="middle" className="fill-gray-700 text-[12px] font-medium tabular-nums dark:fill-gray-200">{hours}</text>
+      </svg>
+    </figure>
+  );
+});

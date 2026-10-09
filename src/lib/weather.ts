@@ -45,6 +45,12 @@ export interface WeatherHistoryPoint {
 
 export interface WeatherResult {
   provider: WeatherProvider;
+  /**
+   * Set when OpenWeatherMap was configured but failed and the data came from
+   * Open-Meteo instead: "auth" = key rejected (HTTP 401), "unavailable" = any
+   * other error. The UI shows a quiet hint with a link to the settings.
+   */
+  fallback?: "auth" | "unavailable";
   data: WeatherData;
   /** Today's observation for the local weather history. */
   today: WeatherHistoryPoint;
@@ -65,8 +71,26 @@ export interface FetchWeatherOptions {
   fetchImpl?: typeof fetch;
 }
 
+/**
+ * Fetches from the configured provider. A failing OpenWeatherMap (rejected
+ * key, outage) never leaves the user without weather: the call falls back to
+ * Open-Meteo and reports why in `fallback`. Only when both fail the original
+ * error is thrown (`WeatherAuthError` for a rejected key).
+ */
 export async function fetchWeather(opts: FetchWeatherOptions): Promise<WeatherResult> {
-  return getWeatherProvider(opts.apiKey) === "openweathermap" ? fetchOpenWeatherMap(opts) : fetchOpenMeteo(opts);
+  if (getWeatherProvider(opts.apiKey) !== "openweathermap") return fetchOpenMeteo(opts);
+  try {
+    return await fetchOpenWeatherMap(opts);
+  } catch (e) {
+    if ((e as Error).name === "AbortError") throw e;
+    try {
+      const result = await fetchOpenMeteo(opts);
+      return { ...result, fallback: e instanceof WeatherAuthError ? "auth" : "unavailable" };
+    } catch (e2) {
+      if ((e2 as Error).name === "AbortError") throw e2;
+      throw e;
+    }
+  }
 }
 
 // ------------------------------------------------------------------ Open-Meteo

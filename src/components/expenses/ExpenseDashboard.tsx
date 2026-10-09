@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
-  Coins, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, Receipt, Scale, Sprout, Stethoscope, Trash2, TrendingUp, Wheat,
+  ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, Receipt, Scale, Sprout, Stethoscope, Trash2, Wheat,
   type LucideIcon,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
@@ -21,14 +21,14 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { Badge } from "@/components/ui/Badge";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
-import { HowCalculated, Meter } from "@/components/ui/charts";
+import { CompareBars, HowCalculated, KeyFigures, Meter } from "@/components/ui/charts";
 import { DateField } from "@/components/ui/DateField";
 import { useToday } from "@/hooks/useToday";
 
@@ -173,36 +173,40 @@ export function ExpenseDashboard() {
             ]}
           />
 
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              label={t("expenses.totalCosts")}
-              value={f.formatCurrency(balance.costs.total)}
-              icon={Coins}
-              tone="neutral"
-              hint={balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined}
-            />
-            <StatCard
-              label={t("expenses.yieldValue")}
-              value={f.formatCurrency(balance.totalValue)}
-              icon={TrendingUp}
-              tone="neutral"
-              hint={t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) })}
-            />
-            <StatCard
-              label={t("expenses.net")}
-              value={f.formatCurrency(net)}
-              icon={Scale}
-              tone="neutral"
-              trend={{ label: net >= 0 ? t("expenses.surplus") : t("expenses.deficit"), direction: net > 0 ? "up" : net < 0 ? "down" : "flat", tone: net >= 0 ? "positive" : "warning" }}
-            />
-            <StatCard
-              label={t("expenses.roi")}
-              value={balance.roi === null ? "–" : f.formatPercent(balance.roi)}
-              icon={TrendingUp}
-              tone="neutral"
-              hint={balance.roi === null ? t("expenses.roiNoCosts") : t("expenses.roiHint")}
-            />
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("expenses.net"),
+              value: f.formatCurrency(net),
+              icon: Scale,
+              visualPlacement: "below",
+              visual: (
+                <CompareBars
+                  rows={[
+                    { label: t("expenses.yieldValue"), value: balance.totalValue, color: "brand" },
+                    { label: t("expenses.totalCosts"), value: balance.costs.total, color: "earth" },
+                  ]}
+                />
+              ),
+              hint: (
+                <span className="inline-flex flex-wrap items-center gap-2">
+                  <Badge tone={net >= 0 ? "positive" : "warning"} icon={net > 0 ? ArrowUpRight : net < 0 ? ArrowDownRight : undefined}>{net >= 0 ? t("expenses.surplus") : t("expenses.deficit")}</Badge>
+                  {balance.roi === null ? t("expenses.roiNoCosts") : t("dashboard.roiValue", { value: f.formatPercent(balance.roi) })}
+                </span>
+              ),
+            }}
+            items={[
+              {
+                label: t("expenses.totalCosts"),
+                value: f.formatCurrency(balance.costs.total),
+                hint: balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined,
+              },
+              {
+                label: t("expenses.yieldValue"),
+                value: f.formatCurrency(balance.totalValue),
+                hint: t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) }),
+              },
+            ]}
+          />
 
           <HowCalculated>
               <p>{t("expenses.howCosts")}</p>

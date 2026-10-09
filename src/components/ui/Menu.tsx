@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 
@@ -22,16 +23,62 @@ interface MenuProps {
   className?: string;
 }
 
+const SUPPORTS_POPOVER = typeof HTMLElement !== "undefined" && typeof HTMLElement.prototype.showPopover === "function";
+const GAP = 4;
+const EDGE = 8;
+
+/**
+ * Places the panel next to the trigger in viewport coordinates: below it when
+ * there is room, otherwise above (flip), otherwise wherever it fits best with
+ * its own scroll. Horizontally it aligns to the requested edge and is clamped
+ * into the viewport.
+ */
+function placePanel(panel: HTMLElement, trigger: HTMLElement, align: "start" | "end") {
+  const r = trigger.getBoundingClientRect();
+  const vw = document.documentElement.clientWidth || window.innerWidth;
+  const vh = window.visualViewport?.height ?? window.innerHeight;
+  panel.style.maxHeight = "";
+  const w = panel.offsetWidth;
+  const h = panel.offsetHeight;
+  const below = vh - r.bottom - GAP - EDGE;
+  const above = r.top - GAP - EDGE;
+  let top: number;
+  let side: "bottom" | "top";
+  if (h <= below || below >= above) {
+    side = "bottom";
+    top = r.bottom + GAP;
+    if (h > below) panel.style.maxHeight = `${Math.max(below, 120)}px`;
+  } else {
+    side = "top";
+    const fit = Math.min(h, above);
+    if (h > above) panel.style.maxHeight = `${above}px`;
+    top = r.top - GAP - fit;
+  }
+  let left = align === "end" ? r.right - w : r.left;
+  left = Math.min(Math.max(left, EDGE), Math.max(EDGE, vw - w - EDGE));
+  panel.style.top = `${Math.round(top)}px`;
+  panel.style.left = `${Math.round(left)}px`;
+  panel.dataset.side = side;
+}
+
 /**
  * Overflow/action menu (WAI-ARIA menu button). Enter/Space/↓ opens and focuses
  * the first item, ↑/↓/Home/End move, Esc closes and returns focus, Tab or a
  * click outside closes.
+ *
+ * The panel is portalled (into the surrounding <dialog>, else <body>) and,
+ * where supported, shown as a popover so it sits in the top layer: no
+ * stacking context of a list row can cover it, and it flips above the
+ * trigger when there is no room below.
  */
 export function Menu({ items, label, trigger, align = "end", className = "" }: MenuProps) {
-  const [open, setOpen] = useState(false);
+  // The portal target while open (the surrounding <dialog> or <body>), else null.
+  const [host, setHost] = useState<HTMLElement | null>(null);
+  const open = host !== null;
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const enabled = items
@@ -40,22 +87,50 @@ export function Menu({ items, label, trigger, align = "end", className = "" }: M
 
   const focusItem = useCallback((index: number) => itemRefs.current[index]?.focus(), []);
 
+  const show = useCallback(() => {
+    setHost(triggerRef.current?.closest("dialog") ?? document.body);
+  }, []);
+
   const close = useCallback((returnFocus: boolean) => {
-    setOpen(false);
+    setHost(null);
     if (returnFocus) triggerRef.current?.focus();
   }, []);
 
   useEffect(() => {
     if (!open) return;
     const onPointer = (e: PointerEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) close(false);
+      const target = e.target as Node;
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) close(false);
     };
     document.addEventListener("pointerdown", onPointer);
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open, close]);
 
+  // Show in the top layer and position before paint; follow the trigger on
+  // scroll/resize.
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const trigger = triggerRef.current;
+    if (!open || !panel || !trigger) return;
+    if (SUPPORTS_POPOVER) {
+      try {
+        panel.showPopover();
+      } catch {
+        /* already shown or unsupported */
+      }
+    }
+    const place = () => placePanel(panel, trigger, align);
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [open, align]);
+
   const openAt = (where: "first" | "last") => {
-    setOpen(true);
+    show();
     const target = where === "first" ? enabled[0] : enabled[enabled.length - 1];
     requestAnimationFrame(() => focusItem(target));
   };
@@ -104,7 +179,7 @@ export function Menu({ items, label, trigger, align = "end", className = "" }: M
         aria-controls={open ? menuId : undefined}
         aria-label={trigger ? undefined : label}
         title={trigger ? undefined : label}
-        onClick={() => (open ? close(false) : setOpen(true))}
+        onClick={() => (open ? close(false) : show())}
         onKeyDown={onTriggerKeyDown}
         className={
           trigger
@@ -114,14 +189,18 @@ export function Menu({ items, label, trigger, align = "end", className = "" }: M
       >
         {trigger ?? <MoreHorizontal size={18} aria-hidden="true" />}
       </button>
-      {open && (
+      {host &&
+        createPortal(
         <div
+          ref={panelRef}
           id={menuId}
+          popover={SUPPORTS_POPOVER ? "manual" : undefined}
           role="menu"
           tabIndex={-1}
           aria-label={label}
           onKeyDown={onMenuKeyDown}
-          className={`absolute top-full z-50 mt-1 min-w-48 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-white/10 dark:bg-gray-800 ${align === "end" ? "right-0" : "left-0"}`}
+          style={{ position: "fixed", inset: "auto", margin: 0, top: 0, left: 0 }}
+          className="z-50 min-w-48 overflow-y-auto rounded-xl border border-gray-200 bg-white p-1 text-inherit shadow-lg dark:border-white/10 dark:bg-gray-800"
         >
           {items.map((item, i) =>
             item === "separator" ? (
@@ -149,8 +228,9 @@ export function Menu({ items, label, trigger, align = "end", className = "" }: M
               </button>
             ),
           )}
-        </div>
-      )}
+        </div>,
+          host,
+        )}
     </div>
   );
 }

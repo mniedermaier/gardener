@@ -1,6 +1,6 @@
 import { useId, useMemo, useState, type KeyboardEvent } from "react";
 import { HatchPattern, Legend } from "./Legend";
-import { niceScale, SERIES_FILL, SERIES_TEXT, useElementWidth, type SeriesColor } from "./scale";
+import { axisLabelStep, niceScale, SERIES_FILL, SERIES_TEXT, useElementWidth, type SeriesColor } from "./scale";
 
 export interface BarDatum {
   key: string;
@@ -70,7 +70,10 @@ export function BarChart({
   const band = plotW / Math.max(1, data.length);
   const barW = Math.max(4, Math.min(36, band * 0.62));
   const y = (v: number) => M.top + plotH - (Math.min(v, top) / top) * plotH;
-  const labelEvery = band < 30 ? 2 : 1;
+  // Thin the axis by the real label width ("KW 34" needs more room than "Okt.").
+  const labelEvery = axisLabelStep(data.map((d) => d.label), band);
+  const labelAnchor = marker && marker.index >= 0 && marker.index < data.length ? marker.index : data.length - 1;
+  const showLabel = (i: number) => (((i - labelAnchor) % labelEvery) + labelEvery) % labelEvery === 0;
 
   const onKey = (e: KeyboardEvent) => {
     if (e.key === "ArrowRight") setActive((a) => Math.min(data.length - 1, (a ?? -1) + 1));
@@ -135,7 +138,7 @@ export function BarChart({
                   const path = `M${x0},${y0} V${top0 + r} Q${x0},${top0} ${x0 + r},${top0} H${x0 + barW - r} Q${x0 + barW},${top0} ${x0 + barW},${top0 + r} V${y0} Z`;
                   return <path key={k} d={path} className={cls} fill={fill} />;
                 })}
-                {(i % labelEvery === 0 || i === marker?.index) && (
+                {showLabel(i) && (
                   <text
                     x={cx}
                     y={height - 6}

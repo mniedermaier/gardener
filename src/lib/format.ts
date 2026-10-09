@@ -41,8 +41,9 @@ function noNegativeZero(value: number, maximumFractionDigits: number): number {
  * - monthYear: "Oktober 2026"                            — group headers
  * - month:     "Okt."                                    — chart axes
  * - weekday:   "Sa."                                     — weather strips
+ * - weekdayDate: "Mo., 12. Okt."                          — the coming week (one format per group)
  */
-export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday";
+export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday" | "weekdayDate";
 
 export interface FormatOptions {
   locale?: string;
@@ -92,6 +93,8 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
       return new Intl.DateTimeFormat(locale, { month: "short" }).format(d);
     case "weekday":
       return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(d);
+    case "weekdayDate":
+      return new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }).format(d);
     case "short":
     default: {
       const sameYear = d.getFullYear() === now.getFullYear();

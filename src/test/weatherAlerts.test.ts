@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   detectFrostAlerts,
+  summarizeFrost,
   detectGreenhouseAlerts,
   generateWateringAdvice,
   generateWeeklySummary,
@@ -190,5 +191,24 @@ describe("Greenhouse cold alert names the coldest night", () => {
     const alerts = detectGreenhouseAlerts(mixed, [gh]);
     expect(alerts.map((a) => a.type).sort()).toEqual(["greenhouse_cold", "greenhouse_hot"]);
     expect(alerts.find((a) => a.type === "greenhouse_hot")?.date).toBe("2026-05-02");
+  });
+});
+
+describe("summarizeFrost", () => {
+  const days = [
+    { date: "2026-10-04", tempMin: -3 },
+    { date: "2026-10-05", tempMin: 2 },
+    { date: "2026-10-06", tempMin: -1 },
+    { date: "2026-10-07", tempMin: -6 },
+    { date: "2026-10-08", tempMin: 5 },
+  ];
+  it("counts nights from today onwards and names the coldest", () => {
+    const s = summarizeFrost(days, 2, "2026-10-05");
+    expect(s?.nights.map((n) => n.date)).toEqual(["2026-10-05", "2026-10-06", "2026-10-07"]);
+    expect(s?.coldest).toEqual({ date: "2026-10-07", tempMin: -6 });
+    expect(s?.severity).toBe("danger");
+  });
+  it("returns null without frost nights", () => {
+    expect(summarizeFrost(days, -10, "2026-10-05")).toBeNull();
   });
 });
