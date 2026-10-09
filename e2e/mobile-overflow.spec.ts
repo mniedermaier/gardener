@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 const demoState = JSON.parse(readFileSync(new URL("./fixtures/demo-state.json", import.meta.url), "utf8")) as Record<string, unknown>;
 
 const ROUTES = [
-  "/", "/weather", "/planner", "/planner?bed=b-hochbeet", "/plants", "/plants/tomato", "/companions",
+  "/", "/weather", "/planner", "/planner?bed=b-hochbeet", "/plants", "/plants?plant=tomato", "/companions",
   "/calendar", "/tasks", "/harvest", "/journal", "/pantry", "/seeds", "/soil", "/pests", "/water-log",
   "/livestock", "/livestock/a1", "/livestock/production", "/livestock/feed", "/livestock/health",
   "/sufficiency", "/foodplan", "/expenses", "/settings", "/import",
@@ -57,7 +57,7 @@ function openMeteo() {
 
 test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-test("no horizontal overflow on any main route at 390 px", async ({ page }) => {
+test("no overflow beyond the shell on any main route at 390 px", async ({ page }) => {
   test.setTimeout(120_000);
   await page.route(/api\.open-meteo\.com\/v1\/forecast/, (r) => r.fulfill({ json: openMeteo() }));
   await page.route(/openweathermap\.org\/data\/2\.5\/weather/, (r) =>
@@ -81,9 +81,14 @@ test("no horizontal overflow on any main route at 390 px", async ({ page }) => {
     const m = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,
       doc: document.documentElement.scrollWidth,
+      height: document.documentElement.clientHeight,
+      docHeight: document.documentElement.scrollHeight,
       main: document.querySelector("main")?.scrollWidth ?? 0,
     }));
     if (m.doc > m.viewport || m.main > m.viewport) failures.push(`${route}: document ${m.doc}px, main ${m.main}px (viewport ${m.viewport}px)`);
+    // Only <main> scrolls. A taller document (e.g. an sr-only chart table
+    // positioned against the page) lets the shell, bottom nav and FAB scroll away.
+    if (m.docHeight > m.height) failures.push(`${route}: document ${m.docHeight}px tall (viewport ${m.height}px)`);
   }
   expect(failures, failures.join("\n")).toEqual([]);
 });

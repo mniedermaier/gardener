@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, BookOpen, Coins, HeartPulse, Pencil, Plus, Scale, Trash2, Wheat, Egg } from "lucide-react";
+import { ArrowLeft, BookOpen, HeartPulse, Pencil, Plus, Scale, Trash2, Wheat, Egg } from "lucide-react";
 import { differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -14,13 +14,12 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
 import { Tabs } from "@/components/ui/Tabs";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { HowCalculated } from "@/components/ui/charts";
+import { CompareBars, HowCalculated, KeyFigures } from "@/components/ui/charts";
 import { ProductionChart } from "./ProductionChart";
 import { ProductWeekList } from "./ProductWeekList";
 import { HEALTH_ICON, HEALTH_TONE, PRODUCT_ICON } from "./icons";
@@ -142,28 +141,43 @@ export function AnimalDetail() {
         }
       />
 
-      <div className="mb-2 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard
-          label={t("livestock.productionTotal")}
-          value={analytics.main ? formatProductAmount(analytics.main, analytics.totals[analytics.main], f, t) : "–"}
-          icon={analytics.main ? PRODUCT_ICON[analytics.main] : Egg}
-          tone="neutral"
-          hint={[
-            ...analytics.others.map((ty) => (ty === "eggs" ? formatProductAmount(ty, analytics.totals[ty], f, t) : `${formatProductAmount(ty, analytics.totals[ty], f, t)} ${t(`livestock.products.${ty}`)}`)),
-            t("livestock.entriesHint", { count: products.length }),
-          ].join(" · ")}
-        />
-        <StatCard label={t("livestock.totalCosts")} value={f.formatCurrency(analytics.cost)} hint={t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) })} icon={Coins} tone="neutral" />
-        <StatCard label={t("livestock.productionValue")} value={f.formatCurrency(analytics.value)} icon={Scale} tone="neutral" />
-        <StatCard
-          label={t("livestock.balance")}
-          value={f.formatCurrency(analytics.net)}
-          icon={Scale}
-          tone="neutral"
-          trend={analytics.cost > 0 ? { label: f.formatPercent(analytics.net / analytics.cost), direction: analytics.net > 0 ? "up" : analytics.net < 0 ? "down" : "flat", tone: analytics.net >= 0 ? "positive" : "warning" } : undefined}
-          hint={analytics.cost > 0 ? t("livestock.roiHint") : undefined}
-        />
-      </div>
+      <KeyFigures
+        className="mb-2"
+        hero={{
+          label: t("livestock.balance"),
+          value: f.formatCurrency(analytics.net),
+          icon: Scale,
+          visualPlacement: "below",
+          visual: (
+            <CompareBars
+              rows={[
+                { label: t("livestock.productionValue"), value: analytics.value, color: "brand" },
+                { label: t("livestock.totalCosts"), value: analytics.cost, color: "earth" },
+              ]}
+            />
+          ),
+          hint: analytics.cost > 0
+            ? (
+              <span className="inline-flex flex-wrap items-center gap-2">
+                <Badge tone={analytics.net >= 0 ? "positive" : "warning"}>{f.formatPercent(analytics.net / analytics.cost)}</Badge>
+                {t("livestock.roiHint")}
+              </span>
+            )
+            : undefined,
+        }}
+        items={[
+          {
+            label: t("livestock.productionTotal"),
+            value: analytics.main ? formatProductAmount(analytics.main, analytics.totals[analytics.main], f, t) : "–",
+            hint: [
+              ...analytics.others.map((ty) => (ty === "eggs" ? formatProductAmount(ty, analytics.totals[ty], f, t) : `${formatProductAmount(ty, analytics.totals[ty], f, t)} ${t(`livestock.products.${ty}`)}`)),
+              t("livestock.entriesHint", { count: products.length }),
+            ].join(" · "),
+          },
+          { label: t("livestock.productionValue"), value: f.formatCurrency(analytics.value) },
+          { label: t("livestock.totalCosts"), value: f.formatCurrency(analytics.cost), hint: t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) }) },
+        ]}
+      />
       <div className="mb-6 flex flex-wrap items-center gap-2">
         {analytics.cost > 0 && analytics.perUnit && (
           <Badge variant="outline" icon={PRODUCT_ICON[analytics.perUnit.type]}>

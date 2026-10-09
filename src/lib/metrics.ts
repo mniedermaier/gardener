@@ -348,6 +348,8 @@ export interface FeedCostStats {
   perMonth: number;
   /** Months the average spans (≥ 1). */
   months: number;
+  /** Date of the first entry (YYYY-MM-DD), the start of the `perMonth` span. */
+  since: string | null;
   /** Entries in the last 30 days. */
   entriesLast30Days: number;
 }
@@ -371,7 +373,7 @@ export function getFeedCostStats(feedEntries: FeedEntry[], now: Date = new Date(
   }
   const span = first ? (now.getTime() - Date.parse(first)) / (30.44 * 86_400_000) : 1;
   const months = Math.max(1, span);
-  return { thisMonth, lastMonth, last30Days, total, perMonth: total / months, months, entriesLast30Days };
+  return { thisMonth, lastMonth, last30Days, total, perMonth: total / months, months, since: first, entriesLast30Days };
 }
 
 export interface Balance {

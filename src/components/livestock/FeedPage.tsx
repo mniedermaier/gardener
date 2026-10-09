@@ -78,7 +78,7 @@ export function FeedPage() {
               hint: t("livestock.feedEntriesCount", { count: stats.entriesLast30Days }),
             }}
             items={[
-              { label: t("livestock.feed.perMonth"), value: f.formatCurrency(stats.perMonth), hint: t("livestock.feed.perMonthHint", { count: Math.round(stats.months) }) },
+              { label: t("livestock.feed.perMonth"), value: f.formatCurrency(stats.perMonth), hint: stats.since ? t("livestock.feed.perMonthSince", { date: f.formatDate(stats.since) }) : undefined },
               { label: t("livestock.feed.totalCost"), value: f.formatCurrency(stats.total) },
               { label: t("livestock.feed.totalKg"), value: f.formatWeight(stats.totalKg * 1000) },
             ]}

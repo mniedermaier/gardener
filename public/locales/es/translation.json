@@ -1136,7 +1136,10 @@
     "fleeceTaskDesc": "Noches de helada previstas: {{nights}}. Cubre los cultivos sensibles por la tarde y destápalos por la mañana.",
     "fleeceTaskAdded": "Tarea «Cubrir con manta térmica» añadida para {{day}}",
     "fleeceTaskPlanned": "Tarea de manta térmica para {{day}}",
-    "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto."
+    "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
+    "frostGroupTitleMixed_one": "Riesgo de helada en {{count}} noche, {{hard}} con helada, hasta {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "Riesgo de helada en {{count}} noches, {{hard}} con helada, hasta {{temp}} ({{day}})",
+    "frostGroupTitleMixed_many": "Riesgo de helada en {{count}} noches, {{hard}} con helada, hasta {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Cosecha",
@@ -1373,7 +1376,7 @@
     "subtitle": "Cuánto deberías cultivar de cada cosa para abastecer a tu hogar un año.",
     "coverage": "Autosuficiencia",
     "produced": "Producido / Objetivo",
-    "area": "Superficie plantada",
+    "area": "Superficie de los cultivos del plan",
     "deficits": "Cultivos con déficit",
     "deficitsTitle": "Donde más falta",
     "needMore": "-{{kg}} kg (necesitas +{{m2}} m²)",
@@ -1407,7 +1410,11 @@
     "animalNeed": "consumo {{amount}}",
     "animalSurplus": "excedente {{amount}}",
     "surplusBadge": "Excedente",
-    "animalIntro_many": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas."
+    "animalIntro_many": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas.",
+    "biggestGap": "Mayor déficit",
+    "biggestGapHint_one": "faltan {{kg}} · {{count}} cultivo bajo el objetivo",
+    "biggestGapHint_other": "faltan {{kg}} · {{count}} cultivos bajo el objetivo",
+    "biggestGapHint_many": "faltan {{kg}} · {{count}} cultivos bajo el objetivo"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1587,9 +1594,7 @@
       "perAnimal": "Costo por animal",
       "subtitle": "Cantidades y costes de pienso por animal.",
       "perMonth": "Media mensual",
-      "perMonthHint_one": "en {{count}} mes",
-      "perMonthHint_other": "en {{count}} meses",
-      "perMonthHint_many": "en {{count}} meses"
+      "perMonthSince": "desde el {{date}}"
     },
     "health": {
       "title": "Salud",
@@ -1771,7 +1776,7 @@
     "productThisYear": "{{product}} este año",
     "eggWeeksLabel": "Huevos por semana en las últimas 8 semanas, media {{avg}}",
     "eggWeeksAvg": "Media de {{avg}} por semana en las últimas 8 semanas",
-    "singleHarvests": "Cosechas puntuales (últimos {{months}} meses)"
+    "singleHarvests": "Registros individuales (últimos {{months}} meses)"
   },
   "seeds": {
     "title": "Semillas",
@@ -1779,7 +1784,7 @@
     "added": "Semillas guardadas",
     "items": "Articulos de semillas",
     "expiring": "Por vencer",
-    "totalCost": "Costo total",
+    "totalCost": "Valor de compra en stock",
     "expiringTitle": "Semillas por vencer o vencidas",
     "acquiredIn": "adquiridas",
     "shoppingList": "Falta para tus bancales",
@@ -1946,7 +1951,8 @@
         "high": "Materia orgánica muy alta: reduce el compost durante unos años."
       }
     },
-    "openInPlanner": "Abrir en el planificador"
+    "openInPlanner": "Abrir en el planificador",
+    "yourNote": "Nota:"
   },
   "preservation": {
     "title": "Guía de conservación",
@@ -2403,7 +2409,7 @@
     "compositionLabel": "Huerto {{garden}}, productos animales {{animals}} de la necesidad anual",
     "fromGarden": "Huerto",
     "fromAnimals": "Productos animales",
-    "surplusNote": "No se cuenta por superar el consumo habitual: {{items}}.",
+    "surplusNote": "Según la previsión anual supera el consumo habitual, por eso no se cuenta: {{items}}.",
     "notCovered": "Sin cubrir"
   }
 }

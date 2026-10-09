@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { migrateLegacyPhotos } from "@/lib/migratePhotos";
 import { useStorageHealth } from "@/hooks/useStorageHealth";
 import { AppShell } from "@/components/layout/AppShell";
@@ -68,6 +68,12 @@ function L({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
 }
 
+/** "/plants/tomato" reads like a detail link; the detail lives at "/plants?plant=tomato". */
+function PlantRedirect() {
+  const { id = "" } = useParams();
+  return <Navigate to={`/plants?plant=${encodeURIComponent(id)}`} replace />;
+}
+
 export default function App() {
   const gardens = useStore((s) => s.gardens);
   const [onboardingDone, setOnboardingDone] = useState(gardens.length > 0);
@@ -89,6 +95,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="planner" element={<L><GardenPlanner /></L>} />
           <Route path="plants" element={<L><PlantList /></L>} />
+          <Route path="plants/:id" element={<PlantRedirect />} />
           <Route path="companions" element={<L><CompanionMatrix /></L>} />
           <Route path="calendar" element={<L><CalendarPage /></L>} />
           <Route path="tasks" element={<L><TaskCalendar /></L>} />

@@ -1136,7 +1136,10 @@
     "fleeceTaskDesc": "Nuits de gel prévues : {{nights}}. Couvrez les cultures sensibles le soir, découvrez-les le matin.",
     "fleeceTaskAdded": "Tâche « Poser le voile d’hivernage » ajoutée pour {{day}}",
     "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}",
-    "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri."
+    "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
+    "frostGroupTitleMixed_one": "Risque de gel {{count}} nuit, dont {{hard}} avec gel, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "Risque de gel {{count}} nuits, dont {{hard}} avec gel, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitleMixed_many": "Risque de gel {{count}} nuits, dont {{hard}} avec gel, jusqu’à {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Récolte",
@@ -1373,7 +1376,7 @@
     "subtitle": "Combien cultiver de chaque légume pour nourrir votre foyer pendant un an.",
     "coverage": "Autosuffisance",
     "produced": "Produit / Objectif",
-    "area": "Surface plantée",
+    "area": "Surface des cultures du plan",
     "deficits": "Cultures en déficit",
     "deficitsTitle": "Là où il manque le plus",
     "needMore": "-{{kg}} kg (besoin de +{{m2}} m²)",
@@ -1407,7 +1410,11 @@
     "animalNeed": "consommation {{amount}}",
     "animalSurplus": "surplus {{amount}}",
     "surplusBadge": "Surplus",
-    "animalIntro_many": "Rendement annuel typique de tes animaux et consommation habituelle de {{count}} personnes."
+    "animalIntro_many": "Rendement annuel typique de tes animaux et consommation habituelle de {{count}} personnes.",
+    "biggestGap": "Plus gros déficit",
+    "biggestGapHint_one": "{{kg}} manquants · {{count}} culture sous l’objectif",
+    "biggestGapHint_other": "{{kg}} manquants · {{count}} cultures sous l’objectif",
+    "biggestGapHint_many": "{{kg}} manquants · {{count}} cultures sous l’objectif"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -1587,9 +1594,7 @@
       "perAnimal": "Coût par animal",
       "subtitle": "Quantités et coûts d’alimentation par animal.",
       "perMonth": "Moyenne par mois",
-      "perMonthHint_one": "sur {{count}} mois",
-      "perMonthHint_other": "sur {{count}} mois",
-      "perMonthHint_many": "sur {{count}} mois"
+      "perMonthSince": "depuis le {{date}}"
     },
     "health": {
       "title": "Santé",
@@ -1771,7 +1776,7 @@
     "productThisYear": "{{product}} cette année",
     "eggWeeksLabel": "Œufs par semaine sur les 8 dernières semaines, moy. {{avg}}",
     "eggWeeksAvg": "Moy. {{avg}} par semaine sur les 8 dernières semaines",
-    "singleHarvests": "Récoltes ponctuelles ({{months}} derniers mois)"
+    "singleHarvests": "Saisies individuelles ({{months}} derniers mois)"
   },
   "seeds": {
     "title": "Semences",
@@ -1779,7 +1784,7 @@
     "added": "Semences enregistrées",
     "items": "Articles de semences",
     "expiring": "Expirant",
-    "totalCost": "Coût total",
+    "totalCost": "Valeur d’achat en stock",
     "expiringTitle": "Semences expirantes ou expirées",
     "acquiredIn": "acquis",
     "shoppingList": "Manque pour vos planches",
@@ -1946,7 +1951,8 @@
         "high": "Humus très élevé : réduire le compost pendant quelques années."
       }
     },
-    "openInPlanner": "Ouvrir dans le planificateur"
+    "openInPlanner": "Ouvrir dans le planificateur",
+    "yourNote": "Note :"
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -2403,7 +2409,7 @@
     "compositionLabel": "Jardin {{garden}}, produits animaux {{animals}} du besoin annuel",
     "fromGarden": "Jardin",
     "fromAnimals": "Produits animaux",
-    "surplusNote": "Non compté car au-delà de la consommation habituelle : {{items}}.",
+    "surplusNote": "Selon la prévision annuelle, au-delà de la consommation habituelle, donc non compté : {{items}}.",
     "notCovered": "Non couvert"
   }
 }

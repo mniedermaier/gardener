@@ -157,7 +157,8 @@ export function PlantList() {
           />
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        // Phones: one surface with hairlines (DESIGN_SYSTEM §4, no card per row); wider screens: a tile grid.
+        <div className="divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs sm:grid sm:grid-cols-2 sm:gap-3 sm:divide-y-0 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none lg:grid-cols-3 2xl:grid-cols-4 dark:divide-white/5 dark:border-white/10 dark:bg-gray-900 sm:dark:bg-transparent">
           {filtered.map((plant) => (
             <PlantCard key={plant.id} plant={plant} planted={plantedIds.has(plant.id)} custom={customPlants.some((p) => p.id === plant.id)} onOpen={openPlant} />
           ))}

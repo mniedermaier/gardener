@@ -25,9 +25,9 @@ export const PlantCard = memo(function PlantCard({ plant, planted, custom, onOpe
     <button
       type="button"
       onClick={() => onOpen(plant.id)}
-      className="flex w-full items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xs transition-colors hover:border-garden-300 hover:bg-gray-50/60 dark:border-white/10 dark:bg-gray-900 dark:hover:border-garden-500/40 dark:hover:bg-white/5"
+      className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50/60 sm:rounded-xl sm:border sm:border-gray-200 sm:bg-white sm:p-4 sm:shadow-xs sm:hover:border-garden-300 dark:hover:bg-white/5 sm:dark:border-white/10 sm:dark:bg-gray-900 sm:dark:hover:border-garden-500/40"
     >
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5" aria-hidden="true">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 sm:size-12 dark:bg-white/5" aria-hidden="true">
         <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={30} />
       </span>
       <span className="min-w-0 flex-1">

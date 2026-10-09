@@ -59,7 +59,7 @@ export function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col overflow-clip">
         <TopBar onMenuClick={() => setSidebarOpen(true)} onSearchClick={() => setPaletteOpen(true)} />
         <SectionTabs />
-        <main ref={mainRef} id="main" tabIndex={-1} className="flex-1 focus-visible:outline-none overflow-y-auto bg-gray-50 p-4 pb-safe-nav sm:pb-6 md:p-6 lg:px-8 dark:bg-gray-950">
+        <main ref={mainRef} id="main" tabIndex={-1} className="relative flex-1 focus-visible:outline-none overflow-y-auto bg-gray-50 p-4 pb-safe-nav sm:pb-6 md:p-6 lg:px-8 dark:bg-gray-950">
           <Outlet />
         </main>
       </div>

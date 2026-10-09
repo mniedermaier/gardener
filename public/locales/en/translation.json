@@ -1099,7 +1099,9 @@
     "fleeceTaskDesc": "Frost nights in the forecast: {{nights}}. Cover tender crops in the evening, uncover in the morning.",
     "fleeceTaskAdded": "Task “Cover with fleece” added for {{day}}",
     "fleeceTaskPlanned": "Fleece task planned for {{day}}",
-    "frostAffectedAll": "Affected: {{plants}}. Cover with fleece or bring indoors."
+    "frostAffectedAll": "Affected: {{plants}}. Cover with fleece or bring indoors.",
+    "frostGroupTitleMixed_one": "Frost risk on {{count}} night, {{hard}} of them freezing, down to {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "Frost risk on {{count}} nights, {{hard}} of them freezing, down to {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Harvest",
@@ -1319,7 +1321,7 @@
     "subtitle": "How much of each crop you'd need to grow to feed your household for a year.",
     "coverage": "Self-sufficiency",
     "produced": "Produced / target",
-    "area": "Planted area",
+    "area": "Area of plan crops",
     "deficits": "Crops with a gap",
     "deficitsTitle": "Biggest shortfalls",
     "needMore": "-{{kg}} kg (need +{{m2}} m²)",
@@ -1351,7 +1353,10 @@
     "animalIntro_other": "Typical annual yield of your animals and the typical consumption of {{count}} people.",
     "animalNeed": "consumption {{amount}}",
     "animalSurplus": "surplus {{amount}}",
-    "surplusBadge": "Surplus"
+    "surplusBadge": "Surplus",
+    "biggestGap": "Biggest gap",
+    "biggestGapHint_one": "{{kg}} short · {{count}} crop below target",
+    "biggestGapHint_other": "{{kg}} short · {{count}} crops below target"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1526,8 +1531,7 @@
       "perAnimal": "Cost per animal",
       "subtitle": "Feed amounts and costs per animal.",
       "perMonth": "Avg. per month",
-      "perMonthHint_one": "over {{count}} month",
-      "perMonthHint_other": "over {{count}} months"
+      "perMonthSince": "since {{date}}"
     },
     "health": {
       "title": "Health",
@@ -1694,7 +1698,7 @@
     "productThisYear": "{{product}} this year",
     "eggWeeksLabel": "Eggs per week over the last 8 weeks, avg. {{avg}}",
     "eggWeeksAvg": "Avg. {{avg}} per week over the last 8 weeks",
-    "singleHarvests": "Single harvests (last {{months}} months)"
+    "singleHarvests": "Individual entries (last {{months}} months)"
   },
   "seeds": {
     "title": "Seeds",
@@ -1702,7 +1706,7 @@
     "added": "Seeds saved",
     "items": "Seed items",
     "expiring": "Expiring",
-    "totalCost": "Total cost",
+    "totalCost": "Purchase value in stock",
     "expiringTitle": "Expiring or expired seeds",
     "acquiredIn": "acquired",
     "shoppingList": "Missing for your beds",
@@ -1864,7 +1868,8 @@
         "high": "Organic matter very high: cut back on compost for a few years."
       }
     },
-    "openInPlanner": "Open in planner"
+    "openInPlanner": "Open in planner",
+    "yourNote": "Note:"
   },
   "preservation": {
     "title": "Preservation guide",
@@ -2300,7 +2305,7 @@
     "compositionLabel": "Garden {{garden}}, animal products {{animals}} of the annual need",
     "fromGarden": "Garden",
     "fromAnimals": "Animal products",
-    "surplusNote": "Not counted because above typical consumption: {{items}}.",
+    "surplusNote": "Forecast for the year above typical consumption, so not counted: {{items}}.",
     "notCovered": "Not covered"
   }
 }

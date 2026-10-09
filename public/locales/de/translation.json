@@ -1099,7 +1099,9 @@
     "fleeceTaskDesc": "Frostnächte laut Vorhersage: {{nights}}. Empfindliche Kulturen am Abend abdecken, morgens lüften.",
     "fleeceTaskAdded": "Aufgabe „Vlies auflegen“ für {{day}} angelegt",
     "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant",
-    "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen."
+    "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
+    "frostGroupTitleMixed_one": "Frostgefahr in {{count}} Nacht, {{hard}} davon mit Frost, bis {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "Frostgefahr in {{count}} Nächten, {{hard}} davon mit Frost, bis {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Ernte",
@@ -1319,7 +1321,7 @@
     "subtitle": "Wie viel du von jeder Kultur anbauen müsstest, um deinen Haushalt ein Jahr zu versorgen.",
     "coverage": "Selbstversorgung",
     "produced": "Produziert / Ziel",
-    "area": "Bepflanzte Fläche",
+    "area": "Fläche der Plan-Kulturen",
     "deficits": "Kulturen mit Lücke",
     "deficitsTitle": "Hier fehlt am meisten",
     "needMore": "-{{kg}} kg (brauche +{{m2}} m²)",
@@ -1351,7 +1353,10 @@
     "animalIntro_other": "Typischer Jahresertrag deiner Tiere und der übliche Verbrauch von {{count}} Personen.",
     "animalNeed": "Verbrauch {{amount}}",
     "animalSurplus": "Überschuss {{amount}}",
-    "surplusBadge": "Überschuss"
+    "surplusBadge": "Überschuss",
+    "biggestGap": "Größte Lücke",
+    "biggestGapHint_one": "{{kg}} fehlen · {{count}} Kultur unter Ziel",
+    "biggestGapHint_other": "{{kg}} fehlen · {{count}} Kulturen unter Ziel"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1526,8 +1531,7 @@
       "perAnimal": "Kosten pro Tier",
       "subtitle": "Futtermengen und -kosten pro Tier.",
       "perMonth": "Ø pro Monat",
-      "perMonthHint_one": "über {{count}} Monat",
-      "perMonthHint_other": "über {{count}} Monate"
+      "perMonthSince": "seit {{date}}"
     },
     "health": {
       "title": "Gesundheit",
@@ -1694,7 +1698,7 @@
     "productThisYear": "{{product}} dieses Jahr",
     "eggWeeksLabel": "Eier pro Woche, letzte 8 Wochen, Ø {{avg}}",
     "eggWeeksAvg": "Ø {{avg}} pro Woche in den letzten 8 Wochen",
-    "singleHarvests": "Einzelne Ernten (letzte {{months}} Monate)"
+    "singleHarvests": "Einzelne Einträge (letzte {{months}} Monate)"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1702,7 +1706,7 @@
     "added": "Saatgut gespeichert",
     "items": "Saatgut-Posten",
     "expiring": "Ablaufend",
-    "totalCost": "Gesamtkosten",
+    "totalCost": "Einkaufswert im Vorrat",
     "expiringTitle": "Ablaufendes oder abgelaufenes Saatgut",
     "acquiredIn": "erworben",
     "shoppingList": "Für deine Beete fehlt",
@@ -1864,7 +1868,8 @@
         "high": "Humus sehr hoch: Kompostgaben für einige Jahre reduzieren."
       }
     },
-    "openInPlanner": "Im Planer öffnen"
+    "openInPlanner": "Im Planer öffnen",
+    "yourNote": "Notiz:"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2300,7 +2305,7 @@
     "compositionLabel": "Garten {{garden}}, Tierprodukte {{animals}} des Jahresbedarfs",
     "fromGarden": "Garten",
     "fromAnimals": "Tierprodukte",
-    "surplusNote": "Nicht eingerechnet, weil über dem üblichen Verbrauch: {{items}}.",
+    "surplusNote": "Laut Jahresprognose mehr als der übliche Verbrauch, daher nicht eingerechnet: {{items}}.",
     "notCovered": "Nicht gedeckt"
   }
 }

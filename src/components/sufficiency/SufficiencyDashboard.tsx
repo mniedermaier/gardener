@@ -17,8 +17,7 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { Select } from "@/components/ui/Select";
+import { Tabs } from "@/components/ui/Tabs";
 import { List, ListRow } from "@/components/ui/List";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
@@ -86,7 +85,7 @@ export function SufficiencyDashboard() {
       title={t("sufficiency.title")}
       description={t("sufficiency.subtitle")}
       actions={<HouseholdSizeField />}
-      tabs={result ? <ViewSwitch value={view} onChange={setView} options={viewOptions} label={t("sufficiency.views")} /> : undefined}
+      tabs={result ? <Tabs items={viewOptions} value={view} onChange={setView} label={t("sufficiency.views")} /> : undefined}
     />
   );
 
@@ -110,6 +109,9 @@ export function SufficiencyDashboard() {
   const lowCount = result.lowMonths.length;
   const gap = result.winterGap;
   const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
+  // Small shares get a decimal, so "Soll bis heute" late in the year does not
+  // read as the same 4 % as the annual forecast.
+  const pct = (r: number) => f.formatPercent(r, r < 0.1 ? 1 : 0);
   const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
 
   return (
@@ -121,7 +123,7 @@ export function SufficiencyDashboard() {
           <KeyFigures
             hero={{
               label: t("metrics.selfSufficiencyForecast"),
-              value: f.formatPercent(ss.forecastRatio),
+              value: pct(ss.forecastRatio),
               icon: Target,
               tone: "brand",
               hint: t("metrics.caloriesFor", { count: householdSize }),
@@ -129,8 +131,8 @@ export function SufficiencyDashboard() {
             items={[
               {
                 label: t("metrics.selfSufficiencyActual"),
-                value: f.formatPercent(ss.actualRatio),
-                hint: ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: f.formatPercent(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year }),
+                value: pct(ss.actualRatio),
+                hint: ss.forecastToDateRatio !== null ? t("metrics.expectedToDate", { value: pct(ss.forecastToDateRatio) }) : t("metrics.recordedSince", { year }),
               },
               { label: t("metrics.yieldForecast"), value: f.formatWeight(metrics.harvest.forecast.totalGrams), hint: t("metrics.plantsOnly") },
               { label: t("metrics.yieldActual"), value: f.formatWeight(metrics.harvest.actual.totalGrams), hint: t("metrics.harvestEntries", { count: metrics.harvest.entryCount }), to: "/harvest" },
@@ -325,24 +327,6 @@ export function SufficiencyDashboard() {
 function LegendNote() {
   const { t } = useTranslation();
   return <p className="text-xs text-gray-500 dark:text-gray-400">{t("metrics.meterLegend")}</p>;
-}
-
-/** Second-level view switch: a segmented control, a native select on phones (never cut off). */
-function ViewSwitch<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; count?: number }[]; label: string }) {
-  return (
-    <>
-      <Select
-        wrapperClassName="sm:hidden"
-        aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        options={options.map((o) => ({ value: o.value, label: o.count !== undefined ? `${o.label} (${o.count})` : o.label }))}
-      />
-      <div className="hidden sm:block">
-        <SegmentedControl label={label} value={value} onChange={onChange} options={options} />
-      </div>
-    </>
-  );
 }
 
 /** Edible kg → amount in the product's recording unit (eggs as hen's eggs). */

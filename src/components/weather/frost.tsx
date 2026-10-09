@@ -42,8 +42,13 @@ export function useFrostSummary(forecast: { date: string; tempMin: number }[] | 
   return useMemo(() => {
     const summary = forecast ? summarizeFrost(forecast, threshold, toISODate(today)) : null;
     if (!summary) return null;
-    const title = t("alerts.frostGroupTitle", {
+    // Below the threshold but above 0 °C is only "Frostgefahr" (the warning
+    // chips); name how many nights actually freeze when both kinds occur.
+    const hard = summary.nights.filter((n) => n.tempMin <= 0).length;
+    const mixed = hard > 0 && hard < summary.nights.length;
+    const title = t(mixed ? "alerts.frostGroupTitleMixed" : "alerts.frostGroupTitle", {
       count: summary.nights.length,
+      hard,
       temp: f.formatTemperature(summary.coldest.tempMin),
       day: dayLabel(summary.coldest.date, true),
     });

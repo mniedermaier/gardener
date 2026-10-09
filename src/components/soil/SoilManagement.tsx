@@ -321,7 +321,12 @@ export function SoilManagement() {
                       {nutrientHints.map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
                     </ul>
                   )}
-                  {s.notes && <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">{s.notes}</p>}
+                  {/* The user's own words, set apart from the advice above so the two cannot be read as one. */}
+                  {s.notes && (
+                    <p className="mt-3 border-l-2 border-gray-200 pl-3 text-sm text-gray-600 dark:border-white/15 dark:text-gray-400">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">{t("soil.yourNote")}</span> {s.notes}
+                    </p>
+                  )}
                 </article>
               );
             })}

@@ -78,7 +78,10 @@ export function FoodPlan() {
             items={[
               { label: t("foodplan.coverageActual"), value: f.formatPercent(plan.actualCoverage), hint: t("foodplan.actualKg", { kg: kg(plan.actualKg) }) },
               { label: t("foodplan.area"), value: f.formatArea(plan.areaM2), hint: t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) }) },
-              { label: t("foodplan.deficits"), value: f.formatNumber(deficits.length, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) },
+              // "20 von 20 Kulturen mit Lücke" says nothing; the largest gap does (rows are sorted by deficit).
+              deficits.length > 0
+                ? { label: t("foodplan.biggestGap"), value: plantName(deficits[0].plantId), hint: t("foodplan.biggestGapHint", { kg: kg(deficits[0].deficitKg), count: deficits.length }) }
+                : { label: t("foodplan.deficits"), value: f.formatNumber(0, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) },
             ]}
           />
           <HowCalculated>
