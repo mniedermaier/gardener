@@ -270,3 +270,21 @@ describe("autumn season: tasks, palette, garden agenda agree", () => {
     expect(getPlantingTaskDates(P("spinach"), frost, raised).some((d) => d.action === "sow_autumn")).toBe(true);
   });
 });
+
+describe("autumn harvest window", () => {
+  it("gives an autumn sowing its own harvest, wrapping into next year", async () => {
+    const { autumnPhaseWindows } = await import("@/lib/advisor");
+    const ws = autumnPhaseWindows("lambs_lettuce", 2026, 0, "outdoor_bed", { harvestDaysMin: 60, harvestDaysMax: 90 });
+    const harvest = ws.find((w) => w.phase === "harvest")!;
+    expect(harvest).toBeDefined();
+    // Sowing 15 Jul–10 Oct: harvest from mid-September into January.
+    expect(harvest.start.getMonth()).toBe(8);
+    expect(harvest.end.getFullYear()).toBe(2027);
+  });
+
+  it("adds no harvest without plant data or for long-lived crops", async () => {
+    const { autumnPhaseWindows } = await import("@/lib/advisor");
+    expect(autumnPhaseWindows("lambs_lettuce", 2026, 0).some((w) => w.phase === "harvest")).toBe(false);
+    expect(autumnPhaseWindows("garlic", 2026, 0, "outdoor_bed", { harvestDaysMin: 240, harvestDaysMax: 270 }).some((w) => w.phase === "harvest")).toBe(false);
+  });
+});

@@ -10,7 +10,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { calculateSufficiency, loggedKgByMonth, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
-import { annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
+import { getActualProductKgByMonth, annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
 import type { ProductType } from "@/types/animal";
 import { PRODUCT_NUTRITION } from "@/types/animal";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
@@ -44,8 +44,8 @@ export function SufficiencyDashboard() {
   const f = useFormat();
   const navigate = useNavigate();
   const addBed = useAddBed();
-  const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems, harvests } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems, harvests: s.harvests })),
+  const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems, harvests, animalProducts } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems, harvests: s.harvests, animalProducts: s.animalProducts })),
   );
   const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const plants = usePlants();
@@ -122,6 +122,9 @@ export function SufficiencyDashboard() {
   const pct = (r: number) => f.formatPercent(r, r < 0.1 ? 1 : 0);
   // Past and running months: what was logged; later months: the forecast.
   const logged = loggedKgByMonth(harvests, now.getFullYear());
+  // Recorded eggs, honey … per month (same source as Produktion): the past months' animal part.
+  const loggedAnimal = getActualProductKgByMonth(animalProducts, animals, now.getFullYear());
+  const hasLoggedAnimal = loggedAnimal.some((v) => v > 0);
   const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
 
   return (
@@ -172,7 +175,7 @@ export function SufficiencyDashboard() {
               current={currentMonth}
               currentLabel={t("charts.today")}
               threshold={LOW_COVERAGE_PERCENT / 100}
-              caption={t("sufficiency.monthlyCaption")}
+              caption={t("sufficiency.monthlyCaptionTypical")}
             />
             <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
               {lowCount >= 11 ? (
@@ -204,7 +207,10 @@ export function SufficiencyDashboard() {
                     // Series order brand → earth → sky (DESIGN_SYSTEM charts). Stored food
                     // and animal products are forecasts: drawn from this month on only, so
                     // past months show exactly what was logged.
-                    ...(hasAnimals ? [m.month >= currentMonth ? m.animalKg : 0] : []),
+                    // Animal products: recorded up to this month (solid), forecast after (hatched).
+                    ...(hasAnimals || hasLoggedAnimal ? [m.month <= currentMonth ? loggedAnimal[m.month] : 0] : []),
+                    ...(hasAnimals ? [m.month > currentMonth ? m.animalKg : 0] : []),
+                    // Stored food is a forecast from this month on: hatched.
                     ...(hasStored ? [m.month >= currentMonth ? m.storedKg : 0] : []),
                   ],
                 }))}
@@ -212,13 +218,14 @@ export function SufficiencyDashboard() {
                   { label: t("sufficiency.harvested"), color: "brand" },
                   // Legend only for a series that is actually drawn.
                   ...(hasForecast ? [{ label: t("sufficiency.freshForecast"), color: "brand" as const, hatched: true }] : []),
-                  ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const }] : []),
-                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const }] : []),
+                  ...(hasAnimals || hasLoggedAnimal ? [{ label: t("sufficiency.animalLogged"), color: "earth" as const }] : []),
+                  ...(hasAnimals ? [{ label: t("sufficiency.animalForecast"), color: "earth" as const, hatched: true }] : []),
+                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const, hatched: true }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
                 formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}
                 marker={{ index: currentMonth, label: t("charts.today") }}
-                caption={t("sufficiency.monthlyKgCaptionSplit", { month: monthLong[currentMonth] })}
+                caption={t("sufficiency.monthlyKgCaptionLogged")}
                 categoryLabel={t("charts.month")}
               />
             </div>

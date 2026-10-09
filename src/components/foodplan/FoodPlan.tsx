@@ -166,7 +166,7 @@ export function FoodPlan() {
                       trailing={
                         // Fixed width: every bar in the list ends at the same x.
                         <span className="block w-24 text-right">
-                          {t("foodplan.rowLogged", { actual: kg(r.actualKg) })}
+                          {r.actualKg > 0 ? t("foodplan.rowLogged", { actual: kg(r.actualKg) }) : t("foodplan.rowNothingLogged")}
                           <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{t("foodplan.rowTargetOf", { target: kg(r.targetKg) })}</span>
                         </span>
                       }

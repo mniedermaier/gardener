@@ -4,6 +4,7 @@ import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useToday } from "@/hooks/useToday";
 import { getPhaseWindows, seasonFrost } from "@/lib/season";
+import { autumnPhaseWindows } from "@/lib/advisor";
 import { getFrostProtectionWeeks, type Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
@@ -40,7 +41,14 @@ export const BedCropList = memo(function BedCropList({ bed, plantMap, getPlantNa
     const frostProtectionWeeks = getFrostProtectionWeeks(bed);
     const frost = seasonFrost(lastFrostDate, today);
     return [...byPlant.values()]
-      .map((r) => ({ ...r, window: getPhaseWindows(r.plant, frost, { frostProtectionWeeks }).find((w) => w.phase === "harvest") ?? null }))
+      .map((r) => {
+        // Spring harvest and, for autumn-sown crops, the autumn harvest: show the
+        // one still ahead or running (lamb's lettuce in October → autumn/winter).
+        const spring = getPhaseWindows(r.plant, frost, { frostProtectionWeeks }).find((w) => w.phase === "harvest") ?? null;
+        const autumn = autumnPhaseWindows(r.plant.id, frost.getFullYear(), frostProtectionWeeks, bed.environmentType, r.plant).find((w) => w.phase === "harvest") ?? null;
+        const window = autumn && (!spring || spring.end < today) ? autumn : spring;
+        return { ...r, window };
+      })
       // Crops without a seasonal window (perennials) go last.
       .sort((a, b) => (a.window?.start.getTime() ?? Infinity) - (b.window?.start.getTime() ?? Infinity));
   }, [bed, plantMap, lastFrostDate, today]);

@@ -166,7 +166,8 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
     : withData.length === 1 ? f.formatDate(withData[0].b.date, "monthYear") : "";
   const best = values.reduce((bi, v, i, a) => (v > a[bi] ? i : bi), 0);
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,36rem)_1fr] lg:gap-8">
+    // Up to four months: a narrower chart column, so three or four bars don't spread thin.
+    <div className={`grid gap-6 lg:gap-8 ${values.length <= 4 ? "lg:grid-cols-[minmax(0,24rem)_1fr]" : "lg:grid-cols-[minmax(0,36rem)_1fr]"}`}>
       {charts}
       {sparseList || (
         values.filter((v) => v > 0).length > 1 && (

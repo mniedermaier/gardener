@@ -368,7 +368,7 @@
     },
     {
      "id": "b-acker",
-     "name": "Kartoffelacker",
+     "name": "Acker",
      "x": 0,
      "y": 2,
      "width": 8,
@@ -739,7 +739,7 @@
    "gardenId": "g-hof",
    "type": "soil_test",
    "bedId": "b-acker",
-   "title": "Bodenprobe Kartoffelacker",
+   "title": "Bodenprobe Acker",
    "dueDate": "2026-10-17"
   }
  ],
@@ -1686,7 +1686,7 @@
    "animalId": "a1",
    "date": "2026-09-21",
    "type": "deworming",
-   "description": "Entwurmung mit Flubenvet",
+   "description": "Entwurmung Hühner",
    "cost": 18.5
   },
   {

@@ -91,7 +91,7 @@ export function SeasonTimeline() {
           if (!plant) continue;
           const phases: PlantTimeline["phases"] = {};
           for (const w of getPhaseWindows(plant, frostDate, { frostProtectionWeeks: protection })) phases[w.phase] = { start: w.start, end: w.end };
-          const autumn = autumnPhaseWindows(plantId, frostDate.getFullYear(), protection, bed.environmentType).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
+          const autumn = autumnPhaseWindows(plantId, frostDate.getFullYear(), protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
           result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn });
         }
       }
