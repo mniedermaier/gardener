@@ -131,12 +131,13 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
           const label = t(`plants.details.${p.key}`);
           return (
             <li key={p.key} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-              <span className="flex items-baseline justify-between gap-2 text-sm sm:block sm:w-28 sm:shrink-0">
+              {/* Label and exact dates beside the bar: the bars are never the only carrier, and no second table repeats them. */}
+              <span className="flex items-baseline justify-between gap-2 text-sm sm:block sm:w-36 sm:shrink-0">
                 <span className="inline-flex items-center gap-1.5 font-medium text-gray-800 dark:text-gray-200">
                   <PhaseIcon phase={p.key} />
                   {label}
                 </span>
-                <span className="text-xs text-gray-500 sm:hidden dark:text-gray-400">{range}</span>
+                <span className="text-xs text-gray-500 tabular-nums sm:block dark:text-gray-400">{range}</span>
               </span>
               <span className="relative block h-7 w-full shrink-0 overflow-hidden rounded-md bg-gray-50 sm:w-auto sm:flex-1 dark:bg-white/5">
                 {grid}
@@ -170,20 +171,6 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
         )}
       </div>
 
-      {/* Exact dates as text, so the bars are never the only carrier of information */}
-      <dl className="mt-4 hidden gap-x-6 gap-y-2 text-sm sm:grid sm:grid-cols-2">
-        {phases.map((p) => (
-          <div key={p.key} className="flex items-center justify-between gap-3 border-b border-gray-100 pb-2 dark:border-white/5">
-            <dt className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300">
-              <PhaseSwatch phase={p.key} className="h-2.5 w-3.5" />
-              {t(`plants.details.${p.key}`)}
-            </dt>
-            <dd className="font-medium text-gray-900 tabular-nums dark:text-gray-100">
-              {formatDateRange(p.start, p.end)}
-            </dd>
-          </div>
-        ))}
-      </dl>
     </div>
   );
 });
@@ -298,13 +285,16 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   }, [plant, allPlants, getPlantName]);
 
   const locations = useMemo(() => {
-    const rows: Array<{ key: string; gardenName: string; bedName: string; env: EnvironmentType; count: number }> = [];
+    const rows: Array<{ key: string; gardenName: string; bedName: string; env: EnvironmentType; count: number; conflicts: string[] }> = [];
+    const badSet = new Set(bad);
     for (const g of gardens) for (const b of g.beds) {
       const count = b.cells.filter((c) => c.plantId === plant.id).length;
-      if (count > 0) rows.push({ key: b.id, gardenName: g.name, bedName: b.name, env: b.environmentType ?? "outdoor_bed", count });
+      // Unfavourable neighbours in the same bed: the same rule as the companion page.
+      const conflicts = [...new Set(b.cells.map((c) => c.plantId).filter((id) => badSet.has(id)))];
+      if (count > 0) rows.push({ key: b.id, gardenName: g.name, bedName: b.name, env: b.environmentType ?? "outdoor_bed", count, conflicts });
     }
     return rows;
-  }, [gardens, plant.id]);
+  }, [gardens, plant.id, bad]);
 
   const harvestStats = useMemo(() => {
     const own = harvests.filter((h) => h.plantId === plant.id);
@@ -513,6 +503,9 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                 leading={<EnvironmentChip type={loc.env} />}
                 title={loc.bedName}
                 meta={gardens.length > 1 ? loc.gardenName : undefined}
+                badges={loc.conflicts.length > 0
+                  ? <Badge tone="warning" size="sm" icon={TriangleAlert}>{t("plants.detail.sameBedConflict", { plants: loc.conflicts.map(getPlantName).join(", ") })}</Badge>
+                  : undefined}
                 trailing={t("plants.detail.plantCount", { count: loc.count })}
                 onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
               />

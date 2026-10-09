@@ -1,7 +1,7 @@
 import { Fragment, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown } from "lucide-react";
-import { endOfWeek, getISOWeek, startOfWeek } from "date-fns";
+import { addDays, endOfWeek, getISOWeek, startOfWeek } from "date-fns";
 import { useFormat } from "@/hooks/useFormat";
 import { toDate, toISODate } from "@/lib/format";
 import { PRODUCT_TYPES, type ProductTotals } from "@/lib/metrics";
@@ -38,14 +38,20 @@ export function groupByWeek(items: AnimalProduct[]): ProductWeek[] {
   return out;
 }
 
-/** Weeks grouped by the month their Monday falls in — a week is never split across two cards. */
+/**
+ * Weeks grouped by the month that holds most of their days (the month of the
+ * week's Thursday, as ISO weeks count) — a week is never split across two
+ * cards, and "KW 40 (28. Sept.–4. Okt.)" lands under October like most of its
+ * eggs in the monthly chart.
+ */
 export function weeksByMonth(weeks: ProductWeek[]): { key: string; date: Date; count: number; weeks: ProductWeek[] }[] {
   const out: { key: string; date: Date; count: number; weeks: ProductWeek[] }[] = [];
   for (const w of weeks) {
-    const key = toISODate(w.from).slice(0, 7);
+    const thursday = addDays(w.from, 3);
+    const key = toISODate(thursday).slice(0, 7);
     let g = out.find((x) => x.key === key);
     if (!g) {
-      g = { key, date: w.from, count: 0, weeks: [] };
+      g = { key, date: thursday, count: 0, weeks: [] };
       out.push(g);
     }
     g.weeks.push(w);

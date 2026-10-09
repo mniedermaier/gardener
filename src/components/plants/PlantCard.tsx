@@ -44,7 +44,8 @@ export const PlantCard = memo(function PlantCard({ plant, planted, custom, onOpe
           </span>
           <span className="inline-flex items-center gap-1">
             <Droplets size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
-            {t(`plants.water.${plant.waterNeed}`)}
+            {/* "Viel" alone does not say what is much: name the need. */}
+            {t("plants.waterCaption", { level: t(`plants.water.${plant.waterNeed}`) })}
           </span>
           <span className="inline-flex items-center gap-1 tabular-nums">
             <Ruler size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />

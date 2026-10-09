@@ -327,7 +327,12 @@ export function ExpenseDashboard() {
                     key={e.id}
                     leading={<CategoryTile category={e.category} />}
                     title={e.description}
-                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")]}
+                    meta={[
+                      t(`expenses.categories.${e.category}`),
+                      // Same bill also in a livestock log: counted once, said here.
+                      balance.costs.matchedExpenses[e.id] && t(balance.costs.matchedExpenses[e.id] === "feed" ? "expenses.alsoInFeedBook" : "expenses.alsoInHealthBook"),
+                      f.formatDate(e.date, "relative"),
+                    ]}
                     trailing={f.formatCurrency(e.amountCents / 100)}
                     onClick={() => openEdit(e)}
                     actions={

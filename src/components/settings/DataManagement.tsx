@@ -1,5 +1,5 @@
 import { daysSince } from "@/lib/format";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace, TriangleAlert } from "lucide-react";
 import { useStore } from "@/store";
@@ -9,7 +9,7 @@ import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { useFormat } from "@/hooks/useFormat";
 import { useToday } from "@/hooks/useToday";
-import { exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExport } from "@/lib/dataExport";
+import { buildCostsCsv, exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExport } from "@/lib/dataExport";
 import { importAllData, validateExportFile, type ImportMode, type ImportResult } from "@/lib/dataImport";
 
 const STAT_KEYS = ["gardens", "tasks", "harvests", "journalEntries", "expenses"] as const;
@@ -19,11 +19,13 @@ export function DataManagement() {
   const { t } = useTranslation();
   const { formatDate } = useFormat();
   const today = useToday();
-  const { lastBackupDate, harvests, expenses, hasData } = useStore(useShallow((s) => ({
-    lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses,
+  const { lastBackupDate, harvests, expenses, feedEntries, healthEvents, hasData } = useStore(useShallow((s) => ({
+    lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses, feedEntries: s.feedEntries, healthEvents: s.healthEvents,
     // Anything worth keeping: a bed or any record. Before that a backup is no urgent matter.
     hasData: s.gardens.some((g) => g.beds.length > 0) || s.harvests.length > 0 || s.journalEntries.length > 0 || s.expenses.length > 0 || s.animals.length > 0 || s.tasks.length > 0,
   })));
+  // Same rows as the Kosten page (manual expenses + counted feed/health costs).
+  const costRows = useMemo(() => buildCostsCsv({ expenses, feedEntries, healthEvents }).rows, [expenses, feedEntries, healthEvents]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<GardenerExport | null>(null);
@@ -100,7 +102,7 @@ export function DataManagement() {
 
       {/* Only exports that have rows: without harvests or expenses the whole
           subsection waits (a heading over a sentence with no button reads as broken). */}
-      {(harvests.length > 0 || expenses.length > 0) && (
+      {(harvests.length > 0 || costRows > 0) && (
         <div>
           <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
           {/* Secondary buttons with a download icon: they read as actions, not as text. */}
@@ -113,11 +115,11 @@ export function DataManagement() {
                 <Download size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
               </Button>
             )}
-            {expenses.length > 0 && (
+            {costRows > 0 && (
               <Button variant="secondary" size="sm" onClick={exportExpensesCsv}>
                 <FileSpreadsheet size={14} aria-hidden="true" />
                 {t("dataManagement.exportExpensesCsv")}
-                <span className="text-gray-500 tabular-nums dark:text-gray-400">{expenses.length}</span>
+                <span className="text-gray-500 tabular-nums dark:text-gray-400">{costRows}</span>
                 <Download size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
               </Button>
             )}

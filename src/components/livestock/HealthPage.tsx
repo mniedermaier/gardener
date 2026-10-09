@@ -138,18 +138,18 @@ export function HealthPage() {
               items={[
                 ...(stats.vaccinable > 0 ? [{
                   // The scope is named: only animals with a vaccination schedule (bees have none).
+                  // Neutral figure: the warning card below says what is due.
                   label: t("livestock.health.vaccCoverageScoped"),
                   value: (
                     <span className="inline-flex flex-wrap items-center gap-2">
                       {t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable })}
-                      {stats.due.length > 0 && <Badge tone="warning" size="sm">{t("livestock.health.vaccDueBadge")}</Badge>}
                     </span>
                   ),
                   hint: stats.due.length === 0 && stats.nextDue
                     ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") })
                     : t("livestock.health.vaccScopeHint"),
                 }] : []),
-                { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: undefined },
+                { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: t("livestock.health.lossesHint") },
               ]}
             />
           )}

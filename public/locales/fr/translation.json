@@ -856,9 +856,11 @@
       "bedFirstHint": "Ajoute une planche pour planifier {{plant}} :",
       "yieldPerPlant": "≈ {{value}} par plante",
       "frostHarvest": "Gel dès le {{date}} – récolter maintenant",
-      "stockEmpty": "{{plant}} n’est encore dans aucune planche, sans récolte ni semences."
+      "stockEmpty": "{{plant}} n’est encore dans aucune planche, sans récolte ni semences.",
+      "sameBedConflict": "Même planche · {{plants}}"
     },
-    "sowNowFilter": "À semer"
+    "sowNowFilter": "À semer",
+    "waterCaption": "Eau : {{level}}"
   },
   "weather": {
     "title": "Météo",
@@ -1032,8 +1034,8 @@
     "notesPlaceholder": "p. ex. outils, rappels…",
     "afterFrostWindow": "après les nuits de gel : {{range}}",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
-    "untilByBed": "jusqu’au {{date}} ({{bed}})",
-    "fromByBed": "à partir du {{date}} ({{bed}})"
+    "untilByBed": "jusqu’au {{date}} · {{bed}}",
+    "fromByBed": "à partir du {{date}} · {{bed}}"
   },
   "settings": {
     "title": "Paramètres",
@@ -1497,7 +1499,7 @@
     "planCropsTitle_other": "{{count}} cultures dans le plan",
     "planCropsTitle_many": "{{count}} cultures dans le plan",
     "byCaloriesLabel": "En calories",
-    "byCaloriesHint": "avec produits animaux · autonomie",
+    "byCaloriesHint": "produits animaux inclus",
     "rowMissing": "{{kg}} manquants",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objectif atteint selon la prévision"
@@ -1739,8 +1741,8 @@
       "notesPlaceholder": "p. ex. vétérinaire, prochain rendez-vous…",
       "vaccCoverageScoped": "Vaccination",
       "vaccScopeHint": "Groupes soumis à vaccination",
-      "vaccDueBadge": "à faire",
-      "addEntry": "Saisir une entrée de santé"
+      "addEntry": "Saisir une entrée de santé",
+      "lossesHint": "depuis le début"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1865,7 +1867,6 @@
     "entriesHint_many": "{{count}} entrées",
     "costSplit": "Alimentation {{feed}} · vétérinaire {{vet}}",
     "balance": "Bilan",
-    "roiHint": "Rentabilité rapportée aux coûts",
     "howValue": "Valeur = produits enregistrés × prix unitaire (par défaut : œuf 0,35 €, miel 12 €/kg, lait 1,40 €/l, viande 14 €/kg). Coûts = alimentation + vétérinaire de cet animal.",
     "costPer": {
       "eggs": "{{cost}} par œuf",
@@ -1984,7 +1985,10 @@
     "invalidYear": "Saisissez une année entre 1950 et aujourd’hui",
     "years_many": "{{count}} ans",
     "notesPlaceholder": "p. ex. taux de germination, origine…",
-    "onionSets": "Bulbilles"
+    "onionSets": "Bulbilles",
+    "itemsCrops_one": "{{count}} culture",
+    "itemsCrops_other": "{{count}} cultures",
+    "itemsCrops_many": "{{count}} cultures"
   },
   "soil": {
     "title": "Sol",
@@ -2282,7 +2286,9 @@
     "fromHealthBook": "du carnet de santé",
     "openFeedBook": "Ouvrir dans le carnet d’alimentation",
     "openHealthBook": "Ouvrir dans la santé",
-    "notesPlaceholder": "p. ex. magasin, numéro de facture…"
+    "notesPlaceholder": "p. ex. magasin, numéro de facture…",
+    "alsoInFeedBook": "aussi dans le carnet d’alimentation",
+    "alsoInHealthBook": "aussi dans le carnet de santé"
   },
   "succession": {
     "pick": "Choisir une culture",

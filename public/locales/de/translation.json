@@ -830,9 +830,11 @@
       "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein:",
       "yieldPerPlant": "≈ {{value}} pro Pflanze",
       "frostHarvest": "Frost ab {{date}} – jetzt abernten",
-      "stockEmpty": "{{plant}} steht noch in keinem Beet, Ernten und Saatgut fehlen noch."
+      "stockEmpty": "{{plant}} steht noch in keinem Beet, Ernten und Saatgut fehlen noch.",
+      "sameBedConflict": "Im selben Beet · {{plants}}"
     },
-    "sowNowFilter": "Jetzt säen"
+    "sowNowFilter": "Jetzt säen",
+    "waterCaption": "Wasser: {{level}}"
   },
   "weather": {
     "title": "Wetter",
@@ -1000,8 +1002,8 @@
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
     "afterFrostWindow": "nach den Frostnächten: {{range}}",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
-    "untilByBed": "bis {{date}} ({{bed}})",
-    "fromByBed": "ab {{date}} ({{bed}})"
+    "untilByBed": "bis {{date}} · {{bed}}",
+    "fromByBed": "ab {{date}} · {{bed}}"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1432,7 +1434,7 @@
     "planCropsTitle_one": "{{count}} Kultur im Plan",
     "planCropsTitle_other": "{{count}} Kulturen im Plan",
     "byCaloriesLabel": "Nach Kalorien",
-    "byCaloriesHint": "mit Tierprodukten · Selbstversorgung",
+    "byCaloriesHint": "inkl. Tierprodukte",
     "rowMissing": "fehlen {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Ziel laut Prognose erreicht"
@@ -1665,8 +1667,8 @@
       "notesPlaceholder": "z. B. Tierarzt, nächster Termin …",
       "vaccCoverageScoped": "Impfschutz",
       "vaccScopeHint": "Tiergruppen mit Impfpflicht",
-      "vaccDueBadge": "fällig",
-      "addEntry": "Gesundheitseintrag erfassen"
+      "addEntry": "Gesundheitseintrag erfassen",
+      "lossesHint": "seit Bestandsbeginn"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1777,7 +1779,6 @@
     "entriesHint_other": "{{count}} Einträge",
     "costSplit": "Futter {{feed}} · Tierarzt {{vet}}",
     "balance": "Bilanz",
-    "roiHint": "Rendite im Verhältnis zu den Kosten",
     "howValue": "Wert = erfasste Produkte × Preis pro Einheit (Standard: Ei 0,35 €, Honig 12 €/kg, Milch 1,40 €/l, Fleisch 14 €/kg). Kosten = Futter + Tierarzt dieses Tieres.",
     "costPer": {
       "eggs": "{{cost}} pro Ei",
@@ -1890,7 +1891,9 @@
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben",
     "notesPlaceholder": "z. B. Keimrate, Herkunft …",
-    "onionSets": "Steckzwiebeln"
+    "onionSets": "Steckzwiebeln",
+    "itemsCrops_one": "{{count}} Kultur",
+    "itemsCrops_other": "{{count}} Kulturen"
   },
   "soil": {
     "title": "Boden",
@@ -2179,7 +2182,9 @@
     "fromHealthBook": "aus der Gesundheitsakte",
     "openFeedBook": "Im Futterbuch öffnen",
     "openHealthBook": "In Gesundheit öffnen",
-    "notesPlaceholder": "z. B. Händler, Rechnungsnummer …"
+    "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
+    "alsoInFeedBook": "auch im Futterbuch",
+    "alsoInHealthBook": "auch in der Gesundheitsakte"
   },
   "succession": {
     "pick": "Kultur wählen",

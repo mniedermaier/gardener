@@ -195,9 +195,9 @@ export function SeedInventory() {
           // the stock itself leads. Zero counts are left out.
           hero={missing.length > 0
             ? { label: t("seeds.missingStat"), value: formatNumber(missing.length), hint: t("seeds.missingStatHint"), icon: ShoppingCart, tone: "info" }
-            : { label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand" }}
+            : { label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand", hint: t("seeds.itemsCrops", { count: new Set(seeds.map((x) => x.plantId)).size }) }}
           items={[
-            ...(missing.length > 0 ? [{ label: t("seeds.items"), value: formatNumber(seeds.length) }] : []),
+            ...(missing.length > 0 ? [{ label: t("seeds.items"), value: formatNumber(seeds.length), hint: t("seeds.itemsCrops", { count: new Set(seeds.map((x) => x.plantId)).size }) }] : []),
             ...(testCount > 0 ? [{ label: t("seeds.testRecommended"), value: formatNumber(testCount), hint: t("seeds.testHintShort") }] : []),
             ...(totalCost > 0 ? [{ label: t("seeds.totalCost"), value: formatCurrency(totalCost) }] : []),
           ]}

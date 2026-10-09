@@ -830,9 +830,11 @@
       "bedFirstHint": "Add a bed to plan {{plant}} right away:",
       "yieldPerPlant": "≈ {{value}} per plant",
       "frostHarvest": "Frost from {{date}} – harvest now",
-      "stockEmpty": "{{plant}} isn't in a bed yet, and there are no harvests or seeds."
+      "stockEmpty": "{{plant}} isn't in a bed yet, and there are no harvests or seeds.",
+      "sameBedConflict": "Same bed · {{plants}}"
     },
-    "sowNowFilter": "Sow now"
+    "sowNowFilter": "Sow now",
+    "waterCaption": "Water: {{level}}"
   },
   "weather": {
     "title": "Weather",
@@ -1000,8 +1002,8 @@
     "notesPlaceholder": "e.g. tools, reminders…",
     "afterFrostWindow": "after the frost nights: {{range}}",
     "timelineEmptyLine": "Your season plan needs a bed.",
-    "untilByBed": "until {{date}} ({{bed}})",
-    "fromByBed": "from {{date}} ({{bed}})"
+    "untilByBed": "until {{date}} · {{bed}}",
+    "fromByBed": "from {{date}} · {{bed}}"
   },
   "settings": {
     "title": "Settings",
@@ -1432,7 +1434,7 @@
     "planCropsTitle_one": "{{count}} crop in the plan",
     "planCropsTitle_other": "{{count}} crops in the plan",
     "byCaloriesLabel": "By calories",
-    "byCaloriesHint": "with animal products · self-sufficiency",
+    "byCaloriesHint": "incl. animal products",
     "rowMissing": "{{kg}} short",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Target reached by the forecast"
@@ -1665,8 +1667,8 @@
       "notesPlaceholder": "e.g. vet, next appointment…",
       "vaccCoverageScoped": "Vaccination",
       "vaccScopeHint": "Animal groups that require vaccination",
-      "vaccDueBadge": "due",
-      "addEntry": "Log health entry"
+      "addEntry": "Log health entry",
+      "lossesHint": "since the herd started"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1777,7 +1779,6 @@
     "entriesHint_other": "{{count}} entries",
     "costSplit": "Feed {{feed}} · vet {{vet}}",
     "balance": "Balance",
-    "roiHint": "Return relative to costs",
     "howValue": "Value = recorded products × price per unit (default: egg €0.35, honey €12/kg, milk €1.40/l, meat €14/kg). Costs = feed + vet for this animal.",
     "costPer": {
       "eggs": "{{cost}} per egg",
@@ -1890,7 +1891,9 @@
     "invalidNumber": "Enter a valid number",
     "invalidYear": "Enter a year between 1950 and today",
     "notesPlaceholder": "e.g. germination rate, origin…",
-    "onionSets": "Onion sets"
+    "onionSets": "Onion sets",
+    "itemsCrops_one": "{{count}} crop",
+    "itemsCrops_other": "{{count}} crops"
   },
   "soil": {
     "title": "Soil",
@@ -2179,7 +2182,9 @@
     "fromHealthBook": "from the health record",
     "openFeedBook": "Open in feed log",
     "openHealthBook": "Open in health log",
-    "notesPlaceholder": "e.g. shop, invoice number…"
+    "notesPlaceholder": "e.g. shop, invoice number…",
+    "alsoInFeedBook": "also in the feed log",
+    "alsoInHealthBook": "also in the health log"
   },
   "succession": {
     "pick": "Pick a crop",

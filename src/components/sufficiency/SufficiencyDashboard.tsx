@@ -201,16 +201,17 @@ export function SufficiencyDashboard() {
                   values: [
                     m.month <= currentMonth ? logged[m.month] : 0,
                     ...(hasForecast ? [m.month > currentMonth ? m.freshKg : 0] : []),
-                    ...(hasStored ? [m.storedKg] : []),
+                    // Series order brand → earth → sky (DESIGN_SYSTEM charts).
                     ...(hasAnimals ? [m.animalKg] : []),
+                    ...(hasStored ? [m.storedKg] : []),
                   ],
                 }))}
                 series={[
                   { label: t("sufficiency.harvested"), color: "brand" },
                   // Legend only for a series that is actually drawn.
                   ...(hasForecast ? [{ label: t("sufficiency.freshForecast"), color: "brand" as const, hatched: true }] : []),
-                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const }] : []),
                   ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const, muted: true }] : []),
+                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "sky" as const }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
                 formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}

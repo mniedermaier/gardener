@@ -362,9 +362,9 @@ export function SoilManagement() {
                       </ul>
                     </details>
                   )}
-                  {/* The user's own words, set apart from the advice above so the two cannot be read as one. */}
+                  {/* The user's own words, labelled "Notiz:" like notes elsewhere — no quote styling. */}
                   {s.notes && (
-                    <p className="mt-3 border-l-2 border-gray-200 pl-3 text-sm text-gray-600 dark:border-white/15 dark:text-gray-400">
+                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                       <span className="font-medium text-gray-700 dark:text-gray-300">{t("soil.yourNote")}</span> {s.notes}
                     </p>
                   )}

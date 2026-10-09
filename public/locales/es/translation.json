@@ -856,9 +856,11 @@
       "bedFirstHint": "Crea un bancal para planificar {{plant}}:",
       "yieldPerPlant": "≈ {{value}} por planta",
       "frostHarvest": "Helada desde el {{date}}: cosecha ya",
-      "stockEmpty": "{{plant}} aún no está en ningún bancal y no hay cosechas ni semillas."
+      "stockEmpty": "{{plant}} aún no está en ningún bancal y no hay cosechas ni semillas.",
+      "sameBedConflict": "Mismo bancal · {{plants}}"
     },
-    "sowNowFilter": "Sembrar ahora"
+    "sowNowFilter": "Sembrar ahora",
+    "waterCaption": "Agua: {{level}}"
   },
   "weather": {
     "title": "Tiempo",
@@ -1032,8 +1034,8 @@
     "notesPlaceholder": "p. ej. herramientas, avisos…",
     "afterFrostWindow": "tras las noches de helada: {{range}}",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
-    "untilByBed": "hasta el {{date}} ({{bed}})",
-    "fromByBed": "desde el {{date}} ({{bed}})"
+    "untilByBed": "hasta el {{date}} · {{bed}}",
+    "fromByBed": "desde el {{date}} · {{bed}}"
   },
   "settings": {
     "title": "Ajustes",
@@ -1497,7 +1499,7 @@
     "planCropsTitle_other": "{{count}} cultivos en el plan",
     "planCropsTitle_many": "{{count}} cultivos en el plan",
     "byCaloriesLabel": "Por calorías",
-    "byCaloriesHint": "con productos animales · autosuficiencia",
+    "byCaloriesHint": "incl. productos animales",
     "rowMissing": "faltan {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objetivo alcanzado según la previsión"
@@ -1739,8 +1741,8 @@
       "notesPlaceholder": "p. ej. veterinario, próxima cita…",
       "vaccCoverageScoped": "Vacunación",
       "vaccScopeHint": "Grupos con vacuna obligatoria",
-      "vaccDueBadge": "pendiente",
-      "addEntry": "Registrar entrada de salud"
+      "addEntry": "Registrar entrada de salud",
+      "lossesHint": "desde el inicio"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1865,7 +1867,6 @@
     "entriesHint_many": "{{count}} registros",
     "costSplit": "Pienso {{feed}} · veterinario {{vet}}",
     "balance": "Balance",
-    "roiHint": "Rentabilidad en relación con los costes",
     "howValue": "Valor = productos registrados × precio por unidad (por defecto: huevo 0,35 €, miel 12 €/kg, leche 1,40 €/l, carne 14 €/kg). Costes = pienso + veterinario de este animal.",
     "costPer": {
       "eggs": "{{cost}} por huevo",
@@ -1984,7 +1985,10 @@
     "invalidYear": "Introduce un año entre 1950 y hoy",
     "years_many": "{{count}} años",
     "notesPlaceholder": "p. ej. tasa de germinación, origen…",
-    "onionSets": "Bulbillos"
+    "onionSets": "Bulbillos",
+    "itemsCrops_one": "{{count}} cultivo",
+    "itemsCrops_other": "{{count}} cultivos",
+    "itemsCrops_many": "{{count}} cultivos"
   },
   "soil": {
     "title": "Suelo",
@@ -2282,7 +2286,9 @@
     "fromHealthBook": "del registro de salud",
     "openFeedBook": "Abrir en el registro de alimento",
     "openHealthBook": "Abrir en salud",
-    "notesPlaceholder": "p. ej. tienda, número de factura…"
+    "notesPlaceholder": "p. ej. tienda, número de factura…",
+    "alsoInFeedBook": "también en el registro de alimentación",
+    "alsoInHealthBook": "también en el registro de salud"
   },
   "succession": {
     "pick": "Elegir cultivo",

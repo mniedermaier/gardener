@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, BookOpen, HeartPulse, Pencil, Plus, Scale, Trash2, Wheat, Egg } from "lucide-react";
+import { ArrowDownRight, ArrowLeft, ArrowUpRight, BookOpen, HeartPulse, Pencil, Plus, Scale, Trash2, Wheat, Egg } from "lucide-react";
 import { differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -169,8 +169,11 @@ export function AnimalDetail() {
           hint: analytics.cost > 0
             ? (
               <span className="inline-flex flex-wrap items-center gap-2">
-                <Badge tone={analytics.net >= 0 ? "positive" : "warning"}>{f.formatPercent(analytics.net / analytics.cost)}</Badge>
-                {t("livestock.roiHint")}
+                {/* Same pattern as the cost page: status in the chip, the number as text. */}
+                <Badge tone={analytics.net >= 0 ? "positive" : "warning"} icon={analytics.net > 0 ? ArrowUpRight : analytics.net < 0 ? ArrowDownRight : undefined}>
+                  {analytics.net >= 0 ? t("expenses.surplus") : t("expenses.deficit")}
+                </Badge>
+                {t("dashboard.roiValue", { value: f.formatPercent(analytics.net / analytics.cost) })}
               </span>
             )
             : undefined,

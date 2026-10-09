@@ -338,6 +338,8 @@ export interface CostBreakdown {
   duplicatesSkipped: number;
   /** The livestock log entries counted in `feed`/`veterinary` (after de-duplication). */
   logEntries: CostLogEntry[];
+  /** Expenses that absorbed a log entry (same bill): expense id → the log it is also in. */
+  matchedExpenses: Record<string, CostLogEntry["source"]>;
 }
 
 /** A log entry within this many days of an expense with the same amount is the same bill. */
@@ -356,8 +358,9 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
   // a log entry is skipped when an animal_feed/veterinary expense with the
   // same amount lies within ±3 days. Each expense absorbs at most one entry.
   const used = new Set<string>();
+  const matchedExpenses: Record<string, CostLogEntry["source"]> = {};
   let duplicatesSkipped = 0;
-  const isDuplicate = (category: ExpenseCategory, date: string, cost: number) => {
+  const isDuplicate = (category: ExpenseCategory, date: string, cost: number, source: CostLogEntry["source"]) => {
     const cents = Math.round(cost * 100);
     const t = Date.parse(date);
     const match = input.expenses.find(
@@ -365,13 +368,14 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
     );
     if (!match) return false;
     used.add(match.id);
+    matchedExpenses[match.id] = source;
     duplicatesSkipped++;
     return true;
   };
   const logEntries: CostLogEntry[] = [];
   const sumLog = (entries: { id: string; date: string; cost?: number; label: string }[], category: ExpenseCategory, source: CostLogEntry["source"]) =>
     entries
-      .filter((x) => inPeriod(x.date, input.period) && (x.cost ?? 0) > 0 && !isDuplicate(category, x.date, x.cost ?? 0))
+      .filter((x) => inPeriod(x.date, input.period) && (x.cost ?? 0) > 0 && !isDuplicate(category, x.date, x.cost ?? 0, source))
       .reduce((s, x) => {
         logEntries.push({ source, id: x.id, date: x.date, cost: x.cost ?? 0, label: x.label });
         return s + (x.cost ?? 0);
@@ -392,6 +396,7 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
     animals: (byCategory.animal_feed ?? 0) + (byCategory.veterinary ?? 0),
     duplicatesSkipped,
     logEntries,
+    matchedExpenses,
   };
 }
 
