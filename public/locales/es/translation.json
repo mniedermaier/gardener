@@ -1258,7 +1258,9 @@
     "showAll_many": "Mostrar los {{count}}",
     "showOlder": "Mostrar meses anteriores",
     "weightIn": "Peso ({{unit}})",
-    "prev30": "30 días antes: {{weight}}"
+    "prev30": "30 días antes: {{weight}}",
+    "qualityScaleLow": "Mala",
+    "qualityScaleHigh": "Top"
   },
   "journal": {
     "title": "Diario",
@@ -1290,7 +1292,7 @@
     "photoN": "Foto {{n}}",
     "removePhoto": "Quitar foto {{n}}",
     "addPhoto": "Añadir foto",
-    "suggestedTags": "Sugerencias:",
+    "suggestedTags": "Usadas a menudo",
     "noAnimal": "Sin animal",
     "linkToggle": "Vincular planta, bancal o animal",
     "photoHintShort": "Hasta {{max}} fotos, solo en este dispositivo.",
@@ -1640,11 +1642,11 @@
     "productionEntries_one": "{{count}} registro",
     "productionEntries_many": "{{count}} registros",
     "productionEntries_other": "{{count}} registros",
-    "addHealth": "Registrar salud",
+    "addHealth": "Registrar entrada de salud",
     "healthAdded": "Registro de salud guardado",
     "noHealth": "Anota vacunas, tratamientos y revisiones para no olvidar nada.",
     "healthType": "Tipo",
-    "healthDesc": "Descripción",
+    "healthDesc": "Hallazgo",
     "editAnimal": "Editar animal",
     "updated": "Animal actualizado",
     "since": "desde",
@@ -1718,7 +1720,7 @@
       "vaccCoverageScoped": "Vacunación",
       "vaccScopeHint": "Grupos con vacuna obligatoria",
       "vaccDueBadge": "pendiente",
-      "addEntry": "Registrar entrada"
+      "addEntry": "Registrar entrada de salud"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -2029,7 +2031,7 @@
       "high": "alto"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nutrientes en ppm (mg/kg), como los indican kits y laboratorios. Deja vacíos los campos que no hayas medido.",
+    "ppmHint": "Nutrientes en ppm (mg/kg), como los indican kits y laboratorios.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",

@@ -474,7 +474,7 @@ export function HarvestLog() {
                 placeholder={t("common.examplePlaceholder", { value: formatNumber(12) })}
               />
             ) : (
-              <Button variant="ghost" size="sm" className="mt-1 -ml-3" onClick={() => patch({ showCount: true })}>
+              <Button variant="ghost" size="sm" className="-mb-2 -ml-3" onClick={() => patch({ showCount: true })}>
                 <Hash size={14} aria-hidden="true" />
                 {t("harvest.addCount")}
               </Button>

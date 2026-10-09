@@ -362,14 +362,15 @@ export function TaskCalendar() {
             placeholder={t("calendar.titlePlaceholder")}
             autoFocus
           />
+          {/* Rule 9 task exception: the due date follows the title — "when" is the
+              first thing a task answers. Heute / Morgen / +1 Woche. */}
+          <DateField mode="future" label={t("calendar.taskDate")} value={draft.dueDate} onChange={(dueDate) => patch({ dueDate })} />
           <Select
             label={t("calendar.taskType")}
             value={draft.type}
             onChange={(e) => patch({ type: e.target.value as TaskType })}
             options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
           />
-          {/* Tasks lie ahead: Heute / Morgen / In 1 Woche, like the record dialogs' Heute / Gestern. */}
-          <DateField mode="future" label={t("calendar.taskDate")} value={draft.dueDate} onChange={(dueDate) => patch({ dueDate })} />
           {gardens.length > 1 && (
             <Select
               label={t("calendar.garden")}

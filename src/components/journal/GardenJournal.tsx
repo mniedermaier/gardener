@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Camera, ChevronDown, ImagePlus, LayoutGrid, PawPrint, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useStore } from "@/store";
@@ -259,6 +260,7 @@ export function GardenJournal() {
   const editing = editingId ? journalEntries.find((e) => e.id === editingId) : undefined;
   const draftTags = parseTags(draft.tags);
   const suggestedTags = allTags.filter((tag) => !draftTags.includes(tag)).slice(0, 8);
+  const { ref: tagRowRef, fadeClass: tagRowFade } = useScrollFade<HTMLDivElement>("", null);
 
   return (
     <div>
@@ -429,8 +431,9 @@ export function GardenJournal() {
             {suggestedTags.length > 0 && (
               // Label on its own line, chips in one scrolling row: no single chip left alone on a line.
               <div className="mt-2">
-                <span className="mb-1 block text-xs text-gray-500 dark:text-gray-400">{t("journal.suggestedTags")}</span>
-                <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+                <span className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">{t("journal.suggestedTags")}</span>
+                {/* The edge fade says the row scrolls on; no chip is ever cut off without a cue. */}
+                <div ref={tagRowRef} className={`-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] ${tagRowFade}`}>
                 {suggestedTags.map((tag) => (
                   <button
                     key={tag}
@@ -446,13 +449,12 @@ export function GardenJournal() {
             )}
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
-
           {/* Links are optional: a disclosure keeps the dialog short (open when the entry already has one).
               It sits above the photos without a divider, so it is never a lone rule cut off at the footer. */}
           <details
             open={linksOpen}
             onToggle={(e) => setLinksOpen(e.currentTarget.open)}
-            className="group"
+            className="group -mt-2"
           >
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold text-gray-900 [&::-webkit-details-marker]:hidden dark:text-gray-100">
               {t("journal.linkToggle")}

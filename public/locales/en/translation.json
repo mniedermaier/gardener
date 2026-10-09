@@ -1213,7 +1213,9 @@
     "log": "Log",
     "showOlder": "Show older months",
     "weightIn": "Weight ({{unit}})",
-    "prev30": "30 days before: {{weight}}"
+    "prev30": "30 days before: {{weight}}",
+    "qualityScaleLow": "Poor",
+    "qualityScaleHigh": "Top"
   },
   "journal": {
     "title": "Journal",
@@ -1245,7 +1247,7 @@
     "photoN": "Photo {{n}}",
     "removePhoto": "Remove photo {{n}}",
     "addPhoto": "Add photo",
-    "suggestedTags": "Suggestions:",
+    "suggestedTags": "Often used",
     "noAnimal": "No animal",
     "linkToggle": "Link a plant, bed or animal",
     "photoHintShort": "Up to {{max}} photos, stored on this device only.",
@@ -1570,11 +1572,11 @@
     "liters": "Liters",
     "productionEntries_one": "{{count}} entry",
     "productionEntries_other": "{{count}} entries",
-    "addHealth": "Log health",
+    "addHealth": "Log health entry",
     "healthAdded": "Health entry logged",
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
-    "healthDesc": "Description",
+    "healthDesc": "Finding",
     "editAnimal": "Edit animal",
     "updated": "Animal updated",
     "since": "since",
@@ -1647,7 +1649,7 @@
       "vaccCoverageScoped": "Vaccination",
       "vaccScopeHint": "Animal groups that require vaccination",
       "vaccDueBadge": "due",
-      "addEntry": "Log entry"
+      "addEntry": "Log health entry"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1938,7 +1940,7 @@
       "high": "high"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nutrients in ppm (mg/kg), as test kits and labs report them. Leave fields empty if not measured.",
+    "ppmHint": "Nutrients in ppm (mg/kg), as test kits and labs report them.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
@@ -2312,7 +2314,7 @@
     "methods": {
       "manual": "Watering can",
       "hose": "Hose",
-      "drip": "Drip irrigation",
+      "drip": "Drip line",
       "sprinkler": "Sprinkler",
       "rain": "Rain"
     },

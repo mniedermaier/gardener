@@ -1258,7 +1258,9 @@
     "showAll_many": "Afficher les {{count}}",
     "showOlder": "Afficher les mois précédents",
     "weightIn": "Poids ({{unit}})",
-    "prev30": "30 jours avant : {{weight}}"
+    "prev30": "30 jours avant : {{weight}}",
+    "qualityScaleLow": "Mauvaise",
+    "qualityScaleHigh": "Top"
   },
   "journal": {
     "title": "Journal",
@@ -1290,7 +1292,7 @@
     "photoN": "Photo {{n}}",
     "removePhoto": "Retirer la photo {{n}}",
     "addPhoto": "Ajouter une photo",
-    "suggestedTags": "Suggestions :",
+    "suggestedTags": "Souvent utilisés",
     "noAnimal": "Aucun animal",
     "linkToggle": "Lier une plante, un carré ou un animal",
     "photoHintShort": "Jusqu’à {{max}} photos, stockées uniquement sur cet appareil.",
@@ -1640,11 +1642,11 @@
     "productionEntries_one": "{{count}} entrée",
     "productionEntries_many": "{{count}} entrées",
     "productionEntries_other": "{{count}} entrées",
-    "addHealth": "Saisir la santé",
+    "addHealth": "Saisir une entrée de santé",
     "healthAdded": "Entrée de santé enregistrée",
     "noHealth": "Notez vaccins, traitements et contrôles pour ne rien oublier.",
     "healthType": "Type",
-    "healthDesc": "Description",
+    "healthDesc": "Constat",
     "editAnimal": "Modifier l'animal",
     "updated": "Animal mis à jour",
     "since": "depuis",
@@ -1718,7 +1720,7 @@
       "vaccCoverageScoped": "Vaccination",
       "vaccScopeHint": "Groupes soumis à vaccination",
       "vaccDueBadge": "à faire",
-      "addEntry": "Saisir une entrée"
+      "addEntry": "Saisir une entrée de santé"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -2029,7 +2031,7 @@
       "high": "élevé"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nutriments en ppm (mg/kg), comme les indiquent kits et laboratoires. Laisser vide si non mesuré.",
+    "ppmHint": "Nutriments en ppm (mg/kg), comme les indiquent kits et laboratoires.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
