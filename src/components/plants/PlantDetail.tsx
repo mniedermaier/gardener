@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
@@ -15,7 +15,8 @@ import { intlLocale } from "@/lib/format";
 import { getPhaseWindows, seasonFrost, type PhaseWindow } from "@/lib/season";
 import { PHASE_META, PhaseSwatch, phaseFill } from "@/components/ui/phase";
 import type { Plant } from "@/types/plant";
-import type { EnvironmentType } from "@/types/garden";
+import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -40,9 +41,12 @@ interface PlantDetailProps {
 type Phase = PhaseWindow & { key: PhaseWindow["phase"] };
 
 /** Season windows for the user's own last-frost date (shared with the calendar). */
-function buildPhases(plant: Plant, frost: Date): Phase[] {
-  return getPhaseWindows(plant, frost).map((w) => ({ ...w, key: w.phase }));
+function buildPhases(plant: Plant, frost: Date, frostProtectionWeeks = 0): Phase[] {
+  return getPhaseWindows(plant, frost, { frostProtectionWeeks }).map((w) => ({ ...w, key: w.phase }));
 }
+
+/** Where the dates apply: open field, or a protected bed type with its head start. */
+interface SeasonContext { env: EnvironmentType; protection: number }
 
 function PhaseIcon({ phase }: { phase: Phase["key"] }) {
   const Icon = PHASE_META[phase].icon;
@@ -215,7 +219,25 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   );
 
   const frost = useMemo(() => seasonFrost(lastFrostDate), [lastFrostDate]);
-  const phases = useMemo(() => buildPhases(plant, frost), [plant, frost]);
+  const hasBeds = gardens.some((g) => g.beds.length > 0);
+
+  // The year plan follows the beds the crop actually stands in, with the same
+  // head start as the calendar (greenhouse tomatoes go out weeks earlier).
+  // Open field stays as a comparison when the crop only grows under cover.
+  const contexts = useMemo(() => {
+    const out: SeasonContext[] = [];
+    for (const g of gardens) for (const b of g.beds) {
+      if (!b.cells.some((c) => c.plantId === plant.id)) continue;
+      const protection = getFrostProtectionWeeks(b);
+      if (!out.some((c) => c.protection === protection)) out.push({ env: protection > 0 ? b.environmentType : "outdoor_bed", protection });
+    }
+    if (!out.some((c) => c.protection === 0)) out.push({ env: "outdoor_bed", protection: 0 });
+    return out;
+  }, [gardens, plant.id]);
+  const [contextChoice, setContextChoice] = useState<number | null>(null);
+  const context = contexts.find((c) => c.protection === contextChoice) ?? contexts[0];
+  const phases = useMemo(() => buildPhases(plant, frost, context.protection), [plant, frost, context.protection]);
+  const contextLabel = (c: SeasonContext) => (c.protection > 0 ? t(`planner.environmentTypes.${c.env}`) : t("plants.detail.openField"));
 
   // Relations are symmetric, like in the companion matrix.
   const { good, bad } = useMemo(() => {
@@ -273,13 +295,13 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         title={getPlantName(plant.id)}
         description={t(`plants.category.${plant.category}`)}
         actions={
-          // Phones: primary first, both buttons share one row at equal width.
+          // Phones: primary first, stacked at full width so no label breaks onto two lines.
           <>
-            <Button className="flex-1 sm:flex-none" onClick={goPlanner}>
+            <Button className="w-full sm:w-auto" onClick={goPlanner}>
               <LayoutGrid size={16} aria-hidden="true" />
-              {t("plants.placeInPlanner")}
+              {hasBeds ? t("plants.placeInPlanner") : t("plants.createBedFirst")}
             </Button>
-            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={goSeeds}>
+            <Button variant="secondary" className="w-full sm:w-auto" onClick={goSeeds}>
               <Package size={16} aria-hidden="true" />
               {t("plants.addSeeds")}
             </Button>
@@ -339,7 +361,21 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
-            <CardHeader title={t("plants.detail.season")} description={t("plants.detail.seasonDesc")} />
+            <CardHeader
+              title={t("plants.detail.season")}
+              description={context.protection > 0
+                ? t("plants.detail.seasonDescProtected", { place: contextLabel(context), count: context.protection })
+                : t("plants.detail.seasonDesc")}
+            />
+            {contexts.length > 1 && (
+              <SegmentedControl
+                className="mb-4"
+                label={t("plants.detail.seasonFor")}
+                value={String(context.protection)}
+                onChange={(v) => setContextChoice(Number(v))}
+                options={contexts.map((c) => ({ value: String(c.protection), label: contextLabel(c) }))}
+              />
+            )}
             {phases.length > 0 ? (
               <SeasonStrip phases={phases} frost={frost} />
             ) : (
@@ -404,9 +440,8 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               muted={harvestStats.count === 0}
               leading={<StockTile icon={Apple} />}
               title={t("plants.detail.yourHarvests")}
-              meta={harvestStats.count > 0
-                ? [t("plants.detail.harvestEntries", { count: harvestStats.count }), harvestStats.last && t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") })]
-                : t("plants.detail.noHarvests")}
+              meta={harvestStats.count > 0 ? t("plants.detail.harvestEntries", { count: harvestStats.count }) : t("plants.detail.noHarvests")}
+              description={harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : undefined}
               trailing={harvestStats.count > 0 ? formatWeight(harvestStats.grams) : undefined}
               actions={<IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} />}
             />

@@ -1,7 +1,10 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Check, TriangleAlert, Search, Info, ChevronRight, Grid3x3, ListTree } from "lucide-react";
+import { Check, TriangleAlert, Search, Info, ChevronLeft, ChevronRight, Grid3x3, ListTree } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
+import { useStore } from "@/store";
+import { IconButton } from "@/components/ui/IconButton";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -15,6 +18,7 @@ import type { Plant } from "@/types/plant";
 
 type Relation = "good" | "bad" | null;
 type View = "matrix" | "plant";
+type Scope = "garden" | "all";
 
 const MD_QUERY = "(min-width: 768px)";
 function subscribeMd(cb: () => void) {
@@ -144,10 +148,18 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
   // column reads as "scroll for more" instead of the end of the matrix.
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hiddenRight, setHiddenRight] = useState(false);
+  const [hiddenLeft, setHiddenLeft] = useState(false);
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    el?.scrollBy({ left: dir * Math.max(200, el.clientWidth * 0.6), behavior: "smooth" });
+  };
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const measure = () => setHiddenRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+    const measure = () => {
+      setHiddenRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+      setHiddenLeft(el.scrollLeft > 2);
+    };
     measure();
     el.addEventListener("scroll", measure, { passive: true });
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
@@ -162,7 +174,7 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
   return (
     <Card padding="none" className="relative overflow-hidden">
       {hiddenRight && (
-        <div className="pointer-events-none absolute top-0 right-0 bottom-10 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+        <div className="pointer-events-none absolute top-0 right-0 bottom-12 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
       )}
       <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
         <table className="border-separate border-spacing-0">
@@ -207,11 +219,12 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
           </tbody>
         </table>
       </div>
-      {hiddenRight && (
-        <p className="flex h-10 items-center justify-end gap-1 border-t border-gray-100 px-4 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
-          {t("companions.scrollForMore", { count: plants.length })}
-          <ChevronRight size={14} aria-hidden="true" />
-        </p>
+      {(hiddenRight || hiddenLeft) && (
+        <div className="flex h-12 items-center justify-end gap-2 border-t border-gray-100 px-2 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
+          <span className="mr-1">{t("companions.scrollForMore", { count: plants.length })}</span>
+          <IconButton icon={ChevronLeft} label={t("companions.scrollLeft")} onClick={() => scrollBy(-1)} disabled={!hiddenLeft} />
+          <IconButton icon={ChevronRight} label={t("companions.scrollRight")} onClick={() => scrollBy(1)} disabled={!hiddenRight} />
+        </div>
       )}
     </Card>
   );
@@ -287,8 +300,9 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{names.get(selected.id)}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                <span className="whitespace-nowrap">{t("companions.goodCount", { count: good.length })} ·</span>{" "}
+              {/* Two parts that wrap whole, without a separator that could dangle at a line end. */}
+              <p className="flex flex-wrap gap-x-3 text-sm text-gray-500 dark:text-gray-400">
+                <span className="whitespace-nowrap">{t("companions.goodCount", { count: good.length })}</span>
                 <span className="whitespace-nowrap">{t("companions.badCount", { count: bad.length })}</span>
               </p>
             </div>
@@ -333,6 +347,18 @@ export function CompanionMatrix() {
   );
   const relation = useRelations(allPlants);
 
+  // Crops standing in any bed. With a few of them, "Im Garten" is the useful
+  // default: 20 × 20 fits a wide screen, 47 × 47 never does.
+  const { gardens } = useStore(useShallow((s) => ({ gardens: s.gardens })));
+  const plantedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) if (c.plantId) ids.add(c.plantId);
+    return ids;
+  }, [gardens]);
+  const canScope = plantedIds.size >= 2;
+  const [scopeChoice, setScope] = useState<Scope | null>(null);
+  const scope: Scope = scopeChoice ?? (canScope ? "garden" : "all");
+
   const focusParam = searchParams.get("plant");
   const focusId = focusParam && names.has(focusParam) ? focusParam : null;
   const setFocus = useCallback(
@@ -345,10 +371,11 @@ export function CompanionMatrix() {
   );
 
   const filtered = useMemo(() => {
-    if (!search) return sorted;
+    const inScope = scope === "garden" && canScope ? sorted.filter((p) => plantedIds.has(p.id) || p.id === focusId) : sorted;
+    if (!search) return inScope;
     // Keep the focused plant visible so its row/column stays as reference.
-    return sorted.filter((p) => p.id === focusId || (names.get(p.id) ?? "").toLowerCase().includes(search));
-  }, [sorted, search, names, focusId]);
+    return inScope.filter((p) => p.id === focusId || (names.get(p.id) ?? "").toLowerCase().includes(search));
+  }, [sorted, search, names, focusId, scope, canScope, plantedIds]);
 
   const showMatrix = isDesktop && view === "matrix";
 
@@ -386,6 +413,17 @@ export function CompanionMatrix() {
                 className="pl-9"
               />
             </div>
+            {canScope && (
+              <SegmentedControl
+                label={t("companions.scopeLabel")}
+                value={scope}
+                onChange={setScope}
+                options={[
+                  { value: "garden", label: t("companions.scopeGarden"), count: plantedIds.size },
+                  { value: "all", label: t("companions.scopeAll"), count: sorted.length },
+                ]}
+              />
+            )}
             <Select
               wrapperClassName="lg:w-60"
               aria-label={t("companions.focusLabel")}
