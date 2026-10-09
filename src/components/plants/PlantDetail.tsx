@@ -339,11 +339,14 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         description={t(`plants.category.${plant.category}`)}
         actions={
           // One action in the header (seeds live in "Dein Bestand"); off-season it steps back to secondary.
+          // Without beds the sowing line below carries the "add a bed" link instead.
           <>
-            <Button variant={sowNote?.offSeason ? "secondary" : "primary"} size={sowNote?.offSeason ? "sm" : undefined} className="w-full sm:w-auto" onClick={goPlanner}>
-              {hasBeds ? <LayoutGrid size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
-              {hasBeds ? t("plants.placeInPlanner") : t("planner.addBed")}
-            </Button>
+            {hasBeds && (
+              <Button variant={sowNote?.offSeason ? "secondary" : "primary"} size={sowNote?.offSeason ? "sm" : undefined} className="w-full sm:w-auto" onClick={goPlanner}>
+                <LayoutGrid size={16} aria-hidden="true" />
+                {t("plants.placeInPlanner")}
+              </Button>
+            )}
             {onEdit && (
               <Button variant="ghost" onClick={onEdit}>
                 <Pencil size={16} aria-hidden="true" />
@@ -354,17 +357,35 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         }
       />
 
-      {(description || sowNote || !hasBeds) && (
+      {(description || sowNote || !hasBeds || plant.caloriesPer100g) && (
         <div className="-mt-2 mb-6 max-w-3xl text-sm">
           {sowNote && (
             <p className="mb-2 inline-flex items-center gap-1.5 font-medium text-garden-700 dark:text-garden-300">
               <CalendarClock size={14} aria-hidden="true" />
               {/* No bed yet: one clause on the sowing line instead of a third "add a bed" prompt. */}
-              {hasBeds ? sowNote.text : t("plants.detail.sowNoteBedFirst", { note: sowNote.text })}
+              {sowNote.text}
+              {!hasBeds && (
+                <>
+                  {" – "}
+                  <button type="button" onClick={addBed} className="inline-flex min-h-11 items-center gap-1 font-semibold underline underline-offset-2 hover:text-garden-800 dark:hover:text-garden-200">
+                    <Plus size={14} aria-hidden="true" />
+                    {t("planner.addBed")}
+                  </button>
+                </>
+              )}
             </p>
           )}
-          {!hasBeds && !sowNote && <p className="mb-2 text-gray-600 dark:text-gray-400">{t("plants.detail.bedFirstHint", { plant: getPlantName(plant.id) })}</p>}
+          {!hasBeds && !sowNote && (
+            <p className="mb-2 text-gray-600 dark:text-gray-400">
+              {t("plants.detail.bedFirstHint", { plant: getPlantName(plant.id) })}{" "}
+              <button type="button" onClick={addBed} className="inline-flex min-h-11 items-center gap-1 font-semibold text-garden-700 underline underline-offset-2 dark:text-garden-300">
+                <Plus size={14} aria-hidden="true" />
+                {t("planner.addBed")}
+              </button>
+            </p>
+          )}
           {description && <p className="text-gray-700 dark:text-gray-300">{description}</p>}
+          {plant.caloriesPer100g ? <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) })}</p> : null}
         </div>
       )}
 
@@ -392,10 +413,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           label={t("plants.detail.yield")}
           value={plant.expectedYieldKgPerM2 ? formatNumber(plant.expectedYieldKgPerM2) : "–"}
           unit={plant.expectedYieldKgPerM2 ? t("plants.detail.yieldUnit") : undefined}
-          hint={[
-            plant.expectedYieldKgPerM2 ? t("plants.detail.yieldPerPlant", { value: formatWeight(plantYieldKg(plant, gridCellSizeCm) * 1000) }) : null,
-            plant.caloriesPer100g ? t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) }) : null,
-          ].filter(Boolean).join(" · ") || undefined}
+          hint={plant.expectedYieldKgPerM2 ? t("plants.detail.yieldPerPlant", { value: formatWeight(plantYieldKg(plant, gridCellSizeCm) * 1000) }) : undefined}
         />
         <StatCard
           icon={Sun}

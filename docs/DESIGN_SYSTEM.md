@@ -94,6 +94,10 @@ covered here, copy the pattern from the reference page
    - An optional cost field sits on its own full-width row after the amounts,
      with the shared hint `common.costHint` ("Fließt in die Bilanz …").
    - Save stays disabled until the required fields are valid.
+   - **Choosing a type:** up to 3 options → `SegmentedControl`; up to 8 →
+     icon tiles in a grid (animal species, health "Art", bed environment);
+     more than 8 → `Select` (task type, plant).
+   - Scale endpoint captions are short single words ("Gering" … "Stark").
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation
     marks and uses active phrasing ("3 Aufgaben überfällig").

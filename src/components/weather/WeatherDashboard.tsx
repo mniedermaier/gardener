@@ -56,16 +56,15 @@ function AlertCallout({ group, frost, related = [] }: { group: AlertGroup; frost
   if (group.type === "frost") {
     // Same sentence as on "Heute" (one source: summarizeFrost).
     title = frost?.title ?? "";
-    // Colour carries meaning once (the severity badge): neutral day chips. When
-    // the headline splits frost from mere risk, the chips list the freezing nights.
+    // Colour carries meaning once (the severity badge): neutral day chips, every
+    // night of the headline in date order. Nights only at risk (above 0 °C) are
+    // muted and dashed, so "2 weitere mit Frostgefahr" has a visible anchor.
     const nights = group.alerts.map((a) => ({ a, temp: Number(a.titleParams?.temp ?? 0) }));
-    const freezing = nights.filter((n) => n.temp <= 0);
-    const chips = freezing.length > 0 && freezing.length < nights.length ? freezing : nights;
     body = (
       <>
         <span className="flex flex-wrap gap-1.5">
-          {chips.map(({ a, temp }) => (
-            <Badge key={a.id} variant="outline" size="sm" className="tabular-nums">
+          {nights.map(({ a, temp }) => (
+            <Badge key={a.id} variant="outline" size="sm" className={`tabular-nums ${temp > 0 ? "border-dashed text-gray-500 dark:text-gray-400" : ""}`}>
               {dayLabel(a.date ?? "")} {f.formatTemperature(temp)}
             </Badge>
           ))}

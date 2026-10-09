@@ -261,12 +261,12 @@ export function TaskCalendar() {
             action={<Button onClick={() => openAdd()}><Plus size={16} aria-hidden="true" />{t("calendar.addTask")}</Button>}
             // The text promises dates from the bed plan: with planted beds generate them, else go plant some.
             secondaryAction={hasPlantedBeds ? (
-              <Button variant="secondary" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
+              <Button variant="ghost" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
             ) : gardens.every((g) => g.beds.length === 0) ? (
               // No bed at all: the next step is one, with the planner's dialog already open.
-              <Button variant="secondary" onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>
+              <Button variant="ghost" onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>
             ) : (
-              <Button variant="secondary" onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>
+              <Button variant="ghost" onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>
             )}
           />
         </Card>

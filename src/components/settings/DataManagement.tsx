@@ -19,7 +19,11 @@ export function DataManagement() {
   const { t } = useTranslation();
   const { formatDate } = useFormat();
   const today = useToday();
-  const { lastBackupDate, harvests, expenses } = useStore(useShallow((s) => ({ lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses })));
+  const { lastBackupDate, harvests, expenses, hasData } = useStore(useShallow((s) => ({
+    lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses,
+    // Anything worth keeping: a bed or any record. Before that a backup is no urgent matter.
+    hasData: s.gardens.some((g) => g.beds.length > 0) || s.harvests.length > 0 || s.journalEntries.length > 0 || s.expenses.length > 0 || s.animals.length > 0 || s.tasks.length > 0,
+  })));
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<GardenerExport | null>(null);
@@ -78,12 +82,12 @@ export function DataManagement() {
                 {stale && <span className="block text-xs text-gray-600 dark:text-gray-300">{t("dataManagement.backupStale")}</span>}
               </>
             )
-            : t("dataManagement.noBackup")}
+            : t(hasData ? "dataManagement.noBackup" : "dataManagement.nothingYet")}
         </p>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <Button onClick={handleExportAll}>
+        <Button variant={hasData ? "primary" : "secondary"} onClick={handleExportAll}>
           <Download size={16} aria-hidden="true" />
           {t("dataManagement.exportAll")}
         </Button>

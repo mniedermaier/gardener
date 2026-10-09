@@ -110,3 +110,11 @@ export const rotationGroups = [
   { families: ["chenopodiaceae", "amaryllidaceae"] as PlantFamily[], label: { de: "Schwachzehrer", en: "Light feeders" } },
   { families: ["fabaceae"] as PlantFamily[], label: { de: "Bodenverbesserer", en: "Soil improvers" } },
 ];
+
+/**
+ * Family of any plant: the catalogue mapping for built-in plants, the family a
+ * custom plant was given in its form, otherwise "other".
+ */
+export function familyOf(plantId: string, plant?: { family?: PlantFamily }): PlantFamily {
+  return plantFamilyMap[plantId] ?? plant?.family ?? "other";
+}

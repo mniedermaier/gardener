@@ -121,21 +121,21 @@ export function ImportPage() {
           <div className="mt-5">
             <PasteLink />
           </div>
+          {/* What a shared link brings: part of the link section, above the divider (a backup restores everything). */}
+          <ul className="mt-4 space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
+            <li className="flex items-start gap-2">
+              <Check size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
+              {t("importPage.includes")}
+            </li>
+            <li className="flex items-start gap-2">
+              <X size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-400 dark:text-gray-500" />
+              {t("importPage.excludes")}
+            </li>
+          </ul>
           <div className="mt-4 flex flex-col border-t border-gray-100 pt-3 dark:border-white/10">
             {restoreLink}
           </div>
         </Card>
-        {/* What a shared link brings, before anyone pastes one. */}
-        <ul className="mt-4 max-w-3xl space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
-          <li className="flex items-start gap-2">
-            <Check size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-garden-600 dark:text-garden-300" />
-            {t("importPage.includes")}
-          </li>
-          <li className="flex items-start gap-2">
-            <X size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-400 dark:text-gray-500" />
-            {t("importPage.excludes")}
-          </li>
-        </ul>
       </div>
     );
   }

@@ -455,9 +455,9 @@ export function SoilManagement() {
             <Input label={`${t("soil.nutrients.organicMatter")} (%)`} optional inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4.5) })} error={testErrors.om} />
           </div>
           <div className="grid grid-cols-3 items-end gap-3">
-            <Input label={t("soil.nShort")} optional inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
-            <Input label={t("soil.pShort")} optional inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />
-            <Input label={t("soil.kShort")} optional inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(150) })} error={testErrors.k} />
+            <Input label={t("soil.nShort")} inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
+            <Input label={t("soil.pShort")} inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />
+            <Input label={t("soil.kShort")} inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(150) })} error={testErrors.k} />
           </div>
           <p className="-mt-2 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
           <DateField label={t("harvest.date")} value={test.date} onChange={(date) => patchTest({ date })} />

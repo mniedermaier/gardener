@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useScrollFade } from "@/components/ui/useScrollFade";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Camera, ChevronDown, ImagePlus, LayoutGrid, PawPrint, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useStore } from "@/store";
@@ -260,7 +259,6 @@ export function GardenJournal() {
   const editing = editingId ? journalEntries.find((e) => e.id === editingId) : undefined;
   const draftTags = parseTags(draft.tags);
   const suggestedTags = allTags.filter((tag) => !draftTags.includes(tag)).slice(0, 8);
-  const { ref: tagRowRef, fadeClass: tagRowFade } = useScrollFade<HTMLDivElement>("", null);
 
   return (
     <div>
@@ -429,17 +427,16 @@ export function GardenJournal() {
           <div>
             <Input label={t("journal.tags")} optional value={draft.tags} onChange={(e) => patch({ tags: e.target.value })} placeholder={t("journal.tagsPlaceholder")} hint={t("journal.tagsHint")} />
             {suggestedTags.length > 0 && (
-              // Label on its own line, chips in one scrolling row: no single chip left alone on a line.
+              // Label on its own line, chips wrap (at most the six most used): nothing scrolls sideways or is cut off.
               <div className="mt-2">
                 <span className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">{t("journal.suggestedTags")}</span>
-                {/* The edge fade says the row scrolls on; no chip is ever cut off without a cue. */}
-                <div ref={tagRowRef} className={`-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] ${tagRowFade}`}>
-                {suggestedTags.map((tag) => (
+                <div className="flex flex-wrap gap-1.5">
+                {suggestedTags.slice(0, 6).map((tag) => (
                   <button
                     key={tag}
                     type="button"
                     onClick={() => patch({ tags: [...draftTags, tag].join(", ") })}
-                    className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-gray-100 px-2.5 text-xs whitespace-nowrap sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
+                    className="inline-flex min-h-11 items-center rounded-full bg-gray-100 px-2.5 text-xs whitespace-nowrap sm:min-h-8 font-medium text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
                   >
                     + #{tag}
                   </button>
@@ -449,8 +446,34 @@ export function GardenJournal() {
             )}
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
+          {/* Photos */}
+          <div>
+            <p className={LABEL_CLASS}>{t("journal.photos")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>
+            <div className="flex flex-wrap gap-2">
+              {draft.photos.map((photo, idx) => (
+                <div key={photo} className="relative">
+                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-24 rounded-lg border border-gray-200 object-cover sm:size-20 dark:border-white/10" />
+                  <IconButton
+                    icon={X}
+                    size="sm"
+                    label={t("journal.removePhoto", { n: idx + 1 })}
+                    onClick={() => removeDraftPhoto(photo)}
+                    className="absolute top-1 right-1 bg-white/90 shadow-xs hover:bg-white dark:bg-gray-900/90"
+                  />
+                </div>
+              ))}
+              {draft.photos.length < MAX_PHOTOS && (
+                <label className="flex size-24 sm:size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
+                  {uploading ? <Camera size={20} aria-hidden="true" className="animate-pulse" /> : <ImagePlus size={20} aria-hidden="true" />}
+                  {t("journal.addPhoto")}
+                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoSelect} />
+                </label>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHintShort", { max: MAX_PHOTOS })}</p>
+          </div>
           {/* Links are optional: a disclosure keeps the dialog short (open when the entry already has one).
-              It sits above the photos without a divider, so it is never a lone rule cut off at the footer. */}
+              Photos come first (the more common addition); the disclosure has no divider, so no lone rule sits at the footer. */}
           <details
             open={linksOpen}
             onToggle={(e) => setLinksOpen(e.currentTarget.open)}
@@ -488,32 +511,6 @@ export function GardenJournal() {
             </div>
           </details>
 
-          {/* Photos */}
-          <div>
-            <p className={LABEL_CLASS}>{t("journal.photos")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>
-            <div className="flex flex-wrap gap-2">
-              {draft.photos.map((photo, idx) => (
-                <div key={photo} className="relative">
-                  <JournalPhoto photo={photo} alt={t("journal.photoN", { n: idx + 1 })} className="size-24 rounded-lg border border-gray-200 object-cover sm:size-20 dark:border-white/10" />
-                  <IconButton
-                    icon={X}
-                    size="sm"
-                    label={t("journal.removePhoto", { n: idx + 1 })}
-                    onClick={() => removeDraftPhoto(photo)}
-                    className="absolute top-1 right-1 bg-white/90 shadow-xs hover:bg-white dark:bg-gray-900/90"
-                  />
-                </div>
-              ))}
-              {draft.photos.length < MAX_PHOTOS && (
-                <label className="flex size-24 sm:size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 text-center border-2 border-dashed border-gray-300 text-xs font-medium text-gray-600 hover:border-garden-500 hover:text-garden-700 focus-within:outline-2 focus-within:outline-focus dark:border-white/20 dark:text-gray-400 dark:hover:text-garden-300">
-                  {uploading ? <Camera size={20} aria-hidden="true" className="animate-pulse" /> : <ImagePlus size={20} aria-hidden="true" />}
-                  {t("journal.addPhoto")}
-                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoSelect} />
-                </label>
-              )}
-            </div>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHintShort", { max: MAX_PHOTOS })}</p>
-          </div>
         </div>
       </Modal>
 

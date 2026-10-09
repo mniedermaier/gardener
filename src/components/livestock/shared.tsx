@@ -392,12 +392,33 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
     >
       <div className="space-y-4">
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} placeholder={t("livestock.chooseAnimal")} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
-        <Select
-          label={t("livestock.healthType")}
-          value={type}
-          onChange={(e) => setType(e.target.value as HealthEventType)}
-          options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))}
-        />
+        {/* A small fixed set (8): icon tiles, like the animal species (DESIGN_SYSTEM rule 9). */}
+        <div>
+          <p id="health-type-label" className={LABEL_CLASS}>{t("livestock.healthType")}</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-labelledby="health-type-label">
+            {HEALTH_EVENT_TYPES.map((ty) => {
+              const Icon = HEALTH_ICON[ty];
+              const selected = type === ty;
+              return (
+                <button
+                  key={ty}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setType(ty)}
+                  className={`flex min-h-11 items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm ${
+                    selected
+                      ? "border-garden-500 bg-garden-50 font-medium text-garden-800 ring-1 ring-garden-500 dark:bg-garden-500/15 dark:text-garden-200"
+                      : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                  }`}
+                >
+                  <Icon size={16} aria-hidden="true" className="shrink-0" />
+                  <span className="min-w-0">{t(`livestock.healthTypes.${ty}`)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <Input label={t("livestock.healthDesc")} optional value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t(`livestock.healthDescPlaceholders.${type}`)} autoFocus />
         <Input label={t("livestock.cost")} optional hint={t("common.costHint")} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />

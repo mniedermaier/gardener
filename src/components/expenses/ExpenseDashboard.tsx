@@ -19,6 +19,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -55,8 +56,8 @@ function CategoryTile({ category }: { category: ExpenseCategory }) {
   );
 }
 
-interface Draft { description: string; amount: string; category: ExpenseCategory; date: string }
-const emptyDraft = (): Draft => ({ description: "", amount: "", category: "seeds", date: todayISO() });
+interface Draft { description: string; amount: string; category: ExpenseCategory; date: string; notes: string }
+const emptyDraft = (): Draft => ({ description: "", amount: "", category: "seeds", date: todayISO(), notes: "" });
 const parseAmount = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
 
 export function ExpenseDashboard() {
@@ -91,7 +92,7 @@ export function ExpenseDashboard() {
 
   const openEdit = (e: Expense) => {
     setEditingId(e.id);
-    setDraft({ description: e.description, amount: (e.amountCents / 100).toLocaleString(f.locale, { useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2 }), category: e.category, date: e.date });
+    setDraft({ description: e.description, amount: (e.amountCents / 100).toLocaleString(f.locale, { useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2 }), category: e.category, date: e.date, notes: e.notes ?? "" });
     setDialogOpen(true);
   };
 
@@ -100,7 +101,7 @@ export function ExpenseDashboard() {
 
   const save = () => {
     if (!canSave) return;
-    const fields = { description: draft.description.trim(), amountCents: Math.round(amount * 100), category: draft.category, date: draft.date };
+    const fields = { description: draft.description.trim(), amountCents: Math.round(amount * 100), category: draft.category, date: draft.date, notes: draft.notes.trim() || undefined };
     if (editingId) {
       updateExpense(editingId, fields);
       toast(t("expenses.updated"), "success");
@@ -378,6 +379,7 @@ export function ExpenseDashboard() {
             />
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("expenses.notesPlaceholder")} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>
