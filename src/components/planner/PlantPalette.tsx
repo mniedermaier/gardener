@@ -8,6 +8,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 import { cn } from "@/lib/cn";
 import type { PlantableNow } from "@/lib/advisor";
 import type { Plant } from "@/types/plant";
@@ -73,6 +74,7 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("recommended");
+  const { ref: filterRef, fadeClass: filterFade } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', category);
 
   // Debounce the filter (200 ms) so typing stays smooth with many items.
   useEffect(() => {
@@ -126,9 +128,12 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
         />
       </div>
 
-      <div className="-mx-1 mb-3 overflow-x-auto px-1">
+      {/* Spans the search field's width; in a narrow side pane it scrolls with a faded edge instead of clipping "Beeren". */}
+      <div ref={filterRef} className={`mb-3 overflow-x-auto [scrollbar-width:none] ${filterFade}`}>
         <SegmentedControl
           size="sm"
+          fullWidth
+          className="min-w-max"
           label={t("palette.filter")}
           value={category}
           onChange={setCategory}

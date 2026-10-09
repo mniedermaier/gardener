@@ -172,9 +172,10 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
     };
   }, []);
   return (
-    <Card padding="none" className="relative overflow-hidden">
+    // w-fit: a small matrix ("Im Garten") hugs its table instead of leaving an empty strip.
+    <Card padding="none" className="relative w-fit max-w-full overflow-hidden">
       {hiddenRight && (
-        <div className="pointer-events-none absolute top-0 right-0 bottom-12 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+        <div className="pointer-events-none absolute top-0 right-0 bottom-14 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
       )}
       <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
         <table className="border-separate border-spacing-0">
@@ -219,18 +220,26 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
           </tbody>
         </table>
       </div>
-      {(hiddenRight || hiddenLeft) && (
-        <div className="flex h-12 items-center justify-end gap-2 border-t border-gray-100 px-2 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
-          <span className="mr-1">{t("companions.scrollForMore", { count: plants.length })}</span>
-          <IconButton icon={ChevronLeft} label={t("companions.scrollLeft")} onClick={() => scrollBy(-1)} disabled={!hiddenLeft} />
-          <IconButton icon={ChevronRight} label={t("companions.scrollRight")} onClick={() => scrollBy(1)} disabled={!hiddenRight} />
-        </div>
-      )}
+      {/* Footer: the legend explains the marks right under them; scroll controls only while columns are hidden. */}
+      <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-gray-100 px-3 py-2 dark:border-white/10">
+        <Legend />
+        {(hiddenRight || hiddenLeft) && (
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span className="mr-1">{t("companions.scrollForMore", { count: plants.length })}</span>
+            <IconButton icon={ChevronLeft} label={t("companions.scrollLeft")} onClick={() => scrollBy(-1)} disabled={!hiddenLeft} />
+            <IconButton icon={ChevronRight} label={t("companions.scrollRight")} onClick={() => scrollBy(1)} disabled={!hiddenRight} />
+          </div>
+        )}
+      </div>
     </Card>
   );
 }
 
 // ------------------------------------------------------------------ partner finder (mobile + desktop alt view)
+
+const DEFAULT_PLANT = "tomato";
+/** Quick picks above the full list: the crops people look up most. */
+const QUICK_PICKS = ["tomato", "potato", "carrot", "lettuce", "bean", "zucchini"];
 
 function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
   plants: Plant[];
@@ -292,20 +301,38 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
           onChange={(e) => onSelect(e.target.value)}
           options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
         />
-        {/* Stacked on phones: long FR/ES labels would squeeze the name to a narrow column. */}
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
+          {QUICK_PICKS.filter((id) => names.has(id)).map((id) => {
+            const active = id === selected.id;
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => onSelect(id)}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-9 ${
+                  active
+                    ? "border-garden-600 bg-garden-50 text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
+                    : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                }`}
+              >
+                <PlantIconDisplay plantId={id} emoji="" size={18} />
+                {names.get(id)}
+              </button>
+            );
+          })}
+        </div>
+        {/* The name is already in the select: only the counts and the way to the details. */}
+        <div className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-3 sm:flex-row sm:items-center sm:gap-3 dark:border-white/10">
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
-              <PlantIconDisplay plantId={selected.id} emoji={selected.icon} size={30} />
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
+              <PlantIconDisplay plantId={selected.id} emoji={selected.icon} size={26} />
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{names.get(selected.id)}</p>
-              {/* Two parts that wrap whole, without a separator that could dangle at a line end. */}
-              <p className="flex flex-wrap gap-x-3 text-sm text-gray-500 dark:text-gray-400">
-                <span className="whitespace-nowrap">{t("companions.goodCount", { count: good.length })}</span>
-                <span className="whitespace-nowrap">{t("companions.badCount", { count: bad.length })}</span>
-              </p>
-            </div>
+            {/* Two parts that wrap whole, without a separator that could dangle at a line end. */}
+            <p className="flex min-w-0 flex-1 flex-wrap gap-x-3 text-sm text-gray-600 dark:text-gray-300">
+              <span className="whitespace-nowrap">{t("companions.goodCount", { count: good.length })}</span>
+              <span className="whitespace-nowrap">{t("companions.badCount", { count: bad.length })}</span>
+            </p>
           </div>
           <Button variant="ghost" size="sm" className="self-start sm:self-auto" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
             {t("companions.openDetails")}
@@ -432,7 +459,6 @@ export function CompanionMatrix() {
               placeholder={t("companions.focusNone")}
               options={sorted.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
             />
-            <div className="lg:ml-auto"><Legend /></div>
           </div>
           {filtered.length === 0 ? (
             <Card>
@@ -450,7 +476,8 @@ export function CompanionMatrix() {
           plants={sorted}
           names={names}
           relation={relation}
-          selectedId={focusId ?? sorted[0]?.id ?? ""}
+          // Tomato, not the alphabetical first (Aubergine): the crop most people look up first.
+          selectedId={focusId ?? (names.has(DEFAULT_PLANT) ? DEFAULT_PLANT : sorted[0]?.id ?? "")}
           onSelect={(id) => { setFocus(id); document.querySelector("main")?.scrollTo({ top: 0 }); }}
         />
       )}

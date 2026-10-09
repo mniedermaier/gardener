@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 import type { Plant, PlantCategory } from "@/types/plant";
 
 type CategoryFilter = PlantCategory | "all";
@@ -30,6 +31,7 @@ export function PlantList() {
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
+  const { ref: filterRef, fadeClass: filterFade } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', category);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Plant | undefined>(undefined);
 
@@ -104,7 +106,8 @@ export function PlantList() {
         title={t("plants.title")}
         description={t("plants.subtitle", { count: plants.length })}
         actions={
-          <Button onClick={openCreate}>
+          // Secondary: the catalogue is the point of the page, a custom plant the exception.
+          <Button variant="secondary" onClick={openCreate}>
             <Plus size={16} aria-hidden="true" />
             {t("plants.addCustom")}
           </Button>
@@ -123,7 +126,8 @@ export function PlantList() {
             className="pl-9"
           />
         </div>
-        <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0 lg:pb-0">
+        {/* Phones: the row scrolls with a faded edge, so a cut-off "Kräuter 7" reads as "more". */}
+        <div ref={filterRef} className={`-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:px-0 lg:pb-0 ${filterFade}`}>
           <SegmentedControl
             label={t("plants.categoryFilter")}
             value={category}

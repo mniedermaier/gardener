@@ -142,13 +142,28 @@ function fitCell(width: number, maxHeight: number, cols: number, rows: number): 
   return Math.floor(Math.max(MIN_CELL, Math.min(MAX_CELL, byWidth, byHeight)));
 }
 
+/** Usable bed height in the editor (read once, see EditableBedGrid). */
+function editorMaxHeight(): number {
+  return typeof window === "undefined" ? 600 : Math.max(260, window.innerHeight - (window.innerWidth >= 768 ? 300 : 320));
+}
+
+/**
+ * Width of the grid when its height is the limit (tall beds on wide screens),
+ * so a side-by-side layout can give the grid exactly that column instead of
+ * centring it in empty space.
+ */
+export function heightBoundBedWidth(cols: number, rows: number): number {
+  const cell = fitCell(Number.POSITIVE_INFINITY, editorMaxHeight(), cols, rows);
+  return cols * cell + (cols - 1) * GAP + 2 * PAD;
+}
+
 /** The bed grid in the editor: every cell is a button and a drop target. */
 export const EditableBedGrid = memo(function EditableBedGrid({ bed, plantMap, getPlantName, mode, hints, conflicts, selectedKey, zoom, onActivate }: EditableGridProps) {
   const { t } = useTranslation();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   // Read once: a later viewport height change (address bar, keyboard) must not resize the bed under the finger.
-  const [maxHeight] = useState(() => (typeof window === "undefined" ? 600 : Math.max(260, window.innerHeight - (window.innerWidth >= 768 ? 300 : 320))));
+  const [maxHeight] = useState(editorMaxHeight);
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;

@@ -510,8 +510,9 @@
     "inspectHintShort": "Tippe auf eine Pflanze, um sie anzusehen.",
     "inspectHintShortClick": "Klicke auf eine Pflanze, um sie anzusehen.",
     "cropListTitle": "Im Beet",
-    "cropListMeta_one": "{{count}} Pflanze · Ernte {{start}} – {{end}}",
-    "cropListMeta_other": "{{count}} Pflanzen · Ernte {{start}} – {{end}}"
+    "cropListCount_one": "{{count}} Pflanze",
+    "cropListCount_other": "{{count}} Pflanzen",
+    "cropListHarvest": "Ernte {{range}}"
   },
   "plants": {
     "title": "Pflanzen",
@@ -2230,7 +2231,8 @@
     "scopeGarden": "Im Garten",
     "scopeAll": "Alle",
     "scrollLeft": "Nach links scrollen",
-    "scrollRight": "Nach rechts scrollen"
+    "scrollRight": "Nach rechts scrollen",
+    "quickPick": "Häufige Kulturen"
   },
   "water": {
     "title": "Bewässerung",
