@@ -1942,7 +1942,7 @@
     "eggTrend": "{{value}} frente a la semana media",
     "chooseAnimal": "Elegir animal…",
     "valueHint": "{{amount}} × {{price}}",
-    "ofExpectedSince": "esperados ~{{amount}} desde el {{date}}",
+    "ofExpectedSince": "esperados ~{{amount}} desde el 1.er registro ({{date}})",
     "recordedSince": "Registrado desde el {{date}}",
     "weekSpan": "sem. {{from}}–{{to}}"
   },

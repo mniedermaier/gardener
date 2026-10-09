@@ -85,7 +85,8 @@ covered here, copy the pattern from the reference page
      case, harmless if kept) — and only these: expense category "Saatgut",
      task type "Sonstiges", health "Kontrolle", pest kind "Schädling", bed
      environment "Freilandbeet", pantry method once a plant is chosen, watering
-     method "Manuell" (or the last entry's). A wrong value that
+     method "Manuell" (or the last entry's), production product (the chosen
+     animal's main product, e.g. "Eier" for hens). A wrong value that
      would be a silent data error never starts preselected (the species of a new
      animal; a custom plant's category, sun, water and sowing timing; the
      source of seed). The plant symbol starts on the neutral sprout, shown as
@@ -111,7 +112,8 @@ covered here, copy the pattern from the reference page
    - Save stays disabled until the required fields are valid.
    - **Choosing a type:** up to 3 options → `SegmentedControl` (a short
      scale or interval may take 4, e.g. task "Wiederholen": Nie / Täglich /
-     Wöchentlich / 14-tägig, as long as every label fits at 390 px); up to 8 →
+     Wöchentlich / 14-tägig, or the four app languages in onboarding, as long
+     as every label fits at 390 px); up to 8 →
      `ui/ChoiceTiles` (animal species, health "Art", bed environment, pantry
      method); more than 8 → `Select` (task type, plant). `ChoiceTiles` picks
      the column count so no row ends with a lone tile (8 → 4 × 2, 7 → 4 + 3,

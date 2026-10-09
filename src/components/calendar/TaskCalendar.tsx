@@ -264,7 +264,7 @@ export function TaskCalendar() {
               <Button variant="ghost" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
             ) : gardens.every((g) => g.beds.length === 0) ? (
               // No bed at all: the next step is one, with the planner's dialog already open.
-              <Button variant="ghost" onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>
+              <Button variant="ghost" onClick={addBed}>{t("planner.addBed")}</Button>
             ) : (
               <Button variant="ghost" onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>
             )}

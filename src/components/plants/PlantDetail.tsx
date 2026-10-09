@@ -21,6 +21,7 @@ import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 import { PartnerChips } from "./PartnerChips";
+import { familyOf } from "@/data/plantFamilies";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -452,6 +453,13 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                       {t("plants.details.antagonists")}
                     </h3>
                     <PartnerChips ids={bad} kind="bad" onSelect={onSelectPlant} />
+                    {/* The one known reason, as on the companion page. */}
+                    {(() => {
+                      const same = bad.filter((id) => familyOf(id, allPlants.find((p) => p.id === id)) === familyOf(plant.id, plant));
+                      return same.length > 0 ? (
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{same.map((id) => getPlantName(id)).join(", ")}: {t("companions.sameFamilyReason")}</p>
+                      ) : null;
+                    })()}
                   </section>
                 )}
               </div>
