@@ -324,7 +324,7 @@ export function WaterTracker() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => patch({ liters: String(l) })}
-                    className={`inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium sm:min-h-8 ${
+                    className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 text-sm font-medium sm:min-h-8 sm:min-w-0 ${
                       active
                         ? "bg-garden-100 text-garden-800 ring-1 ring-garden-600/40 dark:bg-garden-500/20 dark:text-garden-200 dark:ring-garden-400/40"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"

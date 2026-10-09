@@ -161,8 +161,8 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             {t("plants.customIcon")}
             <span className="font-normal text-gray-600 dark:text-gray-400">: {ICONS.includes(draft.icon) ? getPlantName(draft.icon) : t("plants.form.iconNeutral")}</span>
           </span>
-          {/* 16 tiles: 4 × 4 on phones, 8 × 2 wider — no row ends with a lone tile. An old emoji icon of an edited plant replaces the sprout tile. */}
-          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8 sm:gap-2" role="radiogroup" aria-labelledby="custom-plant-icon-label">
+          {/* Phones: one scrolling row, so the required fields stay above the fold; wider: 8 × 2. An old emoji icon of an edited plant replaces the sprout tile. */}
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-8 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0" role="radiogroup" aria-labelledby="custom-plant-icon-label">
             {(ICON_TILES.includes(draft.icon) ? ICON_TILES : [draft.icon, ...ICONS]).map((ic) => (
               <button
                 key={ic}
@@ -172,7 +172,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
                 aria-label={ICONS.includes(ic) ? getPlantName(ic) : t("plants.form.iconNeutral")}
                 title={ICONS.includes(ic) ? getPlantName(ic) : t("plants.form.iconNeutral")}
                 aria-checked={draft.icon === ic}
-                className={`flex h-11 items-center justify-center rounded-lg border ${
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border sm:w-auto ${
                   draft.icon === ic
                     ? "border-garden-500 bg-garden-50 ring-1 ring-garden-500 dark:bg-garden-500/15"
                     : "border-gray-200 hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10"
