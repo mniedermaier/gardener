@@ -499,7 +499,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           <div className="px-4 pt-4 sm:px-6 sm:pt-6">
             <CardHeader title={t("plants.detail.yourStock")} className="mb-2" />
           </div>
-          <List label={t("plants.detail.yourStock")} className="rounded-none rounded-b-xl border-x-0 border-b-0 shadow-none">
+          <List label={t("plants.detail.yourStock")} className="rounded-t-none rounded-b-xl border-x-0 border-b-0 shadow-none">
 
             {locations.length > 0 ? locations.map((loc) => (
               <ListRow

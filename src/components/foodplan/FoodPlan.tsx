@@ -165,7 +165,7 @@ export function FoodPlan() {
                       meta={gap ? [t("foodplan.rowMissing", { kg: kg(r.deficitKg) }), t("foodplan.rowExtraArea", { area: f.formatArea(r.extraAreaM2) })] : covered ? t("foodplan.rowCovered") : undefined}
                       trailing={
                         // Fixed width: every bar in the list ends at the same x.
-                        <span className="block w-24 text-right">
+                        <span className="block w-24 whitespace-normal text-right">
                           {r.actualKg > 0 ? t("foodplan.rowLogged", { actual: kg(r.actualKg) }) : t("foodplan.rowNothingLogged")}
                           <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{t("foodplan.rowTargetOf", { target: kg(r.targetKg) })}</span>
                         </span>

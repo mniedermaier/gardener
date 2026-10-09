@@ -92,6 +92,8 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
   const allWeeks = groupByWeek(products);
   const weeks = initialWeeks !== undefined && !showAll ? allWeeks.slice(0, initialWeeks) : allWeeks;
   const hiddenWeeks = allWeeks.length - weeks.length;
+  // Month totals always cover every week of the month, also those behind "Ältere Wochen anzeigen".
+  const fullMonths = new Map(weeksByMonth(allWeeks).map((m) => [m.key, m.weeks]));
 
   return (
     <div className="space-y-3">
@@ -103,9 +105,9 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
             <span className="flex items-center justify-between gap-2">
               <span>{f.formatDate(g.date, "monthYear")}</span>
               <span className="font-medium tabular-nums">
-                {PRODUCT_TYPES.filter((ty) => g.weeks.some((w) => w.totals[ty] > 0))
+                {PRODUCT_TYPES.filter((ty) => (fullMonths.get(g.key) ?? g.weeks).some((w) => w.totals[ty] > 0))
                   .map((ty) => {
-                    const sum = g.weeks.reduce((s, w) => s + w.totals[ty], 0);
+                    const sum = (fullMonths.get(g.key) ?? g.weeks).reduce((s, w) => s + w.totals[ty], 0);
                     return formatProductAmount(ty, sum, f, t) + (typeCount > 1 && ty !== "eggs" ? ` ${t(`livestock.products.${ty}`)}` : "");
                   })
                   .join(" · ")}
