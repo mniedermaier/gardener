@@ -30,6 +30,7 @@ import { useToast } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
 import { HowCalculated, Meter } from "@/components/ui/charts";
 import { DateField } from "@/components/ui/DateField";
+import { useToday } from "@/hooks/useToday";
 
 const CATEGORIES: ExpenseCategory[] = ["seeds", "soil", "fertilizer", "tools", "infrastructure", "water", "animal_feed", "veterinary", "other"];
 
@@ -59,6 +60,7 @@ const emptyDraft = (): Draft => ({ description: "", amount: "", category: "seeds
 const parseAmount = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
 
 export function ExpenseDashboard() {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
@@ -68,7 +70,7 @@ export function ExpenseDashboard() {
   );
   const { productPrices, setProductPrice } = useAnalysisPrefs(useShallow((p) => ({ productPrices: p.productPrices, setProductPrice: p.setProductPrice })));
 
-  const year = new Date().getFullYear();
+  const year = now.getFullYear();
   const [scope, setScope] = useState<"season" | "all">("season");
   const period: Period = scope === "season" ? year : null;
   const m = useGardenMetrics({ period });

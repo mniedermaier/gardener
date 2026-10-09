@@ -13,13 +13,13 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-rate-limit": "^8.7.0",
-    "zod": "^4.5.4"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.2",
-    "tsx": "^4.23.13",
+    "tsx": "^4.23.15",
     "typescript": "~7.0.2"
   }
 }

@@ -28,6 +28,7 @@ import { PRODUCT_ICON } from "@/components/livestock/icons";
 import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { HouseholdSizeField } from "./HouseholdSizeField";
 import { PreservationGuide } from "./PreservationGuide";
+import { useToday } from "@/hooks/useToday";
 
 type View = "overview" | "crops" | "animals" | "preserve";
 const NUTRIENTS = ["calories", "protein", "vitaminC", "fiber"] as const;
@@ -37,6 +38,7 @@ const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "squash", "pea"];
 const LEVER_AREA_M2 = 5;
 
 export function SufficiencyDashboard() {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
@@ -60,8 +62,8 @@ export function SufficiencyDashboard() {
   const months = useMemo(() => Array.from({ length: 12 }, (_, i) => new Date(2026, i, 1)), []);
   const monthShort = months.map((d) => f.formatDate(d, "month"));
   const monthLong = months.map((d) => new Intl.DateTimeFormat(f.locale, { month: "long" }).format(d));
-  const currentMonth = new Date().getMonth();
-  const year = new Date().getFullYear();
+  const currentMonth = now.getMonth();
+  const year = now.getFullYear();
   const ss = metrics.selfSufficiency;
 
   const levers = useMemo(() => {

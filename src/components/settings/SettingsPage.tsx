@@ -18,6 +18,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import { DataManagement } from "./DataManagement";
 import { LocationPicker, type PickedLocation } from "./LocationPicker";
+import { useToday } from "@/hooks/useToday";
 
 type Locale = "de" | "en" | "es" | "fr";
 type Theme = "light" | "dark" | "system";
@@ -53,6 +54,7 @@ function Section({ id, title, description, children, tone }: { id: string; title
  * alone in a danger zone at the very end.
  */
 export function SettingsPage() {
+  const now = useToday();
   const { t, i18n } = useTranslation();
   const { confirm } = useToast();
   const { formatDate } = useFormat();
@@ -117,7 +119,7 @@ export function SettingsPage() {
     if (ok) clearAllData();
   };
 
-  const frostYear = Number(store.lastFrostDate.slice(0, 4)) || new Date().getFullYear();
+  const frostYear = Number(store.lastFrostDate.slice(0, 4)) || now.getFullYear();
   const frostEstimate = store.locationLat !== null && elevation !== undefined ? estimateLastFrost(store.locationLat, elevation, frostYear) : null;
   const hasLocation = isWeatherConfigured(store.locationLat, store.locationLon);
   const provider = getWeatherProvider(store.weatherApiKey);

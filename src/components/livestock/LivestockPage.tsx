@@ -19,10 +19,12 @@ import { useToast } from "@/components/ui/Toast";
 import { AnimalCard } from "./AnimalCard";
 import { ProductionChart } from "./ProductionChart";
 import { AnimalDialog, animalLabel, herdSummary } from "./shared";
+import { useToday } from "@/hooks/useToday";
 
 const QUICK_EGGS = [1, 2, 3, 5, 10];
 
 export function LivestockPage() {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
@@ -38,12 +40,11 @@ export function LivestockPage() {
   const openAdd = useCallback(() => setDialog({ open: true }), []);
   useOpenAddOnNavigate(openAdd);
 
-  const year = new Date().getFullYear();
+  const year = now.getFullYear();
   const today = todayISO();
   const eggAnimal = animals.find((a) => EGG_LAYERS.includes(a.type));
 
   const stats = useMemo(() => {
-    const now = new Date();
     const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
     const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
     const eggs = animalProducts.filter((p) => p.type === "eggs");
@@ -53,7 +54,7 @@ export function LivestockPage() {
       year: getActualProducts(animalProducts, year),
       feed: getFeedCostStats(feedEntries, now),
     };
-  }, [animalProducts, feedEntries, today, year]);
+  }, [now, animalProducts, feedEntries, today, year]);
 
   const perAnimal = useMemo(() => {
     const map = new Map<string, { recorded: Partial<ProductTotals>; feedCost: number; lastHealth?: (typeof healthEvents)[number] }>();

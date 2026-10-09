@@ -27,6 +27,7 @@ import {
   AnimalDialog, FeedDialog, HealthDialog, IconTile, ProductDialog,
   animalLabel, formatFeedAmount, formatProductAmount, useRecordActions,
 } from "./shared";
+import { useToday } from "@/hooks/useToday";
 
 type Tab = "production" | "feed" | "health" | "journal";
 type Dialog =
@@ -73,6 +74,7 @@ function groupByWeek(items: AnimalProduct[]) {
 }
 
 export function AnimalDetail() {
+  const now = useToday();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -131,7 +133,7 @@ export function AnimalDetail() {
 
   const availableTypes = new Set(products.map((p) => p.type)).size;
   const acquired = toDate(animal.acquiredDate);
-  const days = acquired ? differenceInCalendarDays(new Date(), acquired) : 0;
+  const days = acquired ? differenceInCalendarDays(now, acquired) : 0;
 
   const addLabel: Record<Exclude<Tab, "journal">, string> = {
     production: t("livestock.addProduct"),

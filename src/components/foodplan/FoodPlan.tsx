@@ -21,8 +21,10 @@ import { HowCalculated, Legend, Meter } from "@/components/ui/charts";
 import { HouseholdSizeField } from "@/components/sufficiency/HouseholdSizeField";
 import { PRODUCT_ICON } from "@/components/livestock/icons";
 import { IconTile, formatProductAmount } from "@/components/livestock/shared";
+import { useToday } from "@/hooks/useToday";
 
 export function FoodPlan() {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ export function FoodPlan() {
   const householdSize = useAnalysisPrefs((s) => s.householdSize);
   const plantMap = usePlantMap();
   const plantName = usePlantName();
-  const year = new Date().getFullYear();
+  const year = now.getFullYear();
 
   const plan = useMemo(
     () => getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: year }),

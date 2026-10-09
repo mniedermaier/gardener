@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Menu } from "@/components/ui/Menu";
 import { ANIMAL_ICON, HEALTH_ICON, HEALTH_TONE, PRODUCT_ICON } from "./icons";
 import { IconTile, animalLabel, formatProductAmount } from "./shared";
+import { useToday } from "@/hooks/useToday";
 
 interface AnimalCardProps {
   animal: Animal;
@@ -23,6 +24,7 @@ interface AnimalCardProps {
 
 /** One herd/colony. The whole card opens the detail page; actions sit in the menu. */
 export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost, lastHealth, onEdit, onDelete, onOpen }: AnimalCardProps) {
+  const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const yields = ANNUAL_YIELD[animal.type];
@@ -60,7 +62,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
           // Same time basis as the recorded value: expected so far this year (since the animal arrived).
-          const expected = formatProductAmount(y.product, y.quantity * animal.count * expectedShareToDate(y.product, new Date(), animal.acquiredDate), f, t);
+          const expected = formatProductAmount(y.product, y.quantity * animal.count * expectedShareToDate(y.product, now, animal.acquiredDate), f, t);
           return (
             <div key={y.product}>
               <dt className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">

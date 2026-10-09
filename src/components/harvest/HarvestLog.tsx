@@ -30,6 +30,7 @@ import { BarChart } from "@/components/ui/charts";
 import { QualityInput, QualityStars, type Quality } from "@/components/records/Quality";
 import { useBeds } from "@/components/records/useBeds";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
+import { useToday } from "@/hooks/useToday";
 
 type Unit = "g" | "kg";
 
@@ -69,6 +70,7 @@ function parseAmount(text: string): number {
 }
 
 export function HarvestLog() {
+  const now = useToday();
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
   const { formatDate, formatWeight, formatNumber, locale } = useFormat();
@@ -177,7 +179,6 @@ export function HarvestLog() {
 
   // ---------------------------------------------------------------- stats
   const stats = useMemo(() => {
-    const now = new Date();
     let total = 0, last30 = 0, qualitySum = 0;
     const byPlant = new Map<string, { grams: number; count: number; entries: number }>();
     for (const h of harvests) {
@@ -209,7 +210,7 @@ export function HarvestLog() {
         return { key, date: m, kg: (perMonth.get(key) ?? 0) / 1000 };
       }),
     };
-  }, [harvests]);
+  }, [now, harvests]);
 
   const [showAllPlants, setShowAllPlants] = useState(false);
   const top = stats.ranking[0];

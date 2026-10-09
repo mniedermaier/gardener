@@ -6,6 +6,7 @@ import { plantFamilyMap, familyColors, rotationGroups, type PlantFamily } from "
 import { Card, CardHeader } from "@/components/ui/Card";
 import { usePlantMap } from "@/hooks/usePlants";
 import { isPerennial } from "@/lib/season";
+import { useToday } from "@/hooks/useToday";
 
 const GROUP_KEYS = ["heavy", "medium", "light", "improver"] as const;
 
@@ -14,6 +15,7 @@ const GROUP_KEYS = ["heavy", "medium", "light", "improver"] as const;
  * this season and which feeder group should follow next year.
  */
 export const CropRotation = memo(function CropRotation({ garden }: { garden: Garden }) {
+  const now = useToday();
   const { t } = useTranslation();
   const family = (f: PlantFamily) => t(`planner.families.${f}`);
   const group = (i: number) => t(`planner.rotation.groups.${GROUP_KEYS[i]}`);
@@ -44,7 +46,7 @@ export const CropRotation = memo(function CropRotation({ garden }: { garden: Gar
   );
 
   if (beds.length === 0) return null;
-  const nextYear = Number(garden.season || new Date().getFullYear()) + 1;
+  const nextYear = Number(garden.season || now.getFullYear()) + 1;
 
   return (
     <Card>

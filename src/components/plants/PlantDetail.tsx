@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/Badge";
 import { List, ListRow } from "@/components/ui/List";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { EnvironmentChip } from "@/components/planner/environment";
+import { useToday } from "@/hooks/useToday";
 
 interface PlantDetailProps {
   plant: Plant;
@@ -66,7 +67,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
     });
   })();
 
-  const now = new Date();
+  const now = useToday();
   const today = new Date(yearStart.getFullYear(), now.getMonth(), now.getDate());
   const todayLeft = pos(today);
   const frostLeft = pos(frost);
