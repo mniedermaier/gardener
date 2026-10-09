@@ -15,7 +15,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { DatePicker } from "@/components/ui/DatePicker";
+import { DateField } from "@/components/ui/DateField";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Menu } from "@/components/ui/Menu";
@@ -356,42 +356,43 @@ export function TaskCalendar() {
             placeholder={t("calendar.titlePlaceholder")}
             autoFocus
           />
-          <div className="grid gap-4 sm:grid-cols-2">
+          <Select
+            label={t("calendar.taskType")}
+            value={draft.type}
+            onChange={(e) => patch({ type: e.target.value as TaskType })}
+            options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
+          />
+          {/* Tasks lie ahead: Heute / Morgen / In 1 Woche, like the record dialogs' Heute / Gestern. */}
+          <DateField mode="future" label={t("calendar.taskDate")} value={draft.dueDate} onChange={(dueDate) => patch({ dueDate })} />
+          {gardens.length > 1 && (
             <Select
-              label={t("calendar.taskType")}
-              value={draft.type}
-              onChange={(e) => patch({ type: e.target.value as TaskType })}
-              options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
+              label={t("calendar.garden")}
+              value={draft.gardenId}
+              onChange={(e) => patch({ gardenId: e.target.value, bedId: "" })}
+              options={gardens.map((g) => ({ value: g.id, label: g.name }))}
             />
-            <DatePicker label={t("calendar.taskDate")} value={draft.dueDate} onChange={(e) => patch({ dueDate: e.target.value })} />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {gardens.length > 1 && (
-              <Select
-                label={t("calendar.garden")}
-                value={draft.gardenId}
-                onChange={(e) => patch({ gardenId: e.target.value, bedId: "" })}
-                options={gardens.map((g) => ({ value: g.id, label: g.name }))}
-              />
-            )}
+          )}
+          {/* Bed and plant share one row; the plant takes the full width when there is no bed to pick. */}
+          <div className={bedOptions.length > 0 ? "grid gap-4 sm:grid-cols-2" : undefined}>
             {bedOptions.length > 0 && (
               <Select
                 label={t("harvest.bed")}
+                optional
                 value={draft.bedId}
                 onChange={(e) => patch({ bedId: e.target.value })}
                 placeholder={t("harvest.noBed")}
                 options={bedOptions}
               />
             )}
+            {/* The searchable plant field of every other dialog, not a 47-entry select. */}
+            <PlantCombobox
+              label={t("harvest.plant")}
+              plants={plants}
+              optional
+              value={draft.plantId}
+              onChange={({ plantId }) => patch({ plantId })}
+            />
           </div>
-          {/* The searchable plant field of every other dialog, not a 47-entry select. */}
-          <PlantCombobox
-            label={t("harvest.plant")}
-            plants={plants}
-            optional
-            value={draft.plantId}
-            onChange={({ plantId }) => patch({ plantId })}
-          />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.recurrence")}</p>
             <SegmentedControl
@@ -402,7 +403,7 @@ export function TaskCalendar() {
               options={(["none", "daily", "weekly", "biweekly"] as const).map((r) => ({ value: r, label: t(`calendar.recurring.${r}`) }))}
             />
           </div>
-          <Textarea label={t("harvest.notes")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("common.notesPlaceholder")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>

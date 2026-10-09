@@ -278,6 +278,7 @@ export function PestTracker() {
           {beds.beds.length > 0 && (
             <Select
               label={t("harvest.bed")}
+              optional
               value={draft.bedId}
               onChange={(e) => patch({ bedId: e.target.value })}
               placeholder={t("harvest.noBed")}
@@ -301,8 +302,8 @@ export function PestTracker() {
               <span>{t("pests.severityLevel.5")}</span>
             </div>
           </div>
-          <Textarea label={t("pests.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
-          <Textarea label={t("pests.treatment")} hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
+          <Textarea label={t("pests.description")} optional value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
+          <Textarea label={t("pests.treatment")} optional hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
           {draft.treatment.trim() && (
             <Checkbox label={t("pests.organicOnly")} checked={draft.organic} onChange={(e) => patch({ organic: e.target.checked })} />
           )}

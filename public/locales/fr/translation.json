@@ -784,11 +784,11 @@
     "form": {
       "category": "Catégorie",
       "spacingCm": "Espacement (cm)",
-      "harvestMin": "Récolte au plus tôt",
-      "harvestMax": "Récolte au plus tard",
+      "harvestMin": "Récolte dès (jours)",
+      "harvestMax": "Récolte jusqu’à (jours)",
       "harvestError": "Ne peut pas être inférieur à la valeur la plus précoce.",
       "namePlaceholder": "p. ex. gingembre",
-      "daysAfterSowing": "Jours après le semis"
+      "daysAfterSowing": "Les deux comptés à partir du semis."
     },
     "detail": {
       "today": "Aujourd’hui",
@@ -998,7 +998,7 @@
       "scout": "Inspection",
       "preserve": "Conservation",
       "soil_test": "Analyse du sol",
-      "custom": "Personnalisée"
+      "custom": "Autre"
     },
     "reopenNamed": "Rouvrir « {{title}} »",
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
@@ -1219,7 +1219,6 @@
       "4": "Très bonne",
       "5": "Excellente"
     },
-    "notesPlaceholder": "p. ex. goût, conservation, remarques",
     "saveAction": "Enregistrer la récolte",
     "saved": "{{name}} · {{amount}} enregistré",
     "updated": "Modifications enregistrées",
@@ -1252,7 +1251,6 @@
     "text": "Que s'est-il passé au jardin aujourd'hui ?",
     "tags": "Mots-clés",
     "tagsPlaceholder": "p. ex. semis, gel, récolte (séparés par des virgules)",
-    "linkedTo": "Lié à",
     "animal": "Animal",
     "all": "Tous",
     "addPhotos": "Ajouter des photos (max. 3)",
@@ -1276,9 +1274,10 @@
     "photoN": "Photo {{n}}",
     "removePhoto": "Retirer la photo {{n}}",
     "addPhoto": "Ajouter une photo",
-    "photoHint": "Jusqu’à {{max}} photos. Elles sont réduites et stockées uniquement sur cet appareil.",
     "suggestedTags": "Suggestions :",
-    "noAnimal": "Aucun animal"
+    "noAnimal": "Aucun animal",
+    "linkToggle": "Lier une plante, un carré ou un animal",
+    "photoHintShort": "Jusqu’à {{max}} photos, stockées uniquement sur cet appareil."
   },
   "pantry": {
     "title": "Réserves",
@@ -1296,7 +1295,7 @@
     "unitCount": "Nombre de bocaux/sachets",
     "label": "Étiquette",
     "labelPlaceholder": "ex. Sauce tomate août 2026",
-    "supplyCost": "Coût des fournitures",
+    "supplyCost": "Coût des fournitures (€)",
     "storedOn": "stocké",
     "expiresOn": "à consommer avant",
     "consumedOn": "consommé",
@@ -1362,12 +1361,11 @@
     "needPlant": "Choisissez une plante",
     "needQuantity": "Saisissez une quantité en kg",
     "invalidNumber": "Saisissez un nombre valide",
-    "methodSummary": "Se conserve {{shelf}} · rendement env. {{yield}}",
+    "methodSummary": "Se conserve {{shelf}} (jusqu’au {{date}}) · rendement env. {{yield}}",
     "quantityKg": "Quantité (kg)",
     "unitLabel": "Unité",
     "unitLabelPlaceholder": "p. ex. seaux",
     "storedDate": "Stocké le",
-    "bestBefore": "À consommer avant le {{date}}",
     "supplyCostHint": "Bocaux, couvercles, sachets",
     "withinDays_many": "dans les {{count}} prochains jours",
     "daysLeft_many": "encore {{count}} jours",
@@ -1619,7 +1617,6 @@
     "perEgg": "œuf",
     "deleteAnimal": "Supprimer l'animal",
     "noJournal": "Relie des entrées du journal à cet animal et elles apparaîtront ici.",
-    "notesPlaceholder": "ex. race, notes spéciales…",
     "production": {
       "title": "Production",
       "totalEggs": "Total œufs",
@@ -1787,7 +1784,7 @@
     "editHealth": "Modifier l’entrée de santé",
     "healthUpdated": "Entrée de santé mise à jour",
     "healthDeleted": "Entrée de santé supprimée",
-    "cost": "Coût en €",
+    "cost": "Coût (€)",
     "costHint": "Compte dans le bilan sous Coûts.",
     "filterAnimal": "Animal",
     "filterProduct": "Produit",
@@ -1891,7 +1888,7 @@
     "acquired": "de {{year}}",
     "shopName": "Fournisseur",
     "shopPlaceholder": "p. ex. Kokopelli",
-    "cost": "Coût en €",
+    "cost": "Coût (€)",
     "needPlant": "Choisissez une plante",
     "invalidNumber": "Saisissez un nombre valide",
     "invalidYear": "Saisissez une année entre 1950 et aujourd’hui",
@@ -1975,7 +1972,7 @@
     "invalidPh": "Saisissez un pH entre 3 et 10",
     "invalidNumber": "Saisissez un nombre valide",
     "quantityKg": "Quantité (kg)",
-    "cost": "Coût",
+    "cost": "Coût (€)",
     "unknownBed": "Planche supprimée",
     "limeReason": {
       "potato": "La chaux favorise la gale commune de la pomme de terre.",
@@ -2295,7 +2292,8 @@
       "garden": "Supprimer le jardin « {{name}} » ?"
     },
     "examplePlaceholder": "p. ex. {{value}}",
-    "optionalLabel": "{{label}} (facultatif)"
+    "optionalMark": "(facultatif)",
+    "notesPlaceholder": "p. ex. observations, variété, météo…"
   },
   "companions": {
     "title": "Associations",
@@ -2371,8 +2369,8 @@
     "minutesCount_one": "{{count}} minute",
     "minutesCount_other": "{{count}} minutes",
     "showOlder": "Afficher les semaines précédentes",
-    "litersLabel": "Quantité (litres)",
-    "durationLabel": "Durée en minutes",
+    "litersLabel": "Quantité (l)",
+    "durationLabel": "Durée (min)",
     "needBed": "Choisissez une planche",
     "needLiters": "Saisissez une quantité en litres",
     "invalidNumber": "Saisissez un nombre valide",
@@ -2411,7 +2409,9 @@
     "plantSearch": "Rechercher une plante …",
     "clearPlant": "Retirer la plante",
     "plantedNow": "Dans vos planches",
-    "allPlants": "Toutes les plantes"
+    "allPlants": "Toutes les plantes",
+    "tomorrow": "Demain",
+    "inAWeek": "Dans 1 semaine"
   },
   "importPage": {
     "title": "Importer un jardin",

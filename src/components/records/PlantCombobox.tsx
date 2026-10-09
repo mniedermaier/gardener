@@ -2,7 +2,7 @@ import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Search, X } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { CONTROL_CLASS, LABEL_CLASS } from "@/components/ui/Field";
+import { CONTROL_CLASS, LABEL_CLASS, LabelText } from "@/components/ui/Field";
 import { usePlantName } from "@/hooks/usePlantName";
 import type { Plant } from "@/types/plant";
 import type { BedInfo } from "./useBeds";
@@ -124,7 +124,7 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
 
   return (
     <div>
-      <label htmlFor={id} className={LABEL_CLASS}>{label}</label>
+      <label htmlFor={id} className={LABEL_CLASS}><LabelText label={label} optional={optional} /></label>
       <div className="relative">
         <span className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 items-center text-gray-500" aria-hidden="true">
           {selectedPlant && !open ? <PlantIconDisplay plantId={selectedPlant.id} emoji={selectedPlant.icon} size={20} /> : <Search size={16} />}

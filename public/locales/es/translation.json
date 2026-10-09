@@ -784,11 +784,11 @@
     "form": {
       "category": "Categoría",
       "spacingCm": "Distancia de plantación (cm)",
-      "harvestMin": "Cosecha más temprana",
-      "harvestMax": "Cosecha más tardía",
+      "harvestMin": "Cosecha desde (días)",
+      "harvestMax": "Cosecha hasta (días)",
       "harvestError": "No puede ser menor que el valor más temprano.",
       "namePlaceholder": "p. ej., jengibre",
-      "daysAfterSowing": "Días tras la siembra"
+      "daysAfterSowing": "Ambos contados desde la siembra."
     },
     "detail": {
       "today": "Hoy",
@@ -998,7 +998,7 @@
       "scout": "Inspeccionar",
       "preserve": "Conservar",
       "soil_test": "Análisis de suelo",
-      "custom": "Personalizada"
+      "custom": "Otra"
     },
     "reopenNamed": "Reabrir «{{title}}»",
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
@@ -1219,7 +1219,6 @@
       "4": "Muy buena",
       "5": "Excelente"
     },
-    "notesPlaceholder": "p. ej. sabor, conservación, observaciones",
     "saveAction": "Guardar cosecha",
     "saved": "{{name}} · {{amount}} guardado",
     "updated": "Cambios guardados",
@@ -1252,7 +1251,6 @@
     "text": "Que paso hoy en el huerto?",
     "tags": "Etiquetas",
     "tagsPlaceholder": "p. ej. siembra, helada, cosecha (separadas por comas)",
-    "linkedTo": "Relacionado con",
     "animal": "Animal",
     "all": "Todos",
     "addPhotos": "Añadir fotos (máx. 3)",
@@ -1276,9 +1274,10 @@
     "photoN": "Foto {{n}}",
     "removePhoto": "Quitar foto {{n}}",
     "addPhoto": "Añadir foto",
-    "photoHint": "Hasta {{max}} fotos. Se reducen y se guardan solo en este dispositivo.",
     "suggestedTags": "Sugerencias:",
-    "noAnimal": "Sin animal"
+    "noAnimal": "Sin animal",
+    "linkToggle": "Vincular planta, bancal o animal",
+    "photoHintShort": "Hasta {{max}} fotos, solo en este dispositivo."
   },
   "pantry": {
     "title": "Despensa",
@@ -1296,7 +1295,7 @@
     "unitCount": "Número de tarros/bolsas",
     "label": "Etiqueta",
     "labelPlaceholder": "ej. Salsa de tomate agosto 2026",
-    "supplyCost": "Costo de insumos",
+    "supplyCost": "Coste de insumos (€)",
     "storedOn": "guardado",
     "expiresOn": "consumir antes de",
     "consumedOn": "consumido",
@@ -1362,12 +1361,11 @@
     "needPlant": "Elige una planta",
     "needQuantity": "Introduce una cantidad en kg",
     "invalidNumber": "Introduce un número válido",
-    "methodSummary": "Se conserva {{shelf}} · rendimiento aprox. {{yield}}",
+    "methodSummary": "Se conserva {{shelf}} (hasta el {{date}}) · rendimiento aprox. {{yield}}",
     "quantityKg": "Cantidad (kg)",
     "unitLabel": "Unidad",
     "unitLabelPlaceholder": "p. ej. cubos",
     "storedDate": "Guardado el",
-    "bestBefore": "Consumir antes de {{date}}",
     "supplyCostHint": "Tarros, tapas, bolsas",
     "withinDays_many": "en los próximos {{count}} días",
     "daysLeft_many": "quedan {{count}} días",
@@ -1619,7 +1617,6 @@
     "perEgg": "huevo",
     "deleteAnimal": "Eliminar animal",
     "noJournal": "Vincula entradas del diario a este animal y aparecerán aquí.",
-    "notesPlaceholder": "ej. raza, notas especiales…",
     "production": {
       "title": "Registro de producción",
       "totalEggs": "Total huevos",
@@ -1787,7 +1784,7 @@
     "editHealth": "Editar registro de salud",
     "healthUpdated": "Registro de salud actualizado",
     "healthDeleted": "Registro de salud eliminado",
-    "cost": "Coste en €",
+    "cost": "Coste (€)",
     "costHint": "Cuenta en el balance de Costes.",
     "filterAnimal": "Animal",
     "filterProduct": "Producto",
@@ -1891,7 +1888,7 @@
     "acquired": "de {{year}}",
     "shopName": "Proveedor",
     "shopPlaceholder": "p. ej. Vivero local",
-    "cost": "Coste en €",
+    "cost": "Coste (€)",
     "needPlant": "Elige una planta",
     "invalidNumber": "Introduce un número válido",
     "invalidYear": "Introduce un año entre 1950 y hoy",
@@ -1975,7 +1972,7 @@
     "invalidPh": "Introduce un pH entre 3 y 10",
     "invalidNumber": "Introduce un número válido",
     "quantityKg": "Cantidad (kg)",
-    "cost": "Coste",
+    "cost": "Coste (€)",
     "unknownBed": "Bancal eliminado",
     "limeReason": {
       "potato": "La cal favorece la sarna de la patata.",
@@ -2295,7 +2292,8 @@
       "garden": "¿Eliminar el huerto «{{name}}»?"
     },
     "examplePlaceholder": "p. ej. {{value}}",
-    "optionalLabel": "{{label}} (opcional)"
+    "optionalMark": "(opcional)",
+    "notesPlaceholder": "p. ej. observaciones, variedad, tiempo…"
   },
   "companions": {
     "title": "Asociaciones",
@@ -2371,8 +2369,8 @@
     "minutesCount_one": "{{count}} minuto",
     "minutesCount_other": "{{count}} minutos",
     "showOlder": "Mostrar semanas anteriores",
-    "litersLabel": "Cantidad (litros)",
-    "durationLabel": "Duración en minutos",
+    "litersLabel": "Cantidad (l)",
+    "durationLabel": "Duración (min)",
     "needBed": "Elige un bancal",
     "needLiters": "Introduce una cantidad en litros",
     "invalidNumber": "Introduce un número válido",
@@ -2411,7 +2409,9 @@
     "plantSearch": "Buscar planta …",
     "clearPlant": "Quitar planta",
     "plantedNow": "En tus bancales",
-    "allPlants": "Todas las plantas"
+    "allPlants": "Todas las plantas",
+    "tomorrow": "Mañana",
+    "inAWeek": "En 1 semana"
   },
   "importPage": {
     "title": "Importar huerto",

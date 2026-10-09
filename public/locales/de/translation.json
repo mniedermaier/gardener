@@ -282,7 +282,7 @@
     "locationUses": "Nur für Wetter, Sonnenstand und Frosttermine."
   },
   "search": {
-    "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen…",
+    "placeholder": "Pflanzen, Aufgaben, Tagebuch suchen …",
     "noResults": "Keine Treffer"
   },
   "planner": {
@@ -764,11 +764,11 @@
     "form": {
       "category": "Kategorie",
       "spacingCm": "Pflanzabstand (cm)",
-      "harvestMin": "Ernte frühestens",
-      "harvestMax": "Ernte spätestens",
+      "harvestMin": "Ernte ab (Tage)",
+      "harvestMax": "Ernte bis (Tage)",
       "harvestError": "Darf nicht kleiner sein als der früheste Wert.",
       "namePlaceholder": "z. B. Ingwer",
-      "daysAfterSowing": "Tage nach der Aussaat"
+      "daysAfterSowing": "Beide gezählt ab der Aussaat."
     },
     "detail": {
       "today": "Heute",
@@ -968,7 +968,7 @@
       "scout": "Kontrollgang",
       "preserve": "Konservieren",
       "soil_test": "Bodentest",
-      "custom": "Eigene"
+      "custom": "Sonstiges"
     },
     "reopenNamed": "„{{title}}“ wieder öffnen",
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
@@ -1178,7 +1178,6 @@
       "4": "Sehr gut",
       "5": "Hervorragend"
     },
-    "notesPlaceholder": "z. B. Geschmack, Lagerfähigkeit, Auffälligkeiten",
     "saveAction": "Ernte speichern",
     "saved": "{{name}} · {{amount}} gespeichert",
     "updated": "Änderungen gespeichert",
@@ -1207,7 +1206,6 @@
     "text": "Was ist heute im Garten passiert?",
     "tags": "Tags",
     "tagsPlaceholder": "z. B. aussaat, frost, ernte (kommagetrennt)",
-    "linkedTo": "Bezug",
     "animal": "Tier",
     "all": "Alle",
     "addPhotos": "Fotos hinzufügen (max. 3)",
@@ -1231,9 +1229,10 @@
     "photoN": "Foto {{n}}",
     "removePhoto": "Foto {{n}} entfernen",
     "addPhoto": "Foto hinzufügen",
-    "photoHint": "Bis zu {{max}} Fotos. Sie werden verkleinert und nur auf diesem Gerät gespeichert.",
     "suggestedTags": "Vorschläge:",
-    "noAnimal": "Kein Tier"
+    "noAnimal": "Kein Tier",
+    "linkToggle": "Pflanze, Beet oder Tier verknüpfen",
+    "photoHintShort": "Bis zu {{max}} Fotos, nur auf diesem Gerät gespeichert."
   },
   "pantry": {
     "title": "Vorrat",
@@ -1251,7 +1250,7 @@
     "unitCount": "Anzahl Gläser/Beutel",
     "label": "Bezeichnung",
     "labelPlaceholder": "z. B. Tomatensauce August 2026",
-    "supplyCost": "Zubehörkosten",
+    "supplyCost": "Zubehörkosten (€)",
     "storedOn": "eingelagert",
     "expiresOn": "haltbar bis",
     "consumedOn": "verbraucht",
@@ -1316,12 +1315,11 @@
     "needPlant": "Bitte eine Pflanze wählen",
     "needQuantity": "Bitte eine Menge in kg eingeben",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
-    "methodSummary": "Haltbar {{shelf}} · Ausbeute ca. {{yield}}",
+    "methodSummary": "{{shelf}} haltbar (bis {{date}}) · Ausbeute ca. {{yield}}",
     "quantityKg": "Menge (kg)",
     "unitLabel": "Einheit",
     "unitLabelPlaceholder": "z. B. Eimer",
     "storedDate": "Eingelagert am",
-    "bestBefore": "Haltbar bis {{date}}",
     "supplyCostHint": "Gläser, Deckel, Beutel",
     "unitOther": "Andere …",
     "unitOtherLabel": "Eigene Einheit",
@@ -1475,7 +1473,7 @@
     "active": "Aktiv",
     "resolvedLabel": "Gelöst",
     "name": "Bezeichnung",
-    "namePlaceholder": "z. B. Blattläuse, Tomatenfäule, Mehltau…",
+    "namePlaceholder": "z. B. Blattläuse, Tomatenfäule, Mehltau …",
     "severity": "Schweregrad",
     "description": "Beschreibung",
     "organicOnly": "Biologisch behandelt",
@@ -1519,7 +1517,7 @@
     "animalsTab": "Bestand",
     "noProducts": "Erfasse Eier, Honig oder Milch, um Verlauf und Wert zu sehen.",
     "animalName": "Name",
-    "namePlaceholder": "z. B. Henriette, Bienenstock 1…",
+    "namePlaceholder": "z. B. Henriette, Bienenstock 1 …",
     "count": "Anzahl",
     "selectAnimal": "Tier",
     "quantity": "Menge",
@@ -1529,7 +1527,7 @@
     "feedAdded": "Futter erfasst",
     "noFeed": "Mit Futtermengen und Kosten siehst du, was deine Tiere kosten.",
     "feedType": "Futterart",
-    "feedTypePlaceholder": "z. B. Körnerfutter, Heu, Zuckersirup…",
+    "feedTypePlaceholder": "z. B. Körnerfutter, Heu, Zuckersirup …",
     "feedCost": "Kosten (€)",
     "feedTotal": "Futterkosten gesamt",
     "unit": "Einheit",
@@ -1553,7 +1551,6 @@
     "perEgg": "Ei",
     "deleteAnimal": "Tier löschen",
     "noJournal": "Verknüpfe Tagebucheinträge mit diesem Tier, dann erscheinen sie hier.",
-    "notesPlaceholder": "z. B. Rasse, Besonderheiten…",
     "production": {
       "title": "Produktion",
       "totalEggs": "Eier gesamt",
@@ -1707,7 +1704,7 @@
     "editHealth": "Gesundheitseintrag bearbeiten",
     "healthUpdated": "Gesundheitseintrag aktualisiert",
     "healthDeleted": "Gesundheitseintrag gelöscht",
-    "cost": "Kosten in €",
+    "cost": "Kosten (€)",
     "costHint": "Fließt in die Bilanz unter Kosten ein.",
     "filterAnimal": "Tier",
     "filterProduct": "Produkt",
@@ -1806,7 +1803,7 @@
     "acquired": "aus {{year}}",
     "shopName": "Händler",
     "shopPlaceholder": "z. B. Bingenheimer",
-    "cost": "Kosten in €",
+    "cost": "Kosten (€)",
     "needPlant": "Bitte eine Pflanze wählen",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben",
@@ -1824,7 +1821,7 @@
     "organicMatter": "Organische Substanz",
     "amendmentType": "Typ",
     "material": "Material",
-    "materialPlaceholder": "z. B. Pferdemist, Gartenkompost…",
+    "materialPlaceholder": "z. B. Pferdemist, Gartenkompost …",
     "types": {
       "compost": "Kompost",
       "manure": "Mist",
@@ -1889,7 +1886,7 @@
     "invalidPh": "pH zwischen 3 und 10 eingeben",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
     "quantityKg": "Menge (kg)",
-    "cost": "Kosten",
+    "cost": "Kosten (€)",
     "unknownBed": "Gelöschtes Beet",
     "limeReason": {
       "potato": "Kalk fördert Kartoffelschorf.",
@@ -2197,7 +2194,8 @@
       "garden": "Garten „{{name}}“ löschen?"
     },
     "examplePlaceholder": "z. B. {{value}}",
-    "optionalLabel": "{{label}} (optional)"
+    "optionalMark": "(optional)",
+    "notesPlaceholder": "z. B. Beobachtungen, Sorte, Wetter …"
   },
   "companions": {
     "title": "Pflanzpartner",
@@ -2270,8 +2268,8 @@
     "minutesCount_one": "{{count}} Minute",
     "minutesCount_other": "{{count}} Minuten",
     "showOlder": "Ältere Wochen anzeigen",
-    "litersLabel": "Menge (Liter)",
-    "durationLabel": "Dauer in Minuten",
+    "litersLabel": "Menge (l)",
+    "durationLabel": "Dauer (Min.)",
     "needBed": "Bitte ein Beet wählen",
     "needLiters": "Bitte eine Menge in Litern eingeben",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
@@ -2306,7 +2304,9 @@
     "plantSearch": "Pflanze suchen …",
     "clearPlant": "Pflanze entfernen",
     "plantedNow": "In deinen Beeten",
-    "allPlants": "Alle Pflanzen"
+    "allPlants": "Alle Pflanzen",
+    "tomorrow": "Morgen",
+    "inAWeek": "In 1 Woche"
   },
   "importPage": {
     "title": "Garten importieren",
