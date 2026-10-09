@@ -158,7 +158,7 @@
     "nowSubtitle": "What is ready to pick and what to sow or plant next",
     "tabHarvest": "Harvest",
     "tabSow": "Sow & plant",
-    "harvestSoon": "Pick soon",
+    "harvestSoon": "Pick now",
     "plantCount_one": "{{count}} plant",
     "plantCount_other": "{{count}} plants",
     "logHarvestFor": "Log harvest: {{name}}",
@@ -1014,7 +1014,9 @@
     "afterFrostShort": "after the frost nights",
     "pageSubtitleNoBeds": "What you can sow and plant now.",
     "dueRelative": "due {{dateInline}}",
-    "emptyTextNoBeds": "Add tasks – or a bed, and Gardener creates sowing and planting dates from it."
+    "emptyTextNoBeds": "Add tasks – or a bed, and Gardener creates sowing and planting dates from it.",
+    "autumnPossible": "possible",
+    "autumnPossibleLegend": "Possible autumn crop"
   },
   "settings": {
     "title": "Settings",

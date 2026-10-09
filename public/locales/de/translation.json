@@ -158,7 +158,7 @@
     "nowSubtitle": "Was erntereif ist und was du als Nächstes säen oder pflanzen kannst",
     "tabHarvest": "Ernten",
     "tabSow": "Säen & pflanzen",
-    "harvestSoon": "Bald ernten",
+    "harvestSoon": "Zügig ernten",
     "plantCount_one": "{{count}} Pflanze",
     "plantCount_other": "{{count}} Pflanzen",
     "logHarvestFor": "Ernte erfassen: {{name}}",
@@ -520,7 +520,7 @@
   },
   "plants": {
     "title": "Pflanzen",
-    "search": "Pflanzen suchen…",
+    "search": "Pflanzen suchen …",
     "addCustom": "Eigene Pflanze hinzufügen",
     "customName": "Name",
     "allCategories": "Alle Kategorien",
@@ -1014,7 +1014,9 @@
     "afterFrostShort": "nach den Frostnächten",
     "pageSubtitleNoBeds": "Was du jetzt säen und pflanzen kannst.",
     "dueRelative": "{{date}} fällig",
-    "emptyTextNoBeds": "Lege Aufgaben an – oder ein Beet, dann erzeugt Gardener Aussaat- und Pflanztermine daraus."
+    "emptyTextNoBeds": "Lege Aufgaben an – oder ein Beet, dann erzeugt Gardener Aussaat- und Pflanztermine daraus.",
+    "autumnPossible": "möglich",
+    "autumnPossibleLegend": "Mögliche Herbstkultur"
   },
   "settings": {
     "title": "Einstellungen",
@@ -2020,7 +2022,7 @@
     },
     "openInPlanner": "Im Planer öffnen",
     "yourNote": "Notiz:",
-    "emptyNoBeds": "Bodentests und Düngungen gehören zu einem Beet. Lege zuerst im Planer ein Beet an.",
+    "emptyNoBeds": "Bodentests und Düngungen gehören zu einem Beet. Lege zuerst ein Beet an.",
     "moreMeasures_one": "{{count}} weitere Maßnahme",
     "moreMeasures_other": "{{count}} weitere Maßnahmen",
     "notesPlaceholder": "z. B. Wetter, eingearbeitet …",
@@ -2324,7 +2326,7 @@
   },
   "companions": {
     "title": "Pflanzpartner",
-    "search": "Pflanze suchen…",
+    "search": "Pflanze suchen …",
     "matrixView": "Matrix",
     "listView": "Liste",
     "companionsLabel": "Gute Nachbarn",
@@ -2382,7 +2384,7 @@
     "deleted": "Eintrag gelöscht",
     "emptyTitle": "Noch keine Bewässerung erfasst",
     "emptyText": "Trage ein, wann du wie viel gießt. Das Wochendiagramm zeigt dann, ob deine Beete genug bekommen.",
-    "emptyNoBeds": "Lege zuerst im Planer ein Beet an – dann kannst du hier die Bewässerung erfassen.",
+    "emptyNoBeds": "Lege zuerst ein Beet an – dann kannst du hier die Bewässerung erfassen.",
     "plusRain": "+ {{amount}} Regen",
     "avgPerWeek": "Ø pro Woche",
     "lastWeeks_one": "letzte {{count}} Woche",

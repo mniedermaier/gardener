@@ -1046,7 +1046,9 @@
     "afterFrostShort": "après les nuits de gel",
     "pageSubtitleNoBeds": "Ce que vous pouvez semer et planter maintenant.",
     "dueRelative": "prévue {{dateInline}}",
-    "emptyTextNoBeds": "Ajoutez des tâches – ou une planche, et Gardener en tirera les dates de semis et de plantation."
+    "emptyTextNoBeds": "Ajoutez des tâches – ou une planche, et Gardener en tirera les dates de semis et de plantation.",
+    "autumnPossible": "possible",
+    "autumnPossibleLegend": "Culture d’automne possible"
   },
   "settings": {
     "title": "Paramètres",

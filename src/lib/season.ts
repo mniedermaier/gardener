@@ -120,6 +120,9 @@ export interface HarvestReadyItem {
   late: boolean;
 }
 
+/** Days a harvest stays listed after its window closed (then marked late). */
+export const HARVEST_GRACE_DAYS = 21;
+
 /**
  * Harvest window from real planting dates: earliest planting + min days to
  * the latest + max days. Continuous croppers (tomato, chard …) stay open
@@ -169,7 +172,7 @@ export function getHarvestReady(
         if (!planted || !plant || plant.harvestDaysMax >= 365) continue;
         const from = addDays(planted, plant.harvestDaysMin);
         let to = addDays(planted, plant.harvestDaysMax);
-        let grace = 21;
+        let grace = HARVEST_GRACE_DAYS;
         if (isContinuousCropper(plant)) {
           const seasonEnd = addWeeks(autumnFrost, protection);
           if (isAfter(seasonEnd, to)) { to = seasonEnd; grace = 0; }

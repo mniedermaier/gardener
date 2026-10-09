@@ -275,7 +275,6 @@ export function PestTracker() {
             plants={plants}
             beds={beds.beds}
             optional
-            autoFocus
             value={draft.plantId}
             bedId={draft.bedId}
             onChange={({ plantId, bedId }) => patch({ plantId, ...(bedId ? { bedId } : {}) })}
@@ -303,7 +302,7 @@ export function PestTracker() {
               ]}
             />
           </div>
-          <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t(`pests.namePlaceholders.${draft.type}`)} />
+          <Input label={t("pests.name")} data-autofocus-field="" value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t(`pests.namePlaceholders.${draft.type}`)} />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("pests.severity")}{draft.severity !== null && <>: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span></>}

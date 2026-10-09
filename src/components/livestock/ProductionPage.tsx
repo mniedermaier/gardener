@@ -77,12 +77,14 @@ export function ProductionPage() {
   const heroExpected = heroType ? expectedToDate(heroType) : 0;
   const heroAmount = heroType === "eggs" ? f.formatNumber(heroExpected, { maximumFractionDigits: 0 }) : heroType ? formatProductAmount(heroType, heroExpected, f, t) : "";
   // Name the basis when it is not 1 January (earliest arrival/first entry of the producing animals).
-  const heroBasis = heroType
-    ? animals
-      .filter((a) => ANNUAL_YIELD[a.type]?.some((x) => x.product === heroType))
-      .map((a) => expectationBasisDate(expectationStart(a, animalProducts), now))
-      .reduce<string | null>((min, d) => (d === null ? min : min === null || d < min ? d : min), null)
-    : null;
+  const basisFor = (ty: ProductType) => animals
+    .filter((a) => ANNUAL_YIELD[a.type]?.some((x) => x.product === ty))
+    .map((a) => expectationBasisDate(expectationStart(a, animalProducts), now))
+    .reduce<string | null>((min, d) => (d === null ? min : min === null || d < min ? d : min), null);
+  const heroBasis = heroType ? basisFor(heroType) : null;
+  // One wording for every expectation (as on the herd cards): "erwartet ~… seit 27. Juli".
+  const expectedHint = (amount: string, basis: string | null) =>
+    basis ? t("livestock.ofExpectedSince", { amount, date: f.formatDate(basis, "dayMonth") }) : t("livestock.ofExpectedToDate", { amount });
   const heroFigure = heroType
     ? {
         ...yearFigure(heroType),
@@ -112,7 +114,7 @@ export function ProductionPage() {
     const expected = expectedToDate(ty);
     return {
       ...yearFigure(ty),
-      hint: expected > 0 ? t("livestock.ofExpectedToDate", { amount: formatProductAmount(ty, expected, f, t) }) : undefined,
+      hint: expected > 0 ? expectedHint(formatProductAmount(ty, expected, f, t), basisFor(ty)) : undefined,
     };
   })];
 

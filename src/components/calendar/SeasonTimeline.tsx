@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CalendarRange, Plus } from "lucide-react";
 import { useAddBed } from "@/hooks/useAddBed";
-import { addWeeks, addYears, differenceInCalendarDays, endOfYear, startOfDay, startOfYear } from "date-fns";
+import { addDays, addWeeks, addYears, differenceInCalendarDays, endOfYear, startOfDay, startOfYear } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlantMap } from "@/hooks/usePlants";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/Button";
 import { List, ListRow } from "@/components/ui/List";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
-import { PHASES, getPhaseWindows, plantedHarvestWindow, seasonFrost, type Phase } from "@/lib/season";
+import { HARVEST_GRACE_DAYS, PHASES, getPhaseWindows, plantedHarvestWindow, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
 import { PlantableNowRows, useVisibleAgendaRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
@@ -117,7 +117,9 @@ export function SeasonTimeline() {
       for (const phase of PHASES) {
         const range = tl.phases[phase];
         if (!range) continue;
-        if (range.start <= today && range.end >= today) now.push({ tl, phase, range });
+        // A harvest stays "now" three weeks past its window, as on "Heute" (getHarvestReady).
+        const openUntil = phase === "harvest" ? addDays(range.end, HARVEST_GRACE_DAYS) : range.end;
+        if (range.start <= today && openUntil >= today) now.push({ tl, phase, range });
         else if (range.start > today && range.start <= soon) next.push({ tl, phase, range });
       }
     }
@@ -202,7 +204,7 @@ export function SeasonTimeline() {
         meta={[
           tl.bedName,
           kind === "now"
-            ? t("calendar.until", { date: formatDate(range.end, "short") })
+            ? (range.end < today ? t("dashboard.harvestSoon") : t("calendar.until", { date: formatDate(range.end, "short") }))
             : t("calendar.from", { date: formatDate(range.start, "short") }),
         ]}
         // Same behaviour as the sowing rows below: every agenda row opens its plant.
@@ -293,6 +295,7 @@ export function SeasonTimeline() {
                   todayPct={todayPct}
                   frostPct={frostPct}
                   describe={(p, r) => `${phaseLabel(p)}: ${rangeLabel(r)}`}
+                  possibleLabel={t("calendar.autumnPossible")}
                 />
               ))}
             </ul>
@@ -303,6 +306,10 @@ export function SeasonTimeline() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-600 dark:text-gray-300">
           <PhaseLegend phases={PHASES} />
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-4 rounded-sm bg-garden-600 opacity-35 dark:bg-garden-400" aria-hidden="true" />
+            {t("calendar.autumnPossibleLegend")}
+          </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-0.5 bg-garden-600 dark:bg-garden-400" aria-hidden="true" />
             {t("calendar.today")}
@@ -319,7 +326,7 @@ export function SeasonTimeline() {
 }
 
 const TimelineRow = memo(function TimelineRow({
-  tl, name, icon, showBed, pct, todayPct, frostPct, describe,
+  tl, name, icon, showBed, pct, todayPct, frostPct, describe, possibleLabel,
 }: {
   tl: PlantTimeline;
   name: string;
@@ -329,12 +336,15 @@ const TimelineRow = memo(function TimelineRow({
   todayPct: number;
   frostPct: number;
   describe: (p: Phase, r: Range) => string;
+  possibleLabel: string;
 }) {
+  // Autumn windows are a possibility, not a planting: drawn faint and named so.
   const bars = [
-    ...PHASES.filter((p) => tl.phases[p]).map((p) => ({ phase: p, range: tl.phases[p]! })),
-    ...tl.autumn,
+    ...PHASES.filter((p) => tl.phases[p]).map((p) => ({ phase: p, range: tl.phases[p]!, possible: false })),
+    ...tl.autumn.map((a) => ({ ...a, possible: true })),
   ];
-  const summary = bars.map((b) => describe(b.phase, b.range)).join("; ");
+  const label = (b: (typeof bars)[number]) => (b.possible ? `${describe(b.phase, b.range)} (${possibleLabel})` : describe(b.phase, b.range));
+  const summary = bars.map(label).join("; ");
   return (
     <li className="flex items-center gap-3 py-1">
       <div className="flex w-44 shrink-0 items-center gap-2">
@@ -351,16 +361,17 @@ const TimelineRow = memo(function TimelineRow({
       </div>
       <div className="relative h-8 flex-1 rounded-md bg-gray-50 dark:bg-white/[0.03]" role="img" aria-label={`${name}: ${summary}`}>
         {/* One lane per phase; autumn windows share the lane of their phase. */}
-        {bars.map(({ phase: p, range: r }) => {
+        {bars.map((b) => {
+          const { phase: p, range: r } = b;
           const left = pct(r.start);
           const width = Math.max(pct(r.end) - left, 1);
           const fill = phaseFill(p);
           return (
             <div
               key={`${p}-${r.start.getTime()}`}
-              className={`absolute h-1.5 rounded-sm ${fill.className}`}
+              className={`absolute h-1.5 rounded-sm ${fill.className} ${b.possible ? "opacity-35" : ""}`}
               style={{ ...fill.style, left: `${left}%`, width: `${width}%`, top: `${2 + PHASES.indexOf(p) * 7}px` }}
-              title={describe(p, r)}
+              title={label(b)}
             />
           );
         })}

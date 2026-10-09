@@ -162,7 +162,7 @@
     "nowSubtitle": "Qué está listo para cosechar y qué sembrar o plantar ahora",
     "tabHarvest": "Cosechar",
     "tabSow": "Sembrar y plantar",
-    "harvestSoon": "Cosechar pronto",
+    "harvestSoon": "Cosechar ya",
     "plantCount_one": "{{count}} planta",
     "plantCount_other": "{{count}} plantas",
     "plantCount_many": "{{count}} plantas",
@@ -1046,7 +1046,9 @@
     "afterFrostShort": "tras las noches de helada",
     "pageSubtitleNoBeds": "Lo que puedes sembrar y plantar ahora.",
     "dueRelative": "vence {{dateInline}}",
-    "emptyTextNoBeds": "Añade tareas, o un bancal y Gardener creará a partir de él las fechas de siembra y plantación."
+    "emptyTextNoBeds": "Añade tareas, o un bancal y Gardener creará a partir de él las fechas de siembra y plantación.",
+    "autumnPossible": "posible",
+    "autumnPossibleLegend": "Cultivo de otoño posible"
   },
   "settings": {
     "title": "Ajustes",

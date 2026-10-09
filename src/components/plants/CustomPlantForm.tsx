@@ -246,9 +246,9 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           )}
         </div>
         {/* The two harvest days form a pair with their shared hint; the spacing is a
-            separate figure on its own half-width row. */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+            separate figure on its own full row (a half row left an empty column). */}
+        <div className="grid gap-4">
+          <div>
             <div className="grid grid-cols-2 items-end gap-4">
               <Input
                 label={t("plants.form.harvestMin")}
