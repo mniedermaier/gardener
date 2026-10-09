@@ -11,7 +11,7 @@ interface MonthStripProps {
   formatValue: (ratio: number) => string;
   /** Month index marked like the charts' "Jetzt" line (current month). */
   current?: number;
-  /** Text above the current month, e.g. t("charts.now"). */
+  /** Text above the current month, e.g. t("charts.today"). */
   currentLabel?: string;
   /** Accessible name / table caption. */
   caption: string;
@@ -21,10 +21,11 @@ interface MonthStripProps {
 /** Sequential single-hue ramp, light → dark; text switches for contrast. */
 const STEPS = [
   "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300",
-  "bg-garden-100 text-garden-900 dark:bg-garden-900/60 dark:text-garden-100",
-  "bg-garden-200 text-garden-900 dark:bg-garden-800 dark:text-garden-50",
-  "bg-garden-400 text-white dark:bg-garden-600 dark:text-white",
-  "bg-garden-600 text-white dark:bg-garden-500 dark:text-gray-950",
+  // Dark: wide steps on gray-900 (900/60 and 800 looked the same), dark text on the top step.
+  "bg-garden-100 text-garden-900 dark:bg-garden-900/40 dark:text-garden-100",
+  "bg-garden-200 text-garden-900 dark:bg-garden-700/70 dark:text-white",
+  "bg-garden-400 text-white dark:bg-garden-500 dark:text-gray-950",
+  "bg-garden-600 text-white dark:bg-garden-300 dark:text-gray-950",
 ];
 /**
  * Step of a value on the strip's own range (at least 0–10 %): in a garden that

@@ -2,13 +2,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Bird, Egg, Pencil, Plus, Trash2 } from "lucide-react";
-import { endOfWeek, startOfWeek } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { toISODate } from "@/lib/format";
-import { expectedShareToDate, getActualProducts } from "@/lib/metrics";
+import { expectationStart, expectedShareToDate, getActualProducts } from "@/lib/metrics";
 import { ANNUAL_YIELD, EGG_LAYERS, type AnimalProduct, type ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -48,12 +46,12 @@ export function ProductionPage() {
 
   const year = now.getFullYear();
   const stats = useMemo(() => {
-    const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
-    const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
+    const eggWeeks = weeklyEggs(animalProducts, now);
     return {
-      eggsWeek: animalProducts.filter((p) => p.type === "eggs" && p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
+      // Last 7 days (the newest rolling window), not the calendar week.
+      eggsWeek: eggWeeks[eggWeeks.length - 1],
       year: getActualProducts(animalProducts, year),
-      eggWeeks: weeklyEggs(animalProducts, now),
+      eggWeeks,
     };
   }, [now, animalProducts, year]);
 
@@ -66,10 +64,10 @@ export function ProductionPage() {
   });
   const eggWeeks = stats.eggWeeks;
   const eggAvg = eggWeeks.reduce((s, n) => s + n, 0) / eggWeeks.length;
-  // Same basis as the herd cards on "Tiere": expected up to today since each animal arrived.
+  // Same basis as the herd cards on "Tiere": expected up to today since arrival or the first entry.
   const expectedToDate = (ty: ProductType) => animals.reduce((sum, a) => {
     const y = ANNUAL_YIELD[a.type]?.find((x) => x.product === ty);
-    return y ? sum + y.quantity * a.count * expectedShareToDate(ty, now, a.acquiredDate) : sum;
+    return y ? sum + y.quantity * a.count * expectedShareToDate(ty, now, expectationStart(a, animalProducts)) : sum;
   }, 0);
   // "Tiere" leads with this week; this page is the record: the year so far
   // against what the herd should have yielded by now, then the week.
@@ -112,7 +110,7 @@ export function ProductionPage() {
       <PageHeader title={t("livestock.production.title")} description={t("livestock.production.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
       {animals.length === 0 ? (
-        <NoAnimalsYet text={t("livestock.production.emptyText")} />
+        <NoAnimalsYet icon={Egg} title={t("livestock.production.emptyTitle")} text={t("livestock.production.emptyText")} />
       ) : (
         <div className="space-y-6">
           {heroFigure && <KeyFigures hero={heroFigure} items={yearFigures.slice(0, 3)} />}

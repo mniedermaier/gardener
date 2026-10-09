@@ -12,7 +12,8 @@ export interface LegendItem {
 export function HatchPattern({ id, className }: { id: string; className?: string }) {
   return (
     <pattern id={id} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)" className={className}>
-      <rect width="6" height="6" fill="currentColor" opacity="0.18" />
+      {/* Tinted ground so even a few pixels of forecast read as "something", also on gray-900. */}
+      <rect width="6" height="6" fill="currentColor" opacity="0.3" />
       <line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" strokeWidth="2.5" />
     </pattern>
   );

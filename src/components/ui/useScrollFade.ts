@@ -44,9 +44,9 @@ export function useScrollFade<T extends HTMLElement>(activeSelector: string, act
   }, [activeSelector, activeKey]);
 
   const fadeClass = edges.start && edges.end
-    ? "[mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)]"
+    ? "[mask-image:linear-gradient(to_right,transparent,#000_32px,#000_calc(100%-48px),transparent)]"
     : edges.end
-      ? "[mask-image:linear-gradient(to_right,#000_calc(100%-32px),transparent)]"
+      ? "[mask-image:linear-gradient(to_right,#000_calc(100%-56px),transparent)]"
       : edges.start
         ? "[mask-image:linear-gradient(to_right,transparent,#000_32px)]"
         : "";

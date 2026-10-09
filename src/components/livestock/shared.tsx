@@ -495,14 +495,15 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
  * exists: the page's own sentence plus one action that opens the add-animal
  * dialog on "Tiere" (useOpenAddOnNavigate), not a bare "go there" link.
  */
-export function NoAnimalsYet({ text }: { text: string }) {
+/** No animals yet on a livestock sub-page: its own icon and outcome title, one way forward. */
+export function NoAnimalsYet({ text, title, icon = Bird }: { text: string; title?: string; icon?: LucideIcon }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <Card>
       <EmptyState
-        icon={Bird}
-        title={t("livestock.emptyTitle")}
+        icon={icon}
+        title={title ?? t("livestock.emptyTitle")}
         description={text}
         action={
           <Button onClick={() => navigate("/livestock", { state: { openAdd: true } satisfies OpenAddState })}>

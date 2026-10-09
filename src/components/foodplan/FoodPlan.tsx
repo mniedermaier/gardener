@@ -49,23 +49,28 @@ export function FoodPlan() {
   const unplantedArea = unplanted.reduce((sum, r) => sum + r.neededAreaM2, 0);
   const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
   const kg = (v: number) => f.formatWeight(v * 1000, "kg");
+  const empty = !hasPlantings && animals.length === 0;
+  // Meter draws the target tick only when the bar's scale exceeds the target.
+  const targetTickShown = grown.some((r) => r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) > r.targetKg);
 
   return (
     <div>
       <PageHeader title={t("foodplan.title")} description={t("foodplan.subtitle")} actions={<HouseholdSizeField />} />
 
-      {!hasPlantings && animals.length === 0 ? (
-        <Card>
-          <EmptyState
-            icon={Target}
-            title={t("foodplan.emptyTitle")}
-            description={t("foodplan.emptyText", { kg: kg(plan.targetKg) })}
-            action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
-          />
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {/* The disclosure explains the figures: attached below them, not a section of its own. */}
+      <div className="space-y-6">
+        {/* Nothing planted yet: the targets per crop are the useful part, so they stay;
+            only the 0 % figures give way to a slim hint. */}
+        {empty ? (
+          <Card>
+            <EmptyState
+              compact
+              icon={Target}
+              title={t("foodplan.emptyTitle")}
+              description={t("foodplan.emptyText", { kg: kg(plan.targetKg) })}
+              action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
+            />
+          </Card>
+        ) : (
           <div>
             <KeyFigures
               hero={{
@@ -101,8 +106,9 @@ export function FoodPlan() {
               <p>{t("foodplan.howVsCalories")}</p>
             </HowCalculated>
           </div>
+        )}
 
-          {deficits.length > 0 && (
+          {!empty && deficits.length > 0 && (
             <Card padding="none">
               <div className="px-4 pt-4 sm:px-6 sm:pt-5"><CardHeader title={t("foodplan.deficitsTitle")} description={t("foodplan.deficitsDesc")} /></div>
               <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
@@ -126,13 +132,16 @@ export function FoodPlan() {
           <section aria-labelledby="crop-plan" className="space-y-3">
             <div className="flex flex-wrap items-end justify-between gap-2">
               <h2 id="crop-plan" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.cropPlan")}</h2>
-              <Legend
-                items={[
-                  { label: t("metrics.actual"), color: "brand" },
-                  { label: t("metrics.forecast"), color: "brand", swatch: "hatched" },
-                  { label: t("foodplan.target"), color: "muted", swatch: "line" },
-                ]}
-              />
+              {grown.length > 0 && (
+                <Legend
+                  items={[
+                    { label: t("metrics.actual"), color: "brand" },
+                    { label: t("metrics.forecast"), color: "brand", swatch: "hatched" },
+                    // The target tick is only drawn where a crop overshoots it.
+                    ...(targetTickShown ? [{ label: t("foodplan.target"), color: "muted" as const, swatch: "line" as const }] : []),
+                  ]}
+                />
+              )}
             </div>
             {grown.length > 0 && (
               <List label={t("foodplan.cropPlan")}>
@@ -163,7 +172,7 @@ export function FoodPlan() {
               </List>
             )}
             {unplanted.length > 0 && (
-              <details className="group rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
+              <details open={empty || undefined} className="group rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
                 <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 [&::-webkit-details-marker]:hidden">
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.unplantedTitle", { count: unplanted.length })}</span>
@@ -211,7 +220,7 @@ export function FoodPlan() {
                       key={ty}
                       leading={<IconTile icon={PRODUCT_ICON[ty]} />}
                       title={t(`livestock.products.${ty}`)}
-                      badges={need !== null && surplus > 0 ? <Badge tone="neutral">{t("foodplan.surplusBadge")}</Badge> : undefined}
+                      badges={need !== null && surplus > 0 ? <Badge tone="positive">{t("foodplan.surplusBadge")}</Badge> : undefined}
                       meta={need === null
                         ? t("sufficiency.nonFood")
                         : [t("foodplan.animalNeed", { amount: formatProductAmount(ty, need, f, t) }), surplus > 0 ? t("foodplan.animalSurplus", { amount: formatProductAmount(ty, surplus, f, t) }) : null]}
@@ -222,8 +231,7 @@ export function FoodPlan() {
               </List>
             </section>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

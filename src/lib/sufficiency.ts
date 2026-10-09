@@ -22,7 +22,10 @@ export interface PlantYieldEstimate {
 
 export interface MonthlyFood {
   month: number; // 0-11
+  /** Garden produce eaten fresh in its harvest months (preserved surplus excluded). */
   freshKg: number;
+  /** Eggs, honey, meat — kept apart so the garden kg match the yield forecast. */
+  animalKg: number;
   storedKg: number;
   totalKg: number;
   calories: number;
@@ -255,6 +258,7 @@ export function calculateSufficiency(
   // --- Monthly food availability ---
   const monthlyCalories = Array.from({ length: 12 }, () => 0);
   const monthlyKg = Array.from({ length: 12 }, () => 0);
+  const animalKg = Array.from({ length: 12 }, () => 0);
 
   // Distribute animal production across months
   // Eggs: year-round (all 12 months), honey: May-Sep, meat: spread across year
@@ -265,7 +269,7 @@ export function calculateSufficiency(
     const kgPerMonth = ay.quantityKg / months.length;
     const calPerMonth = ay.calories / months.length;
     for (const m of months) {
-      monthlyKg[m] += kgPerMonth;
+      animalKg[m] += kgPerMonth;
       monthlyCalories[m] += calPerMonth;
     }
   }
@@ -327,6 +331,12 @@ export function calculateSufficiency(
           storedCalories[m] += calPerStorageMonth;
           storedKg[m] += kgPerStorageMonth;
         }
+        // The preserved part is no longer eaten fresh: move it out of the
+        // harvest months, so no kilogram is counted twice.
+        for (const m of y.harvestMonths) {
+          monthlyKg[m] -= surplusKg / y.harvestMonths.length;
+          monthlyCalories[m] -= surplusCal / y.harvestMonths.length;
+        }
 
         storageRequirements.push({
           plantId: y.plantId,
@@ -345,9 +355,10 @@ export function calculateSufficiency(
     const storedCal = storedCalories[month];
     return {
       month,
-      freshKg: Math.round(monthlyKg[month] * 10) / 10,
+      freshKg: Math.round(Math.max(0, monthlyKg[month]) * 10) / 10,
+      animalKg: Math.round(animalKg[month] * 10) / 10,
       storedKg: Math.round(storedKg[month] * 10) / 10,
-      totalKg: Math.round((monthlyKg[month] + storedKg[month]) * 10) / 10,
+      totalKg: Math.round((Math.max(0, monthlyKg[month]) + animalKg[month] + storedKg[month]) * 10) / 10,
       calories: Math.round(freshCal + storedCal),
       caloriesNeeded: Math.round(monthlyCalNeed),
       coveragePercent: Math.min(100, Math.round(((freshCal + storedCal) / monthlyCalNeed) * 100)),

@@ -422,6 +422,18 @@ export function expectedShareToDate(type: ProductType, asOf: Date = new Date(), 
   return Math.min(1, covered / full);
 }
 
+/**
+ * Where "expected so far" starts for one animal group: when it arrived, or —
+ * if recording began later — the first entry logged for it. An animal kept
+ * since last year but recorded only from August must not look like it lays at
+ * a fifth of the usual rate.
+ */
+export function expectationStart(animal: { id: string; acquiredDate: string }, products: Pick<AnimalProduct, "animalId" | "date">[]): string {
+  let first: string | null = null;
+  for (const p of products) if (p.animalId === animal.id && (first === null || p.date < first)) first = p.date;
+  return first !== null && first > animal.acquiredDate ? first : animal.acquiredDate;
+}
+
 // ------------------------------------------------------------------ self-sufficiency
 
 export function annualCalorieNeed(householdSize: number): number {

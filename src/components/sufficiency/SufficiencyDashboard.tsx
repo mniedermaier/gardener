@@ -98,7 +98,7 @@ export function SufficiencyDashboard() {
           <EmptyState
             icon={Target}
             title={t("sufficiency.emptyTitle")}
-            description={t("sufficiency.emptyText")}
+            description={t("sufficiency.emptyText", { count: householdSize, kcal: f.formatNumber(DAILY_KCAL_PER_PERSON * householdSize, { maximumFractionDigits: 0 }) })}
             action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
             secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock")}>{t("sufficiency.toLivestock")}</Button>}
           />
@@ -110,6 +110,7 @@ export function SufficiencyDashboard() {
   const lowCount = result.lowMonths.length;
   const gap = result.winterGap;
   const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
+  const hasAnimals = result.monthlyFood.some((m) => m.animalKg > 0);
   // Small shares get a decimal, so "Soll bis heute" late in the year does not
   // read as the same 4 % as the annual forecast.
   const pct = (r: number) => f.formatPercent(r, r < 0.1 ? 1 : 0);
@@ -161,7 +162,7 @@ export function SufficiencyDashboard() {
               monthNames={monthLong}
               formatValue={(r) => f.formatPercent(Math.min(1, r))}
               current={currentMonth}
-              currentLabel={t("charts.now")}
+              currentLabel={t("charts.today")}
               caption={t("sufficiency.monthlyCaption")}
             />
             <div className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
@@ -183,11 +184,17 @@ export function SufficiencyDashboard() {
             <div className="mt-6">
               <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.monthlyKgTitle")}</h3>
               <BarChart
-                data={result.monthlyFood.map((m) => ({ key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month], values: hasStored ? [m.freshKg, m.storedKg] : [m.freshKg] }))}
+                // Garden (fresh + stored) and animal products stacked apart, so the
+                // garden kg match "Ertrag (Prognose)" and the herd is its own part.
+                data={result.monthlyFood.map((m) => ({
+                  key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month],
+                  values: [m.freshKg, ...(hasStored ? [m.storedKg] : []), ...(hasAnimals ? [m.animalKg] : [])],
+                }))}
                 series={[
                   { label: t("sufficiency.fresh"), color: "brand" },
                   // Legend only for a series that is actually drawn.
-                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "earth" as const, hatched: true }] : []),
+                  ...(hasStored ? [{ label: t("sufficiency.stored"), color: "brand" as const, hatched: true }] : []),
+                  ...(hasAnimals ? [{ label: t("metrics.fromAnimals"), color: "earth" as const }] : []),
                 ]}
                 formatValue={(v) => f.formatWeight(v * 1000)}
                 formatTick={(v) => (v === 0 ? "0" : f.formatWeight(v * 1000))}
@@ -358,9 +365,10 @@ function Composition() {
   return (
     <Card>
       <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/15" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, digits), animals: f.formatPercent(animals, digits) })}>
-        <span className="h-full bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />
-        <span className="h-full bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/20" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, digits), animals: f.formatPercent(animals, digits) })}>
+        {/* min-w: a share under 1 % still shows as a sliver next to its legend swatch. */}
+        {garden > 0 && <span className="h-full min-w-1 bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />}
+        {animals > 0 && <span className="h-full min-w-1 bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />}
       </div>
       <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
         <div>
@@ -372,7 +380,7 @@ function Composition() {
           <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, digits)}</dd>
         </div>
         <div>
-          <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-gray-200 dark:bg-white/15" />{t("metrics.notCovered")}</dt>
+          <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-gray-200 ring-1 ring-gray-300 ring-inset dark:bg-white/20 dark:ring-white/25" />{t("metrics.notCovered")}</dt>
           <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(open, digits)}</dd>
         </div>
       </dl>

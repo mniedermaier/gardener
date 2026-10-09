@@ -27,8 +27,10 @@ interface MeterProps {
 export const Meter = memo(function Meter({ actual, forecast, max, target, label, color = "brand", size = 8, className = "" }: MeterProps) {
   const pid = useId();
   const pct = (v: number | undefined) => (v === undefined || !(max > 0) ? 0 : Math.max(0, Math.min(100, (v / max) * 100)));
-  const a = pct(actual);
-  const f = pct(forecast);
+  // A non-zero value never shrinks below a sliver (~2 %), or 0,4 of 6 kg would vanish.
+  const sliver = (p: number) => (p > 0 ? Math.max(p, 2) : 0);
+  const a = sliver(pct(actual));
+  const f = sliver(pct(forecast));
   const t = target !== undefined ? pct(target) : null;
   return (
     <div

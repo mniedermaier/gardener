@@ -65,6 +65,23 @@ describe("Sufficiency calculator", () => {
     expect(result.nutrition.protein.percent).toBeGreaterThanOrEqual(0);
   });
 
+  it("monthly kg add up to the garden forecast: preserved surplus is not also counted fresh", () => {
+    const bigGarden: Garden = {
+      ...garden,
+      beds: [{ ...garden.beds[0], width: 20, height: 20, cells: Array.from({ length: 200 }, (_, i) => ({ cellX: i % 20, cellY: Math.floor(i / 20), plantId: "tomato" })) }],
+    };
+    // A very productive tomato, so the harvest exceeds fresh eating and a surplus is preserved.
+    const heavy: Plant = { ...tomato, expectedYieldKgPerM2: 200, caloriesPer100g: 300 };
+    const result = calculateSufficiency([bigGarden], [heavy, bean], 1, 30);
+    const gardenKg = result.plantYields.reduce((s, y) => s + y.estimatedKg, 0);
+    const fresh = result.monthlyFood.reduce((s, m) => s + m.freshKg, 0);
+    const stored = result.monthlyFood.reduce((s, m) => s + m.storedKg, 0);
+    expect(stored).toBeGreaterThan(0);
+    // Stored food loses weight in preservation, so fresh + stored stays at or below the harvest.
+    expect(fresh + stored).toBeLessThanOrEqual(gardenKg + 0.5);
+    expect(result.monthlyFood.every((m) => m.animalKg === 0)).toBe(true);
+  });
+
   it("should have higher coverage for smaller families", () => {
     // Use a bigger garden so we get non-zero percentages
     const bigGarden: Garden = {
