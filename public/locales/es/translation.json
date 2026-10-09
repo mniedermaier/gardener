@@ -837,7 +837,9 @@
       "sowNow": "Siembra ahora, hasta el {{date}}",
       "nextSowing": "Próxima siembra desde el {{date}}",
       "hatchLegend": "Rayado: bajo cubierta",
-      "bedFirstHint": "Crea un bancal y podrás planificar {{plant}} enseguida."
+      "bedFirstHint": "Crea un bancal y podrás planificar {{plant}} enseguida.",
+      "sowNoteBedFirst": "{{note}} – crea un bancal antes",
+      "yieldPerPlant": "≈ {{value}} por planta"
     },
     "sowNowFilter": "Sembrar ahora"
   },
@@ -1259,7 +1261,7 @@
   },
   "journal": {
     "title": "Diario",
-    "add": "Añadir entrada",
+    "add": "Registrar entrada",
     "entryTitle": "Título",
     "text": "¿Qué pasó hoy en el huerto?",
     "tags": "Etiquetas",
@@ -1381,7 +1383,6 @@
     "unitLabel": "Unidad",
     "unitLabelPlaceholder": "p. ej. cubos",
     "storedDate": "Guardado el",
-    "supplyCostHint": "Tarros, tapas, bolsas. Cuenta en el balance de Costes.",
     "withinDays_many": "en los próximos {{count}} días",
     "daysLeft_many": "quedan {{count}} días",
     "monthsCount_many": "{{count}} meses",
@@ -1568,7 +1569,6 @@
     "active": "Activos",
     "resolvedLabel": "Resueltos",
     "name": "Nombre",
-    "namePlaceholder": "ej. Pulgones, Tizon del tomate, Oidio…",
     "severity": "Gravedad",
     "description": "Descripción",
     "organicOnly": "Tratamiento ecológico",
@@ -1601,7 +1601,11 @@
     "treatmentOrganic": "Tratamiento (ecológico)",
     "descriptionPlaceholder": "p. ej. hojas enrolladas, envés pegajoso…",
     "treatmentPlaceholder": "p. ej. lavado con agua, purín de ortiga…",
-    "kindLabel": "Tipo"
+    "kindLabel": "Tipo",
+    "namePlaceholders": {
+      "pest": "ej. Pulgones, babosas…",
+      "disease": "ej. Oídio, mildiu…"
+    }
   },
   "livestock": {
     "title": "Animales",
@@ -1865,16 +1869,17 @@
     "monthAvgLabel": "Media mensual",
     "bestMonth": "Mejor mes",
     "healthDescPlaceholders": {
-      "vaccination": "p. ej. Newcastle (ND), en el agua",
-      "deworming": "p. ej. Flubenvet, 7 días",
-      "illness": "p. ej. resfriado, diarrea",
+      "vaccination": "p. ej. Newcastle (ND), en el agua…",
+      "deworming": "p. ej. Flubenvet, 7 días…",
+      "illness": "p. ej. resfriado, diarrea…",
       "injury": "p. ej. picotazo en la cresta",
-      "checkup": "p. ej. plumaje, heces, peso",
+      "checkup": "p. ej. plumaje, heces, peso…",
       "treatment": "p. ej. antiácaros",
-      "death": "p. ej. zorro, vejez",
+      "death": "p. ej. zorro, vejez…",
       "other": "p. ej. recorte de pezuñas"
     },
-    "ofExpectedSince": "de ~{{amount}} esperados desde el {{date}}"
+    "ofExpectedSince": "de ~{{amount}} esperados desde el {{date}}",
+    "quantityIn": "Cantidad ({{unit}})"
   },
   "seeds": {
     "title": "Semillas",
@@ -2455,7 +2460,7 @@
     "title": "Añadir rápido",
     "harvest": "Registrar cosecha",
     "task": "Añadir tarea",
-    "journal": "Añadir entrada al diario",
+    "journal": "Registrar entrada en el diario",
     "harvestHint": "Qué, cuánto y de qué bancal",
     "taskHint": "Un recordatorio con fecha",
     "journalHint": "Observación, nota o foto",

@@ -534,8 +534,9 @@ export function PantryPage() {
               )}
             </div>
           )}
+          <Input label={t("pantry.supplyCost")} optional inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("common.costHint")} error={errors.cost} />
+          {/* Rule 9: amounts and costs, then the date, then the free text. */}
           <DateField label={t("pantry.storedDate")} value={draft.date} onChange={(date) => patch({ date })} />
-          <Input label={t("pantry.supplyCost")} optional inputMode="decimal" value={draft.supplyCost} onChange={(e) => patch({ supplyCost: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} hint={t("pantry.supplyCostHint")} error={errors.cost} />
           <Textarea label={t("harvest.notes")} optional placeholder={t("pantry.notesPlaceholder")} rows={2} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} />
         </div>
       </Modal>

@@ -813,7 +813,9 @@
       "sowNow": "Sow now, until {{date}}",
       "nextSowing": "Next sowing from {{date}}",
       "hatchLegend": "Hatched: under glass",
-      "bedFirstHint": "Add a bed, then you can place {{plant}} right away."
+      "bedFirstHint": "Add a bed, then you can place {{plant}} right away.",
+      "sowNoteBedFirst": "{{note}} – add a bed before then",
+      "yieldPerPlant": "≈ {{value}} per plant"
     },
     "sowNowFilter": "Sow now"
   },
@@ -1214,7 +1216,7 @@
   },
   "journal": {
     "title": "Journal",
-    "add": "Add entry",
+    "add": "Log entry",
     "entryTitle": "Title",
     "text": "What happened in the garden today?",
     "tags": "Tags",
@@ -1335,7 +1337,6 @@
     "unitLabel": "Unit",
     "unitLabelPlaceholder": "e.g. buckets",
     "storedDate": "Stored on",
-    "supplyCostHint": "Jars, lids, bags. Counts towards the balance under Costs.",
     "unitOther": "Other …",
     "unitOtherLabel": "Custom unit",
     "unitNames": {
@@ -1500,7 +1501,6 @@
     "active": "Active",
     "resolvedLabel": "Resolved",
     "name": "Name",
-    "namePlaceholder": "e.g. Aphids, Tomato blight, Powdery mildew…",
     "severity": "Severity",
     "description": "Description",
     "organicOnly": "Treated organically",
@@ -1533,7 +1533,11 @@
     "treatmentOrganic": "Treatment (organic)",
     "descriptionPlaceholder": "e.g. leaves curling, sticky undersides…",
     "treatmentPlaceholder": "e.g. hosed off, nettle tea…",
-    "kindLabel": "Type"
+    "kindLabel": "Type",
+    "namePlaceholders": {
+      "pest": "e.g. Aphids, slugs…",
+      "disease": "e.g. Powdery mildew, blight…"
+    }
   },
   "livestock": {
     "title": "Animals",
@@ -1781,16 +1785,17 @@
     "monthAvgLabel": "Avg. per month",
     "bestMonth": "Best month",
     "healthDescPlaceholders": {
-      "vaccination": "e.g. Newcastle (ND), drinking water",
-      "deworming": "e.g. Flubenvet, 7 days",
-      "illness": "e.g. cold, diarrhoea",
+      "vaccination": "e.g. Newcastle (ND), drinking water…",
+      "deworming": "e.g. Flubenvet, 7 days…",
+      "illness": "e.g. cold, diarrhoea…",
       "injury": "e.g. peck wound on comb",
-      "checkup": "e.g. feathers, droppings, weight",
+      "checkup": "e.g. feathers, droppings, weight…",
       "treatment": "e.g. mite treatment",
-      "death": "e.g. fox, old age",
+      "death": "e.g. fox, old age…",
       "other": "e.g. hoof trimming"
     },
-    "ofExpectedSince": "of ~{{amount}} expected since {{date}}"
+    "ofExpectedSince": "of ~{{amount}} expected since {{date}}",
+    "quantityIn": "Quantity ({{unit}})"
   },
   "seeds": {
     "title": "Seeds",
@@ -2347,7 +2352,7 @@
     "title": "Quick add",
     "harvest": "Log harvest",
     "task": "Add task",
-    "journal": "Add journal entry",
+    "journal": "Log journal entry",
     "harvestHint": "What, how much, from which bed",
     "taskHint": "A reminder with a due date",
     "journalHint": "Observation, note or photo",
