@@ -1709,8 +1709,7 @@
       "yearHint": "attendus ~{{amount}} (à ce jour)",
       "emptyTitle": "Œufs et miel en un coup d’œil",
       "entries": "Saisies",
-      "notesPlaceholder": "p. ex. météo, pause de ponte…",
-      "yearHintSince": "~{{amount}} attendus depuis la première saisie le {{date}}"
+      "notesPlaceholder": "p. ex. météo, pause de ponte…"
     },
     "feed": {
       "title": "Alimentation",

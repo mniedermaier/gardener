@@ -1636,8 +1636,7 @@
       "yearHint": "erwartet ~{{amount}} (bis heute)",
       "emptyTitle": "Eier und Honig im Blick",
       "entries": "Einträge",
-      "notesPlaceholder": "z. B. Wetter, Legepause …",
-      "yearHintSince": "erwartet ~{{amount}} ab erstem Eintrag am {{date}}"
+      "notesPlaceholder": "z. B. Wetter, Legepause …"
     },
     "feed": {
       "title": "Futter",

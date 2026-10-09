@@ -1709,8 +1709,7 @@
       "yearHint": "esperados ~{{amount}} (hasta hoy)",
       "emptyTitle": "Huevos y miel bajo control",
       "entries": "Registros",
-      "notesPlaceholder": "p. ej. tiempo, pausa de puesta…",
-      "yearHintSince": "~{{amount}} previstos desde el primer registro el {{date}}"
+      "notesPlaceholder": "p. ej. tiempo, pausa de puesta…"
     },
     "feed": {
       "title": "Alimento",

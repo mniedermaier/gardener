@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getDaysInMonth } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Apple, Beef, Citrus, Lightbulb, Sprout, Target, Wheat, Archive, Plus } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
@@ -123,7 +124,10 @@ export function SufficiencyDashboard() {
   const lowCount = result.lowMonths.length;
   const gap = result.winterGap;
   const hasStored = result.monthlyFood.some((m) => m.storedKg > 0);
-  const hasForecast = result.monthlyFood.some((m) => m.month > currentMonth && m.freshKg > 0);
+  // The running month: logged so far plus the forecast for the days still ahead.
+  const restOfMonth = 1 - (now.getDate() - 1) / getDaysInMonth(now);
+  const ahead = (m: { month: number }, kg: number) => (m.month > currentMonth ? kg : m.month === currentMonth ? kg * restOfMonth : 0);
+  const hasForecast = result.monthlyFood.some((m) => m.month >= currentMonth && m.freshKg > 0);
   const hasAnimals = result.monthlyFood.some((m) => m.animalKg > 0);
   // Small shares get a decimal, so "erwartet bis heute" late in the year does not
   // read as the same 4 % as the annual forecast.
@@ -210,20 +214,20 @@ export function SufficiencyDashboard() {
           <Card>
             <CardHeader title={t("sufficiency.seasonKgTitle", { year: now.getFullYear() })} description={t("sufficiency.seasonKgDesc")} />
               <BarChart
-                // Garden: logged harvest up to this month (solid), forecast after it
-                // (hatched) — past months match the harvest log. Stored food and
+                // Garden: logged harvest up to today (solid), forecast for the rest of
+                // this month and after it (hatched) — past months match the harvest log. Stored food and
                 // animal products are their own parts.
                 data={result.monthlyFood.map((m) => ({
                   key: String(m.month), label: monthShort[m.month], fullLabel: monthLong[m.month],
                   values: [
                     m.month <= currentMonth ? logged[m.month] : 0,
-                    ...(hasForecast ? [m.month > currentMonth ? m.freshKg : 0] : []),
+                    ...(hasForecast ? [ahead(m, m.freshKg)] : []),
                     // Series order brand → earth → sky (DESIGN_SYSTEM charts). Stored food
                     // and animal products are forecasts: drawn from this month on only, so
                     // past months show exactly what was logged.
                     // Animal products: recorded up to this month (solid), forecast after (hatched).
                     ...(hasAnimals || hasLoggedAnimal ? [m.month <= currentMonth ? loggedAnimal[m.month] : 0] : []),
-                    ...(hasAnimals ? [m.month > currentMonth ? m.animalKg : 0] : []),
+                    ...(hasAnimals ? [ahead(m, m.animalKg)] : []),
                     // Stored food is a forecast from this month on: hatched.
                     ...(hasStored ? [m.month >= currentMonth ? m.storedKg : 0] : []),
                   ],

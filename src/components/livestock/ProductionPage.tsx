@@ -89,7 +89,7 @@ export function ProductionPage() {
         icon: PRODUCT_ICON[heroType],
         hint: heroExpected > 0
           ? (heroBasis
-            ? t("livestock.production.yearHintSince", { amount: heroAmount, date: f.formatDate(heroBasis, "short") })
+            ? t("livestock.ofExpectedSince", { amount: heroAmount, date: f.formatDate(heroBasis, "dayMonth") })
             : t("livestock.production.yearHint", { amount: heroAmount }))
           : undefined,
       }

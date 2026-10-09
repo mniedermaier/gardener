@@ -1636,8 +1636,7 @@
       "yearHint": "expected ~{{amount}} (to date)",
       "emptyTitle": "Keep track of eggs and honey",
       "entries": "Entries",
-      "notesPlaceholder": "e.g. weather, laying break…",
-      "yearHintSince": "~{{amount}} expected since the first entry on {{date}}"
+      "notesPlaceholder": "e.g. weather, laying break…"
     },
     "feed": {
       "title": "Feed",

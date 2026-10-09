@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/Button";
 import { List, ListRow } from "@/components/ui/List";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
-import { PHASES, getPhaseWindows, seasonFrost, type Phase } from "@/lib/season";
+import { PHASES, getPhaseWindows, plantedHarvestWindow, seasonFrost, type Phase } from "@/lib/season";
 import { PhaseBadge, PhaseLegend, phaseFill } from "@/components/ui/phase";
 import { PlantableNowRows, useVisibleAgendaRows } from "./PlantableNowList";
 import { useSowingAgenda } from "@/hooks/useSowingAgenda";
@@ -91,6 +91,11 @@ export function SeasonTimeline() {
           if (!plant) continue;
           const phases: PlantTimeline["phases"] = {};
           for (const w of getPhaseWindows(plant, frostDate, { frostProtectionWeeks: protection })) phases[w.phase] = { start: w.start, end: w.end };
+          // Planted this season: the harvest bar follows the real planting dates
+          // (as the bed list and the harvest log do), not the frost-date estimate.
+          const year = frostDate.getFullYear();
+          const planted = plantedHarvestWindow(plant, bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!));
+          if (planted) phases.harvest = planted;
           const autumn = autumnPhaseWindows(plantId, frostDate.getFullYear(), protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
           result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn });
         }

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import plantsData from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
 import type { Bed, Garden } from "@/types/garden";
-import { getPhaseWindows, getHarvestReady, seasonFrost, suitsEnvironment } from "@/lib/season";
+import { getPhaseWindows, getHarvestReady, plantedHarvestWindow, seasonFrost, suitsEnvironment } from "@/lib/season";
 import { agendaRowsByPlant, getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda, groupAgendaBedsByDate } from "@/lib/advisor";
 import { recommendBedPlanting } from "@/lib/bedRecommendation";
 import { groupTasksByDue, nextDue, taskGroup } from "@/lib/tasks";
@@ -286,5 +286,17 @@ describe("autumn harvest window", () => {
     const { autumnPhaseWindows } = await import("@/lib/advisor");
     expect(autumnPhaseWindows("lambs_lettuce", 2026, 0).some((w) => w.phase === "harvest")).toBe(false);
     expect(autumnPhaseWindows("garlic", 2026, 0, "outdoor_bed", { harvestDaysMin: 240, harvestDaysMax: 270 }).some((w) => w.phase === "harvest")).toBe(false);
+  });
+});
+
+describe("plantedHarvestWindow", () => {
+  const carrot = (plantsData as Plant[]).find((p) => p.id === "carrot")!;
+  it("runs from the earliest planting + min days to the latest + max days", () => {
+    const w = plantedHarvestWindow(carrot, ["2026-07-20", "2026-07-10"]);
+    expect([w?.start.getMonth(), w?.start.getDate()]).toEqual([8, 8]); // 10 Jul + 60 days = 8 Sep
+    expect(w?.end.getMonth()).toBe(9); // 20 Jul + 80 days = 8 Oct
+  });
+  it("is null without planting dates", () => {
+    expect(plantedHarvestWindow(carrot, [])).toBeNull();
   });
 });

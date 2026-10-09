@@ -121,6 +121,18 @@ export interface HarvestReadyItem {
 }
 
 /**
+ * Harvest window from real planting dates: earliest planting + min days to
+ * the latest + max days. Null without dates or for perennials — callers then
+ * fall back to the season windows from the frost date.
+ */
+export function plantedHarvestWindow(plant: Plant, plantedDates: string[]): { start: Date; end: Date } | null {
+  if (plant.harvestDaysMax >= 365) return null;
+  const times = plantedDates.flatMap((d) => toDate(d)?.getTime() ?? []);
+  if (times.length === 0) return null;
+  return { start: addDays(Math.min(...times), plant.harvestDaysMin), end: addDays(Math.max(...times), plant.harvestDaysMax) };
+}
+
+/**
  * Plantings whose harvest window (planting date + days to maturity) is open
  * on `now`, grouped per bed and crop. Continuous croppers stay open until the
  * autumn frost, shifted by the bed's frost protection. Only cells with a
