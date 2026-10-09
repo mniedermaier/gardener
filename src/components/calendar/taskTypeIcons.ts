@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { House, Sprout, Shovel, Droplets, Apple, Leaf, Eye, CookingPot, TestTube, ClipboardList } from "lucide-react";
+import { House, Sprout, Shovel, Droplets, Apple, Leaf, Eye, CookingPot, FlaskConical, ClipboardList } from "lucide-react";
 import type { TaskType } from "@/types/task";
 
 export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
@@ -12,6 +12,7 @@ export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
   // An eye, not a magnifier: in a row the magnifier reads as a search button.
   scout: Eye,
   preserve: CookingPot,
-  soil_test: TestTube,
+  // A flask (as on the soil page): the slim test tube reads as "!" at 16 px.
+  soil_test: FlaskConical,
   custom: ClipboardList,
 };

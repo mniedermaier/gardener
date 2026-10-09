@@ -1575,7 +1575,8 @@
       "subtitle": "Eier, Honig und andere Erträge deiner Tiere.",
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Eier, Honig oder Milch und siehst Wochensummen und Verlauf.",
       "yearHint": "~{{amount}} bis heute erwartet",
-      "emptyTitle": "Eier und Honig im Blick"
+      "emptyTitle": "Eier und Honig im Blick",
+      "entries": "Einträge"
     },
     "feed": {
       "title": "Futter",
@@ -1760,7 +1761,9 @@
     "costPerUnit": "Kosten je Einheit",
     "noEggsToday": "Heute noch keine Eier erfasst",
     "addYield": "Ertrag erfassen",
-    "notesPlaceholder": "z. B. Verhalten, Futtermarke …"
+    "notesPlaceholder": "z. B. Verhalten, Futtermarke …",
+    "monthValues": "Monatswerte",
+    "monthAvg": "Ø {{amount}} pro Monat mit Einträgen"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1875,7 +1878,7 @@
     "phAdvice": {
       "limeStrong": "Deutlich unter dem Zielbereich (pH {{range}}). Kohlensauren Kalk oder Algenkalk ausbringen, am besten im Herbst, und nach einem Jahr neu messen.",
       "limeLight": "Etwas unter dem Zielbereich (pH {{range}}). Eine kleine Gabe Algenkalk genügt – nicht überkalken.",
-      "optimal": "Im Zielbereich der Kulturen (pH {{range}}). Weder Kalk noch Schwefel nötig – maßvoll Kompost geben (2–3 l pro m² und Jahr).",
+      "optimal": "Im Zielbereich der Kulturen (pH {{range}}). Weder Kalk noch Schwefel nötig – für den pH ist nichts zu tun.",
       "noLime": "Etwas über dem Zielbereich (pH {{range}}). Nicht kalken und keine Holzasche. Laub- oder Rindenkompost und Nadelstreu senken den pH langsam; normaler Gartenkompost ist eher neutral bis basisch, also sparsam einsetzen. Schwefel ist nicht nötig.",
       "sulfur": "Deutlich über dem Zielbereich (pH {{range}}). Elementaren Schwefel in kleinen Gaben einarbeiten, keinen Kalk und keine Holzasche ausbringen.",
       "limeVeto": "Nicht kalken: Für {{crops}} passt pH {{ph}} (Ziel {{range}}). {{reason}} Die übrigen Kulturen im Beet kommen damit zurecht; Kalk erst nach der Ernte für die Folgekultur.",

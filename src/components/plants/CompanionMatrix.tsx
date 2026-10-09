@@ -11,6 +11,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Badge } from "@/components/ui/Badge";
 import { List, ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlants } from "@/hooks/usePlants";
@@ -55,10 +56,10 @@ function RelationMark({ relation, size = 14 }: { relation: Exclude<Relation, nul
   );
 }
 
-function Legend() {
+function Legend({ vertical = false }: { vertical?: boolean }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600 dark:text-gray-300">
+    <div className={`flex text-sm text-gray-600 dark:text-gray-300 ${vertical ? "flex-col gap-2.5" : "flex-wrap items-center gap-x-5 gap-y-2"}`}>
       <span className="inline-flex items-center gap-2"><RelationMark relation="good" />{t("companions.companionsLabel")}</span>
       <span className="inline-flex items-center gap-2"><RelationMark relation="bad" />{t("companions.antagonistsLabel")}</span>
       <span className="inline-flex items-center gap-2">
@@ -149,6 +150,7 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hiddenRight, setHiddenRight] = useState(false);
   const [hiddenLeft, setHiddenLeft] = useState(false);
+  const [hiddenBottom, setHiddenBottom] = useState(false);
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollRef.current;
     el?.scrollBy({ left: dir * Math.max(200, el.clientWidth * 0.6), behavior: "smooth" });
@@ -159,6 +161,7 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
     const measure = () => {
       setHiddenRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
       setHiddenLeft(el.scrollLeft > 2);
+      setHiddenBottom(el.scrollTop + el.clientHeight < el.scrollHeight - 2);
     };
     measure();
     el.addEventListener("scroll", measure, { passive: true });
@@ -172,10 +175,16 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
     };
   }, []);
   return (
-    // w-fit: a small matrix ("Im Garten") hugs its table instead of leaving an empty strip.
-    <Card padding="none" className="relative w-fit max-w-full overflow-hidden">
+    // The card hugs its table (a small "Im Garten" matrix leaves no empty strip)
+    // and shrinks for a wide one; the legend and scroll controls sit beside it,
+    // in the room a narrow matrix leaves — always in view, never under the fold.
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <Card padding="none" className="relative min-w-0 max-w-full overflow-hidden">
       {hiddenRight && (
-        <div className="pointer-events-none absolute top-0 right-0 bottom-14 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+        <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+      )}
+      {hiddenBottom && (
+        <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-40 h-12 bg-gradient-to-t from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
       )}
       <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
         <table className="border-separate border-spacing-0">
@@ -220,18 +229,20 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
           </tbody>
         </table>
       </div>
-      {/* Footer: the legend explains the marks right under them; scroll controls only while columns are hidden. */}
-      <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-gray-100 px-3 py-2 dark:border-white/10">
-        <Legend />
-        {(hiddenRight || hiddenLeft) && (
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <span className="mr-1">{t("companions.scrollForMore", { count: plants.length })}</span>
+    </Card>
+    <aside className="shrink-0 space-y-4 lg:sticky lg:top-4 lg:w-52">
+      <Legend vertical />
+      {(hiddenRight || hiddenLeft) && (
+        <div className="space-y-2 border-t border-gray-200 pt-3 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
+          <p>{t("companions.scrollForMore", { count: plants.length })}</p>
+          <div className="flex items-center gap-2">
             <IconButton icon={ChevronLeft} label={t("companions.scrollLeft")} onClick={() => scrollBy(-1)} disabled={!hiddenLeft} />
             <IconButton icon={ChevronRight} label={t("companions.scrollRight")} onClick={() => scrollBy(1)} disabled={!hiddenRight} />
           </div>
-        )}
-      </div>
-    </Card>
+        </div>
+      )}
+    </aside>
+    </div>
   );
 }
 
@@ -241,9 +252,11 @@ const DEFAULT_PLANT = "tomato";
 /** Quick picks above the full list: the crops people look up most. */
 const QUICK_PICKS = ["tomato", "potato", "carrot", "lettuce", "bean", "zucchini"];
 
-function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
+function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPlant }: {
   plants: Plant[];
   names: Map<string, string>;
+  /** Bed names per planted crop: partners already in the garden say where. */
+  bedsByPlant: Map<string, string[]>;
   relation: (a: string, b: string) => Relation;
   selectedId: string;
   onSelect: (id: string) => void;
@@ -284,7 +297,9 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
             key={p.id}
             leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={26} />}
             title={names.get(p.id)}
-            meta={t(`plants.category.${p.category}`)}
+            // Garden context beats the category: a good partner already in a bed is the actionable one.
+            badges={bedsByPlant.has(p.id) ? <Badge tone="brand" size="sm">{t("plants.inGarden")}</Badge> : undefined}
+            meta={bedsByPlant.get(p.id) ?? [t(`plants.category.${p.category}`)]}
             onClick={() => onSelect(p.id)}
           />
         ))
@@ -295,12 +310,21 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
   return (
     <div className="space-y-4">
       <Card padding="sm">
-        <Select
-          label={t("companions.choosePlant")}
-          value={selected.id}
-          onChange={(e) => onSelect(e.target.value)}
-          options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
-        />
+        {/* The counts stand in the list headers below; the select row only picks and links. */}
+        <div className="flex items-end gap-3">
+          <Select
+            wrapperClassName="min-w-0 flex-1"
+            label={t("companions.choosePlant")}
+            value={selected.id}
+            onChange={(e) => onSelect(e.target.value)}
+            options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
+          />
+          <Button variant="ghost" size="sm" className="mb-0.5 shrink-0" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
+            {t("companions.openDetails")}
+            <ChevronRight size={16} aria-hidden="true" />
+          </Button>
+        </div>
+        {/* Quick picks: square-cornered outline chips, so they never look like the section-tab pills. */}
         <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
           {QUICK_PICKS.filter((id) => names.has(id)).map((id) => {
             const active = id === selected.id;
@@ -310,34 +334,17 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
                 type="button"
                 aria-pressed={active}
                 onClick={() => onSelect(id)}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-9 ${
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition-colors sm:min-h-8 ${
                   active
-                    ? "border-garden-600 bg-garden-50 text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
-                    : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                    ? "border-garden-600 text-garden-800 dark:border-garden-400 dark:text-garden-200"
+                    : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
                 }`}
               >
-                <PlantIconDisplay plantId={id} emoji="" size={18} />
+                <PlantIconDisplay plantId={id} emoji="" size={16} />
                 {names.get(id)}
               </button>
             );
           })}
-        </div>
-        {/* The name is already in the select: only the counts and the way to the details. */}
-        <div className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-3 sm:flex-row sm:items-center sm:gap-3 dark:border-white/10">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
-              <PlantIconDisplay plantId={selected.id} emoji={selected.icon} size={26} />
-            </span>
-            {/* Two parts that wrap whole, without a separator that could dangle at a line end. */}
-            <p className="flex min-w-0 flex-1 flex-wrap gap-x-3 text-sm text-gray-600 dark:text-gray-300">
-              <span className="whitespace-nowrap">{t("companions.goodCount", { count: good.length })}</span>
-              <span className="whitespace-nowrap">{t("companions.badCount", { count: bad.length })}</span>
-            </p>
-          </div>
-          <Button variant="ghost" size="sm" className="self-start sm:self-auto" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
-            {t("companions.openDetails")}
-            <ChevronRight size={16} aria-hidden="true" />
-          </Button>
         </div>
       </Card>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -377,11 +384,18 @@ export function CompanionMatrix() {
   // Crops standing in any bed. With a few of them, "Im Garten" is the useful
   // default: 20 × 20 fits a wide screen, 47 × 47 never does.
   const { gardens } = useStore(useShallow((s) => ({ gardens: s.gardens })));
-  const plantedIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) if (c.plantId) ids.add(c.plantId);
-    return ids;
+  // Which beds each crop stands in: the scope filter and the partner rows' garden context.
+  const bedsByPlant = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) {
+      if (!c.plantId) continue;
+      const list = map.get(c.plantId) ?? [];
+      if (!list.includes(b.name)) list.push(b.name);
+      map.set(c.plantId, list);
+    }
+    return map;
   }, [gardens]);
+  const plantedIds = useMemo(() => new Set(bedsByPlant.keys()), [bedsByPlant]);
   const canScope = plantedIds.size >= 2;
   const [scopeChoice, setScope] = useState<Scope | null>(null);
   const scope: Scope = scopeChoice ?? (canScope ? "garden" : "all");
@@ -479,6 +493,7 @@ export function CompanionMatrix() {
           // Tomato, not the alphabetical first (Aubergine): the crop most people look up first.
           selectedId={focusId ?? (names.has(DEFAULT_PLANT) ? DEFAULT_PLANT : sorted[0]?.id ?? "")}
           onSelect={(id) => { setFocus(id); document.querySelector("main")?.scrollTo({ top: 0 }); }}
+          bedsByPlant={bedsByPlant}
         />
       )}
     </div>

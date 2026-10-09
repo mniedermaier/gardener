@@ -8,7 +8,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useScrollFade } from "@/components/ui/useScrollFade";
+import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/cn";
 import type { PlantableNow } from "@/lib/advisor";
 import type { Plant } from "@/types/plant";
@@ -74,7 +74,13 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("recommended");
-  const { ref: filterRef, fadeClass: filterFade } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', category);
+  const categoryOptions: { value: Category; label: string }[] = [
+    { value: "recommended", label: t("palette.now") },
+    { value: "all", label: t("common.all") },
+    { value: "vegetable", label: t("plants.category.vegetable") },
+    { value: "herb", label: t("plants.category.herb") },
+    { value: "fruit", label: t("plants.category.berry") },
+  ];
 
   // Debounce the filter (200 ms) so typing stays smooth with many items.
   useEffect(() => {
@@ -128,22 +134,18 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
         />
       </div>
 
-      {/* Spans the search field's width; in a narrow side pane it scrolls with a faded edge instead of clipping "Beeren". */}
-      <div ref={filterRef} className={`mb-3 overflow-x-auto [scrollbar-width:none] ${filterFade}`}>
-        <SegmentedControl
-          size="sm"
-          fullWidth
-          className="min-w-max"
-          label={t("palette.filter")}
+      {/* A container query decides, not the viewport: in a narrow side pane five
+          segments would clip ("Beeren"), so the same choice becomes a select there. */}
+      <div className="@container mb-3">
+        <div className="hidden @[22rem]:block">
+          <SegmentedControl size="sm" fullWidth label={t("palette.filter")} value={category} onChange={setCategory} options={categoryOptions} />
+        </div>
+        <Select
+          wrapperClassName="@[22rem]:hidden"
+          aria-label={t("palette.filter")}
           value={category}
-          onChange={setCategory}
-          options={[
-            { value: "recommended", label: t("palette.now") },
-            { value: "all", label: t("common.all") },
-            { value: "vegetable", label: t("plants.category.vegetable") },
-            { value: "herb", label: t("plants.category.herb") },
-            { value: "fruit", label: t("plants.category.berry") },
-          ]}
+          onChange={(e) => setCategory(e.target.value as Category)}
+          options={categoryOptions.map((o) => ({ value: o.value, label: o.label }))}
         />
       </div>
 

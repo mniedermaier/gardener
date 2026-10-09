@@ -1,4 +1,4 @@
-import { memo, useMemo, type CSSProperties, type ReactNode } from "react";
+import { memo, useMemo, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { ArrowLeft, Copy, Eraser, Footprints, Pencil, Trash2, Wand2, ZoomIn, ZoomOut, Check, MousePointerClick, ShieldCheck, TriangleAlert } from "lucide-react";
 import type { Bed } from "@/types/garden";
@@ -18,6 +18,13 @@ import { BedStats } from "./BedStats";
 import { BedCropList } from "./BedCropList";
 import { GuildPicker } from "./GuildPicker";
 import { usePointerFine } from "./usePointerFine";
+
+const SM_QUERY = "(min-width: 640px)";
+const subscribeSm = (cb: () => void) => {
+  const mq = window.matchMedia(SM_QUERY);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
 
 interface Props {
   gardenId: string;
@@ -69,6 +76,8 @@ export const BedEditor = memo(function BedEditor(props: Props) {
   } = props;
   const { t } = useTranslation();
   const fine = usePointerFine();
+  // From sm on the zoom buttons sit in the header; on phones they move into the bed menu.
+  const wide = useSyncExternalStore(subscribeSm, () => window.matchMedia(SM_QUERY).matches, () => true);
   const { formatNumber, formatPercent } = useFormat();
   const getPlantName = usePlantName();
   const envType = bed.environmentType ?? "outdoor_bed";
@@ -108,13 +117,19 @@ export const BedEditor = memo(function BedEditor(props: Props) {
           </p>
         </div>
         {frostWeeks > 0 && <span className="hidden sm:contents"><Badge tone="info" icon={ShieldCheck}>{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge></span>}
+        {/* Phones: zoom lives in the menu, so the bed name and its meta line get the width. */}
         <div className="-mr-1 flex shrink-0 items-center sm:mr-0 sm:gap-0.5">
-          <IconButton icon={ZoomOut} label={t("planner.zoomOut")} onClick={() => onZoom(Math.max(0.6, Math.round((zoom - 0.2) * 10) / 10))} disabled={zoom <= 0.6} />
+          <IconButton className="max-sm:hidden" icon={ZoomOut} label={t("planner.zoomOut")} onClick={() => onZoom(Math.max(0.6, Math.round((zoom - 0.2) * 10) / 10))} disabled={zoom <= 0.6} />
           <span className="hidden w-11 text-center text-xs text-gray-500 tabular-nums sm:inline dark:text-gray-400">{formatPercent(zoom, 0)}</span>
-          <IconButton icon={ZoomIn} label={t("planner.zoomIn")} onClick={() => onZoom(Math.min(1.6, Math.round((zoom + 0.2) * 10) / 10))} disabled={zoom >= 1.6} />
+          <IconButton className="max-sm:hidden" icon={ZoomIn} label={t("planner.zoomIn")} onClick={() => onZoom(Math.min(1.6, Math.round((zoom + 0.2) * 10) / 10))} disabled={zoom >= 1.6} />
           <Menu
             label={t("planner.bedActions", { name: bed.name })}
             items={[
+              ...(wide ? [] : [
+                { label: t("planner.zoomIn"), icon: ZoomIn, disabled: zoom >= 1.6, onSelect: () => onZoom(Math.min(1.6, Math.round((zoom + 0.2) * 10) / 10)) },
+                { label: t("planner.zoomOut"), icon: ZoomOut, disabled: zoom <= 0.6, onSelect: () => onZoom(Math.max(0.6, Math.round((zoom - 0.2) * 10) / 10)) },
+                "separator" as const,
+              ]),
               { label: t("planner.editBed"), icon: Pencil, onSelect: onEdit },
               { label: t("planner.autoFill"), icon: Wand2, onSelect: onAutoFill },
               { label: mode === "path" ? t("planner.pathModeDone") : t("planner.pathMode"), icon: Footprints, onSelect: onPathMode },

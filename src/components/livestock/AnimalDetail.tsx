@@ -207,14 +207,9 @@ export function AnimalDetail() {
           { value: "health", label: t("livestock.tabTreatments"), count: health.length },
           { value: "journal", label: t("nav.journal"), count: journal.length },
         ]}
+        actions={tab !== "journal" ? <Button onClick={openAddForTab}><Plus size={16} aria-hidden="true" />{addLabel[tab]}</Button> : undefined}
       >
         <div className="space-y-3">
-          {tab !== "journal" && (
-            <div className="flex justify-end">
-              <Button onClick={openAddForTab}><Plus size={16} aria-hidden="true" />{addLabel[tab]}</Button>
-            </div>
-          )}
-
           {tab === "production" && (products.length === 0 ? empty(Egg, t("livestock.noProductsTitle"), t("livestock.noProducts")) : (
             <ProductWeekList
               products={products}

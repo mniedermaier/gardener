@@ -137,6 +137,7 @@ export function HealthPage() {
           )}
 
           {stats.due.length > 0 && (
+            <div className="space-y-2">
             <Card padding="none">
               <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 dark:border-white/5">
                 <IconTile icon={AlertTriangle} tone="warning" />
@@ -164,11 +165,10 @@ export function HealthPage() {
                   );
                 })}
               </ul>
-              {/* The rule behind the hint, after the list it explains: no gap under the title. */}
-              <div className="border-t border-gray-100 px-4 py-2 dark:border-white/5">
-                <HowCalculated>{t("livestock.health.dueHow", { days: VACCINATION_INTERVAL_DAYS })}</HowCalculated>
-              </div>
             </Card>
+            {/* The rule behind the hint, directly under the card it explains (not inside the warning). */}
+            <HowCalculated>{t("livestock.health.dueHow", { days: VACCINATION_INTERVAL_DAYS })}</HowCalculated>
+            </div>
           )}
 
           {healthEvents.length === 0 ? (

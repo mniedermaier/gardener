@@ -806,7 +806,8 @@ export function GardenPlanner() {
                       </div>
                     </li>
                   ))}
-                  <li className="flex">
+                  {/* Phones already have "Beet hinzufügen" in the header; the tile is the wide-screen affordance. */}
+                  <li className="hidden sm:flex">
                     <button
                       type="button"
                       onClick={() => setBedDialog({ open: true })}
