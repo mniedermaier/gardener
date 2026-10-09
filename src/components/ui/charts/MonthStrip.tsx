@@ -40,7 +40,9 @@ const STEPS = [
  * from bright (reached), so the colour agrees with the note under the strip.
  * The printed value carries the exact number.
  */
-const step = (v: number, threshold: number) => {
+const step = (raw: number, threshold: number) => {
+  // Step from the shown (rounded) percentage: two tiles that print "6 %" share a tint.
+  const v = Math.round(raw * 100) / 100;
   if (v <= 0.005) return 0;
   if (v < threshold) return v < threshold / 4 ? 1 : v < threshold / 2 ? 2 : 3;
   return v < Math.min(1, threshold * 2.5) ? 4 : 5;

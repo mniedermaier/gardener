@@ -32,6 +32,8 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
   const yields = ANNUAL_YIELD[animal.type];
   const HealthIcon = lastHealth ? HEALTH_ICON[lastHealth.type] : null;
 
+  // Same time basis as the recorded values: since arrival or the first entry.
+  const expectationBasis = expectationBasisDate(expectedFrom, now);
   return (
     <div className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs transition-colors hover:border-gray-300 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20">
       <div className="flex items-start gap-3">
@@ -63,8 +65,6 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm dark:border-white/5">
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
-          // Same time basis as the recorded value: expected so far this year (since arrival or the first entry).
-          const basis = expectationBasisDate(expectedFrom, now);
           const expectedQty = y.quantity * animal.count * expectedShareToDate(y.product, now, expectedFrom);
           // "225 Eier von ~1.019 bis heute erwartet": the unit is already in the value, count only.
           const expected = y.product === "eggs" ? f.formatNumber(expectedQty, { maximumFractionDigits: 0 }) : formatProductAmount(y.product, expectedQty, f, t);
@@ -78,13 +78,15 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
                 <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
                   {t("livestock.ofExpectedToDate", { amount: expected })}
-                  {/* The basis on its own line, kept whole: it is not the herd's start date. */}
-                  {basis && <span className="block whitespace-nowrap">{t("livestock.expectedBasis", { date: f.formatDate(basis, "short") })}</span>}
                 </span>
               </dd>
             </div>
           );
         })}
+        {/* The expectation basis is the same for every product: said once, across both columns. */}
+        {expectationBasis && yields.length > 0 && (
+          <p className="col-span-2 -mt-1 text-xs text-gray-500 dark:text-gray-400">{t("livestock.expectedBasis", { date: f.formatDate(expectationBasis, "short") })}</p>
+        )}
         {yields.length < 2 && (
           <div>
             <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>

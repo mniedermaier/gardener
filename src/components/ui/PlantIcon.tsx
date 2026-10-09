@@ -99,9 +99,9 @@ const PLANT_SVGS: Record<string, string> = {
     <path d="M10.5 21.2L10 22.5M12 21.4V22.8M13.5 21.2L14 22.5" stroke="#a8a29e" stroke-width="0.5" stroke-linecap="round"/>`,
 
   potato: `
-    <ellipse cx="12" cy="13" rx="8" ry="6.5" fill="#92400e" transform="rotate(-8 12 13)"/>
+    <ellipse cx="12" cy="13" rx="8" ry="6.5" fill="#b45309" transform="rotate(-8 12 13)"/>
     <ellipse cx="12" cy="13" rx="8" ry="6.5" fill="url(#pg)" transform="rotate(-8 12 13)"/>
-    <ellipse cx="12" cy="12.5" rx="6" ry="5" fill="#a16207" transform="rotate(-8 12 13)"/>
+    <ellipse cx="12" cy="12.5" rx="6" ry="5" fill="#ca8a04" transform="rotate(-8 12 13)"/>
     <circle cx="8.5" cy="11" r="0.7" fill="#78350f"/>
     <circle cx="15" cy="14.5" r="0.7" fill="#78350f"/>
     <circle cx="11" cy="15.5" r="0.5" fill="#78350f"/>
