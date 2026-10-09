@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
-import { useNavigate } from "react-router-dom";
-import { CloudRain, Droplets, LayoutGrid, Pencil, Plus, Trash2 } from "lucide-react";
+import { useAddBed } from "@/hooks/useAddBed";
+import { CloudRain, Droplets, Pencil, Plus, Trash2 } from "lucide-react";
 import { addWeeks, endOfWeek, getISOWeek, startOfMonth, startOfWeek, subWeeks } from "date-fns";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
@@ -46,7 +46,7 @@ export function WaterTracker() {
     useShallow((s) => ({ waterEntries: s.waterEntries, addWaterEntry: s.addWaterEntry, updateWaterEntry: s.updateWaterEntry, deleteWaterEntry: s.deleteWaterEntry })),
   );
   const beds = useBeds();
-  const navigate = useNavigate();
+  const addBed = useAddBed();
 
   // ---------------------------------------------------------------- dialog
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -178,7 +178,7 @@ export function WaterTracker() {
             description={beds.beds.length ? t("water.emptyText") : t("water.emptyNoBeds")}
             action={beds.beds.length
               ? <Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("water.add")}</Button>
-              : <Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>}
+              : <Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
           />
         </Card>
       ) : (

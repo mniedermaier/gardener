@@ -836,9 +836,9 @@
       "seasonDescProtected_many": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ.",
       "sowNow": "Semer maintenant, jusqu’au {{date}}",
       "nextSowing": "Prochain semis dès le {{date}}",
-      "hatchLegend": "Hachuré : sous abri"
+      "hatchLegend": "Hachuré : sous abri",
+      "bedFirstHint": "Ajoute une planche, puis place {{plant}} directement."
     },
-    "createBedFirst": "Créer d’abord une planche",
     "sowNowFilter": "À semer"
   },
   "weather": {
@@ -912,7 +912,6 @@
     "subtitle": "Ce qui est à faire au jardin, trié par échéance.",
     "pageSubtitle": "Vue de saison de vos planches et semis échelonnés.",
     "toTasks": "Voir les tâches",
-    "toPlanner": "Ouvrir le planificateur",
     "generatedTitle": "{{action}} : {{plant}}",
     "generateHint": "Crée les dates de semis et de plantation à partir de vos planches. Les tâches personnelles et terminées sont conservées.",
     "exportIcal": "Exporter en calendrier (iCal)",
@@ -962,8 +961,6 @@
     "overdueCount_other": "{{count}} en retard",
     "timeline": "Vue de saison {{year}}",
     "timelineDesc": "Fenêtres de semis, plantation et récolte par planche, à partir des dernières gelées ({{date}}).",
-    "timelineEmptyTitle": "Rien de planifié pour l'instant",
-    "timelineEmptyText": "Dès que vos planches sont plantées, vous verrez ici quand semer, planter et récolter.",
     "bedFilter": "Planche",
     "allBeds": "Toutes les planches",
     "today": "Aujourd'hui",
@@ -1012,7 +1009,9 @@
     "untilRange": "Fin selon la planche : {{range}}",
     "fromRange": "Début selon la planche : {{range}}",
     "upNextFrom": "Ensuite · dès le {{date}}",
-    "notesPlaceholder": "p. ex. outils, rappels…"
+    "notesPlaceholder": "p. ex. outils, rappels…",
+    "afterFrostWindow": "après le gel : {{range}}",
+    "timelineEmptyLine": "Ton plan de saison a besoin d’une planche."
   },
   "settings": {
     "title": "Paramètres",
@@ -1165,9 +1164,9 @@
       "warning": "Attention",
       "info": "Info"
     },
-    "frostGroupTitle_one": "Risque de gel {{count}} nuit, jusqu’à {{temp}} ({{day}})",
-    "frostGroupTitle_other": "Risque de gel {{count}} nuits, jusqu’à {{temp}} ({{day}})",
-    "frostGroupTitle_many": "Risque de gel {{count}} nuits, jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitle_one": "{{count}} nuit avec risque de gel – jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitle_other": "{{count}} nuits avec risque de gel – jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitle_many": "{{count}} nuits avec risque de gel – jusqu’à {{temp}} ({{day}})",
     "frostAffected_one": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
     "frostAffected_other": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
     "frostAffected_many": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
@@ -1179,15 +1178,16 @@
     "fleeceTaskAdded": "Tâche « Poser le voile d’hivernage » ajoutée pour {{day}}",
     "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}",
     "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
-    "frostGroupTitleMixed_one": "{{hard}}, risque de gel {{count}} autre nuit, jusqu’à {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "{{hard}}, risque de gel {{count}} autres nuits, jusqu’à {{temp}} ({{day}})",
-    "frostGroupTitleMixed_many": "{{hard}}, risque de gel {{count}} autres nuits, jusqu’à {{temp}} ({{day}})",
-    "frostHardNights_one": "Gel {{count}} nuit",
-    "frostHardNights_other": "Gel {{count}} nuits",
-    "frostHardNights_many": "Gel {{count}} nuits",
+    "frostGroupTitleMixed_one": "{{hard}}, {{count}} autre avec risque de gel – jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, {{count}} autres avec risque de gel – jusqu’à {{temp}} ({{day}})",
+    "frostGroupTitleMixed_many": "{{hard}}, {{count}} autres avec risque de gel – jusqu’à {{temp}} ({{day}})",
+    "frostHardNights_one": "{{count}} nuit de gel",
+    "frostHardNights_other": "{{count}} nuits de gel",
+    "frostHardNights_many": "{{count}} nuits de gel",
     "frostAdviceNoPlants": "Attendez la fin des nuits de gel pour repiquer.",
     "frostAdviceAutumn": "Rentrez les dernières récoltes et mettez les pots sensibles à l’abri.",
-    "frostAdviceAutumnNoPlants": "Mets pots et outils de jardin à l’abri du gel."
+    "frostAdviceAutumnNoPlants": "Mets pots et outils de jardin à l’abri du gel.",
+    "frostGroupTitleHard": "{{hard}} – jusqu’à {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Récolte",
@@ -1471,7 +1471,10 @@
     "biggestGaps": "Plus grandes quantités : {{plants}}",
     "byCalories": "En calories : {{value}} – voir l’autonomie",
     "rowLogged": "{{actual}} saisis",
-    "rowTargetOf": "sur {{target}}"
+    "rowTargetOf": "sur {{target}}",
+    "planCropsTitle_one": "{{count}} culture dans le plan",
+    "planCropsTitle_other": "{{count}} cultures dans le plan",
+    "planCropsTitle_many": "{{count}} cultures dans le plan"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -1664,7 +1667,7 @@
       "perMonthSince": "depuis le {{date}}",
       "plusLiquid": "plus {{volume}} d’aliment liquide",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici la nourriture et verrez ce qu’elle coûte par mois.",
-      "emptyTitle": "Coût de la nourriture par mois",
+      "emptyTitle": "Nourriture et coût en un coup d’œil",
       "notesPlaceholder": "p. ex. marque, appétence…"
     },
     "health": {

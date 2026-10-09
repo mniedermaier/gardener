@@ -13,7 +13,7 @@ import { useWeatherGlance } from "@/hooks/useWeatherGlance";
 import { useToday } from "@/hooks/useToday";
 import { useFrostSummary } from "@/components/weather/frost";
 import { isFrostSensitive } from "@/lib/weatherAlerts";
-import { toISODate } from "@/lib/format";
+import { toDate, toISODate } from "@/lib/format";
 import { addDays } from "date-fns";
 
 /** Planted in autumn on purpose to overwinter: frost does not stop them. */
@@ -34,12 +34,22 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const today = useToday();
   const glance = useWeatherGlance();
   const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
-  // A real frost (≤ 0 °C) in the next three nights: planting out now would
-  // contradict the frost warning on "Heute" and "Wetter", so those rows say so.
-  const frostSoon = useMemo(() => {
+  // The last forecast frost night (≤ 0 °C) when one comes in the next three
+  // nights: planting out before it would contradict the frost warning on
+  // "Heute" and "Wetter", so those rows show the window after it instead.
+  const lastFrostNight = useMemo(() => {
     const until = toISODate(addDays(today, 3));
-    return !!frost?.summary.nights.some((n) => n.tempMin <= 0 && n.date <= until);
+    const hard = frost?.summary.nights.filter((n) => n.tempMin <= 0) ?? [];
+    if (!hard.some((n) => n.date <= until)) return null;
+    return toDate(hard.reduce((a, b) => (b.date > a.date ? b : a)).date);
   }, [frost, today]);
+  const frostBlocks = (item: AgendaPlantRow, plant: Parameters<typeof isFrostSensitive>[0]) =>
+    !!lastFrostNight && item.kind === "now" && !OVERWINTERING.has(plant.id)
+    && item.actions.some((a) => a === "transplant" || a === "plant_autumn")
+    && (isFrostSensitive(plant) || item.actions.includes("plant_autumn"));
+  const windowEnd = (item: AgendaPlantRow) => new Date(Math.max(...groupAgendaBedsByDate(item).map((g) => g.date.getTime())));
+  /** Some days of the window remain after the last frost night. */
+  const windowAfterFrost = (item: AgendaPlantRow) => !!lastFrostNight && addDays(lastFrostNight, 1) <= windowEnd(item);
   /** "Hochbeet Süd", "Hochbeet Süd, Gewächshaus", "3 Beete". */
   const bedLabel = (beds?: AgendaBed[]) =>
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
@@ -50,12 +60,15 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
    * later): "Ende je nach Beet: 10. Okt.–15. Nov. · 4 Beete" (formatDateRange,
    * one range style app-wide). Every action is a badge, never a meta part.
    */
-  const meta = (item: AgendaPlantRow): string[] => {
+  const meta = (item: AgendaPlantRow, afterFrost: boolean): string[] => {
     const key = item.kind === "now" ? "until" : "from";
     const groups = groupAgendaBedsByDate(item);
     const beds = bedLabel(groups.flatMap((g) => g.beds));
     let when: string;
-    if (groups.length === 1) {
+    if (afterFrost && lastFrostNight) {
+      // Only the days between the last frost night and the window's end count.
+      when = t("calendar.afterFrostWindow", { range: formatDateRange(addDays(lastFrostNight, 1), windowEnd(item)) });
+    } else if (groups.length === 1) {
       when = t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") });
     } else {
       const dates = groups.map((g) => g.date.getTime());
@@ -82,14 +95,13 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
               <>
                 {/* One badge per row ("Herbstsaat / Auspflanzen"), so rows never wrap into two badge lines. */}
                 <PhaseBadge phase={actionPhase(item.actions[0])} label={[...new Set(item.actions.map((a) => t(`advisor.actions.${a}`)))].join(" / ")} />
-                {frostSoon && item.kind === "now" && !OVERWINTERING.has(plant.id)
-                  && item.actions.some((a) => a === "transplant" || a === "plant_autumn")
-                  && (isFrostSensitive(plant) || item.actions.includes("plant_autumn")) && (
+                {/* The window closes before the frost is over: no badge-plus-date contradiction, just this. */}
+                {frostBlocks(item, plant) && !windowAfterFrost(item) && (
                   <Badge tone="warning" size="sm">{t("advisor.afterFrost")}</Badge>
                 )}
               </>
             ) : undefined}
-            meta={meta(item)}
+            meta={meta(item, frostBlocks(item, plant) && windowAfterFrost(item))}
             onClick={() => {
               // With beds: straight to placing it (one bed: that bed; several: pick one). Indoors: the plant.
               const beds = item.beds;

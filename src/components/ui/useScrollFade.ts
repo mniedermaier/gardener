@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
  * - the element matching `activeSelector` is scrolled into view whenever
  *   `activeKey` changes (e.g. a deep link opens the fourth tab).
  */
-export function useScrollFade<T extends HTMLElement>(activeSelector: string, activeKey: unknown): { ref: RefObject<T | null>; fadeClass: string } {
+export function useScrollFade<T extends HTMLElement>(activeSelector: string, activeKey: unknown): { ref: RefObject<T | null>; fadeClass: string; moreEnd: boolean } {
   const ref = useRef<T | null>(null);
   const [edges, setEdges] = useState({ start: false, end: false });
 
@@ -57,5 +57,5 @@ export function useScrollFade<T extends HTMLElement>(activeSelector: string, act
       : edges.start
         ? "[mask-image:linear-gradient(to_right,transparent,#000_32px)]"
         : "";
-  return { ref, fadeClass };
+  return { ref, fadeClass, moreEnd: edges.end };
 }

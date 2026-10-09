@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import { useAddBed } from "@/hooks/useAddBed";
 import {
   Beaker, LayoutGrid, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
 } from "lucide-react";
@@ -73,7 +74,8 @@ export function SoilManagement() {
     })),
   );
   const beds = useBeds();
-  const [tab, setTab] = useState<"tests" | "amendments">("tests");
+  const [tabState, setTab] = useState<"tests" | "amendments">("tests");
+  const addBed = useAddBed();
 
   const bedTarget = useCallback((bedId: string): PhRange => bedPhTarget(beds.byId.get(bedId)?.plantIds ?? []), [beds]);
   const plantName = usePlantName();
@@ -180,9 +182,12 @@ export function SoilManagement() {
   const testEditingItem = testEditing ? soilTests.find((s) => s.id === testEditing) : undefined;
   const amendEditingItem = amendEditing ? amendments.find((a) => a.id === amendEditing) : undefined;
   const draftTarget = test.bedId ? bedTarget(test.bedId) : undefined;
-  // Tests and amendments belong to a bed: without one the empty states point to the planner.
+  // Tests and amendments belong to a bed: without one the page is a single
+  // empty state (no tabs) whose action opens the add-bed dialog in the planner.
   const noBeds = beds.beds.length === 0;
-  const toPlanner = <Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>;
+  const blocked = noBeds && soilTests.length === 0 && amendments.length === 0;
+  const tab = blocked ? "tests" : tabState;
+  const toPlanner = <Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>;
 
   return (
     <div>
@@ -203,7 +208,7 @@ export function SoilManagement() {
             </Button>
           ) : undefined
         }
-        tabs={
+        tabs={blocked ? undefined : (
           <Tabs
             label={t("soil.title")}
             value={tab}
@@ -213,7 +218,7 @@ export function SoilManagement() {
               { value: "amendments", label: t("soil.amendments"), count: amendments.length || undefined },
             ]}
           />
-        }
+        )}
       />
 
       {tab === "tests" && (

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks, LayoutGrid } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAddBed } from "@/hooks/useAddBed";
 import { parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -51,6 +52,7 @@ interface Draft {
 export function TaskCalendar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const addBed = useAddBed();
   const { toast, confirm } = useToast();
   const confirmDelete = useConfirmDelete();
   const { tasks, gardens, lastFrostDate, addTask, updateTask, deleteTask, generateTasks } = useStore(
@@ -259,6 +261,9 @@ export function TaskCalendar() {
             // The text promises dates from the bed plan: with planted beds generate them, else go plant some.
             secondaryAction={hasPlantedBeds ? (
               <Button variant="secondary" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
+            ) : gardens.every((g) => g.beds.length === 0) ? (
+              // No bed at all: the next step is one, with the planner's dialog already open.
+              <Button variant="secondary" onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>
             ) : (
               <Button variant="secondary" onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>
             )}

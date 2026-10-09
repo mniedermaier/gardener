@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { Search, Plus, SearchX } from "lucide-react";
+import { Search, Plus, SearchX, ChevronRight } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -32,7 +32,7 @@ export function PlantList() {
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
-  const { ref: filterRef, fadeClass: filterFade } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', category);
+  const { ref: filterRef, fadeClass: filterFade, moreEnd: filterMore } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', category);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Plant | undefined>(undefined);
 
@@ -135,7 +135,9 @@ export function PlantList() {
             className="pl-9"
           />
         </div>
-        {/* Phones: the row scrolls with a faded edge, so a cut-off "Kräuter 7" reads as "more". */}
+        {/* Phones: the row scrolls with a faded edge plus a chevron button, so a
+            cut-off "Kräuter 7" reads as "more" even where the fade is faint. */}
+        <div className="relative">
         <div ref={filterRef} className={`-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:px-0 lg:pb-0 ${filterFade}`}>
           <SegmentedControl
             label={t("plants.categoryFilter")}
@@ -147,6 +149,18 @@ export function PlantList() {
               count: counts[c],
             }))}
           />
+        </div>
+        {filterMore && (
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={() => filterRef.current?.scrollBy({ left: 160, behavior: "smooth" })}
+            className="absolute top-1/2 -right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow-sm ring-1 ring-gray-200 lg:-right-1 dark:bg-gray-800 dark:text-gray-300 dark:ring-white/10"
+          >
+            <ChevronRight size={16} />
+          </button>
+        )}
         </div>
       </div>
 
