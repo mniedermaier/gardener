@@ -79,7 +79,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
                 <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
                   {/* The basis date sits in the same hint, under the figure it qualifies. */}
                   {expectationBasis
-                    ? t("livestock.ofExpectedSince", { amount: expected, date: f.formatDate(expectationBasis, "dayMonth") })
+                    ? t("livestock.ofExpectedSince", { amount: expected, date: f.formatDate(expectationBasis, "short") })
                     : t("livestock.ofExpectedToDate", { amount: expected })}
                 </span>
               </dd>

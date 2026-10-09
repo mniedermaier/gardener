@@ -91,16 +91,26 @@ export function SeasonTimeline() {
           if (!plant) continue;
           const phases: PlantTimeline["phases"] = {};
           for (const w of getPhaseWindows(plant, frostDate, { frostProtectionWeeks: protection })) phases[w.phase] = { start: w.start, end: w.end };
-          // Planted this season: the harvest bar follows the real planting dates
-          // (as the bed list and the harvest log do), not the frost-date estimate.
+          // Planted this season: the planting and harvest bars follow the real
+          // planting dates (as the bed list and the harvest log do), not the
+          // frost-date estimate; autumn "possible" windows then drop out.
           const year = frostDate.getFullYear();
-          const planted = plantedHarvestWindow(
-            plant,
-            bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!),
-            { lastFrostDate, now: today, protectionWeeks: protection },
-          );
-          if (planted) phases.harvest = planted;
-          const autumn = autumnPhaseWindows(plantId, frostDate.getFullYear(), protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
+          const plantedDates = bed.cells.filter((c) => c.plantId === plantId && c.plantedDate?.startsWith(String(year))).map((c) => c.plantedDate!);
+          let autumn = autumnPhaseWindows(plantId, year, protection, bed.environmentType, plant).map((w) => ({ phase: w.phase, range: { start: w.start, end: w.end } }));
+          const times = plantedDates.flatMap((d) => toDate(d)?.getTime() ?? []);
+          if (times.length > 0) {
+            const first = new Date(Math.min(...times));
+            // Sown in place unless the crop is planted out (or has no sowing at all, like garlic cloves).
+            const phase: Phase = plant.transplantWeeks === null && plant.sowOutdoorsWeeks !== null ? "sowOutdoors" : "transplant";
+            for (const p of ["sowOutdoors", "transplant"] as const) delete phases[p];
+            if (phases.sowIndoors && phases.sowIndoors.end > first) delete phases.sowIndoors;
+            if (phase === "sowOutdoors") delete phases.sowIndoors;
+            phases[phase] = { start: first, end: addDays(new Date(Math.max(...times)), 7) };
+            delete phases.harvest;
+            const planted = plantedHarvestWindow(plant, plantedDates, { lastFrostDate, now: today, protectionWeeks: protection });
+            if (planted) phases.harvest = planted;
+            autumn = [];
+          }
           result.push({ plantId, bedId: bed.id, bedName: gardens.length > 1 ? `${g.name} · ${bed.name}` : bed.name, envType: bed.environmentType ?? "outdoor_bed", phases, autumn });
         }
       }
