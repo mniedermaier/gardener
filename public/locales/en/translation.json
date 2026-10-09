@@ -834,7 +834,8 @@
       "sameBedConflict": "Same bed · {{plants}}"
     },
     "sowNowFilter": "Sow now",
-    "waterCaption": "Water: {{level}}"
+    "waterCaption": "Water: {{level}}",
+    "spacingCaption": "Spacing {{value}}"
   },
   "weather": {
     "title": "Weather",
@@ -1002,8 +1003,8 @@
     "notesPlaceholder": "e.g. tools, reminders…",
     "afterFrostWindow": "after the frost nights: {{range}}",
     "timelineEmptyLine": "Your season plan needs a bed.",
-    "untilByBed": "until {{date}} · {{bed}}",
-    "fromByBed": "from {{date}} · {{bed}}"
+    "untilByBed": "until {{date}} in “{{bed}}”",
+    "fromByBed": "from {{date}} in “{{bed}}”"
   },
   "settings": {
     "title": "Settings",

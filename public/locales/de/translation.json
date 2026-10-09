@@ -834,7 +834,8 @@
       "sameBedConflict": "Im selben Beet · {{plants}}"
     },
     "sowNowFilter": "Jetzt säen",
-    "waterCaption": "Wasser: {{level}}"
+    "waterCaption": "Wasser: {{level}}",
+    "spacingCaption": "Abstand {{value}}"
   },
   "weather": {
     "title": "Wetter",
@@ -1002,8 +1003,8 @@
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
     "afterFrostWindow": "nach den Frostnächten: {{range}}",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
-    "untilByBed": "bis {{date}} · {{bed}}",
-    "fromByBed": "ab {{date}} · {{bed}}"
+    "untilByBed": "bis {{date}} im Beet „{{bed}}“",
+    "fromByBed": "ab {{date}} im Beet „{{bed}}“"
   },
   "settings": {
     "title": "Einstellungen",

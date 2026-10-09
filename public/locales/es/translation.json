@@ -860,7 +860,8 @@
       "sameBedConflict": "Mismo bancal · {{plants}}"
     },
     "sowNowFilter": "Sembrar ahora",
-    "waterCaption": "Agua: {{level}}"
+    "waterCaption": "Agua: {{level}}",
+    "spacingCaption": "Marco {{value}}"
   },
   "weather": {
     "title": "Tiempo",
@@ -1034,8 +1035,8 @@
     "notesPlaceholder": "p. ej. herramientas, avisos…",
     "afterFrostWindow": "tras las noches de helada: {{range}}",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
-    "untilByBed": "hasta el {{date}} · {{bed}}",
-    "fromByBed": "desde el {{date}} · {{bed}}"
+    "untilByBed": "hasta el {{date}} en «{{bed}}»",
+    "fromByBed": "desde el {{date}} en «{{bed}}»"
   },
   "settings": {
     "title": "Ajustes",

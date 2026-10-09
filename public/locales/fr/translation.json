@@ -860,7 +860,8 @@
       "sameBedConflict": "Même planche · {{plants}}"
     },
     "sowNowFilter": "À semer",
-    "waterCaption": "Eau : {{level}}"
+    "waterCaption": "Eau : {{level}}",
+    "spacingCaption": "Espacement {{value}}"
   },
   "weather": {
     "title": "Météo",
@@ -1034,8 +1035,8 @@
     "notesPlaceholder": "p. ex. outils, rappels…",
     "afterFrostWindow": "après les nuits de gel : {{range}}",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
-    "untilByBed": "jusqu’au {{date}} · {{bed}}",
-    "fromByBed": "à partir du {{date}} · {{bed}}"
+    "untilByBed": "jusqu’au {{date}} dans « {{bed}} »",
+    "fromByBed": "à partir du {{date}} dans « {{bed}} »"
   },
   "settings": {
     "title": "Paramètres",

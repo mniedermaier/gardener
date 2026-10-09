@@ -37,8 +37,9 @@ export const TaskRow = memo(function TaskRow({ task, group, plant, bedName, onCo
 
   const meta = [
     task.type === "custom" ? null : t(`calendar.taskTypes.${task.type}`),
-    bedName ?? null,
+    // Glossary order: plant · bed.
     plantName && !task.title.includes(plantName) ? plantName : null,
+    bedName ?? null,
     // The group header already says "Heute"/"Morgen"; within a group every row
     // uses the same date format.
     done

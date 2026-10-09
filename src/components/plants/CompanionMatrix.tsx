@@ -288,7 +288,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
     const beds = bedsByPlant.get(id);
     if (!beds) return undefined;
     const shared = beds.filter((b) => selectedBeds.has(b));
-    if (kind === "bad" && shared.length > 0) return <Badge tone="warning" size="sm">{[t("companions.sameBed"), ...shared].join(" · ")}</Badge>;
+    if (shared.length > 0) return <Badge tone={kind === "bad" ? "warning" : "brand"} size="sm">{[t("companions.sameBed"), ...shared].join(" · ")}</Badge>;
     return <Badge tone={kind === "good" ? "brand" : "neutral"} size="sm">{[t("plants.inGarden"), ...beds].join(" · ")}</Badge>;
   };
 

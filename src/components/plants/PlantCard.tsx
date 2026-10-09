@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Droplets, Ruler, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Badge } from "@/components/ui/Badge";
 import { usePlantName } from "@/hooks/usePlantName";
@@ -36,21 +36,19 @@ export const PlantCard = memo(function PlantCard({ plant, planted, custom, onOpe
           {planted && <Badge tone="brand" size="sm">{t("plants.inGarden")}</Badge>}
           {custom && <Badge variant="outline" size="sm">{t("plants.custom")}</Badge>}
         </span>
-        <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">{t(`plants.category.${plant.category}`)}</span>
-        <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 dark:text-gray-300">
-          <span className="inline-flex items-center gap-1">
-            <Sun size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
-            {t(`plants.sun.${plant.sunRequirement}`)}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Droplets size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
-            {/* "Viel" alone does not say what is much: name the need. */}
-            {t("plants.waterCaption", { level: t(`plants.water.${plant.waterNeed}`) })}
-          </span>
-          <span className="inline-flex items-center gap-1 tabular-nums">
-            <Ruler size={12} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
-            {formatNumber(plant.spacingCm)} {t("common.cm")}
-          </span>
+        {/* One meta line (category · sun · water · spacing), each part kept whole: rows stay compact. */}
+        <span className="mt-0.5 block text-xs text-gray-600 dark:text-gray-400">
+          {[
+            t(`plants.category.${plant.category}`),
+            t(`plants.sun.${plant.sunRequirement}`),
+            t("plants.waterCaption", { level: t(`plants.water.${plant.waterNeed}`) }),
+            t("plants.spacingCaption", { value: `${formatNumber(plant.spacingCm)}\u00a0${t("common.cm")}` }),
+          ].map((part, i, all) => (
+            <span key={i} className="inline-block whitespace-nowrap">
+              {part}
+              {i < all.length - 1 && <span aria-hidden="true">{"\u00a0·\u00a0"}</span>}
+            </span>
+          ))}
         </span>
       </span>
       {/* Row affordance: the whole tile opens the plant. */}
