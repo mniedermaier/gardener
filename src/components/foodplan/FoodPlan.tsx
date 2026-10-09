@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { ChevronDown, LayoutGrid, Target } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -40,6 +41,9 @@ export function FoodPlan() {
     () => getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: year }),
     [gardens, plantMap, gridCellSizeCm, harvests, householdSize, year],
   );
+  const { selfSufficiency } = useGardenMetrics();
+  // Rows are sorted by gap: the first three qualifying crops get "Große Lücke".
+  const bigGapIds = new Set(plan.rows.filter((r) => r.deficitKg > 0.05 && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE).slice(0, 3).map((r) => r.plantId));
   const animalForecast = useMemo(() => getForecastProducts(animals), [animals]);
   const deficits = plan.rows.filter((r) => r.deficitKg > 0.05);
   // Crops with neither area nor harvest: collapsed into one group instead of
@@ -101,7 +105,15 @@ export function FoodPlan() {
                     label={t("metrics.actualVsForecast", { actual: f.formatPercent(plan.actualCoverage), forecast: f.formatPercent(plan.forecastCoverage) })}
                   />
                 ),
-                hint: t("foodplan.ofTarget", { kg: kg(plan.targetKg) }),
+                hint: (
+                  <>
+                    {t("foodplan.ofTarget", { kg: kg(plan.targetKg) })}
+                    {/* The other headline percentage (calories, with animals) is one tap away. */}
+                    <Link to="/sufficiency" className="mt-0.5 block font-medium text-garden-700 hover:underline dark:text-garden-300">
+                      {t("foodplan.byCalories", { value: f.formatPercent(selfSufficiency.forecastRatio, 1) })}
+                    </Link>
+                  </>
+                ),
               }}
               items={[
                 { label: t("foodplan.coverageActual"), value: f.formatPercent(plan.actualCoverage), hint: t("foodplan.actualKg", { kg: kg(plan.actualKg) }) },
@@ -151,7 +163,8 @@ export function FoodPlan() {
                   // "Große Lücke" by a rule, not by rank: the forecast reaches less
                   // than a quarter of the target (two crops with the same figures
                   // always get the same badge).
-                  const bigGap = gap && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE;
+                  // …and only on the three largest, so the badge still tells rows apart.
+                  const bigGap = gap && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE && bigGapIds.has(r.plantId);
                   return (
                     <ListRow
                       key={r.plantId}
@@ -162,11 +175,14 @@ export function FoodPlan() {
                         t("foodplan.rowForecast", { forecast: kg(r.forecastKg) }),
                         gap ? t("foodplan.rowGap", { kg: kg(r.deficitKg), area: f.formatArea(r.extraAreaM2) }) : null,
                       ]}
+                      trailing={
+                        // Fixed width: every bar in the list ends at the same x.
+                        <span className="block w-24 text-right">
+                          {t("foodplan.rowOfTarget", { actual: f.formatNumber(r.actualKg, { maximumFractionDigits: 1 }), target: kg(r.targetKg) })}
+                        </span>
+                      }
                       description={
-                        // Bar and amount side by side, the amount in a fixed-width
-                        // column: every bar starts and ends at the same x, and on
-                        // wide screens the number sits next to its bar.
-                        <span className="mt-1.5 flex max-w-xl items-center gap-3">
+                        <span className="mt-1.5 flex items-center">
                           <Meter
                             className="min-w-0 flex-1"
                             size={6}
@@ -176,9 +192,6 @@ export function FoodPlan() {
                             target={r.targetKg}
                             label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
                           />
-                          <span className="w-28 shrink-0 text-right text-xs font-medium text-gray-900 tabular-nums dark:text-gray-100">
-                            {t("foodplan.rowOfTarget", { actual: f.formatNumber(r.actualKg, { maximumFractionDigits: 1 }), target: kg(r.targetKg) })}
-                          </span>
                         </span>
                       }
                     />

@@ -1467,7 +1467,8 @@
     "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "{{kg}} manquants (+{{area}})",
     "emptyCta": "Ajoute une planche et le plan montrera ce que tu cultives déjà.",
-    "biggestGaps": "Plus grandes quantités : {{plants}}"
+    "biggestGaps": "Plus grandes quantités : {{plants}}",
+    "byCalories": "En calories : {{value}} – voir l’autonomie"
   },
   "sufficiency": {
     "title": "Autosuffisance",

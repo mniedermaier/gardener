@@ -1467,7 +1467,8 @@
     "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "faltan {{kg}} (+{{area}})",
     "emptyCta": "Crea un bancal y el plan mostrará cuánto de esto ya cultivas.",
-    "biggestGaps": "Mayores cantidades: {{plants}}"
+    "biggestGaps": "Mayores cantidades: {{plants}}",
+    "byCalories": "Por calorías: {{value}} – ver autosuficiencia"
   },
   "sufficiency": {
     "title": "Autosuficiencia",

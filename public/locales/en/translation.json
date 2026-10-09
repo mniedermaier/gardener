@@ -1406,7 +1406,8 @@
     "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "{{kg}} short (+{{area}})",
     "emptyCta": "Add a bed and the plan shows how much of this you already grow.",
-    "biggestGaps": "Largest amounts: {{plants}}"
+    "biggestGaps": "Largest amounts: {{plants}}",
+    "byCalories": "By calories: {{value}} – see self-sufficiency"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
