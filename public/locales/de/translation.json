@@ -78,7 +78,8 @@
       "water": "Bewässerung",
       "sufficiency": "Selbstversorgung",
       "expenses": "Kosten",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "import": "Import"
     },
     "group": {
       "garden": "Garten",
@@ -119,7 +120,7 @@
         "tasks": "Aufgaben",
         "journal": "Tagebuch"
       },
-      "logHarvestFor": "Ernte erfassen: {{name}}",
+      "logHarvestFor": "{{name}} · Ernte erfassen",
       "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} Feld",
       "cellCount_other": "{{count}} Felder"
@@ -750,7 +751,9 @@
       "spacingCm": "Pflanzabstand (cm)",
       "harvestMin": "Ernte frühestens (Tage)",
       "harvestMax": "Ernte spätestens (Tage)",
-      "harvestError": "Darf nicht kleiner sein als der früheste Wert."
+      "harvestError": "Darf nicht kleiner sein als der früheste Wert.",
+      "namePlaceholder": "z. B. Ingwer",
+      "daysAfterSowing": "Tage nach der Aussaat"
     },
     "detail": {
       "today": "Heute",
@@ -769,11 +772,9 @@
       "partners": "Pflanzpartner",
       "allPartners": "Partner-Matrix",
       "noPartners": "Keine bekannten Pflanzpartner.",
-      "inGarden": "In deinem Garten",
       "plantCount_one": "{{count}} Pflanze",
       "plantCount_other": "{{count}} Pflanzen",
       "notPlanted": "Noch nicht im Garten",
-      "notPlantedText": "Setze sie in ein Beet, um Aufgaben und eine Ertragsprognose zu bekommen.",
       "yourHarvests": "Deine Ernten",
       "harvestEntries_one": "{{count}} Ernte",
       "harvestEntries_other": "{{count}} Ernten",
@@ -785,7 +786,8 @@
       "viability_one": "{{count}} Jahr keimfähig",
       "viability_other": "{{count}} Jahre keimfähig",
       "isolation": "Isolationsabstand {{distance}} m",
-      "harvestDaysUnit": "Tagen"
+      "harvestDaysUnit": "Tagen",
+      "yourStock": "Dein Bestand"
     }
   },
   "weather": {
@@ -1038,7 +1040,7 @@
     "exportHarvestsCsv": "Ernten als CSV",
     "exportExpensesCsv": "Ausgaben als CSV",
     "lastBackup": "Letztes Backup",
-    "noBackup": "Noch kein Backup. Deine Daten liegen nur in diesem Browser.",
+    "noBackup": "Noch kein Backup. Deine Daten liegen nur auf diesem Gerät.",
     "exportSuccess": "Backup heruntergeladen",
     "importSuccess": "Daten wiederhergestellt",
     "importError": "Import fehlgeschlagen. Die Datei ist unverändert geblieben.",
@@ -1061,7 +1063,9 @@
       "journalEntries_other": "{{count}} Tagebucheinträge",
       "expenses_one": "{{count}} Ausgabe",
       "expenses_other": "{{count}} Ausgaben"
-    }
+    },
+    "backupStale": "Älter als zwei Wochen – ein neues Backup lohnt sich.",
+    "csvEmpty": "Sobald du Ernten oder Ausgaben erfasst, kannst du sie hier als CSV exportieren."
   },
   "alerts": {
     "frostTitle": "Frostwarnung: {{temp}}",
@@ -2183,7 +2187,9 @@
     "byPlant": "Nach Pflanze",
     "focusLabel": "Pflanze hervorheben",
     "focusNone": "Pflanze hervorheben …",
-    "emptyFilter": "Keine Pflanze passt zur Suche."
+    "emptyFilter": "Keine Pflanze passt zur Suche.",
+    "scrollForMore_one": "Seitlich scrollen für alle {{count}} Pflanze",
+    "scrollForMore_other": "Seitlich scrollen für alle {{count}} Pflanzen"
   },
   "water": {
     "title": "Bewässerung",

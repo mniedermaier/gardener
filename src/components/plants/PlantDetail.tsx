@@ -2,8 +2,9 @@ import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { differenceInCalendarDays, endOfYear, startOfYear } from "date-fns";
+import type { LucideIcon } from "lucide-react";
 import {
-  ArrowLeft, Check, TriangleAlert, Ruler, CalendarClock, Scale, Sun, LayoutGrid, Package, Apple, Pencil, Network, Leaf,
+  ArrowLeft, Check, TriangleAlert, Ruler, CalendarClock, Scale, Sun, LayoutGrid, Package, Apple, Pencil, Network, Leaf, Plus,
 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -24,7 +25,6 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { Badge } from "@/components/ui/Badge";
 import { List, ListRow } from "@/components/ui/List";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { useToday } from "@/hooks/useToday";
 
@@ -175,7 +175,7 @@ const SeasonStrip = memo(function SeasonStrip({ phases, frost }: { phases: Phase
 function PartnerChips({ ids, kind, onSelect }: { ids: string[]; kind: "good" | "bad"; onSelect: (id: string) => void }) {
   const getPlantName = usePlantName();
   const plantMap = usePlantMap();
-  const Icon = kind === "good" ? Check : TriangleAlert;
+  // The group heading says good or bad; the chip carries only the plant (border tone as a quiet second cue).
   return (
     <div className="flex flex-wrap gap-2">
       {ids.map((id) => (
@@ -187,14 +187,20 @@ function PartnerChips({ ids, kind, onSelect }: { ids: string[]; kind: "good" | "
             kind === "good" ? "border-positive/40" : "border-warning/40"
           }`}
         >
-          <span className={`inline-flex size-5 items-center justify-center rounded-full ${kind === "good" ? "bg-positive/15 text-positive" : "bg-warning/15 text-warning"}`} aria-hidden="true">
-            <Icon size={13} strokeWidth={3} />
-          </span>
           <PlantIconDisplay plantId={id} emoji={plantMap.get(id)?.icon ?? ""} size={18} />
           {getPlantName(id)}
         </button>
       ))}
     </div>
+  );
+}
+
+/** Neutral icon tile for the rows of "Dein Bestand" (same size as EnvironmentChip). */
+function StockTile({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <span className="inline-flex size-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
+      <Icon size={16} />
+    </span>
   );
 }
 
@@ -255,37 +261,46 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   return (
     <div>
       <PageHeader
-        leading={<IconButton icon={ArrowLeft} label={t("plants.backToList")} onClick={onBack} />}
-        title={
-          <span className="flex items-center gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
-              <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={30} />
+        leading={
+          <>
+            <IconButton icon={ArrowLeft} label={t("plants.backToList")} onClick={onBack} />
+            {/* Icon beside the title block, so name and category stack as on every other page. */}
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
+              <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={32} />
             </span>
-            {getPlantName(plant.id)}
-          </span>
+          </>
         }
+        title={getPlantName(plant.id)}
         description={t(`plants.category.${plant.category}`)}
         actions={
+          // Phones: primary first, both buttons share one row at equal width.
           <>
+            <Button className="flex-1 sm:flex-none" onClick={goPlanner}>
+              <LayoutGrid size={16} aria-hidden="true" />
+              {t("plants.placeInPlanner")}
+            </Button>
+            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={goSeeds}>
+              <Package size={16} aria-hidden="true" />
+              {t("plants.addSeeds")}
+            </Button>
             {onEdit && (
               <Button variant="ghost" onClick={onEdit}>
                 <Pencil size={16} aria-hidden="true" />
                 {t("common.edit")}
               </Button>
             )}
-            <Button variant="secondary" onClick={goSeeds}>
-              <Package size={16} aria-hidden="true" />
-              {t("plants.addSeeds")}
-            </Button>
-            <Button onClick={goPlanner}>
-              <LayoutGrid size={16} aria-hidden="true" />
-              {t("plants.placeInPlanner")}
-            </Button>
           </>
         }
       />
 
-      {description && <p className="-mt-2 mb-6 max-w-3xl text-sm text-gray-700 dark:text-gray-300">{description}</p>}
+      {(description || plant.caloriesPer100g) && (
+        <div className="-mt-2 mb-6 max-w-3xl text-sm">
+          {description && <p className="text-gray-700 dark:text-gray-300">{description}</p>}
+          {plant.caloriesPer100g ? (
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) })}</p>
+          ) : null}
+        </div>
+      )}
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
@@ -311,7 +326,6 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           label={t("plants.detail.yield")}
           value={plant.expectedYieldKgPerM2 ? formatNumber(plant.expectedYieldKgPerM2) : "–"}
           unit={plant.expectedYieldKgPerM2 ? t("plants.detail.yieldUnit") : undefined}
-          hint={plant.caloriesPer100g ? t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) }) : undefined}
         />
         <StatCard
           icon={Sun}
@@ -349,13 +363,19 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               <div className="space-y-4">
                 {good.length > 0 && (
                   <section>
-                    <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("plants.details.companions")}</h3>
+                    <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
+                      {t("plants.details.companions")}
+                    </h3>
                     <PartnerChips ids={good} kind="good" onSelect={onSelectPlant} />
                   </section>
                 )}
                 {bad.length > 0 && (
                   <section>
-                    <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("plants.details.antagonists")}</h3>
+                    <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <TriangleAlert size={14} aria-hidden="true" className="text-warning" />
+                      {t("plants.details.antagonists")}
+                    </h3>
                     <PartnerChips ids={bad} kind="bad" onSelect={onSelectPlant} />
                   </section>
                 )}
@@ -365,71 +385,43 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         </div>
 
         <div className="space-y-6">
-          {locations.length > 0 ? (
-            <List header={t("plants.detail.inGarden")}>
-              {locations.map((loc) => (
-                <ListRow
-                  key={loc.key}
-                  leading={<EnvironmentChip type={loc.env} />}
-                  title={loc.bedName}
-                  meta={gardens.length > 1 ? loc.gardenName : undefined}
-                  trailing={t("plants.detail.plantCount", { count: loc.count })}
-                  onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
-                />
-              ))}
-            </List>
-          ) : (
-            <Card>
-              <EmptyState
-                compact
-                icon={LayoutGrid}
-                title={t("plants.detail.notPlanted")}
-                description={t("plants.detail.notPlantedText")}
-                action={<Button onClick={goPlanner}>{t("plants.placeInPlanner")}</Button>}
+          {/* Beds, harvests and seeds of this crop in one list: three half-empty cards
+              (each with its own button repeating the header actions) read as noise. */}
+          <List header={t("plants.detail.yourStock")}>
+            {locations.length > 0 ? locations.map((loc) => (
+              <ListRow
+                key={loc.key}
+                leading={<EnvironmentChip type={loc.env} />}
+                title={loc.bedName}
+                meta={gardens.length > 1 ? loc.gardenName : undefined}
+                trailing={t("plants.detail.plantCount", { count: loc.count })}
+                onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
               />
-            </Card>
-          )}
-
-          <Card>
-            <CardHeader title={t("plants.detail.yourHarvests")} />
-            {harvestStats.count > 0 ? (
-              <>
-                <p className="text-2xl font-semibold text-gray-900 tabular-nums dark:text-gray-50">{formatWeight(harvestStats.grams)}</p>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {t("plants.detail.harvestEntries", { count: harvestStats.count })}
-                  {harvestStats.last && <> · {t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") })}</>}
-                </p>
-              </>
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t("plants.detail.noHarvests")}</p>
+            )) : (
+              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} />
             )}
-            <Button variant="secondary" size="sm" className="mt-4" onClick={goHarvest}>
-              <Apple size={16} aria-hidden="true" />
-              {t("plants.logHarvest")}
-            </Button>
-          </Card>
-
-          <Card>
-            <CardHeader title={t("plants.detail.seedStock")} />
-            {ownSeeds.length > 0 ? (
-              <ul className="divide-y divide-gray-100 text-sm dark:divide-white/5">
-                {ownSeeds.map((s) => (
-                  <li key={s.id} className="flex items-center justify-between gap-3 py-2">
-                    <span className="min-w-0 truncate text-gray-800 dark:text-gray-200">{s.variety || getPlantName(plant.id)}</span>
-                    <span className="shrink-0 text-gray-600 tabular-nums dark:text-gray-300">
-                      {formatNumber(s.quantity)} {t(`seeds.units.${s.unit}`)} · {s.yearAcquired}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t("plants.detail.noSeeds")}</p>
+            <ListRow
+              muted={harvestStats.count === 0}
+              leading={<StockTile icon={Apple} />}
+              title={t("plants.detail.yourHarvests")}
+              meta={harvestStats.count > 0
+                ? [t("plants.detail.harvestEntries", { count: harvestStats.count }), harvestStats.last && t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") })]
+                : t("plants.detail.noHarvests")}
+              trailing={harvestStats.count > 0 ? formatWeight(harvestStats.grams) : undefined}
+              actions={<IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} />}
+            />
+            {ownSeeds.length > 0 ? ownSeeds.map((s) => (
+              <ListRow
+                key={s.id}
+                leading={<StockTile icon={Package} />}
+                title={s.variety || t("plants.detail.seedStock")}
+                meta={String(s.yearAcquired)}
+                trailing={`${formatNumber(s.quantity)} ${t(`seeds.units.${s.unit}`)}`}
+              />
+            )) : (
+              <ListRow muted leading={<StockTile icon={Package} />} title={t("plants.detail.seedStock")} meta={t("plants.detail.noSeeds")} />
             )}
-            <Button variant="secondary" size="sm" className="mt-4" onClick={goSeeds}>
-              <Package size={16} aria-hidden="true" />
-              {t("plants.addSeeds")}
-            </Button>
-          </Card>
+          </List>
 
           {hasStorageInfo && (
             <Card>

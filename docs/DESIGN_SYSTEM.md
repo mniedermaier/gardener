@@ -236,7 +236,7 @@ if (await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") 
 Helpers: `cn(...)` in `src/lib/cn.ts`. Tone class maps (`TONE_SOFT`,
 `TONE_TEXT`, …) are in `ui/tone.ts`. Crop phases (Vorziehen, Direktsaat, Auspflanzen,
 Ernte) use `PhaseBadge`/`PhaseSwatch`/`PhaseLegend`/`phaseFill` from `ui/phase.tsx`
-(earth → green → earth, icon + hatching for "Vorziehen"); the windows come from
+(info blue → green → earth, icon + hatching for "Vorziehen"); the windows come from
 `lib/season.ts`. Plant-family colours are the muted set in `data/plantFamilies.ts`.
 Task rows everywhere use `calendar/TaskRow` with `groupTasksByDue()` (`lib/tasks.ts`). `CONTROL_CLASS` and `Field` in
 `ui/Field.tsx` are for the rare custom control.

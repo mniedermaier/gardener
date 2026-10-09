@@ -6,12 +6,13 @@ import type { Phase } from "@/lib/season";
 
 /**
  * Crop phases, one look everywhere (Kalender, Pflanzendetail, Dashboard,
- * Palette). Calm earth → green → earth ramp from the design tokens, plus a
+ * Palette). Info blue (under glass) → green → earth ramp from the design tokens, plus a
  * second carrier that is not colour: an icon, and hatching for "under glass"
  * (Vorziehen). Rows in timelines keep a fixed phase order as a third cue.
  */
 export const PHASE_META: Record<Phase, { icon: LucideIcon; bar: string; text: string; hatched: boolean }> = {
-  sowIndoors: { icon: House, bar: "bg-earth-300 dark:bg-earth-300/80", text: "text-earth-600 dark:text-earth-300", hatched: true },
+  // Under glass: the cool info hue, so it never reads as the earth-coloured harvest at small sizes.
+  sowIndoors: { icon: House, bar: "bg-info/40 dark:bg-info/50", text: "text-info", hatched: true },
   sowOutdoors: { icon: Sprout, bar: "bg-garden-300 dark:bg-garden-400/70", text: "text-garden-600 dark:text-garden-300", hatched: false },
   transplant: { icon: Shovel, bar: "bg-garden-600 dark:bg-garden-300", text: "text-garden-700 dark:text-garden-300", hatched: false },
   harvest: { icon: Apple, bar: "bg-earth-500 dark:bg-earth-400", text: "text-earth-600 dark:text-earth-300", hatched: false },

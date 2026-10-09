@@ -341,7 +341,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   onKeyDown={(e) => { if (e.key === "Enter") c.run(); }}
                   className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${selected ? "bg-gray-100 dark:bg-white/10" : ""}`}
                 >
-                  <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${c.leading ? "" : c.group === "actions" ? TONE_SOFT.brand : TONE_SOFT.neutral}`} aria-hidden="true">
+                  <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${c.group === "actions" ? TONE_SOFT.brand : TONE_SOFT.neutral}`} aria-hidden="true">
                     {c.leading ?? <Icon size={16} />}
                   </span>
                   <span className="min-w-0 flex-1 truncate font-medium">{c.label}</span>

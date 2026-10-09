@@ -25,7 +25,7 @@ export const PageHeader = memo(function PageHeader({ title, description, actions
             {description && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
           </div>
         </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        {actions && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{actions}</div>}
       </div>
       {tabs && <div className="mt-4">{tabs}</div>}
     </header>

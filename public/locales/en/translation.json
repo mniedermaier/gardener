@@ -78,7 +78,8 @@
       "water": "Watering",
       "sufficiency": "Self-sufficiency",
       "expenses": "Costs",
-      "settings": "Settings"
+      "settings": "Settings",
+      "import": "Import"
     },
     "group": {
       "garden": "Garden",
@@ -119,7 +120,7 @@
         "tasks": "Tasks",
         "journal": "Journal"
       },
-      "logHarvestFor": "Log harvest: {{name}}",
+      "logHarvestFor": "{{name}} · Log harvest",
       "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} cell",
       "cellCount_other": "{{count}} cells"
@@ -750,7 +751,9 @@
       "spacingCm": "Plant spacing (cm)",
       "harvestMin": "Earliest harvest (days)",
       "harvestMax": "Latest harvest (days)",
-      "harvestError": "Must not be less than the earliest value."
+      "harvestError": "Must not be less than the earliest value.",
+      "namePlaceholder": "e.g. Ginger",
+      "daysAfterSowing": "Days after sowing"
     },
     "detail": {
       "today": "Today",
@@ -769,11 +772,9 @@
       "partners": "Companions",
       "allPartners": "Companion matrix",
       "noPartners": "No known companions.",
-      "inGarden": "In your garden",
       "plantCount_one": "{{count}} plant",
       "plantCount_other": "{{count}} plants",
       "notPlanted": "Not in your garden yet",
-      "notPlantedText": "Put it in a bed to get tasks and a yield forecast.",
       "yourHarvests": "Your harvests",
       "harvestEntries_one": "{{count}} harvest",
       "harvestEntries_other": "{{count}} harvests",
@@ -785,7 +786,8 @@
       "viability_one": "Viable for {{count}} year",
       "viability_other": "Viable for {{count}} years",
       "isolation": "Isolation distance {{distance}} m",
-      "harvestDaysUnit": "days"
+      "harvestDaysUnit": "days",
+      "yourStock": "Your stock"
     }
   },
   "weather": {
@@ -1038,7 +1040,7 @@
     "exportHarvestsCsv": "Harvests as CSV",
     "exportExpensesCsv": "Expenses as CSV",
     "lastBackup": "Last backup",
-    "noBackup": "No backup yet. Your data lives only in this browser.",
+    "noBackup": "No backup yet. Your data lives only on this device.",
     "exportSuccess": "Backup downloaded",
     "importSuccess": "Data restored",
     "importError": "Import failed. Nothing was changed.",
@@ -1061,7 +1063,9 @@
       "journalEntries_other": "{{count}} journal entries",
       "expenses_one": "{{count}} expense",
       "expenses_other": "{{count}} expenses"
-    }
+    },
+    "backupStale": "Older than two weeks – a fresh backup is worth it.",
+    "csvEmpty": "Once you log harvests or expenses, you can export them here as CSV."
   },
   "alerts": {
     "frostTitle": "Frost warning: {{temp}}",
@@ -2183,7 +2187,9 @@
     "byPlant": "By plant",
     "focusLabel": "Highlight plant",
     "focusNone": "Highlight plant …",
-    "emptyFilter": "No plant matches the search."
+    "emptyFilter": "No plant matches the search.",
+    "scrollForMore_one": "Scroll sideways for all {{count}} plant",
+    "scrollForMore_other": "Scroll sideways for all {{count}} plants"
   },
   "water": {
     "title": "Watering",

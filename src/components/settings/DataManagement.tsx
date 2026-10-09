@@ -1,21 +1,24 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace } from "lucide-react";
+import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace, TriangleAlert } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { useFormat } from "@/hooks/useFormat";
+import { useToday } from "@/hooks/useToday";
 import { exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExport } from "@/lib/dataExport";
 import { importAllData, validateExportFile, type ImportMode, type ImportResult } from "@/lib/dataImport";
 
 const STAT_KEYS = ["gardens", "tasks", "harvests", "journalEntries", "expenses"] as const;
+const DAY = 24 * 60 * 60 * 1000;
 
 /** Backup status, full backup/restore and CSV exports. The destructive "delete all" lives in the settings danger zone. */
 export function DataManagement() {
   const { t } = useTranslation();
   const { formatDate } = useFormat();
+  const today = useToday();
   const { lastBackupDate, harvests, expenses } = useStore(useShallow((s) => ({ lastBackupDate: s.lastBackupDate, harvests: s.harvests, expenses: s.expenses })));
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,15 +56,25 @@ export function DataManagement() {
     else toast(t("dataManagement.importError"), "error");
   };
 
+  // Same threshold as the hint on "Heute" (BackupHint): two weeks old = time for a new one.
+  const stale = lastBackupDate !== null && today.getTime() - new Date(lastBackupDate).getTime() >= 14 * DAY;
+
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2.5 dark:bg-white/5">
-        {lastBackupDate
-          ? <ShieldCheck size={18} aria-hidden="true" className="shrink-0 text-positive" />
-          : <HardDrive size={18} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />}
+      <div className={`flex items-start gap-3 rounded-lg px-3 py-2.5 ${stale ? "bg-warning/10 dark:bg-warning/15" : "bg-gray-50 dark:bg-white/5"}`}>
+        {!lastBackupDate
+          ? <HardDrive size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
+          : stale
+            ? <TriangleAlert size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+            : <ShieldCheck size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-positive" />}
         <p className="text-sm text-gray-700 dark:text-gray-300">
           {lastBackupDate
-            ? <>{t("dataManagement.lastBackup")}: <time dateTime={lastBackupDate} className="font-medium">{formatDate(lastBackupDate, "relative")}</time></>
+            ? (
+              <>
+                {t("dataManagement.lastBackup")}: <time dateTime={lastBackupDate} className="font-medium">{formatDate(lastBackupDate, "relative")}</time>
+                {stale && <span className="block text-xs text-gray-600 dark:text-gray-300">{t("dataManagement.backupStale")}</span>}
+              </>
+            )
             : t("dataManagement.noBackup")}
         </p>
       </div>
@@ -80,18 +93,27 @@ export function DataManagement() {
 
       <div>
         <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="ghost" size="sm" onClick={exportHarvestsCsv} disabled={harvests.length === 0}>
-            <FileSpreadsheet size={14} aria-hidden="true" />
-            {t("dataManagement.exportHarvestsCsv")}
-            <span className="text-gray-500 tabular-nums dark:text-gray-400">{harvests.length}</span>
-          </Button>
-          <Button variant="ghost" size="sm" onClick={exportExpensesCsv} disabled={expenses.length === 0}>
-            <FileSpreadsheet size={14} aria-hidden="true" />
-            {t("dataManagement.exportExpensesCsv")}
-            <span className="text-gray-500 tabular-nums dark:text-gray-400">{expenses.length}</span>
-          </Button>
-        </div>
+        {/* Only exports that have rows; a disabled "… 0" button explains nothing. */}
+        {harvests.length === 0 && expenses.length === 0 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t("dataManagement.csvEmpty")}</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {harvests.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={exportHarvestsCsv}>
+                <FileSpreadsheet size={14} aria-hidden="true" />
+                {t("dataManagement.exportHarvestsCsv")}
+                <span className="text-gray-500 tabular-nums dark:text-gray-400">{harvests.length}</span>
+              </Button>
+            )}
+            {expenses.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={exportExpensesCsv}>
+                <FileSpreadsheet size={14} aria-hidden="true" />
+                {t("dataManagement.exportExpensesCsv")}
+                <span className="text-gray-500 tabular-nums dark:text-gray-400">{expenses.length}</span>
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       <Modal

@@ -9,10 +9,13 @@ import { Select } from "@/components/ui/Select";
 import { Modal } from "@/components/ui/Modal";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { usePlantName } from "@/hooks/usePlantName";
 import type { Plant, PlantCategory, SunRequirement, WaterNeed } from "@/types/plant";
 
-// The icon of a custom plant is user content, so an emoji is allowed here.
-const ICONS = ["🌿", "🌱", "🌾", "🌽", "🌸", "🥬", "🫚", "🍇", "🍒", "🪴"];
+// The icon of a custom plant is the id of a catalogue SVG, so custom plants look
+// like the rest of the catalogue (PlantIconDisplay also still renders old emoji icons).
+const ICONS = ["lettuce", "kale", "carrot", "bean", "corn", "pumpkin", "tomato", "strawberry", "basil", "sunflower"];
 
 interface Props {
   open: boolean;
@@ -47,6 +50,7 @@ function toDraft(p?: Plant): Draft {
 export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
+  const getPlantName = usePlantName();
   const { addCustomPlant, updateCustomPlant, deleteCustomPlant } = useStore(
     useShallow((s) => ({ addCustomPlant: s.addCustomPlant, updateCustomPlant: s.updateCustomPlant, deleteCustomPlant: s.deleteCustomPlant })),
   );
@@ -116,27 +120,28 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
       }
     >
       <div className="space-y-4">
-        <Input label={t("plants.customName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} autoFocus />
+        <Input label={t("plants.customName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("plants.form.namePlaceholder")} autoFocus />
 
         <div>
           <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("plants.customIcon")}
           </span>
-          <div className="flex flex-wrap gap-1" role="group" aria-labelledby="custom-plant-icon-label">
-            {ICONS.map((ic) => (
+          {/* An even 5 × 2 grid on every width; an old emoji icon stays selectable as an 11th tile. */}
+          <div className="grid grid-cols-5 gap-2 sm:max-w-sm" role="group" aria-labelledby="custom-plant-icon-label">
+            {(ICONS.includes(draft.icon) ? ICONS : [...ICONS, draft.icon]).map((ic) => (
               <button
                 key={ic}
                 type="button"
                 onClick={() => patch({ icon: ic })}
-                aria-label={ic}
+                aria-label={ICONS.includes(ic) ? getPlantName(ic) : ic}
                 aria-pressed={draft.icon === ic}
-                className={`flex size-11 items-center justify-center rounded-lg text-xl sm:size-10 ${
+                className={`flex h-12 items-center justify-center rounded-lg border ${
                   draft.icon === ic
-                    ? "bg-garden-50 ring-2 ring-garden-500 dark:bg-garden-500/15"
-                    : "hover:bg-gray-100 dark:hover:bg-white/10"
+                    ? "border-garden-500 bg-garden-50 ring-1 ring-garden-500 dark:bg-garden-500/15"
+                    : "border-gray-200 hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10"
                 }`}
               >
-                {ic}
+                <PlantIconDisplay plantId={ic} emoji={ic} size={28} />
               </button>
             ))}
           </div>
@@ -171,18 +176,21 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           />
         </div>
 
-        <Input
-          label={t("plants.form.spacingCm")}
-          type="number" min={5} max={200}
-          value={draft.spacingCm}
-          onChange={(e) => patch({ spacingCm: Number(e.target.value) })}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label={t("plants.form.spacingCm")}
+            type="number" min={5} max={200}
+            value={draft.spacingCm}
+            onChange={(e) => patch({ spacingCm: Number(e.target.value) })}
+          />
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Input
             label={t("plants.form.harvestMin")}
             type="number" min={10} max={365}
             value={draft.harvestMin}
+            hint={t("plants.form.daysAfterSowing")}
             onChange={(e) => patch({ harvestMin: Number(e.target.value) })}
           />
           <Input
@@ -190,6 +198,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             type="number" min={10} max={365}
             value={draft.harvestMax}
             error={harvestError}
+            hint={harvestError ? undefined : t("plants.form.daysAfterSowing")}
             onChange={(e) => patch({ harvestMax: Number(e.target.value) })}
           />
         </div>
