@@ -52,7 +52,9 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
   ];
 
   return (
-    <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4", className)}>
+    // Own container: four columns under the full-width grid, two in the narrow side pane next to a tall bed.
+    <div className="@container">
+    <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3 @md:grid-cols-4", className)}>
       {items.map((it) => (
         <div key={it.label} className="min-w-0">
           <dt className="text-xs text-gray-500 dark:text-gray-400">{it.label}</dt>
@@ -60,5 +62,6 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
         </div>
       ))}
     </dl>
+    </div>
   );
 });

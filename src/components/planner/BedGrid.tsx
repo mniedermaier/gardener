@@ -25,7 +25,7 @@ function conflictShadow(conflict?: CellConflict): string | undefined {
 /** Stone-slab pattern for path cells. */
 function PathMark({ size }: { size: number }) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" className="text-gray-500 dark:text-gray-400">
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" className="text-gray-500 dark:text-earth-300">
       <rect x="3" y="3" width="7" height="5" rx="1" fill="currentColor" opacity="0.45" />
       <rect x="12" y="3" width="9" height="5" rx="1" fill="currentColor" opacity="0.3" />
       <rect x="2" y="10" width="9" height="4" rx="1" fill="currentColor" opacity="0.3" />
@@ -79,7 +79,8 @@ const PlannerCell = memo(function PlannerCell({
       onClick={() => onActivate(x, y)}
       className={cn(
         "relative flex items-center justify-center rounded-md transition-colors focus-visible:z-10",
-        isPath && "bg-gray-200 dark:bg-white/10",
+        // Dark: an earthy path, not a grey block that reads as "disabled".
+        isPath && "bg-gray-200 dark:bg-earth-700/40",
         empty && mode === "place" && hint === "bad" && "cursor-copy bg-warning/10 hover:bg-warning/20",
         empty && mode === "place" && hint === "good" && "cursor-copy bg-positive/15 hover:bg-positive/25",
         // Dark: empty cells sit below the planted ones (dashed, darker), never look raised.
@@ -87,7 +88,8 @@ const PlannerCell = memo(function PlannerCell({
         empty && mode === "place" && !hint && "cursor-copy bg-white/80 hover:bg-garden-100 dark:bg-white/[0.03] dark:hover:bg-garden-500/20",
         empty && mode === "path" && "cursor-pointer bg-white/60 hover:bg-gray-200 dark:bg-white/[0.03] dark:hover:bg-white/10",
         empty && mode === "inspect" && "bg-white/60 dark:bg-white/[0.03]",
-        plant && "bg-(--tint)/15 dark:bg-(--tint)/[0.22]",
+        // Dark: one neutral cell surface, the family colour as a bottom bar (side-by-side tints turned muddy).
+        plant && "bg-(--tint)/15 dark:bg-white/[0.07] dark:shadow-[inset_0_-3px_0_0_var(--tint)]",
         plant && mode !== "path" && "cursor-pointer hover:brightness-95 dark:hover:brightness-125",
         plant && mode === "path" && "cursor-pointer",
         selected && "ring-2 ring-garden-600 ring-offset-1 ring-offset-gray-100 dark:ring-garden-300 dark:ring-offset-gray-900",
@@ -251,7 +253,7 @@ export const MiniBedGrid = memo(function MiniBedGrid({ bed, plantMap, conflicts,
           key={key}
           className={cn(
             "relative flex items-center justify-center rounded-[3px]",
-            isPath ? "bg-gray-300/70 dark:bg-white/15" : plant ? "bg-(--tint)/15 dark:bg-(--tint)/[0.22]" : "bg-white/70 dark:bg-white/[0.03]",
+            isPath ? "bg-gray-300/70 dark:bg-earth-700/40" : plant ? "bg-(--tint)/15 dark:bg-white/[0.08] dark:shadow-[inset_0_-2px_0_0_var(--tint)]" : "bg-white/70 dark:bg-white/[0.03]",
           )}
           style={{ width: cell, height: cell, ...(plant ? { "--tint": plant.color } : {}) } as CSSProperties}
         >
@@ -262,7 +264,7 @@ export const MiniBedGrid = memo(function MiniBedGrid({ bed, plantMap, conflicts,
               <TriangleAlert size={8} strokeWidth={3} />
             </span>
           )}
-          {isPath && cell >= 20 && <Footprints size={10} aria-hidden="true" className="text-gray-500" />}
+          {isPath && cell >= 20 && <Footprints size={10} aria-hidden="true" className="text-gray-500 dark:text-earth-300" />}
         </span>,
       );
     }

@@ -15,6 +15,7 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { EnvironmentChip } from "./environment";
 import { EditableBedGrid, type GridMode } from "./BedGrid";
 import { BedStats } from "./BedStats";
+import { BedCropList } from "./BedCropList";
 import { GuildPicker } from "./GuildPicker";
 import { usePointerFine } from "./usePointerFine";
 
@@ -259,6 +260,12 @@ export const BedEditor = memo(function BedEditor(props: Props) {
       ) : (
         <div className="border-t border-gray-100 px-3 py-4 sm:px-4 dark:border-white/5">
           <GuildPicker gardenId={gardenId} bedId={bed.id} bedWidth={bed.width} bedHeight={bed.height} />
+        </div>
+      )}
+      {/* Side pane only: on phones the same crops are one tap away in the grid. */}
+      {sideBySide && bed.cells.length > 0 && (
+        <div className="hidden @2xl:block">
+          <BedCropList bed={bed} plantMap={plantMap} getPlantName={getPlantName} onSelectCell={onSelectCell} />
         </div>
       )}
       </div>

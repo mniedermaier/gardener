@@ -524,7 +524,11 @@
     "dragPlantClick": "Cliquez sur une plante, puis sur des cases de la planche – ou glissez-la dans la planche.",
     "emptyBedsTextClick": "Indiquez taille et type (pleine terre, carré surélevé, serre …). Placez ensuite les plantes en cliquant ou en glissant.",
     "inspectHintShort": "Touchez une plante pour l’examiner.",
-    "inspectHintShortClick": "Cliquez sur une plante pour l’examiner."
+    "inspectHintShortClick": "Cliquez sur une plante pour l’examiner.",
+    "cropListTitle": "Dans la planche",
+    "cropListMeta_one": "{{count}} plante · récolte {{start}} – {{end}}",
+    "cropListMeta_other": "{{count}} plantes · récolte {{start}} – {{end}}",
+    "cropListMeta_many": "{{count}} plantes · récolte {{start}} – {{end}}"
   },
   "plants": {
     "title": "Plantes",

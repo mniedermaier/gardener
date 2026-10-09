@@ -506,7 +506,10 @@
     "dragPlantClick": "Anklicken und dann Felder im Beet anklicken – oder direkt ins Beet ziehen.",
     "emptyBedsTextClick": "Gib Größe und Art an (Freiland, Hochbeet, Gewächshaus …). Danach setzt du Pflanzen per Klick oder Ziehen.",
     "inspectHintShort": "Tippe auf eine Pflanze, um sie anzusehen.",
-    "inspectHintShortClick": "Klicke auf eine Pflanze, um sie anzusehen."
+    "inspectHintShortClick": "Klicke auf eine Pflanze, um sie anzusehen.",
+    "cropListTitle": "Im Beet",
+    "cropListMeta_one": "{{count}} Pflanze · Ernte {{start}} – {{end}}",
+    "cropListMeta_other": "{{count}} Pflanzen · Ernte {{start}} – {{end}}"
   },
   "plants": {
     "title": "Pflanzen",

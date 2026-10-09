@@ -524,7 +524,11 @@
     "dragPlantClick": "Haz clic en una planta y luego en casillas del bancal, o arrástrala al bancal.",
     "emptyBedsTextClick": "Indica tamaño y tipo (al aire libre, bancal elevado, invernadero…). Después coloca plantas haciendo clic o arrastrando.",
     "inspectHintShort": "Toca una planta para verla.",
-    "inspectHintShortClick": "Haz clic en una planta para verla."
+    "inspectHintShortClick": "Haz clic en una planta para verla.",
+    "cropListTitle": "En el bancal",
+    "cropListMeta_one": "{{count}} planta · cosecha {{start}} – {{end}}",
+    "cropListMeta_other": "{{count}} plantas · cosecha {{start}} – {{end}}",
+    "cropListMeta_many": "{{count}} plantas · cosecha {{start}} – {{end}}"
   },
   "plants": {
     "title": "Plantas",

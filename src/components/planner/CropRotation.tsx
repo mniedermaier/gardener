@@ -56,13 +56,14 @@ export const CropRotation = memo(function CropRotation({ garden }: { garden: Gar
 
       {/* A read-only sequence: numbered steps on a flat tint (no borders, so nothing looks like a button), equal width. */}
       <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("planner.rotation.order")}</p>
-      <ol className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label={t("planner.rotation.order")}>
+      <ol className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("planner.rotation.order")}>
         {rotationGroups.map((g, i) => (
           <li key={GROUP_KEYS[i]} className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2 dark:bg-white/5">
             <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-gray-700 tabular-nums ring-1 ring-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:ring-white/10" aria-hidden="true">
               {i + 1}
             </span>
-            <span className="min-w-0">
+            {/* Long compounds ("Nachtschattengewächse") must wrap inside the tile, never run past its edge. */}
+            <span className="min-w-0 break-words hyphens-auto">
               <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">{group(i)}</span>
               <span className="block text-xs text-gray-500 dark:text-gray-400">{g.families.map(family).join(", ")}</span>
             </span>

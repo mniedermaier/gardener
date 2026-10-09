@@ -506,7 +506,10 @@
     "dragPlantClick": "Click a plant, then click cells in the bed – or drag it into the bed.",
     "emptyBedsTextClick": "Set its size and type (open ground, raised bed, greenhouse …). Then place plants by clicking or dragging.",
     "inspectHintShort": "Tap a plant to inspect it.",
-    "inspectHintShortClick": "Click a plant to inspect it."
+    "inspectHintShortClick": "Click a plant to inspect it.",
+    "cropListTitle": "In this bed",
+    "cropListMeta_one": "{{count}} plant · harvest {{start}} – {{end}}",
+    "cropListMeta_other": "{{count}} plants · harvest {{start}} – {{end}}"
   },
   "plants": {
     "title": "Plants",
