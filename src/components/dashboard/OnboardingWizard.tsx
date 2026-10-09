@@ -343,7 +343,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                       label: (
                         <span className="flex flex-col items-center leading-tight">
                           {t(`onboarding.climate.${c.value}`)}
-                          <span className="text-xs font-normal opacity-75">{formatDate(`${frostYear}-${c.md}`, "dayMonth")}</span>
+                          <span className="text-xs font-normal">{formatDate(`${frostYear}-${c.md}`, "dayMonth")}</span>
                         </span>
                       ),
                     }))}

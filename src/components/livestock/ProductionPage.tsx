@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Bird, Egg, Pencil, Plus, Trash2 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
+import { daysSince } from "@/lib/format";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { expectationBasisDate, expectationStart, expectedShareToDate, getActualProducts } from "@/lib/metrics";
@@ -71,6 +72,8 @@ export function ProductionPage() {
   const eggWeeks = stats.eggWeeks;
   const eggAvg = eggWeeks.reduce((s, n) => s + n, 0) / eggWeeks.length;
   const lastEggEntry = animalProducts.reduce<string | null>((max, p) => (p.type === "eggs" && (max === null || p.date > max) ? p.date : max), null);
+  // A log gap is not a drop: the sparkline stops at the last logged week, like the hint.
+  const sparkWeeks = lastEggEntry && daysSince(lastEggEntry) >= 3 ? eggWeeks.slice(0, -1) : eggWeeks;
   // Same basis as the herd cards on "Tiere": expected up to today since arrival or the first entry.
   const expectedToDate = (ty: ProductType) => animals.reduce((sum, a) => {
     const y = ANNUAL_YIELD[a.type]?.find((x) => x.product === ty);
@@ -107,7 +110,7 @@ export function ProductionPage() {
         value: (
           <span className="inline-flex items-end gap-3">
             {f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })}
-            <Sparkline values={eggWeeks} color="brand" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
+            <Sparkline values={sparkWeeks} color="brand" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
           </span>
         ),
         hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} lastEntry={lastEggEntry} />,
@@ -161,8 +164,10 @@ export function ProductionPage() {
                 {(animals.length > 1 || productTypes.length > 1) && (
                   <div className="flex flex-wrap items-center gap-2">
                     {productTypes.length > 1 && (
+                      // Full width on phones like every other list filter; hugs its content from sm.
                       <SegmentedControl
-                        inline
+                        fullWidth
+                        className="sm:w-auto"
                         label={t("livestock.filterProduct")}
                         value={filterType}
                         onChange={setFilterType}

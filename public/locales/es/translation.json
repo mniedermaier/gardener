@@ -2139,7 +2139,10 @@
     "nutrientsPpm": "Nutrientes (ppm)",
     "staleHintPlanned_one": "{{count}} análisis tiene más de 5 meses: el próximo está previsto para el {{date}}.",
     "staleHintPlanned_other": "{{count}} análisis tienen más de 5 meses: el próximo está previsto para el {{date}}.",
-    "staleHintPlanned_many": "{{count}} análisis tienen más de 5 meses: el próximo está previsto para el {{date}}."
+    "staleHintPlanned_many": "{{count}} análisis tienen más de 5 meses: el próximo está previsto para el {{date}}.",
+    "staleHintPlannedBed_one": "{{count}} análisis tiene más de 5 meses – muestra prevista: {{bed}} · {{date}}.",
+    "staleHintPlannedBed_many": "{{count}} análisis tienen más de 5 meses – muestra prevista: {{bed}} · {{date}}.",
+    "staleHintPlannedBed_other": "{{count}} análisis tienen más de 5 meses – muestra prevista: {{bed}} · {{date}}."
   },
   "preservation": {
     "title": "Guía de conservación",

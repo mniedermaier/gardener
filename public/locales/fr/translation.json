@@ -2139,7 +2139,10 @@
     "nutrientsPpm": "Nutriments (ppm)",
     "staleHintPlanned_one": "{{count}} analyse date de plus de 5 mois – la prochaine est prévue le {{date}}.",
     "staleHintPlanned_other": "{{count}} analyses datent de plus de 5 mois – la prochaine est prévue le {{date}}.",
-    "staleHintPlanned_many": "{{count}} analyses datent de plus de 5 mois – la prochaine est prévue le {{date}}."
+    "staleHintPlanned_many": "{{count}} analyses datent de plus de 5 mois – la prochaine est prévue le {{date}}.",
+    "staleHintPlannedBed_one": "{{count}} analyse date de plus de 5 mois – prélèvement prévu : {{bed}} · {{date}}.",
+    "staleHintPlannedBed_many": "{{count}} analyses datent de plus de 5 mois – prélèvement prévu : {{bed}} · {{date}}.",
+    "staleHintPlannedBed_other": "{{count}} analyses datent de plus de 5 mois – prélèvement prévu : {{bed}} · {{date}}."
   },
   "preservation": {
     "title": "Guide de conservation",

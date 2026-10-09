@@ -204,7 +204,10 @@ export function SoilManagement() {
   const tab = blocked ? "tests" : tabState;
   const toPlanner = <Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>;
 
-  const plannedTest = soilTasks.filter((tk) => !tk.completedDate).map((tk) => tk.dueDate.slice(0, 10)).sort()[0];
+  const plannedTask = soilTasks.filter((tk) => !tk.completedDate).sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
+  const plannedTest = plannedTask?.dueDate.slice(0, 10);
+  // Name the bed when the task has one: "für Acker am 17. Okt." — not a promise for every old test.
+  const plannedBed = plannedTask?.bedId ? beds.label(plannedTask.bedId) : undefined;
   return (
     <div>
       <PageHeader
@@ -257,7 +260,7 @@ export function SoilManagement() {
                 <CalendarClock size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
                 {/* An open soil-test task already answers "neu beproben": name its date instead of "im Frühjahr". */}
                 {plannedTest
-                  ? t("soil.staleHintPlanned", { count: sortedTests.filter((s) => staleTest(s.date)).length, date: formatDate(plannedTest, "short") })
+                  ? t(plannedBed ? "soil.staleHintPlannedBed" : "soil.staleHintPlanned", { count: sortedTests.filter((s) => staleTest(s.date)).length, date: formatDate(plannedTest, "short"), bed: plannedBed })
                   : t("soil.staleHint", { count: sortedTests.filter((s) => staleTest(s.date)).length })}
               </p>
             )}

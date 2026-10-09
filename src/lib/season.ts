@@ -98,10 +98,9 @@ export function getPhaseWindows(plant: Plant, frost: Date, opts: { frostProtecti
   if (base && plant.harvestDaysMax < 200) {
     const start = addDays(base, plant.harvestDaysMin);
     let end = addDays(addWeeks(base, transplant ? PHASE_WEEKS.transplant : PHASE_WEEKS.sowOutdoors), plant.harvestDaysMax);
-    if (isContinuousCropper(plant)) {
-      const autumn = addWeeks(estimateFirstFrost(frost), protection);
-      if (isAfter(autumn, end)) end = autumn;
-    }
+    // Continuous croppers bear until the autumn frost — not shorter, and not
+    // longer either (rosemary's 180 days would otherwise outlast its bed mates).
+    if (isContinuousCropper(plant)) end = addWeeks(estimateFirstFrost(frost), protection);
     windows.push({ phase: "harvest", start, end });
   }
   return windows;

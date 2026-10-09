@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Bird, Egg, Plus, Coins } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
+import { daysSince } from "@/lib/format";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO } from "@/lib/format";
@@ -62,6 +63,8 @@ export function LivestockPage() {
   const herdTypes = herdProductTypes(animals, stats.year).slice(0, eggAnimal ? 2 : 3);
   const eggAvg = stats.eggWeeks.reduce((s, n) => s + n, 0) / stats.eggWeeks.length;
   const lastEggEntry = animalProducts.reduce<string | null>((max, p) => (p.type === "eggs" && (max === null || p.date > max) ? p.date : max), null);
+  // A log gap is not a drop: the sparkline stops at the last logged week, like the hint.
+  const sparkWeeks = lastEggEntry && daysSince(lastEggEntry) >= 3 ? stats.eggWeeks.slice(0, -1) : stats.eggWeeks;
   const feedFigure = {
     label: t("livestock.feedCost30"),
     value: f.formatCurrency(stats.feed.last30Days),
@@ -153,7 +156,7 @@ export function LivestockPage() {
               label: t("livestock.eggsThisWeek"),
               value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
               icon: Egg,
-              visual: <Sparkline values={stats.eggWeeks} color="brand" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
+              visual: <Sparkline values={sparkWeeks} color="brand" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
               hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} lastEntry={lastEggEntry} />,
               to: "/livestock/production",
             } : { ...feedFigure, icon: Coins }}
