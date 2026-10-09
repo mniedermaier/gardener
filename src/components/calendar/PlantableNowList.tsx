@@ -13,7 +13,7 @@ import { useWeatherGlance } from "@/hooks/useWeatherGlance";
 import { useToday } from "@/hooks/useToday";
 import { useFrostSummary } from "@/components/weather/frost";
 import { isFrostSensitive } from "@/lib/weatherAlerts";
-import { toISODate } from "@/lib/format";
+import { toDate, toISODate } from "@/lib/format";
 import { addDays } from "date-fns";
 
 /** Planted in autumn on purpose to overwinter: frost does not stop them. */
@@ -85,7 +85,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
                 {frostSoon && item.kind === "now" && !OVERWINTERING.has(plant.id)
                   && item.actions.some((a) => a === "transplant" || a === "plant_autumn")
                   && (isFrostSensitive(plant) || item.actions.includes("plant_autumn")) && (
-                  <Badge tone="warning" size="sm">{t("advisor.afterFrost")}</Badge>
+                  <Badge tone="warning" size="sm">{t("advisor.afterFrost", { date: formatDate(addDays(toDate(frost!.summary.nights.filter((n) => n.tempMin <= 0).at(-1)!.date)!, 1), "short") })}</Badge>
                 )}
               </>
             ) : undefined}

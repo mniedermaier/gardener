@@ -423,6 +423,17 @@ export function expectedShareToDate(type: ProductType, asOf: Date = new Date(), 
 }
 
 /**
+ * The date "expected so far" is counted from, when it is not simply 1 January:
+ * a later arrival or first entry this year. The UI names it ("seit 6. Aug."),
+ * so a herd kept for years does not seem to be judged by a few weeks.
+ */
+export function expectationBasisDate(since: string | undefined, asOf: Date = new Date()): string | null {
+  if (!since) return null;
+  const yearStart = `${asOf.getFullYear()}-01-01`;
+  return since > yearStart ? since : null;
+}
+
+/**
  * Where "expected so far" starts for one animal group: when it arrived, or —
  * if recording began later — the first entry logged for it. An animal kept
  * since last year but recorded only from August must not look like it lays at

@@ -116,6 +116,19 @@ function autumnWindows(plantId: string, year: number, protection: number, env?: 
   return result;
 }
 
+/**
+ * Autumn sowing/planting windows as season phases (autumn sowing = direct
+ * sowing, autumn planting = planting out), so the season chart can draw them
+ * next to the spring windows of the same phase.
+ */
+export function autumnPhaseWindows(plantId: string, year: number, protection: number, env?: EnvironmentType): Array<{ phase: "sowOutdoors" | "transplant"; start: Date; end: Date }> {
+  return autumnWindows(plantId, year, protection, env).map((w) => ({
+    phase: w.action === "sow_autumn" ? "sowOutdoors" : "transplant",
+    start: w.start,
+    end: w.end,
+  }));
+}
+
 function windowsFor(plant: Plant, frost: Date, year: number, protection: number, includeIndoor: boolean, env?: EnvironmentType): Window[] {
   const result: Window[] = [];
   // Frost-relative: [date − 1 week, date + 3 weeks].

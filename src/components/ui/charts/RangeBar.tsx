@@ -21,7 +21,7 @@ export const RangeBar = memo(function RangeBar({ min, max, domain, threshold, em
   return (
     <div role="img" aria-label={label} className={`relative h-2 rounded-full bg-gray-100 dark:bg-white/10 ${className}`}>
       <span
-        className={`absolute inset-y-0 rounded-full ${emphasis ? "bg-info" : "bg-earth-300 dark:bg-earth-400"}`}
+        className={`absolute inset-y-0 rounded-full ${emphasis ? "bg-info" : "bg-gray-400 dark:bg-gray-500"}`}
         style={{ left: `${pct(min)}%`, width: `${Math.max(4, pct(max) - pct(min))}%` }}
       />
       {threshold !== undefined && threshold > d0 && threshold < d1 && (

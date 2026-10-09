@@ -881,7 +881,10 @@
     "fallbackAuth": "Dein OpenWeatherMap-Schlüssel wurde abgelehnt. Bis du ihn prüfst, kommen die Wetterdaten von Open-Meteo.",
     "fallbackUnavailable": "OpenWeatherMap ist gerade nicht erreichbar. Die Wetterdaten kommen solange von Open-Meteo.",
     "dayArcTitle": "Sonne heute",
-    "dayArcLabel": "Sonnenaufgang {{sunrise}}, Sonnenuntergang {{sunset}}, {{hours}} Tageslicht"
+    "dayArcLabel": "Sonnenaufgang {{sunrise}}, Sonnenuntergang {{sunset}}, {{hours}} Tageslicht",
+    "daylightLeft": "Noch {{hours}} h Tageslicht",
+    "afterSunset": "Sonne untergegangen um {{time}}",
+    "beforeSunrise": "Sonnenaufgang um {{time}}"
   },
   "calendar": {
     "subtitle": "Was im Garten ansteht – nach Fälligkeit sortiert.",
@@ -956,7 +959,7 @@
     "taskTitle": "Titel",
     "taskType": "Typ",
     "taskDate": "Datum",
-    "generate": "Generieren",
+    "generate": "Aufgaben vorschlagen",
     "generated_one": "{{count}} Aufgabe generiert",
     "generated_other": "{{count}} Aufgaben generiert",
     "active": "Aktiv",
@@ -1584,7 +1587,8 @@
       "yearHint": "~{{amount}} bis heute erwartet",
       "emptyTitle": "Eier und Honig im Blick",
       "entries": "Einträge",
-      "notesPlaceholder": "z. B. Wetter, Legepause …"
+      "notesPlaceholder": "z. B. Wetter, Legepause …",
+      "yearHintSince": "~{{amount}} seit {{date}} erwartet"
     },
     "feed": {
       "title": "Futter",
@@ -1629,7 +1633,8 @@
       "dueNames": "Impfung prüfen: {{names}}",
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Impfungen, Entwurmungen und Tierarztbesuche und siehst, was fällig ist.",
       "emptyTitle": "Impfungen und Behandlungen im Blick",
-      "notesPlaceholder": "z. B. Dosierung, Tierarzt …"
+      "notesPlaceholder": "z. B. Dosierung, Tierarzt …",
+      "vaccCoverageScoped": "Impfpflichtige Gruppen mit Schutz"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1768,11 +1773,11 @@
     "tabYields": "Erträge",
     "tabFeedings": "Fütterungen",
     "tabTreatments": "Behandlungen",
-    "costPerUnit": "Kosten je Einheit",
     "noEggsToday": "Heute noch keine Eier erfasst",
     "notesPlaceholder": "z. B. Verhalten, Futtermarke …",
     "monthAvgLabel": "Ø pro Monat",
-    "bestMonth": "Bester Monat"
+    "bestMonth": "Bester Monat",
+    "ofExpectedSince": "von ~{{amount}} seit {{date}} erwartet"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2056,7 +2061,7 @@
     "showMore_other": "{{count}} weitere anzeigen",
     "bedCount_one": "{{count}} Beet",
     "bedCount_other": "{{count}} Beete",
-    "afterFrost": "Erst nach dem Frost"
+    "afterFrost": "Nach der Kältewelle (ab {{date}})"
   },
   "expenses": {
     "title": "Kosten",

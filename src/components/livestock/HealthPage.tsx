@@ -111,26 +111,22 @@ export function HealthPage() {
         <div className="space-y-6">
           {(healthEvents.length > 0 || stats.vaccinable > 0) && (
             <KeyFigures
-              // The figure that needs you: how many animal groups have current vaccination cover.
-              hero={stats.vaccinable > 0 ? {
-                label: t("livestock.health.vaccCoverage"),
-                value: t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable }),
-                icon: Syringe,
-                tone: stats.due.length > 0 ? "warning" : "positive",
-                // When something is due, the card right below names it with its action; no second copy here.
-                hint: stats.due.length === 0 && stats.nextDue ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") }) : undefined,
-              } : {
-                label: t("livestock.health.totalEvents"),
-                value: f.formatNumber(healthEvents.length, { maximumFractionDigits: 0 }),
+              // Hero: what health care cost and when it was last done. A missing
+              // vaccination is a negative status — it lives in the warning card
+              // below, not as the page's biggest number.
+              hero={{
+                label: t("livestock.health.totalCost"),
+                value: f.formatCurrency(stats.cost),
                 icon: ClipboardList,
                 hint: stats.last ? t("livestock.health.lastEntry", { date: f.formatDate(stats.last, "relative") }) : undefined,
               }}
               items={[
-                {
-                  label: t("livestock.health.totalCost"),
-                  value: f.formatCurrency(stats.cost),
-                  hint: stats.last ? t("livestock.health.lastEntry", { date: f.formatDate(stats.last, "relative") }) : undefined,
-                },
+                ...(stats.vaccinable > 0 ? [{
+                  // The scope is named: only animals with a vaccination schedule (bees have none).
+                  label: t("livestock.health.vaccCoverageScoped"),
+                  value: t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable }),
+                  hint: stats.due.length === 0 && stats.nextDue ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") }) : undefined,
+                }] : []),
                 { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: stats.losses === 0 ? t("livestock.health.noLosses") : undefined },
               ]}
             />
@@ -155,7 +151,7 @@ export function HealthPage() {
                           {lastDate ? t("livestock.health.lastVaccination", { date: f.formatDate(lastDate, "short") }) : t("livestock.health.neverVaccinated")}
                         </p>
                         {/* What is actually due for this species, so a hobby keeper can judge the hint. */}
-                        <p className="mt-1 max-w-prose text-xs text-gray-600 dark:text-gray-300">{t(`livestock.health.vaccContext.${VACC_GROUP[animal.type] ?? "other"}`)}</p>
+                        <p className="mt-1 max-w-2xl text-xs text-gray-600 dark:text-gray-300">{t(`livestock.health.vaccContext.${VACC_GROUP[animal.type] ?? "other"}`)}</p>
                       </div>
                       <Button size="sm" variant="secondary" className="shrink-0 self-start sm:self-auto" onClick={() => setDialog({ open: true, animalId, type: "vaccination" })}>
                         <Syringe size={14} aria-hidden="true" />
@@ -177,15 +173,18 @@ export function HealthPage() {
             </Card>
           ) : (
             <section className="space-y-3">
-              {/* Filters only pay off on a longer history; side by side so they cost one row. */}
-              {healthEvents.length >= FILTER_FROM && (
-                <div className={`grid gap-3 sm:max-w-lg ${animals.length > 1 ? "grid-cols-2" : ""}`}>
-                  {animals.length > 1 && (
-                    <Select label={t("livestock.filterAnimal")} value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
-                  )}
-                  <Select label={t("livestock.healthType")} value={filterType} onChange={(e) => setFilterType(e.target.value as "" | HealthEventType)} placeholder={t("livestock.health.allTypes")} options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))} />
-                </div>
-              )}
+              {/* Same list header as Produktion: heading left, filters right (filters only on a longer history). */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("livestock.production.entries")}</h2>
+                {healthEvents.length >= FILTER_FROM && (
+                  <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+                    {animals.length > 1 && (
+                      <Select aria-label={t("livestock.filterAnimal")} wrapperClassName="w-full sm:w-48" value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
+                    )}
+                    <Select aria-label={t("livestock.healthType")} wrapperClassName="w-full sm:w-48" value={filterType} onChange={(e) => setFilterType(e.target.value as "" | HealthEventType)} placeholder={t("livestock.health.allTypes")} options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))} />
+                  </div>
+                )}
+              </div>
               {groups.length === 0 ? (
                 <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
               ) : groups.map((g) => (

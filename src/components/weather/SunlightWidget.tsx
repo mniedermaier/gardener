@@ -26,7 +26,7 @@ function Fact({ icon: Icon, label, value }: { icon: LucideIcon; label: string; v
  * `compact`: only the yearly chart, for the weather page's side column where
  * the day arc already shows today's sun times.
  */
-export function SunlightWidget({ compact = false }: { compact?: boolean }) {
+export function SunlightWidget({ compact = false, className }: { compact?: boolean; className?: string }) {
   const { t } = useTranslation();
   const f = useFormat();
   const { locationLat, locationLon } = useStore(useShallow((s) => ({ locationLat: s.locationLat, locationLon: s.locationLon })));
@@ -44,7 +44,7 @@ export function SunlightWidget({ compact = false }: { compact?: boolean }) {
   const monthDate = (m: number) => new Date(now.getFullYear(), m - 1, 1);
 
   return (
-    <Card className={compact ? undefined : "mt-6"}>
+    <Card className={className ?? (compact ? undefined : "mt-6")}>
       {compact ? (
         <CardHeader title={t("sunlight.yearlyDaylight")} description={t("sunlight.yearlyDesc")} />
       ) : (

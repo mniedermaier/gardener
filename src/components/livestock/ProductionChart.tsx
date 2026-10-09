@@ -14,13 +14,19 @@ const MIN_MONTHS = 3;
 interface ProductionChartProps {
   animalProducts: AnimalProduct[];
   months?: number;
+  /**
+   * Entries that set the first month shown (default: `animalProducts`). The
+   * herd detail passes all entries so its chart spans the same months as the
+   * Produktion page.
+   */
+  rangeProducts?: AnimalProduct[];
 }
 
 /**
  * Production per month as small multiples: one chart per product, each with
  * its own unit (eggs are counted, honey is weighed) — never stacked on one axis.
  */
-export function ProductionChart({ animalProducts, months = 6 }: ProductionChartProps) {
+export function ProductionChart({ animalProducts, months = 6, rangeProducts }: ProductionChartProps) {
   const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
@@ -42,14 +48,14 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
     // Start at the first month with any entry (but show at least 3 months):
     // a herd that arrived in August should not get nine empty bars.
     let first = months - 1;
-    for (const arr of full.values()) {
-      const i = arr.findIndex((v) => v > 0);
-      if (i >= 0) first = Math.min(first, i);
+    for (const p of rangeProducts ?? animalProducts) {
+      const i = index.get(p.date.slice(0, 7));
+      if (i !== undefined && p.quantity > 0) first = Math.min(first, i);
     }
     const start = Math.max(0, Math.min(first, months - MIN_MONTHS));
     const perType = new Map([...full].map(([ty, arr]) => [ty, arr.slice(start)] as const));
     return { buckets: all.slice(start), perType };
-  }, [now, animalProducts, months]);
+  }, [now, animalProducts, months, rangeProducts]);
   const shown = buckets.length;
 
   const present = PRODUCT_TYPES.filter((ty) => perType.get(ty)?.some((v) => v > 0));

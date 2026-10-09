@@ -33,7 +33,8 @@ type View = "overview" | "crops" | "animals" | "preserve";
 const NUTRIENTS = ["calories", "protein", "vitaminC", "fiber"] as const;
 const NUTRIENT_ICON = { calories: Apple, protein: Beef, vitaminC: Citrus, fiber: Wheat };
 /** Calorie-dense staples considered as levers ("+5 m² → +x %"). */
-const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "squash", "pea"];
+// One entry per kind: pumpkin stands for all squashes (Butternut would repeat it).
+const LEVER_CROPS = ["potato", "bean", "corn", "pumpkin", "pea"];
 const LEVER_AREA_M2 = 5;
 
 export function SufficiencyDashboard() {
@@ -232,9 +233,9 @@ export function SufficiencyDashboard() {
                           <Icon size={14} aria-hidden="true" className="text-gray-500" />
                           {label}
                         </span>
-                        <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(data.percent / 100)}</span>
+                        <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}</span>
                       </div>
-                      <Meter forecast={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100)}`} />
+                      <Meter forecast={data.produced} max={data.needed} label={`${label}: ${f.formatPercent(data.percent / 100, data.percent < 10 ? 1 : 0)}`} />
                       <p className="mt-1 text-xs tabular-nums text-gray-500 dark:text-gray-400">
                         {t("sufficiency.ofNeed", { produced: `${f.formatNumber(data.produced, { maximumFractionDigits: 0 })} ${unit}`, needed: `${f.formatNumber(data.needed, { maximumFractionDigits: 0 })} ${unit}` })}
                       </p>
@@ -264,7 +265,7 @@ export function SufficiencyDashboard() {
                   <ul className="space-y-1.5 text-sm">
                     {result.gaps.map((g) => (
                       <li key={g.nutrient} className="text-gray-700 dark:text-gray-300">
-                        <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100)}</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{t(`sufficiency.nutrients.${g.nutrient}`)} · {f.formatPercent(g.percent / 100, g.percent < 10 ? 1 : 0)}</span>
                         {" – "}
                         {g.suggestion.split(",").filter((id) => plantMap.has(id)).map((id) => plantName(id)).join(", ")}
                       </li>

@@ -117,9 +117,13 @@ export function FeedPage() {
           )}
 
           <section className="space-y-3">
-            {animals.length > 1 && (
-              <Select wrapperClassName="sm:max-w-xs" label={t("livestock.filterAnimal")} value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
-            )}
+            {/* Same list header as Produktion and Gesundheit: heading left, filter right. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("livestock.production.entries")}</h2>
+              {animals.length > 1 && (
+                <Select aria-label={t("livestock.filterAnimal")} wrapperClassName="w-full sm:w-48" value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
+              )}
+            </div>
             {groups.length === 0 ? (
               <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
             ) : groups.map((g) => (
