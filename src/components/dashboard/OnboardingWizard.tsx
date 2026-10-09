@@ -14,6 +14,10 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import { useFormat } from "@/hooks/useFormat";
+import { usePlantName } from "@/hooks/usePlantName";
+import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { toDate } from "@/lib/format";
+import { addWeeks } from "date-fns";
 import { applyTheme } from "@/lib/theme";
 import { estimateLastFrost, defaultLastFrost, upcomingFrostYear } from "@/lib/location";
 import { importAllData, validateExportFile } from "@/lib/dataImport";
@@ -33,12 +37,14 @@ const LANGUAGES: Array<{ value: Locale; label: string }> = [
   { value: "fr", label: "Français" },
 ];
 
-function StepHeader({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
+function StepHeader({ icon: Icon, title, description, visual }: { icon: LucideIcon; title: string; description: string; visual?: ReactNode }) {
   return (
     <div className="mb-6">
-      <span className="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-garden-50 text-garden-700 dark:bg-garden-500/15 dark:text-garden-300" aria-hidden="true">
-        <Icon size={22} />
-      </span>
+      {visual ?? (
+        <span className="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-garden-50 text-garden-700 dark:bg-garden-500/15 dark:text-garden-300" aria-hidden="true">
+          <Icon size={22} />
+        </span>
+      )}
       <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-50">{title}</h1>
       <p className="mt-1.5 text-sm text-gray-600 dark:text-gray-400">{description}</p>
     </div>
@@ -80,6 +86,58 @@ function StartOption({ id, name, value, checked, onSelect, icon: Icon, title, de
   );
 }
 
+/** Welcome hero: a small raised bed drawn with the catalogue's own plant icons. */
+const HERO_PLANTS = ["tomato", "lettuce", "carrot", "bean", "strawberry", "pepper", "basil", "zucchini"] as const;
+
+function GardenVignette() {
+  return (
+    <div className="mb-5 rounded-2xl bg-garden-50 p-4 dark:bg-garden-500/10" aria-hidden="true">
+      <div className="mx-auto grid max-w-72 grid-cols-4 gap-2 rounded-xl border-4 border-earth-300 bg-earth-100 p-2 dark:border-earth-700 dark:bg-earth-900/40">
+        {HERO_PLANTS.map((id) => (
+          <span key={id} className="flex aspect-square items-center justify-center rounded-lg bg-white/70 dark:bg-white/5">
+            <PlantIconDisplay plantId={id} emoji="" size={30} />
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Rough last-frost dates for people who do not know theirs (month-day, Central Europe). */
+const CLIMATES = [
+  { value: "mild", md: "04-25" },
+  { value: "mid", md: "05-15" },
+  { value: "cold", md: "05-31" },
+] as const;
+
+/** What the frost date sets in motion: three familiar crops, live with the chosen date. */
+function FrostPreview({ frost }: { frost: string }) {
+  const { t } = useTranslation();
+  const { formatDate } = useFormat();
+  const plantName = usePlantName();
+  const base = toDate(frost);
+  if (!base) return null;
+  const rows = [
+    { id: "lettuce", key: "onboarding.previewSowIndoors", weeks: -6 },
+    { id: "tomato", key: "onboarding.previewTransplant", weeks: 2 },
+    { id: "bean", key: "onboarding.previewSowOutdoors", weeks: 2 },
+  ];
+  return (
+    <div className="mt-5">
+      <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("onboarding.previewTitle")}</p>
+      <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 dark:divide-white/5 dark:border-white/10">
+        {rows.map((r) => (
+          <li key={r.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+            <PlantIconDisplay plantId={r.id} emoji="" size={24} />
+            <span className="min-w-0 flex-1 font-medium text-gray-900 dark:text-gray-100">{plantName(r.id)}</span>
+            <span className="text-gray-600 tabular-nums dark:text-gray-400">{t(r.key, { date: formatDate(addWeeks(base, r.weeks), "dayMonth") })}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /**
  * First run: language → location (place search, device position or manual
  * coordinates) → last frost (estimated from the location) → how to start
@@ -106,7 +164,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   // Until the user edits the date, it follows the estimate for the chosen place.
   const [frostTouched, setFrostTouched] = useState(false);
   const shownFrost = frostTouched ? frostDate : estimate ?? frostDate;
-  const [gardenName, setGardenName] = useState("");
+  // Prefilled with the default (in the chosen language) so the name is visible, not applied silently.
+  const [gardenNameDraft, setGardenName] = useState<string | null>(null);
+  const gardenName = gardenNameDraft ?? t("onboarding.defaultGardenName");
   const [mode, setMode] = useState<StartMode>("starter");
   const [busy, setBusy] = useState(false);
 
@@ -177,8 +237,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   return (
     // Top-anchored, not vertically centred: header and progress bar stay at
     // the same height in every step, only the card below grows or shrinks.
-    <div className="flex min-h-dvh justify-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:py-8 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
-      <div className="w-full max-w-lg sm:mt-[min(10vh,6rem)]">
+    <div className="flex min-h-dvh flex-col items-center bg-gradient-to-b from-garden-50 via-gray-50 to-gray-50 px-4 py-4 pt-safe sm:py-8 dark:from-garden-950/50 dark:via-gray-950 dark:to-gray-950">
+      <div className="flex w-full max-w-lg flex-1 flex-col sm:mt-[min(10vh,6rem)] sm:flex-none">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-8 items-center justify-center rounded-lg bg-garden-600 text-white" aria-hidden="true">
@@ -197,10 +257,11 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
           ))}
         </div>
 
-        <Card className="shadow-sm">
+        {/* Phones: the card fills the screen and the footer sits at the bottom, in thumb reach. */}
+        <Card className="flex flex-1 flex-col shadow-sm sm:block sm:flex-none">
           {step === "welcome" && (
             <>
-              <StepHeader icon={Sprout} title={t("onboarding.welcome")} description={t("onboarding.welcomeDesc")} />
+              <StepHeader icon={Sprout} title={t("onboarding.welcome")} description={t("onboarding.welcomeDesc")} visual={<GardenVignette />} />
               <ul className="mb-6 space-y-3">
                 {([
                   [LayoutGrid, "onboarding.featurePlan"],
@@ -249,6 +310,24 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   {t("onboarding.useEstimate", { date: formatDate(estimate, "dayMonth") })}
                 </Button>
               )}
+              {!estimate && (
+                <div className="mt-4">
+                  <p className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">{t("onboarding.climateLabel")}</p>
+                  <SegmentedControl
+                    label={t("onboarding.climateLabel")}
+                    value={CLIMATES.find((c) => shownFrost.slice(5) === c.md)?.value ?? ""}
+                    onChange={(v) => {
+                      const c = CLIMATES.find((x) => x.value === v);
+                      if (!c) return;
+                      setFrostTouched(true);
+                      setFrostDate(`${frostYear}-${c.md}`);
+                    }}
+                    options={CLIMATES.map((c) => ({ value: c.value, label: t(`onboarding.climate.${c.value}`) }))}
+                    fullWidth
+                  />
+                </div>
+              )}
+              <FrostPreview frost={shownFrost} />
             </>
           )}
 
@@ -284,8 +363,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             </>
           )}
 
+          <div className="h-6 shrink-0 sm:hidden" aria-hidden="true" />
           {/* Phones: the footer sticks to the bottom edge, so "Weiter"/"Anlegen" is never below the fold. */}
-          <div className="sticky bottom-0 -mx-4 -mb-4 mt-6 flex items-center justify-between gap-2 rounded-b-xl border-t border-gray-100 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:mt-8 sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none dark:border-white/10 dark:bg-gray-900/95 sm:dark:bg-transparent">
+          <div className="sticky bottom-0 -mx-4 -mb-4 mt-auto flex items-center justify-between gap-2 rounded-b-xl border-t border-gray-100 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:mt-8 sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none dark:border-white/10 dark:bg-gray-900/95 sm:dark:bg-transparent">
             {index > 0 ? (
               <Button variant="ghost" onClick={back}>
                 <ArrowLeft size={16} aria-hidden="true" />

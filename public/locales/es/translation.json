@@ -283,6 +283,16 @@
       "raisedBed": "Bancal elevado",
       "vegBed": "Bancal de hortalizas",
       "herbPot": "Maceta de hierbas"
+    },
+    "previewTitle": "Con ello planificamos, por ejemplo:",
+    "previewSowIndoors": "semillero desde el {{date}}",
+    "previewTransplant": "trasplantar desde el {{date}}",
+    "previewSowOutdoors": "sembrar desde el {{date}}",
+    "climateLabel": "O elige tu clima",
+    "climate": {
+      "mild": "Suave",
+      "mid": "Medio",
+      "cold": "Duro"
     }
   },
   "planner": {

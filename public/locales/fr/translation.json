@@ -283,6 +283,16 @@
       "raisedBed": "Bac surélevé",
       "vegBed": "Planche potagère",
       "herbPot": "Pot d’aromatiques"
+    },
+    "previewTitle": "Par exemple, cela planifie :",
+    "previewSowIndoors": "semis à l’abri dès le {{date}}",
+    "previewTransplant": "repiquer dès le {{date}}",
+    "previewSowOutdoors": "semer dès le {{date}}",
+    "climateLabel": "Ou choisis ton climat",
+    "climate": {
+      "mild": "Doux",
+      "mid": "Moyen",
+      "cold": "Rude"
     }
   },
   "planner": {

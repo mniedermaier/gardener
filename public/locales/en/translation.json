@@ -271,6 +271,16 @@
       "raisedBed": "Raised bed",
       "vegBed": "Vegetable bed",
       "herbPot": "Herb pot"
+    },
+    "previewTitle": "For example, this plans:",
+    "previewSowIndoors": "start indoors from {{date}}",
+    "previewTransplant": "plant out from {{date}}",
+    "previewSowOutdoors": "sow from {{date}}",
+    "climateLabel": "Or pick your climate",
+    "climate": {
+      "mild": "Mild",
+      "mid": "Average",
+      "cold": "Harsh"
     }
   },
   "planner": {

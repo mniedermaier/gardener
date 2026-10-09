@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, LocateFixed, Search, Loader2, Pencil } from "lucide-react";
+import { MapPin, LocateFixed, Search, Loader2, Pencil, Keyboard } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -174,7 +174,8 @@ export function LocationPicker({ value, onChange, prominent = false }: LocationP
           {locating ? <Loader2 size={16} aria-hidden="true" className="animate-spin" /> : <LocateFixed size={16} aria-hidden="true" />}
           {t("location.useDevice")}
         </Button>
-        <Button variant="ghost" className={prominent ? "-ml-3 sm:ml-0" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+        <Button variant={prominent ? "secondary" : "ghost"} className={prominent ? "w-full sm:w-auto" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+          {prominent && <Keyboard size={16} aria-hidden="true" />}
           {t("location.manual")}
         </Button>
         {hasCoords && (

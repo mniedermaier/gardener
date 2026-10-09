@@ -118,11 +118,11 @@ const PLANT_SVGS: Record<string, string> = {
 
   spinach: `
     <path d="M12 22V12" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M6 9C6 4 9 2 12 2S18 4 18 9C18 13 15 15 12 15S6 13 6 9Z" fill="#166534"/>
-    <path d="M7.5 9C7.5 5 9.5 3 12 3S16.5 5 16.5 9C16.5 12.5 14.5 14 12 14S7.5 12.5 7.5 9Z" fill="#14532d"/>
-    <path d="M12 4V13" stroke="#0f4a1a" stroke-width="0.6"/>
-    <path d="M9 6L12 5L15 6" stroke="#0f4a1a" stroke-width="0.4" fill="none"/>
-    <path d="M8 9L12 8L16 9" stroke="#0f4a1a" stroke-width="0.4" fill="none"/>`,
+    <path d="M6 9C6 4 9 2 12 2S18 4 18 9C18 13 15 15 12 15S6 13 6 9Z" fill="#15803d"/>
+    <path d="M7.5 9C7.5 5 9.5 3 12 3S16.5 5 16.5 9C16.5 12.5 14.5 14 12 14S7.5 12.5 7.5 9Z" fill="#22c55e"/>
+    <path d="M12 4V13" stroke="#15803d" stroke-width="0.6"/>
+    <path d="M9 6L12 5L15 6" stroke="#15803d" stroke-width="0.4" fill="none"/>
+    <path d="M8 9L12 8L16 9" stroke="#15803d" stroke-width="0.4" fill="none"/>`,
 
   beetroot: `
     <circle cx="12" cy="13" r="7" fill="#881337"/>

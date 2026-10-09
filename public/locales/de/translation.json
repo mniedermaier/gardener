@@ -267,6 +267,16 @@
       "raisedBed": "Hochbeet",
       "vegBed": "Gemüsebeet",
       "herbPot": "Kräuterkübel"
+    },
+    "previewTitle": "Damit planen wir zum Beispiel:",
+    "previewSowIndoors": "vorziehen ab {{date}}",
+    "previewTransplant": "auspflanzen ab {{date}}",
+    "previewSowOutdoors": "säen ab {{date}}",
+    "climateLabel": "Oder wähle dein Klima",
+    "climate": {
+      "mild": "Mild",
+      "mid": "Mittel",
+      "cold": "Rau"
     }
   },
   "search": {
