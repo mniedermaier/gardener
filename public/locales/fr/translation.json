@@ -79,7 +79,7 @@
       "sufficiency": "Autosuffisance",
       "expenses": "Coûts",
       "settings": "Paramètres",
-      "import": "Importer"
+      "import": "Importer un jardin"
     },
     "group": {
       "garden": "Jardin",
@@ -1002,9 +1002,10 @@
     },
     "reopenNamed": "Rouvrir « {{title}} »",
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
-    "untilRange": "jusqu’au {{first}} – {{last}} selon la planche",
-    "fromRange": "dès le {{first}} – {{last}} selon la planche",
-    "upNextFrom": "Ensuite · dès le {{date}}"
+    "untilRange": "jusqu’au {{first}}–{{last}}, selon la planche",
+    "fromRange": "dès le {{first}}–{{last}}, selon la planche",
+    "upNextFrom": "Ensuite · dès le {{date}}",
+    "alsoAction": "aussi : {{action}}"
   },
   "settings": {
     "title": "Paramètres",
@@ -1178,7 +1179,9 @@
     "frostHardNights_one": "Gel {{count}} nuit",
     "frostHardNights_other": "Gel {{count}} nuits",
     "frostHardNights_many": "Gel {{count}} nuits",
-    "frostAdviceNoPlants": "Attendez la fin des nuits de gel pour repiquer."
+    "frostAdviceNoPlants": "Attendez la fin des nuits de gel pour repiquer.",
+    "frostAdviceAutumn": "Rentrez les dernières récoltes et mettez les pots sensibles à l’abri.",
+    "frostAdviceAutumnNoPlants": "Gardez un voile d’hivernage prêt pour les légumes d’hiver."
   },
   "harvest": {
     "title": "Récolte",
@@ -2208,7 +2211,9 @@
     "weeks": "semaines",
     "sowings": "Semis",
     "sowing": "Semis",
-    "generateTasks": "Ajouter au calendrier"
+    "generateTasks": "Ajouter au calendrier",
+    "nextSpring": "Les périodes de semis de cette année sont passées. Vous planifiez les semis échelonnés pour le printemps {{year}}.",
+    "pickNextSpring": "Choisir une culture pour le printemps prochain"
   },
   "guilds": {
     "title": "Associations de plantes",
@@ -2417,9 +2422,8 @@
     "title": "Importer un jardin",
     "subtitle": "Quelqu’un a partagé un plan de jardin avec vous. Vérifiez l’aperçu et ajoutez-le comme nouveau jardin.",
     "invalidTitle": "Ce lien ne fonctionne pas",
-    "invalidText": "Le lien de partage est incomplet ou endommagé. Demandez à l’expéditeur de le renvoyer.",
-    "toPlanner": "Aller au planificateur",
-    "restoreBackup": "Restaurer une sauvegarde",
+    "invalidText": "Le lien de partage est incomplet ou endommagé. Collez-le à nouveau ici ou demandez à l’expéditeur de le renvoyer.",
+    "restoreBackup": "Restaurer votre sauvegarde",
     "summary": "{{beds}} · {{plantings}}",
     "beds_one": "{{count}} planche",
     "beds_other": "{{count}} planches",
@@ -2435,7 +2439,12 @@
     "plantings_many": "{{count}} plantations",
     "noLinkSubtitle": "Reprendre des plans de jardin depuis un lien de partage.",
     "noLinkTitle": "Reprendre un jardin depuis un lien",
-    "noLinkText": "Quelqu’un a partagé un plan de jardin avec vous ? Ouvrez le lien et l’aperçu s’affiche ici. Vos propres données se restaurent depuis une sauvegarde."
+    "noLinkText": "Quelqu’un a partagé un plan de jardin avec vous ? Collez le lien ici ou ouvrez-le directement pour voir l’aperçu.",
+    "pasteLabel": "Coller le lien de partage",
+    "pastePlaceholder": "https://…#/import?t=…",
+    "pasteInvalid": "Ce n’est pas un lien de partage valide.",
+    "preview": "Aperçu",
+    "toPlanner": "Aller au planificateur"
   },
   "charts": {
     "month": "Mois",

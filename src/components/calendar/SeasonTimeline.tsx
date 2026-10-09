@@ -13,7 +13,6 @@ import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { List, ListRow } from "@/components/ui/List";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
@@ -37,6 +36,9 @@ interface PlantTimeline {
   phases: Partial<Record<Phase, Range>>;
 }
 
+/** Rows of "Jetzt dran" before "n weitere anzeigen" — the same cap as the sowing list. */
+const NOW_LIMIT = 8;
+
 export function SeasonTimeline() {
   const now = useToday();
   const { t } = useTranslation();
@@ -46,6 +48,7 @@ export function SeasonTimeline() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [filter, setFilter] = useState<string>("all");
+  const [nowExpanded, setNowExpanded] = useState(false);
   const sowing = useSowingAgenda();
   const plantableCount = agendaPlantCount(sowing.now);
 
@@ -133,19 +136,23 @@ export function SeasonTimeline() {
   );
 
   if (plantedBeds.length === 0) {
+    // Without beds the sowing list is the useful part: it leads, the missing season plan is one hint line.
     return (
-      <div className="space-y-6">
-      {/* Compact: the sowing list below is the useful part for a garden without beds. */}
-      <Card padding="sm">
-        <EmptyState
-          compact
-          icon={CalendarRange}
-          title={t("calendar.timelineEmptyTitle")}
-          description={t("calendar.timelineEmptyText")}
-          action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("calendar.toPlanner")}</Button>}
-        />
-      </Card>
-      {sowingList}
+      <div className="space-y-4">
+        {sowingList}
+        <Card padding="sm" className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
+            <CalendarRange size={18} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("calendar.timelineEmptyTitle")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t("calendar.timelineEmptyText")}</p>
+          </div>
+          <Button variant="secondary" className="self-start sm:self-center" onClick={() => navigate("/planner")}>
+            <LayoutGrid size={16} aria-hidden="true" />
+            {t("calendar.toPlanner")}
+          </Button>
+        </Card>
       </div>
     );
   }
@@ -200,8 +207,20 @@ export function SeasonTimeline() {
         {filterSelect}
         <List headingLevel={2} header={[t("calendar.nowDue"), nowPhase && phaseLabel(nowPhase), agenda.now.length].filter((x) => x !== null).join(" · ")}>
           {agenda.now.length > 0
-            ? agenda.now.map((a) => agendaRow(a, "now", nowPhase === null))
+            ? (nowExpanded ? agenda.now : agenda.now.slice(0, NOW_LIMIT)).map((a) => agendaRow(a, "now", nowPhase === null))
             : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNow")}</li>}
+          {/* Same cap as the sowing list below. */}
+          {!nowExpanded && agenda.now.length > NOW_LIMIT && (
+            <li>
+              <button
+                type="button"
+                onClick={() => setNowExpanded(true)}
+                className="flex min-h-11 w-full items-center px-4 text-left text-sm font-medium text-garden-700 hover:underline dark:text-garden-300"
+              >
+                {t("advisor.showMore", { count: agenda.now.length - NOW_LIMIT })}
+              </button>
+            </li>
+          )}
         </List>
         {agenda.next.length > 0 && (
           <List headingLevel={2} header={[t("calendar.next4Weeks"), nextPhase && phaseLabel(nextPhase), agenda.next.length].filter((x) => x !== null).join(" · ")}>

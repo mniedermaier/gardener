@@ -79,7 +79,7 @@
       "sufficiency": "Selbstversorgung",
       "expenses": "Kosten",
       "settings": "Einstellungen",
-      "import": "Import"
+      "import": "Garten importieren"
     },
     "group": {
       "garden": "Garten",
@@ -972,9 +972,10 @@
     },
     "reopenNamed": "„{{title}}“ wieder öffnen",
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
-    "untilRange": "bis {{first}} – {{last}} je nach Beet",
-    "fromRange": "ab {{first}} – {{last}} je nach Beet",
-    "upNextFrom": "Als Nächstes · ab {{date}}"
+    "untilRange": "bis {{first}}–{{last}}, je nach Beet",
+    "fromRange": "ab {{first}}–{{last}}, je nach Beet",
+    "upNextFrom": "Als Nächstes · ab {{date}}",
+    "alsoAction": "auch {{action}}"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1138,7 +1139,9 @@
     "frostGroupTitleMixed_other": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
     "frostHardNights_one": "Frost in {{count}} Nacht",
     "frostHardNights_other": "Frost in {{count}} Nächten",
-    "frostAdviceNoPlants": "Mit dem Auspflanzen warten, bis die Frostnächte vorbei sind."
+    "frostAdviceNoPlants": "Mit dem Auspflanzen warten, bis die Frostnächte vorbei sind.",
+    "frostAdviceAutumn": "Letzte Ernten einholen und frostempfindliche Kübel ins Haus holen.",
+    "frostAdviceAutumnNoPlants": "Für Wintergemüse jetzt Vlies bereithalten."
   },
   "harvest": {
     "title": "Ernte",
@@ -2110,7 +2113,9 @@
     "weeks": "Wochen",
     "sowings": "Aussaaten",
     "sowing": "Aussaat",
-    "generateTasks": "Zum Kalender hinzufügen"
+    "generateTasks": "Zum Kalender hinzufügen",
+    "nextSpring": "Für dieses Jahr sind die Aussaatfenster vorbei. Du planst die Staffeln für das Frühjahr {{year}}.",
+    "pickNextSpring": "Kultur fürs nächste Frühjahr wählen"
   },
   "guilds": {
     "title": "Pflanzgilden",
@@ -2312,9 +2317,8 @@
     "title": "Garten importieren",
     "subtitle": "Jemand hat einen Gartenplan mit dir geteilt. Prüfe die Vorschau und lege ihn als neuen Garten an.",
     "invalidTitle": "Dieser Link funktioniert nicht",
-    "invalidText": "Der Teilen-Link ist unvollständig oder beschädigt. Bitte die Person, ihn noch einmal zu schicken.",
-    "toPlanner": "Zum Planer",
-    "restoreBackup": "Backup wiederherstellen",
+    "invalidText": "Der Teilen-Link ist unvollständig oder beschädigt. Füge ihn hier noch einmal ein oder bitte die Person, ihn erneut zu schicken.",
+    "restoreBackup": "Eigenes Backup wiederherstellen",
     "summary": "{{beds}} · {{plantings}}",
     "beds_one": "{{count}} Beet",
     "beds_other": "{{count}} Beete",
@@ -2328,7 +2332,12 @@
     "done": "„{{name}}“ wurde angelegt",
     "noLinkSubtitle": "Gartenpläne aus einem Teilen-Link übernehmen.",
     "noLinkTitle": "Garten aus einem Link übernehmen",
-    "noLinkText": "Hat jemand einen Gartenplan mit dir geteilt? Öffne den Link, dann siehst du hier die Vorschau. Deine eigenen Daten stellst du aus einem Backup wieder her."
+    "noLinkText": "Hat jemand einen Gartenplan mit dir geteilt? Füge den Link hier ein oder öffne ihn direkt, dann siehst du die Vorschau.",
+    "pasteLabel": "Teilen-Link einfügen",
+    "pastePlaceholder": "https://…#/import?t=…",
+    "pasteInvalid": "Das ist kein gültiger Teilen-Link.",
+    "preview": "Vorschau",
+    "toPlanner": "Zum Planer"
   },
   "charts": {
     "month": "Monat",

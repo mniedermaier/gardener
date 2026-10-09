@@ -79,7 +79,7 @@
       "sufficiency": "Autosuficiencia",
       "expenses": "Costes",
       "settings": "Ajustes",
-      "import": "Importar"
+      "import": "Importar huerto"
     },
     "group": {
       "garden": "Huerto",
@@ -1002,9 +1002,10 @@
     },
     "reopenNamed": "Reabrir «{{title}}»",
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
-    "untilRange": "hasta {{first}} – {{last}} según bancal",
-    "fromRange": "desde {{first}} – {{last}} según bancal",
-    "upNextFrom": "Lo siguiente · desde el {{date}}"
+    "untilRange": "hasta {{first}}–{{last}}, según bancal",
+    "fromRange": "desde {{first}}–{{last}}, según bancal",
+    "upNextFrom": "Lo siguiente · desde el {{date}}",
+    "alsoAction": "también: {{action}}"
   },
   "settings": {
     "title": "Ajustes",
@@ -1178,7 +1179,9 @@
     "frostHardNights_one": "Helada en {{count}} noche",
     "frostHardNights_other": "Helada en {{count}} noches",
     "frostHardNights_many": "Helada en {{count}} noches",
-    "frostAdviceNoPlants": "Espera a trasplantar hasta que pasen las noches de helada."
+    "frostAdviceNoPlants": "Espera a trasplantar hasta que pasen las noches de helada.",
+    "frostAdviceAutumn": "Recoge las últimas cosechas y pon a cubierto las macetas sensibles.",
+    "frostAdviceAutumnNoPlants": "Ten preparada manta térmica para las hortalizas de invierno."
   },
   "harvest": {
     "title": "Cosecha",
@@ -2208,7 +2211,9 @@
     "weeks": "semanas",
     "sowings": "Siembras",
     "sowing": "Siembra",
-    "generateTasks": "Agregar al calendario"
+    "generateTasks": "Agregar al calendario",
+    "nextSpring": "Las ventanas de siembra de este año ya han pasado. Planificas las siembras escalonadas para la primavera de {{year}}.",
+    "pickNextSpring": "Elige un cultivo para la próxima primavera"
   },
   "guilds": {
     "title": "Asociaciones de plantas",
@@ -2417,9 +2422,8 @@
     "title": "Importar huerto",
     "subtitle": "Alguien ha compartido un plan de huerto contigo. Revisa la vista previa y añádelo como huerto nuevo.",
     "invalidTitle": "Este enlace no funciona",
-    "invalidText": "El enlace está incompleto o dañado. Pide a quien te lo envió que lo mande de nuevo.",
-    "toPlanner": "Ir al planificador",
-    "restoreBackup": "Restaurar una copia",
+    "invalidText": "El enlace está incompleto o dañado. Pégalo aquí de nuevo o pide a quien te lo envió que lo mande otra vez.",
+    "restoreBackup": "Restaurar tu copia de seguridad",
     "summary": "{{beds}} · {{plantings}}",
     "beds_one": "{{count}} bancal",
     "beds_other": "{{count}} bancales",
@@ -2435,7 +2439,12 @@
     "plantings_many": "{{count}} plantaciones",
     "noLinkSubtitle": "Adopta planes de huerto desde un enlace compartido.",
     "noLinkTitle": "Adoptar un huerto desde un enlace",
-    "noLinkText": "¿Alguien ha compartido un plan de huerto contigo? Abre el enlace y aquí verás la vista previa. Tus propios datos se restauran desde una copia de seguridad."
+    "noLinkText": "¿Alguien ha compartido un plan de huerto contigo? Pega aquí el enlace o ábrelo directamente para ver la vista previa.",
+    "pasteLabel": "Pegar enlace",
+    "pastePlaceholder": "https://…#/import?t=…",
+    "pasteInvalid": "No es un enlace válido.",
+    "preview": "Vista previa",
+    "toPlanner": "Ir al planificador"
   },
   "charts": {
     "month": "Mes",
