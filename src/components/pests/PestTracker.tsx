@@ -42,7 +42,10 @@ interface Draft {
   name: string;
   plantId: string;
   bedId: string;
-  severity: Severity;
+  /** Unset until chosen: a preset "Mittel" would be a silent guess (rule 9). */
+  severity: Severity | null;
+  /** The treatment field is folded away for a new report. */
+  treatmentOpen: boolean;
   description: string;
   treatment: string;
   organic: boolean;
@@ -51,7 +54,7 @@ interface Draft {
 }
 
 const emptyDraft = (plantId: string): Draft => ({
-  type: "pest", name: "", plantId, bedId: "", severity: 3, description: "", treatment: "", organic: false, date: todayISO(),
+  type: "pest", name: "", plantId, bedId: "", severity: null, treatmentOpen: false, description: "", treatment: "", organic: false, date: todayISO(),
 });
 
 export function PestTracker() {
@@ -97,7 +100,7 @@ export function PestTracker() {
     setEditingId(pest.id);
     setDraft({
       type: pest.type, name: pest.name, plantId: pest.plantId, bedId: pest.bedId, severity: pest.severity,
-      description: pest.description ?? "", treatment: pest.treatment ?? "", organic: pest.organic, date: pest.date,
+      description: pest.description ?? "", treatment: pest.treatment ?? "", treatmentOpen: !!pest.treatment, organic: pest.organic, date: pest.date,
     });
     setDialogOpen(true);
   };
@@ -105,7 +108,7 @@ export function PestTracker() {
   const handleSave = () => {
     if (!draft.name.trim()) return;
     const fields = {
-      type: draft.type, name: draft.name.trim(), plantId: draft.plantId, bedId: draft.bedId, severity: draft.severity,
+      type: draft.type, name: draft.name.trim(), plantId: draft.plantId, bedId: draft.bedId, severity: draft.severity ?? 3,
       description: draft.description.trim() || undefined,
       treatment: draft.treatment.trim() || undefined,
       // "Biologisch behandelt" describes a treatment; without one it means nothing.
@@ -261,7 +264,7 @@ export function PestTracker() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={!draft.name.trim()}>{t("common.save")}</Button>
+            <Button onClick={handleSave} disabled={!draft.name.trim() || draft.severity === null}>{t("common.save")}</Button>
           </>
         }
       >
@@ -302,12 +305,12 @@ export function PestTracker() {
           <Input label={t("pests.name")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t(`pests.namePlaceholders.${draft.type}`)} />
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("pests.severity")}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span>
+              {t("pests.severity")}{draft.severity !== null && <>: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`pests.severityLevel.${draft.severity}`)}</span></>}
             </p>
             <SegmentedControl
               fullWidth
               label={t("pests.severity")}
-              value={String(draft.severity)}
+              value={draft.severity === null ? "" : String(draft.severity)}
               onChange={(v) => patch({ severity: Number(v) as Severity })}
               options={SEVERITIES.map((s) => ({ value: String(s), label: String(s) }))}
             />
@@ -319,7 +322,15 @@ export function PestTracker() {
           {/* Rule 9: details, then the date, then the free text. */}
           <DateField label={t("pests.date")} value={draft.date} onChange={(date) => patch({ date })} />
           <Textarea label={t("pests.description")} optional value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} placeholder={t("pests.descriptionPlaceholder")} />
-          <Textarea label={t("pests.treatment")} optional hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
+          {/* A new report rarely has a treatment yet: folded away, open when editing one that has it. */}
+          {draft.treatmentOpen ? (
+            <Textarea label={t("pests.treatment")} optional hint={t("pests.treatmentHint")} value={draft.treatment} onChange={(e) => patch({ treatment: e.target.value })} rows={2} placeholder={t("pests.treatmentPlaceholder")} />
+          ) : (
+            <Button variant="ghost" size="sm" className="-ml-2" onClick={() => patch({ treatmentOpen: true })}>
+              <Plus size={14} aria-hidden="true" />
+              {t("pests.addTreatment")}
+            </Button>
+          )}
           {draft.treatment.trim() && (
             <Checkbox label={t("pests.organicOnly")} checked={draft.organic} onChange={(e) => patch({ organic: e.target.checked })} />
           )}

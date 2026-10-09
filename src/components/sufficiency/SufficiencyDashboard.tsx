@@ -10,7 +10,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { calculateSufficiency, loggedKgByMonth, LOW_COVERAGE_PERCENT, STORAGE_MONTHS } from "@/lib/sufficiency";
-import { annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
+import { annualCalorieNeed, capToConsumption, DAILY_KCAL_PER_PERSON, EGG_WEIGHT_KG, getCropPlan, getForecastProductKg, getForecastProducts, PRODUCT_TYPES, type ProductKg } from "@/lib/metrics";
 import type { ProductType } from "@/types/animal";
 import { PRODUCT_NUTRITION } from "@/types/animal";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
@@ -94,6 +94,13 @@ export function SufficiencyDashboard() {
     />
   );
 
+  // The need is known before anything grows (the food plan computes it): the
+  // empty state shows it instead of "nothing to calculate".
+  const need = useMemo(
+    () => (result ? null : getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: now.getFullYear() })),
+    [result, gardens, plantMap, gridCellSizeCm, harvests, householdSize, now],
+  );
+
   if (!result) {
     return (
       <div>
@@ -102,7 +109,15 @@ export function SufficiencyDashboard() {
           <EmptyState
             icon={Target}
             title={t("sufficiency.emptyTitle")}
-            description={t("sufficiency.emptyText", { count: householdSize, kcal: f.formatNumber(DAILY_KCAL_PER_PERSON * householdSize, { maximumFractionDigits: 0 }) })}
+            description={
+              <>
+                {need && t("sufficiency.emptyNeed", { count: householdSize, kg: f.formatWeight(need.targetKg * 1000, "kg"), area: f.formatArea(need.neededAreaM2) })}{" "}
+                {t("sufficiency.emptyMissing")}{" "}
+                <button type="button" onClick={() => navigate("/foodplan")} className="inline-flex min-h-11 items-center font-medium text-garden-700 underline-offset-2 hover:underline dark:text-garden-300">
+                  {t("sufficiency.emptyFoodplanLink")}
+                </button>
+              </>
+            }
             // Same first step as every page without beds: "Beet hinzufügen" opens the planner's dialog.
             action={<Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
             secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock", { state: { openAdd: true } })}>{t("livestock.addAnimal")}</Button>}

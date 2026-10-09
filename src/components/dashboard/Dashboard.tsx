@@ -232,7 +232,7 @@ export function Dashboard() {
                       meta={[
                         // One date format per list ("relative" turns into a short date after a week).
                         <time key="d" dateTime={h.date}>{formatDate(h.date, "short")}</time>,
-                        h.quality > 0 && (
+                        (h.quality ?? 0) > 0 && (
                           <span key="q" className="inline-flex items-center gap-0.5 align-top" aria-label={t("dashboard.quality", { count: h.quality })}>
                             <Star size={11} aria-hidden="true" className="fill-current text-amber-500 dark:text-amber-400" />{h.quality}
                           </span>

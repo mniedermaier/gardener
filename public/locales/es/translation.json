@@ -795,11 +795,11 @@
       "namePlaceholder": "p. ej., jengibre",
       "daysAfterSowing": "Ambos contados desde la siembra.",
       "family": "Familia botánica",
-      "familyUnknown": "No lo sé",
+      "familyUnknown": "Elegir familia…",
       "sowMode": "Siembra",
       "sowDirect": "Directa en el bancal",
       "sowIndoors": "En semillero",
-      "sowWhen": "Sembrar",
+      "sowWhen": "Sembrar desde",
       "indoorsWhen": "Semillero desde",
       "transplantWhen": "Trasplantar",
       "atFrost": "En la última helada",
@@ -885,7 +885,7 @@
     "moreAlerts_many": "{{count}} avisos más",
     "updatedAt": "Actualizado a las {{time}}",
     "windValue": "{{speed}} km/h",
-    "forecastDesc": "Mínima y máxima; la marca indica el umbral de helada de {{threshold}}. «Helada» significa 0 °C o menos, «Riesgo de helada» hasta {{threshold}} (posible helada en el suelo).",
+    "forecastDesc": "Mínima y máxima de cada día.",
     "rainChance": "Lluvia {{percent}}",
     "rangeLabel": "{{min}} a {{max}}",
     "frost": "Helada",
@@ -931,7 +931,8 @@
     "dayArcLabel": "Amanecer {{sunrise}}, atardecer {{sunset}}, {{hours}} de luz",
     "daylightLeft": "Quedan {{hours}} h de luz",
     "afterSunset": "El sol se puso a las {{time}}",
-    "beforeSunrise": "Amanecer a las {{time}}"
+    "beforeSunrise": "Amanecer a las {{time}}",
+    "forecastHow": "La marca indica el umbral de helada de {{threshold}}. «Helada» significa 0 °C o menos, «Riesgo de helada» hasta {{threshold}} (posible helada en el suelo)."
   },
   "calendar": {
     "subtitle": "Lo que toca en el huerto, ordenado por fecha.",
@@ -1161,7 +1162,7 @@
       "expenses_many": "{{count}} gastos"
     },
     "backupStale": "Tiene más de dos semanas: conviene hacer una copia nueva.",
-    "nothingYet": "Aún no hay nada que guardar. En cuanto crees bancales o registros, conviene una copia."
+    "nothingYet": "Por ahora solo el huerto y los ajustes. Una copia merece la pena en cuanto añadas bancales o registros."
   },
   "alerts": {
     "frostTitle": "Aviso de helada: {{temp}}",
@@ -1307,7 +1308,7 @@
     "added": "Entrada guardada",
     "updated": "Cambios guardados",
     "deleted": "Entrada eliminada",
-    "needTitle": "Introduce un título",
+    "needTitle": "Escribe una observación o un título.",
     "titlePlaceholder": "p. ej. Primera helada, tomates desbrotados…",
     "photos": "Fotos",
     "photoN": "Foto {{n}}",
@@ -1544,7 +1545,7 @@
       "animals": "Animales",
       "preserve": "Conservas y semillas"
     },
-    "emptyTitle": "Aún no hay nada que calcular",
+    "emptyTitle": "Tu necesidad está calculada; falta la cobertura",
     "toPlanner": "Ir al planificador",
     "toLivestock": "Añadir animales",
     "coverageDesc_one": "Previsión para un año, necesidad de {{count}} persona.",
@@ -1577,15 +1578,17 @@
     "shelfLife_many": "se conserva {{count}} meses",
     "kcalCounted": "{{kcal}} kcal computadas",
     "surplus": "excedente {{amount}}",
-    "emptyText_one": "Una persona necesita unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
-    "emptyText_other": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
-    "emptyText_many": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
     "monthlyDescFresh_one": "Parte de las calorías que necesita {{count}} persona (previsión). Aún no hay nada en reserva.",
     "monthlyDescFresh_other": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
     "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
     "harvested": "Cosechado",
     "freshForecast": "Previsión fresco",
-    "monthlyKgCaptionSplit": "Hasta {{month}} la cosecha registrada; desde {{month}} la previsión según los bancales, más despensa y productos animales."
+    "monthlyKgCaptionSplit": "Hasta {{month}} la cosecha registrada; desde {{month}} la previsión según los bancales, más despensa y productos animales.",
+    "emptyNeed_one": "Una persona necesita unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
+    "emptyNeed_other": "{{count}} personas necesitan unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
+    "emptyNeed_many": "{{count}} personas necesitan unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
+    "emptyMissing": "Faltan bancales o animales para mostrar cuánto cubres tú.",
+    "emptyFoodplanLink": "Ver la necesidad en el plan"
   },
   "pests": {
     "title": "Plagas",
@@ -1649,7 +1652,7 @@
     "animalsTab": "Animales",
     "noProducts": "Registra huevos, miel o leche para ver evolución y valor.",
     "animalName": "Nombre",
-    "namePlaceholder": "p. ej. Henriette, Colmena 1…",
+    "namePlaceholder": "p. ej. Gallinas ponedoras, Colmena 1…",
     "count": "Cantidad",
     "selectAnimal": "Animal",
     "quantity": "Cantidad",
@@ -1964,7 +1967,7 @@
     "missingStatHint": "Plantado pero sin existencias",
     "shoppingListHint": "Cultivos anuales de tus bancales sin semillas ni material de plantación en el inventario. Las perennes como el romero o las bayas no aparecen.",
     "addFor": "Añadir {{name}}",
-    "emptyTitle": "Aún no hay semillas",
+    "emptyTitle": "Aún no has añadido semillas",
     "emptyText": "Registra tus sobres de semillas. Verás qué falta para tus bancales y cuándo las semillas viejas necesitan una prueba de germinación.",
     "filterLabel": "Filtrar semillas",
     "unitCount": {
@@ -2360,7 +2363,7 @@
     "hoursShort": "{{hours}} h",
     "caption": "Luz diurna por mes: más larga en {{longest}} ({{longestHours}}), más corta en {{shortest}} ({{shortestHours}})",
     "yearlyDesc": "Con menos de unas 10 horas de luz casi nada crece: establece antes los cultivos de invierno.",
-    "growthLimit": "10 h"
+    "growthLimit": "Límite de crecimiento 10 h"
   },
   "common": {
     "save": "Guardar",
@@ -2408,7 +2411,8 @@
     "optionalMark": "(opcional)",
     "notesPlaceholder": "p. ej. observaciones, variedad, tiempo…",
     "costHint": "Cuenta en el balance de Costes.",
-    "more": "Más"
+    "more": "Más",
+    "optionalWord": "opcional"
   },
   "companions": {
     "title": "Asociaciones",

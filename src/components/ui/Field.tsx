@@ -32,13 +32,18 @@ export function describedBy(id: string, hint?: ReactNode, error?: ReactNode, ext
   return ids.length ? ids.join(" ") : undefined;
 }
 
-/** Label text with the shared optional marker: "Notizen (optional)". */
+/**
+ * Label text with the shared optional marker: "Notizen (optional)". A label
+ * that already ends in a bracket (a unit) gets " · optional" instead of a
+ * second pair of brackets: "Kosten (€) · optional" (DESIGN_SYSTEM rule 9).
+ */
 export function LabelText({ label, optional }: { label: ReactNode; optional?: boolean }) {
   const { t } = useTranslation();
+  const unitLabel = typeof label === "string" && label.trimEnd().endsWith(")");
   return (
     <>
       {label}
-      {optional && <span className="font-normal text-gray-500 dark:text-gray-400"> {t("common.optionalMark")}</span>}
+      {optional && <span className="font-normal text-gray-500 dark:text-gray-400">{unitLabel ? ` · ${t("common.optionalWord")}` : ` ${t("common.optionalMark")}`}</span>}
     </>
   );
 }

@@ -152,7 +152,7 @@ export function exportHarvestsCsv(): void {
       escapeCsv(bed?.name ?? ""),
       h.weightGrams ?? "",
       h.count ?? "",
-      h.quality,
+      h.quality ?? "",
       escapeCsv(h.notes ?? ""),
     ].join(",");
   });

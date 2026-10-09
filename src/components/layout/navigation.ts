@@ -127,6 +127,23 @@ export function sectionIdForPath(pathname: string): string | null {
   return null;
 }
 
+export type BottomTab = "today" | "tasks" | "harvest" | "planner" | "more";
+
+/**
+ * Which bottom-nav tab a path belongs to, by section: "/calendar" lights
+ * "Aufgaben" (same section), "/weather" lights "Heute", and every page without
+ * a tab of its own lights "Mehr" — the bar always says where you are.
+ */
+export function bottomTabForPath(pathname: string): BottomTab {
+  switch (sectionIdForPath(pathname)) {
+    case "today": return "today";
+    case "calendar": return "tasks";
+    case "harvest": return "harvest";
+    case "planner": return "planner";
+    default: return "more";
+  }
+}
+
 /** The active tab within a section; animal detail pages count as "Tiere". */
 export function activeTabPath(sectionId: string, pathname: string): string | null {
   const tabs = SECTIONS[sectionId];

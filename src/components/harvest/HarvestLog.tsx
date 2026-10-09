@@ -41,7 +41,7 @@ interface Draft {
   unit: Unit;
   count: string;
   showCount: boolean;
-  quality: Quality;
+  quality: Quality | null;
   notes: string;
 }
 
@@ -93,7 +93,7 @@ export function HarvestLog() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [draft, setDraft] = useState<Draft>(() => ({
-    plantId: "", bedId: "", date: todayISO(), amount: "", unit: "kg", count: "", showCount: false, quality: 4, notes: "",
+    plantId: "", bedId: "", date: todayISO(), amount: "", unit: "kg", count: "", showCount: false, quality: null, notes: "",
   }));
   const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
@@ -109,7 +109,7 @@ export function HarvestLog() {
     setSubmitted(false);
     setDraft({
       plantId, bedId, date: params.date ?? todayISO(), amount: "", unit: plantId ? defaultUnit(plantId) : "kg",
-      count: "", showCount: false, quality: 4, notes: "",
+      count: "", showCount: false, quality: null, notes: "",
     });
     setDialogOpen(true);
   }, [plantMap, beds, defaultUnit]);
@@ -125,7 +125,7 @@ export function HarvestLog() {
     setSubmitted(false);
     setDraft({
       plantId: h.plantId, bedId: h.bedId, date: h.date, amount, unit,
-      count: h.count ? String(h.count) : "", showCount: Boolean(h.count), quality: h.quality, notes: h.notes ?? "",
+      count: h.count ? String(h.count) : "", showCount: Boolean(h.count), quality: h.quality ?? null, notes: h.notes ?? "",
     });
     setDialogOpen(true);
   };
@@ -152,7 +152,7 @@ export function HarvestLog() {
       date: draft.date,
       weightGrams: grams || undefined,
       count: countNum || undefined,
-      quality: draft.quality,
+      quality: draft.quality ?? undefined,
       notes: draft.notes.trim() || undefined,
     };
     if (grams) rememberUnit(draft.plantId, draft.unit);
@@ -183,12 +183,12 @@ export function HarvestLog() {
 
   // ---------------------------------------------------------------- stats
   const stats = useMemo(() => {
-    let total = 0, last30 = 0, prev30 = 0, qualitySum = 0;
+    let total = 0, last30 = 0, prev30 = 0, qualitySum = 0, rated = 0;
     const byPlant = new Map<string, { grams: number; count: number; entries: number }>();
     for (const h of harvests) {
       const g = h.weightGrams ?? 0;
       total += g;
-      qualitySum += h.quality;
+      if (h.quality) { qualitySum += h.quality; rated++; }
       const d = toDate(h.date);
       const ago = d ? differenceInCalendarDays(now, d) : -1;
       if (ago >= 0 && ago < 30) last30 += g;
@@ -214,7 +214,7 @@ export function HarvestLog() {
     }
     return {
       total, last30, prev30, ranking,
-      avgQuality: harvests.length ? qualitySum / harvests.length : 0,
+      avgQuality: rated ? qualitySum / rated : 0,
       months: months.map((m) => {
         const key = toISODate(m).slice(0, 7);
         return { key, date: m, kg: (perMonth.get(key) ?? 0) / 1000 };
@@ -370,7 +370,7 @@ export function HarvestLog() {
                         title={getPlantName(h.plantId)}
                         // One date format per list group (DESIGN_SYSTEM): the short date, never "vor 5 Tagen" next to "2. Okt.".
                         meta={[bedLabel, <time key="d" dateTime={h.date}>{formatDate(h.date)}</time>]}
-                        badges={<QualityStars value={h.quality} />}
+                        badges={h.quality ? <QualityStars value={h.quality} /> : undefined}
                         description={h.notes}
                         trailing={amountText(h.weightGrams, h.count) || "–"}
                         actions={

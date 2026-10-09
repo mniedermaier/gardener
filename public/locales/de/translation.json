@@ -775,11 +775,11 @@
       "namePlaceholder": "z. B. Ingwer",
       "daysAfterSowing": "Beide gezählt ab der Aussaat.",
       "family": "Pflanzenfamilie",
-      "familyUnknown": "Weiß ich nicht",
+      "familyUnknown": "Familie wählen …",
       "sowMode": "Aussaat",
       "sowDirect": "Direkt ins Beet",
       "sowIndoors": "Vorziehen",
-      "sowWhen": "Säen",
+      "sowWhen": "Säen ab",
       "indoorsWhen": "Vorziehen ab",
       "transplantWhen": "Auspflanzen",
       "atFrost": "Am letzten Frost",
@@ -858,7 +858,7 @@
     "moreAlerts_other": "{{count}} weitere Hinweise",
     "updatedAt": "Stand {{time}} Uhr",
     "windValue": "{{speed}} km/h",
-    "forecastDesc": "Tiefst- und Höchstwert; der Strich markiert die Frostschwelle {{threshold}}. „Frost“ heißt 0 °C oder kälter, „Frostgefahr“ bis {{threshold}} (Bodenfrost möglich).",
+    "forecastDesc": "Tiefst- und Höchstwert je Tag.",
     "rainChance": "Regen {{percent}}",
     "rangeLabel": "{{min}} bis {{max}}",
     "frost": "Frost",
@@ -904,7 +904,8 @@
     "dayArcLabel": "Sonnenaufgang {{sunrise}}, Sonnenuntergang {{sunset}}, {{hours}} Tageslicht",
     "daylightLeft": "Noch {{hours}} h Tageslicht",
     "afterSunset": "Sonne untergegangen um {{time}}",
-    "beforeSunrise": "Sonnenaufgang um {{time}}"
+    "beforeSunrise": "Sonnenaufgang um {{time}}",
+    "forecastHow": "Der Strich markiert die Frostschwelle {{threshold}}. „Frost“ heißt 0 °C oder kälter, „Frostgefahr“ bis {{threshold}} (Bodenfrost möglich)."
   },
   "calendar": {
     "subtitle": "Was im Garten ansteht – nach Fälligkeit sortiert.",
@@ -1124,7 +1125,7 @@
       "expenses_other": "{{count}} Ausgaben"
     },
     "backupStale": "Älter als zwei Wochen – ein neues Backup lohnt sich.",
-    "nothingYet": "Noch nichts zu sichern. Sobald du Beete oder Einträge anlegst, lohnt sich ein Backup."
+    "nothingYet": "Bisher nur Garten und Einstellungen. Ein Backup lohnt sich vor allem, sobald Beete oder Einträge dazukommen."
   },
   "alerts": {
     "frostTitle": "Frostwarnung: {{temp}}",
@@ -1260,7 +1261,7 @@
     "added": "Eintrag gespeichert",
     "updated": "Änderungen gespeichert",
     "deleted": "Eintrag gelöscht",
-    "needTitle": "Bitte einen Titel eingeben",
+    "needTitle": "Gib eine Beobachtung oder einen Titel ein.",
     "titlePlaceholder": "z. B. Erster Frost, Tomaten ausgegeizt …",
     "photos": "Fotos",
     "photoN": "Foto {{n}}",
@@ -1478,7 +1479,7 @@
       "animals": "Tiere",
       "preserve": "Haltbarmachen & Saatgut"
     },
-    "emptyTitle": "Noch nichts zu berechnen",
+    "emptyTitle": "Dein Bedarf steht – die Deckung fehlt noch",
     "toPlanner": "Zum Planer",
     "toLivestock": "Tiere hinzufügen",
     "coverageDesc_one": "Prognose für ein Jahr, Bedarf von {{count}} Person.",
@@ -1508,13 +1509,15 @@
     "shelfLife_other": "{{count}} Monate haltbar",
     "kcalCounted": "{{kcal}} kcal angerechnet",
     "surplus": "Überschuss {{amount}}",
-    "emptyText_one": "Eine Person braucht rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
-    "emptyText_other": "{{count}} Personen brauchen rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
     "monthlyDescFresh_one": "Anteil des Kalorienbedarfs von {{count}} Person laut Prognose. Im Vorrat liegt noch nichts.",
     "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Im Vorrat liegt noch nichts.",
     "harvested": "Geerntet",
     "freshForecast": "Prognose frisch",
-    "monthlyKgCaptionSplit": "Bis {{month}} die erfasste Ernte; ab {{month}} die Prognose aus der Beetbelegung, dazu Vorrat und Tierprodukte."
+    "monthlyKgCaptionSplit": "Bis {{month}} die erfasste Ernte; ab {{month}} die Prognose aus der Beetbelegung, dazu Vorrat und Tierprodukte.",
+    "emptyNeed_one": "Eine Person braucht rund {{kg}} Gemüse und Obst im Jahr, dafür wären etwa {{area}} Beetfläche nötig.",
+    "emptyNeed_other": "{{count}} Personen brauchen rund {{kg}} Gemüse und Obst im Jahr, dafür wären etwa {{area}} Beetfläche nötig.",
+    "emptyMissing": "Es fehlen noch Beete oder Tiere, um zu zeigen, wie viel davon du selbst deckst.",
+    "emptyFoodplanLink": "Bedarf im Ernährungsplan ansehen"
   },
   "pests": {
     "title": "Schädlinge",
@@ -1528,7 +1531,7 @@
     "description": "Beschreibung",
     "organicOnly": "Biologisch behandelt",
     "treatment": "Behandlung",
-    "addTreatment": "Behandlung hinzufügen",
+    "addTreatment": "Behandlung eintragen",
     "treatmentPrompt": "Welche Behandlung wurde angewendet?",
     "resolve": "Als gelöst markieren",
     "types": {
@@ -1577,7 +1580,7 @@
     "animalsTab": "Bestand",
     "noProducts": "Erfasse Eier, Honig oder Milch, um Verlauf und Wert zu sehen.",
     "animalName": "Name",
-    "namePlaceholder": "z. B. Henriette, Bienenstock 1 …",
+    "namePlaceholder": "z. B. Hühnerschar, Bienenstock 1 …",
     "count": "Anzahl",
     "selectAnimal": "Tier",
     "quantity": "Menge",
@@ -1874,7 +1877,7 @@
     "missingStatHint": "Gepflanzt, aber nicht vorrätig",
     "shoppingListHint": "Einjährige Kulturen in deinen Beeten ohne Saat- oder Pflanzgut im Vorrat. Mehrjährige wie Rosmarin oder Beeren sind nicht dabei.",
     "addFor": "{{name}} hinzufügen",
-    "emptyTitle": "Noch kein Saatgut erfasst",
+    "emptyTitle": "Noch kein Saatgut hinzugefügt",
     "emptyText": "Trage deine Samentüten ein. Dann siehst du, was für die Beete fehlt und wann ältere Samen eine Keimprobe brauchen.",
     "filterLabel": "Saatgut filtern",
     "unitCount": {
@@ -2252,7 +2255,7 @@
     "hoursShort": "{{hours}} h",
     "caption": "Tageslicht pro Monat: am längsten im {{longest}} ({{longestHours}}), am kürzesten im {{shortest}} ({{shortestHours}})",
     "yearlyDesc": "Unter etwa 10 Stunden Tageslicht wächst kaum noch etwas – Wintergemüse vorher etablieren.",
-    "growthLimit": "10 h"
+    "growthLimit": "Wachstumsgrenze 10 h"
   },
   "common": {
     "save": "Speichern",
@@ -2300,7 +2303,8 @@
     "optionalMark": "(optional)",
     "notesPlaceholder": "z. B. Beobachtungen, Sorte, Wetter …",
     "costHint": "Fließt in die Bilanz unter Kosten ein.",
-    "more": "Mehr"
+    "more": "Mehr",
+    "optionalWord": "optional"
   },
   "companions": {
     "title": "Pflanzpartner",

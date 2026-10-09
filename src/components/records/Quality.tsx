@@ -13,28 +13,30 @@ export const QualityStars = memo(function QualityStars({ value }: { value: numbe
   return (
     <span role="img" aria-label={label} title={label} className="inline-flex items-center gap-px">
       {LEVELS.map((q) => (
-        <Star key={q} size={12} aria-hidden="true" className={q <= value ? "text-amber-500 dark:text-amber-400" : "text-gray-300 dark:text-gray-600"} fill={q <= value ? "currentColor" : "none"} />
+        <Star key={q} size={12} aria-hidden="true" className={q <= (value ?? 0) ? "text-amber-500 dark:text-amber-400" : "text-gray-300 dark:text-gray-600"} fill={q <= (value ?? 0) ? "currentColor" : "none"} />
       ))}
     </span>
   );
 });
 
 /** Star rating input: a radio group (arrow keys move), 44 px targets. */
-export function QualityInput({ label, value, onChange }: { label: string; value: Quality; onChange: (q: Quality) => void }) {
+export function QualityInput({ label, value, onChange }: { label: string; value: Quality | null; onChange: (q: Quality) => void }) {
   const { t } = useTranslation();
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const onKeyDown = (e: KeyboardEvent) => {
     const delta = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
     if (!delta) return;
     e.preventDefault();
-    const next = Math.min(5, Math.max(1, value + delta)) as Quality;
+    const next = Math.min(5, Math.max(1, (value ?? 3) + delta)) as Quality;
     onChange(next);
     refs.current[next - 1]?.focus();
   };
   return (
     <div>
       <p className={LABEL_CLASS}>
-        {label}: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`harvest.qualityLevel.${value}`)}</span>
+        {label}{value === null
+          ? <span className="font-normal text-gray-500 dark:text-gray-400"> {t("common.optionalMark")}</span>
+          : <>: <span className="font-normal text-gray-600 dark:text-gray-400">{t(`harvest.qualityLevel.${value}`)}</span></>}
       </p>
       {/* Stars and endpoint captions share one box, so the right caption ends under star 5 (as on the pest scale). */}
       <div className="-ml-2 inline-flex flex-col">
@@ -47,12 +49,12 @@ export function QualityInput({ label, value, onChange }: { label: string; value:
             role="radio"
             aria-checked={q === value}
             aria-label={t("harvest.stars", { count: q })}
-            tabIndex={q === value ? 0 : -1}
+            tabIndex={q === (value ?? 1) ? 0 : -1}
             onClick={() => onChange(q)}
             onKeyDown={onKeyDown}
             className="inline-flex size-11 items-center justify-center rounded-lg hover:bg-gray-100 sm:size-10 dark:hover:bg-white/10"
           >
-            <Star size={24} aria-hidden="true" className={q <= value ? "text-amber-500 dark:text-amber-400" : "text-gray-300 dark:text-gray-600"} fill={q <= value ? "currentColor" : "none"} />
+            <Star size={24} aria-hidden="true" className={q <= (value ?? 0) ? "text-amber-500 dark:text-amber-400" : "text-gray-300 dark:text-gray-600"} fill={q <= (value ?? 0) ? "currentColor" : "none"} />
           </button>
         ))}
       </div>
