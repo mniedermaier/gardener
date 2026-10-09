@@ -426,7 +426,7 @@ function Composition() {
       </dl>
       {/* Why the garden share is small: vegetables are low in calories (see "Größte Hebel"). */}
       <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">{t("metrics.compositionHint")}</p>
-      {surplus.length > 0 && <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { count: householdSize, items: surplus.join(", ") })}</p>}
+      {surplus.length > 0 && <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t("metrics.surplusNote", { count: householdSize, items: surplus.join(", ") })}</p>}
     </Card>
   );
 }

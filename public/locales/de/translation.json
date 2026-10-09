@@ -1494,7 +1494,7 @@
     "monthlyDesc_one": "Anteil des Kalorienbedarfs von {{count}} Person: frisch laut Prognose und aus dem Vorrat.",
     "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen: frisch laut Prognose und aus dem Vorrat.",
     "noWinterGap": "Von {{from}} bis {{to}} reicht dein geplanter Vorrat für mindestens ein Viertel des Bedarfs.",
-    "noMonthCovered": "Dein Garten deckt bisher in keinem Monat {{percent}} des Bedarfs. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
+    "noMonthCovered": "In keinem Monat werden {{percent}} des Bedarfs gedeckt. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
     "ofNeed": "{{produced}} von {{needed}}",
     "leversTitle": "Größte Hebel",
     "leversDesc": "Was zusätzliche {{area}} einer kalorienreichen Kultur bringen würden.",
@@ -1842,9 +1842,9 @@
     "singleEntriesRange_other": "letzte {{count}} Monate",
     "eggTrend": "{{value}} zur Ø-Woche",
     "chooseAnimal": "Tier wählen …",
-    "expectedBasis": "ab erstem Eintrag am {{date}}",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "Erste Erfassung"
+    "firstEntry": "Erste Erfassung",
+    "ofExpectedSince": "erwartet ~{{amount}} seit {{date}}"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2194,18 +2194,18 @@
     "emptyTitle": "Was kostet dein Garten, was bringt er?",
     "emptyText": "Erfasse Ausgaben und Ernten, dann rechnet Gardener die Bilanz mit Marktpreisen aus.",
     "toHarvest": "Ernte erfassen",
-    "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futterbuch und Gesundheitsakte. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
+    "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futter und Gesundheit. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
     "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
-    "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
+    "fromFeedLog": "davon {{amount}} aus Futter",
     "fromHealthLog": "davon {{amount}} aus Gesundheit",
-    "openFeedBook": "Im Futterbuch öffnen",
-    "openHealthBook": "In Gesundheit öffnen",
+    "openFeedBook": "Unter Futter öffnen",
+    "openHealthBook": "Unter Gesundheit öffnen",
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
-    "sourceFeed": "Futterbuch",
+    "sourceFeed": "Futter",
     "sourceHealth": "Gesundheit",
-    "alsoInFeedBook": "auch im Futterbuch",
-    "alsoInHealthBook": "auch in Gesundheit"
+    "alsoInFeedBook": "auch unter Futter",
+    "alsoInHealthBook": "auch unter Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",

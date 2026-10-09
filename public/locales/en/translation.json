@@ -1494,7 +1494,7 @@
     "monthlyDesc_one": "Share of the calorie needs of {{count}} person: fresh from the forecast and from storage.",
     "monthlyDesc_other": "Share of the calorie needs of {{count}} people: fresh from the forecast and from storage.",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
-    "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
+    "noMonthCovered": "No month reaches {{percent}} of your needs. The levers below show where more space helps most.",
     "ofNeed": "{{produced}} of {{needed}}",
     "leversTitle": "Biggest levers",
     "leversDesc": "What an extra {{area}} of a calorie-rich crop would add.",
@@ -1842,9 +1842,9 @@
     "singleEntriesRange_other": "last {{count}} months",
     "eggTrend": "{{value}} vs. average week",
     "chooseAnimal": "Choose animal…",
-    "expectedBasis": "since the first entry on {{date}}",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "First entry"
+    "firstEntry": "First entry",
+    "ofExpectedSince": "expected ~{{amount}} since {{date}}"
   },
   "seeds": {
     "title": "Seeds",

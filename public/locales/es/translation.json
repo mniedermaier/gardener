@@ -1562,7 +1562,7 @@
     "monthlyDesc_other": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
     "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
     "noWinterGap": "De {{from}} a {{to}} tus reservas previstas cubren al menos una cuarta parte de la necesidad.",
-    "noMonthCovered": "Tu huerto aún no cubre el {{percent}} de la necesidad en ningún mes. Las palancas de abajo muestran dónde más superficie aporta más.",
+    "noMonthCovered": "Ningún mes alcanza el {{percent}} de la necesidad. Las palancas de abajo muestran dónde más superficie aporta más.",
     "ofNeed": "{{produced}} de {{needed}}",
     "leversTitle": "Mayores palancas",
     "leversDesc": "Lo que aportarían {{area}} más de un cultivo rico en calorías.",
@@ -1932,9 +1932,9 @@
     "singleEntriesRange_many": "últimos {{count}} meses",
     "eggTrend": "{{value}} frente a la semana media",
     "chooseAnimal": "Elegir animal…",
-    "expectedBasis": "desde el primer registro el {{date}}",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "Primer registro"
+    "firstEntry": "Primer registro",
+    "ofExpectedSince": "esperados ~{{amount}} desde el {{date}}"
   },
   "seeds": {
     "title": "Semillas",

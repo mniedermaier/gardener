@@ -65,6 +65,19 @@ describe("Sufficiency calculator", () => {
     expect(result.nutrition.protein.percent).toBeGreaterThanOrEqual(0);
   });
 
+  it("a real planting date sets the harvest months (autumn sowing → winter harvest)", () => {
+    const autumn: Garden = {
+      ...garden,
+      beds: [{ ...garden.beds[0], cells: [{ cellX: 0, cellY: 0, plantId: "bean", plantedDate: "2026-09-20" }] }],
+    };
+    const planted = calculateSufficiency([autumn], [tomato, bean], 1, 30).plantYields.find((y) => y.plantId === "bean");
+    // 20 Sept + 50…65 days = Nov
+    expect(planted?.harvestMonths).toEqual([10]);
+    // Without a date: the spring sowing from the frost date (June/July).
+    const spring = calculateSufficiency([garden], [tomato, bean], 1, 30).plantYields.find((y) => y.plantId === "bean");
+    expect(spring?.harvestMonths.every((m) => m >= 5 && m <= 7)).toBe(true);
+  });
+
   it("monthly kg add up to the garden forecast: preserved surplus is not also counted fresh", () => {
     const bigGarden: Garden = {
       ...garden,

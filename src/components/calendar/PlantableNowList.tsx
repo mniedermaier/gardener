@@ -59,7 +59,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
   /**
-   * One date for all beds: "bis 17. Okt. · Hochbeet Süd". Dates that differ
+   * One date for all beds: "Hochbeet Süd · bis 17. Okt.". Dates that differ
    * per bed (glass closes later): one part per bed group, each with its own
    * date — "Gewächshaus bis 15. Nov. · Hochbeet Süd, Acker bis 17. Okt." — the
    * same dates the planner palette shows for each bed.
@@ -74,7 +74,8 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
       const when = after
         ? t("calendar.afterFrostWindow", { range: formatDateRange(after, windowEnd(item)) })
         : t(`calendar.${key}`, { date: formatDate(groups[0]?.date ?? new Date(), "short") });
-      return [when, bedLabel(allBeds)].filter((x): x is string => !!x);
+      // Bed first, as in every multi-group row on the page.
+      return [bedLabel(allBeds), when].filter((x): x is string => !!x);
     }
     // Every bed group with its own date (meta parts wrap whole) — dropping one
     // would contradict the planner palette for that bed.

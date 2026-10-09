@@ -204,6 +204,20 @@ function getHarvestMonths(
   return Array.from(months).sort((a, b) => a - b);
 }
 
+/** Months (0-11) of the harvest windows that start from real planting dates. */
+function getPlantedHarvestMonths(plant: Plant, plantedDates: string[]): number[] {
+  if (plant.harvestDaysMax >= 365) return [];
+  const months = new Set<number>();
+  for (const iso of plantedDates) {
+    const base = parseISO(iso);
+    if (Number.isNaN(base.getTime())) continue;
+    const end = addDays(base, plant.harvestDaysMax);
+    for (let d = addDays(base, plant.harvestDaysMin); d <= end; d = addDays(d, 15)) months.add(getMonth(d));
+    months.add(getMonth(end));
+  }
+  return Array.from(months).sort((a, b) => a - b);
+}
+
 export function calculateSufficiency(
   gardens: Garden[],
   plants: Plant[],
@@ -219,25 +233,32 @@ export function calculateSufficiency(
   // Calculate yields with harvest months
   const plantYields: PlantYieldEstimate[] = [];
   // Aggregate by plant
-  const plantAreas = new Map<string, { area: number; protections: number[] }>();
+  const plantAreas = new Map<string, { area: number; protections: number[]; planted: Set<string> }>();
   for (const g of gardens) {
     for (const b of g.beds) {
       const protection = getFrostProtectionWeeks(b);
-      for (const r of bedPlantAreas(b, plantMap, gridCellSizeCm)) {
-        const existing = plantAreas.get(r.plantId) ?? { area: 0, protections: [] };
+      // bedPlantAreas keeps the cell order, so index i is bed.cells[i].
+      bedPlantAreas(b, plantMap, gridCellSizeCm).forEach((r, i) => {
+        const existing = plantAreas.get(r.plantId) ?? { area: 0, protections: [], planted: new Set<string>() };
         existing.area += r.areaM2;
         if (!existing.protections.includes(protection)) existing.protections.push(protection);
+        const plantedDate = b.cells[i]?.plantedDate;
+        if (plantedDate) existing.planted.add(plantedDate);
         plantAreas.set(r.plantId, existing);
-      }
+      });
     }
   }
 
-  for (const [plantId, { area, protections }] of plantAreas) {
+  for (const [plantId, { area, protections, planted }] of plantAreas) {
     const plant = plantMap.get(plantId);
     if (!plant || area <= 0) continue;
     const yield_ = calculatePlantYield(plant, area);
-    // Use max frost protection for harvest months
-    yield_.harvestMonths = getHarvestMonths(plant, lastFrostDate, Math.max(...protections));
+    // Real planting dates win (an autumn sowing of lamb's lettuce is harvested
+    // in winter, as the calendar shows); otherwise the spring sowing from the
+    // frost date, with the bed's best frost protection.
+    yield_.harvestMonths = planted.size > 0
+      ? getPlantedHarvestMonths(plant, [...planted])
+      : getHarvestMonths(plant, lastFrostDate, Math.max(...protections));
     plantYields.push(yield_);
   }
 

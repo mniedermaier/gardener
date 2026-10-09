@@ -1562,7 +1562,7 @@
     "monthlyDesc_other": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
-    "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
+    "noMonthCovered": "Aucun mois n’atteint {{percent}} des besoins. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
     "ofNeed": "{{produced}} sur {{needed}}",
     "leversTitle": "Principaux leviers",
     "leversDesc": "Ce qu’apporteraient {{area}} de plus d’une culture riche en calories.",
@@ -1932,9 +1932,9 @@
     "singleEntriesRange_many": "{{count}} derniers mois",
     "eggTrend": "{{value}} par rapport à la semaine moyenne",
     "chooseAnimal": "Choisir un animal…",
-    "expectedBasis": "depuis la première saisie le {{date}}",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "Première saisie"
+    "firstEntry": "Première saisie",
+    "ofExpectedSince": "attendus ~{{amount}} depuis le {{date}}"
   },
   "seeds": {
     "title": "Semences",

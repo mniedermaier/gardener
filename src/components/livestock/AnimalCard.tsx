@@ -77,7 +77,10 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
               <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
                 <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
-                  {t("livestock.ofExpectedToDate", { amount: expected })}
+                  {/* The basis date sits in the same hint, under the figure it qualifies. */}
+                  {expectationBasis
+                    ? t("livestock.ofExpectedSince", { amount: expected, date: f.formatDate(expectationBasis, "dayMonth") })
+                    : t("livestock.ofExpectedToDate", { amount: expected })}
                 </span>
               </dd>
             </div>
@@ -88,10 +91,6 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
           <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>
           <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatCurrency(feedCost)}</dd>
         </div>
-        {/* The expectation basis is the same for every product: said once, across both columns. */}
-        {expectationBasis && yields.length > 0 && (
-          <p className="col-span-2 -mt-1 text-xs text-gray-500 dark:text-gray-400">{t("livestock.expectedBasis", { date: f.formatDate(expectationBasis, "short") })}</p>
-        )}
       </dl>
 
       {(lastHealth || animal.notes) && (
