@@ -94,8 +94,8 @@ export function AnimalDetail() {
   const days = acquired ? differenceInCalendarDays(now, acquired) : 0;
 
   const addLabel: Record<Exclude<Tab, "journal">, string> = {
-    // Same word as the tab ("Erträge"), not the section name "Produktion".
-    production: t("livestock.addYield"),
+    // "Ertrag" everywhere: tab "Erträge", this button, the production page and the dialog.
+    production: t("livestock.addProduct"),
     feed: t("livestock.addFeed"),
     health: t("livestock.addHealth"),
   };
@@ -135,10 +135,19 @@ export function AnimalDetail() {
           t("livestock.daysKept", { count: days }),
         ].join(" · ")}
         actions={
-          <Button variant="secondary" onClick={() => setDialog({ kind: "animal" })}>
-            <Pencil size={16} aria-hidden="true" />
-            {t("livestock.editAnimal")}
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => setDialog({ kind: "animal" })}>
+              <Pencil size={16} aria-hidden="true" />
+              {t("livestock.editAnimal")}
+            </Button>
+            {/* The add action of the open tab sits with the page actions, not floating mid-page. */}
+            {tab !== "journal" && (
+              <Button onClick={openAddForTab}>
+                <Plus size={16} aria-hidden="true" />
+                {addLabel[tab]}
+              </Button>
+            )}
+          </>
         }
       />
 
@@ -207,11 +216,11 @@ export function AnimalDetail() {
           { value: "health", label: t("livestock.tabTreatments"), count: health.length },
           { value: "journal", label: t("nav.journal"), count: journal.length },
         ]}
-        actions={tab !== "journal" ? <Button onClick={openAddForTab}><Plus size={16} aria-hidden="true" />{addLabel[tab]}</Button> : undefined}
       >
         <div className="space-y-3">
           {tab === "production" && (products.length === 0 ? empty(Egg, t("livestock.noProductsTitle"), t("livestock.noProducts")) : (
             <ProductWeekList
+              initialWeeks={4}
               products={products}
               onOpen={(p) => setDialog({ kind: "product", entry: p })}
               renderActions={(p) => rowMenu(() => setDialog({ kind: "product", entry: p }), () => void deleteProduct(p))}

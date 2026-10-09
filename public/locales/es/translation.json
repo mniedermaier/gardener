@@ -212,10 +212,9 @@
       "old_one": "Última copia hace {{count}} día",
       "old_other": "Última copia hace {{count}} días",
       "old_many": "Última copia hace {{count}} días",
-      "why": "Tus datos solo están en este navegador. Una copia los protege y ayuda al cambiar de dispositivo.",
+      "why": "Tus datos solo están en este dispositivo. Una copia los protege y ayuda al cambiar de dispositivo.",
       "action": "Descargar copia",
-      "later": "Más tarde",
-      "whyApp": "Tus datos solo están en esta app, en este dispositivo. Una copia los protege y ayuda al cambiar de dispositivo."
+      "later": "Más tarde"
     },
     "forecastValue": "Previsión {{value}}",
     "roiValue": "Rentabilidad {{value}}",
@@ -1009,8 +1008,8 @@
     },
     "reopenNamed": "Reabrir «{{title}}»",
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
-    "untilRange": "hasta el {{range}} según el bancal",
-    "fromRange": "desde el {{range}} según el bancal",
+    "untilRange": "Fin según el bancal: {{range}}",
+    "fromRange": "Inicio según el bancal: {{range}}",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
     "notesPlaceholder": "p. ej. herramientas, avisos…"
   },
@@ -1489,7 +1488,6 @@
     "yieldByPlant": "Rendimiento por planta",
     "monthlyTitle": "Abastecimiento por mes",
     "annualCoverage": "Cobertura anual",
-    "fresh": "Huerto, fresco",
     "stored": "De reserva",
     "months": "meses de vida útil",
     "winterGap": "Hueco de reservas en invierno",
@@ -1520,7 +1518,6 @@
     "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
     "monthlyCaption": "Cobertura calórica por mes",
     "monthlyKgTitle": "Alimentos disponibles por mes",
-    "monthlyKgCaption": "Alimentos disponibles por mes en kg: del huerto (frescos y de reserva) y de los animales",
     "noWinterGap": "De {{from}} a {{to}} tus reservas previstas cubren al menos una cuarta parte de la necesidad.",
     "noMonthCovered": "Tu huerto aún no cubre el {{percent}} de la necesidad en ningún mes. Las palancas de abajo muestran dónde más superficie aporta más.",
     "ofNeed": "{{produced}} de {{needed}}",
@@ -1549,7 +1546,9 @@
     "monthlyDescFresh_one": "Parte de las calorías que necesita {{count}} persona (previsión). Aún no hay nada en reserva.",
     "monthlyDescFresh_other": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
     "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
-    "monthlyKgCaptionFresh": "Alimentos disponibles por mes en kg: frescos del huerto y de los animales"
+    "harvested": "Cosechado",
+    "freshForecast": "Previsión fresco",
+    "monthlyKgCaptionSplit": "Hasta {{month}} la cosecha registrada, después la previsión según los bancales actuales; más despensa y productos animales."
   },
   "pests": {
     "title": "Plagas",
@@ -1597,7 +1596,7 @@
   "livestock": {
     "title": "Animales",
     "addAnimal": "Añadir animal",
-    "addProduct": "Registrar producción",
+    "addProduct": "Registrar rendimiento",
     "added": "{{name}} añadido",
     "totalAnimals": "Total animales",
     "eggsThisWeek": "Huevos, últimos 7 días",
@@ -1622,7 +1621,7 @@
     "productionEntries_one": "{{count}} registro",
     "productionEntries_many": "{{count}} registros",
     "productionEntries_other": "{{count}} registros",
-    "addHealth": "Registrar evento de salud",
+    "addHealth": "Registrar tratamiento",
     "healthAdded": "Registro de salud guardado",
     "noHealth": "Anota vacunas, tratamientos y revisiones para no olvidar nada.",
     "healthType": "Tipo",
@@ -1778,7 +1777,7 @@
     "feedEntriesCount_one": "{{count}} registro de pienso",
     "feedEntriesCount_other": "{{count}} registros de pienso",
     "feedEntriesCount_many": "{{count}} registros de pienso",
-    "chartDesc12": "Por mes desde el primer registro, hasta 12 meses. Las cosechas puntuales como la miel aparecen en una lista debajo.",
+    "chartDesc12": "Huevos por mes; miel y cera en la lista de abajo.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "unidades al mes",
@@ -1848,10 +1847,9 @@
     "tabTreatments": "Tratamientos",
     "costPerUnit": "Coste por unidad",
     "noEggsToday": "Hoy aún no hay huevos registrados",
-    "addYield": "Registrar rendimiento",
     "notesPlaceholder": "p. ej. comportamiento, marca de pienso…",
-    "monthValues": "Valores mensuales",
-    "monthAvg": "Media {{amount}} por mes con registros"
+    "monthAvgLabel": "Media mensual",
+    "bestMonth": "Mejor mes"
   },
   "seeds": {
     "title": "Semillas",
@@ -2138,7 +2136,7 @@
       "sow_indoors": "Semillero",
       "sow_outdoors": "Siembra directa",
       "transplant": "Trasplante",
-      "plant_autumn": "Plantar",
+      "plant_autumn": "Trasplante",
       "sow_autumn": "Siembra de otoño"
     },
     "showMore_one": "Mostrar {{count}} más",
@@ -2146,7 +2144,8 @@
     "showMore_other": "Mostrar {{count}} más",
     "bedCount_one": "{{count}} bancal",
     "bedCount_many": "{{count}} bancales",
-    "bedCount_other": "{{count}} bancales"
+    "bedCount_other": "{{count}} bancales",
+    "afterFrost": "Tras la helada"
   },
   "expenses": {
     "title": "Costes",
@@ -2237,8 +2236,7 @@
     "sowing": "Siembra",
     "generateTasks": "Agregar al calendario",
     "nextSpring": "Este año ya es tarde para siembras escalonadas: las siembras de otoño sueltas están arriba, en «Sembrar y plantar ahora». Aquí planificas para la primavera de {{year}}.",
-    "pickNextSpring": "Elige un cultivo para la próxima primavera",
-    "noBeds": "Planifica siembras escalonadas en cuanto tengas un bancal."
+    "pickNextSpring": "Elige un cultivo para la próxima primavera"
   },
   "guilds": {
     "title": "Asociaciones de plantas",

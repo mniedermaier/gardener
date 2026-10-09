@@ -212,10 +212,9 @@
       "old_one": "Dernière sauvegarde il y a {{count}} jour",
       "old_other": "Dernière sauvegarde il y a {{count}} jours",
       "old_many": "Dernière sauvegarde il y a {{count}} jours",
-      "why": "Vos données ne sont que dans ce navigateur. Une sauvegarde les protège et facilite le changement d’appareil.",
+      "why": "Vos données ne sont que sur cet appareil. Une sauvegarde les protège et facilite le changement d’appareil.",
       "action": "Télécharger la sauvegarde",
-      "later": "Plus tard",
-      "whyApp": "Vos données ne sont que dans cette app, sur cet appareil. Une sauvegarde les protège et facilite le changement d’appareil."
+      "later": "Plus tard"
     },
     "forecastValue": "Prévision {{value}}",
     "roiValue": "Rentabilité {{value}}",
@@ -1009,8 +1008,8 @@
     },
     "reopenNamed": "Rouvrir « {{title}} »",
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
-    "untilRange": "jusqu’au {{range}} selon la planche",
-    "fromRange": "à partir du {{range}} selon la planche",
+    "untilRange": "Fin selon la planche : {{range}}",
+    "fromRange": "Début selon la planche : {{range}}",
     "upNextFrom": "Ensuite · dès le {{date}}",
     "notesPlaceholder": "p. ex. outils, rappels…"
   },
@@ -1489,7 +1488,6 @@
     "yieldByPlant": "Rendement par plante",
     "monthlyTitle": "Approvisionnement par mois",
     "annualCoverage": "Couverture annuelle",
-    "fresh": "Jardin, frais",
     "stored": "En réserve",
     "months": "mois de conservation",
     "winterGap": "Manque de réserves en hiver",
@@ -1520,7 +1518,6 @@
     "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "monthlyCaption": "Couverture calorique par mois",
     "monthlyKgTitle": "Quantité disponible par mois",
-    "monthlyKgCaption": "Aliments disponibles par mois en kg : du jardin (frais et en réserve) et des animaux",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
     "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
     "ofNeed": "{{produced}} sur {{needed}}",
@@ -1549,7 +1546,9 @@
     "monthlyDescFresh_one": "Part des besoins caloriques de {{count}} personne (prévision). Rien en réserve pour l’instant.",
     "monthlyDescFresh_other": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
     "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
-    "monthlyKgCaptionFresh": "Aliments disponibles par mois en kg : frais du jardin et des animaux"
+    "harvested": "Récolté",
+    "freshForecast": "Prévision frais",
+    "monthlyKgCaptionSplit": "Jusqu’en {{month}} la récolte saisie, ensuite la prévision selon les planches actuelles ; plus réserve et produits animaux."
   },
   "pests": {
     "title": "Ravageurs",
@@ -1597,7 +1596,7 @@
   "livestock": {
     "title": "Animaux",
     "addAnimal": "Ajouter un animal",
-    "addProduct": "Noter la production",
+    "addProduct": "Noter un rendement",
     "added": "{{name}} ajouté",
     "totalAnimals": "Total animaux",
     "eggsThisWeek": "Œufs, 7 derniers jours",
@@ -1622,7 +1621,7 @@
     "productionEntries_one": "{{count}} entrée",
     "productionEntries_many": "{{count}} entrées",
     "productionEntries_other": "{{count}} entrées",
-    "addHealth": "Noter un événement de santé",
+    "addHealth": "Saisir un soin",
     "healthAdded": "Entrée de santé enregistrée",
     "noHealth": "Notez vaccins, traitements et contrôles pour ne rien oublier.",
     "healthType": "Type",
@@ -1778,7 +1777,7 @@
     "feedEntriesCount_one": "{{count}} entrée d’alimentation",
     "feedEntriesCount_other": "{{count}} entrées d’alimentation",
     "feedEntriesCount_many": "{{count}} entrées d’alimentation",
-    "chartDesc12": "Par mois depuis la première saisie, 12 mois au plus. Les récoltes ponctuelles comme le miel sont listées en dessous.",
+    "chartDesc12": "Œufs par mois ; miel et cire en liste ci-dessous.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "pièces par mois",
@@ -1848,10 +1847,9 @@
     "tabTreatments": "Soins",
     "costPerUnit": "Coût par unité",
     "noEggsToday": "Aucun œuf noté aujourd’hui",
-    "addYield": "Noter un rendement",
     "notesPlaceholder": "p. ex. comportement, marque d’aliment…",
-    "monthValues": "Valeurs mensuelles",
-    "monthAvg": "Moy. {{amount}} par mois avec saisies"
+    "monthAvgLabel": "Moyenne par mois",
+    "bestMonth": "Meilleur mois"
   },
   "seeds": {
     "title": "Semences",
@@ -2138,7 +2136,7 @@
       "sow_indoors": "Semis à l’abri",
       "sow_outdoors": "Semis direct",
       "transplant": "Repiquage",
-      "plant_autumn": "Plantation",
+      "plant_autumn": "Repiquage",
       "sow_autumn": "Semis d’automne"
     },
     "showMore_one": "Afficher {{count}} de plus",
@@ -2146,7 +2144,8 @@
     "showMore_other": "Afficher {{count}} de plus",
     "bedCount_one": "{{count}} planche",
     "bedCount_many": "{{count}} planches",
-    "bedCount_other": "{{count}} planches"
+    "bedCount_other": "{{count}} planches",
+    "afterFrost": "Après le gel"
   },
   "expenses": {
     "title": "Coûts",
@@ -2237,8 +2236,7 @@
     "sowing": "Semis",
     "generateTasks": "Ajouter au calendrier",
     "nextSpring": "Il est trop tard pour des semis échelonnés cette année – les semis d’automne isolés figurent plus haut sous « Semer et planter maintenant ». Ici, vous planifiez pour le printemps {{year}}.",
-    "pickNextSpring": "Choisir une culture pour le printemps prochain",
-    "noBeds": "Planifiez des semis échelonnés dès qu’une planche existe."
+    "pickNextSpring": "Choisir une culture pour le printemps prochain"
   },
   "guilds": {
     "title": "Associations de plantes",

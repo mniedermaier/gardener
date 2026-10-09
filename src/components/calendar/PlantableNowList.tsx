@@ -8,6 +8,16 @@ import { agendaRowsByPlant, groupAgendaBedsByDate, type AgendaBed, type AgendaPl
 import { ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { PhaseBadge, actionPhase } from "@/components/ui/phase";
+import { Badge } from "@/components/ui/Badge";
+import { useWeatherGlance } from "@/hooks/useWeatherGlance";
+import { useToday } from "@/hooks/useToday";
+import { useFrostSummary } from "@/components/weather/frost";
+import { isFrostSensitive } from "@/lib/weatherAlerts";
+import { toISODate } from "@/lib/format";
+import { addDays } from "date-fns";
+
+/** Planted in autumn on purpose to overwinter: frost does not stop them. */
+const OVERWINTERING = new Set(["garlic", "onion", "currant", "gooseberry", "raspberry", "blueberry", "strawberry"]);
 
 /**
  * Rows of the sowing agenda (`useSowingAgenda`): what can be sown or planted
@@ -21,6 +31,15 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [expanded, setExpanded] = useState(false);
+  const today = useToday();
+  const glance = useWeatherGlance();
+  const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
+  // A real frost (≤ 0 °C) in the next three nights: planting out now would
+  // contradict the frost warning on "Heute" and "Wetter", so those rows say so.
+  const frostSoon = useMemo(() => {
+    const until = toISODate(addDays(today, 3));
+    return !!frost?.summary.nights.some((n) => n.tempMin <= 0 && n.date <= until);
+  }, [frost, today]);
   /** "Hochbeet Süd", "Hochbeet Süd, Gewächshaus", "3 Beete". */
   const bedLabel = (beds?: AgendaBed[]) =>
     !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
@@ -28,7 +47,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   /**
    * Always two short parts: the date and the beds. One date for all beds:
    * "bis 17. Okt. · Hochbeet Süd". Dates that differ per bed (glass closes
-   * later): "je nach Beet bis 10. Okt.–15. Nov. · 4 Beete" (formatDateRange,
+   * later): "Ende je nach Beet: 10. Okt.–15. Nov. · 4 Beete" (formatDateRange,
    * one range style app-wide). Every action is a badge, never a meta part.
    */
   const meta = (item: AgendaPlantRow): string[] => {
@@ -61,7 +80,13 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
             title={getPlantName(item.plantId)}
             badges={item.actions.length > 0 ? (
               <>
-                {item.actions.map((a) => <PhaseBadge key={a} phase={actionPhase(a)} label={t(`advisor.actions.${a}`)} />)}
+                {/* One badge per row ("Herbstsaat / Auspflanzen"), so rows never wrap into two badge lines. */}
+                <PhaseBadge phase={actionPhase(item.actions[0])} label={[...new Set(item.actions.map((a) => t(`advisor.actions.${a}`)))].join(" / ")} />
+                {frostSoon && item.kind === "now" && !OVERWINTERING.has(plant.id)
+                  && item.actions.some((a) => a === "transplant" || a === "plant_autumn")
+                  && (isFrostSensitive(plant) || item.actions.includes("plant_autumn")) && (
+                  <Badge tone="warning" size="sm">{t("advisor.afterFrost")}</Badge>
+                )}
               </>
             ) : undefined}
             meta={meta(item)}

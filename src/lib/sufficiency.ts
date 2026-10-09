@@ -475,3 +475,18 @@ export function calculateSufficiency(
     annualCoveragePercent,
   };
 }
+
+/**
+ * Logged harvest per calendar month of `year`, in kg (index 0 = January).
+ * The monthly chart shows these for months that are over or running, so past
+ * months never contradict the harvest log; the forecast covers the rest.
+ */
+export function loggedKgByMonth(harvests: { date: string; weightGrams?: number }[], year: number): number[] {
+  const out: number[] = Array.from({ length: 12 }, () => 0);
+  for (const h of harvests) {
+    if (!h.weightGrams || Number(h.date.slice(0, 4)) !== year) continue;
+    const m = Number(h.date.slice(5, 7)) - 1;
+    if (m >= 0 && m < 12) out[m] += h.weightGrams / 1000;
+  }
+  return out;
+}

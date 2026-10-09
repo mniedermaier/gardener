@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { useFormat } from "@/hooks/useFormat";
 import type { GlanceState } from "@/hooks/useWeatherGlance";
 import { todayISO } from "@/lib/format";
-import { FrostTaskButton, frostLabelKey, frostTone, useFrostAffectedText, useFrostSummary } from "@/components/weather/frost";
+import { FrostTaskButton, frostTone, useDayLabel, useFrostAffectedText, useFrostSummary } from "@/components/weather/frost";
 import { ALERT_ICON, SEVERITY_TONE, useAlertText, useWeatherAlerts } from "@/components/weather/alerts";
 import { Badge } from "@/components/ui/Badge";
 import { TONE_TEXT } from "@/components/ui/tone";
@@ -41,7 +41,9 @@ const capitalize = (s: string) => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s
 export const WeatherCard = memo(function WeatherCard({ glance }: { glance: GlanceState }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { formatDate, formatTemperature } = useFormat();
+  const { formatTemperature } = useFormat();
+  // "Heute", "Morgen", then "Sa" — the same day names as the weather page.
+  const dayLabel = useDayLabel();
   const { threshold, locationName } = useStore(useShallow((s) => ({ threshold: s.alerts.frostThresholdC, locationName: s.locationName })));
   const [today] = useState(todayISO);
   // Same summary as the weather page (lib/weatherAlerts summarizeFrost).
@@ -109,7 +111,7 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
             const frost = d.tempMin <= threshold;
             return (
               <li key={d.date} className="rounded-lg bg-gray-50 px-2 py-2.5 text-center dark:bg-white/5" title={capitalize(d.description)}>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{formatDate(d.date, "weekday")}</p>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{dayLabel(d.date)}</p>
                 <WeatherIcon code={d.icon} size={20} label={d.description} className="mx-auto my-1.5 text-gray-600 dark:text-gray-300" />
                 <p className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{formatTemperature(d.tempMax)}</p>
                 {/* Neutral number; the snowflake marks the frost night (colour carries meaning once, not on the figure). */}
@@ -128,8 +130,8 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
           <p className="flex items-start gap-2">
             <Snowflake size={16} aria-hidden="true" className={`mt-0.5 shrink-0 ${TONE_TEXT[frostTone(frost.summary)]}`} />
             <span>
+              {/* The sentence already says "Frost"/"Frostgefahr"; no badge in mid-text. */}
               <span className="font-medium">{frost.title}.</span>{" "}
-              <Badge tone={frostTone(frost.summary)} size="sm" className="align-text-bottom">{t(frostLabelKey(frost.summary))}</Badge>{" "}
               {affected}
               {/* Only the headline of the greenhouse warning here; its reasoning
                   (outside low, assumed buffer) lives on the weather page. */}

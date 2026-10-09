@@ -4,7 +4,6 @@ import { HardDriveDownload } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { exportAllData } from "@/lib/dataExport";
-import { isNativeApp } from "@/lib/nativeStorage";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 
@@ -68,7 +67,7 @@ export const BackupHint = memo(function BackupHint({ now }: { now: Date }) {
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
           {daysSince === null ? t("dashboard.backup.never") : t("dashboard.backup.old", { count: daysSince })}
         </p>
-        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t(isNativeApp() ? "dashboard.backup.whyApp" : "dashboard.backup.why")}</p>
+        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t("dashboard.backup.why")}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" onClick={backup}>{t("dashboard.backup.action")}</Button>
           <Button size="sm" variant="ghost" onClick={snooze}>{t("dashboard.backup.later")}</Button>

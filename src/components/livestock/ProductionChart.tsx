@@ -124,8 +124,8 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
 
   // One chart over few months: a full-width card would stretch three bars
   // over 1000 px, a capped chart leaves the card half empty. The chart takes
-  // the left column and the right one carries the figures behind it — the
-  // single entries, or the month values with their average.
+  // the left column; the right one carries the single entries, or a short
+  // summary (average and best month) — never the bar values again.
   const single = types.length === 1 && shown < 6;
   if (!single) {
     return (
@@ -139,24 +139,26 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
   const values = perType.get(type)!;
   const withData = values.filter((v) => v > 0);
   const avg = withData.length > 0 ? withData.reduce((s, v) => s + v, 0) / withData.length : 0;
+  const best = values.reduce((bi, v, i, a) => (v > a[bi] ? i : bi), 0);
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,36rem)_1fr] lg:gap-8">
       {charts}
       {sparseList || (
-        <div>
-          <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("livestock.monthValues")}</h3>
-          <ul className="divide-y divide-gray-100 text-sm dark:divide-white/5">
-            {buckets.map((b, i) => (
-              <li key={b.key} className="flex items-center justify-between gap-3 py-2">
-                <span className="text-gray-700 dark:text-gray-300">{f.formatDate(b.date, "monthYear")}</span>
-                <span className="font-medium text-gray-900 tabular-nums dark:text-gray-100">{formatProductAmount(type, values[i], f, t)}</span>
-              </li>
-            ))}
-          </ul>
-          {withData.length > 1 && (
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t("livestock.monthAvg", { amount: formatProductAmount(type, avg, f, t) })}</p>
-          )}
-        </div>
+        withData.length > 1 && (
+          <dl className="grid grid-cols-2 content-start gap-x-6 gap-y-4 text-sm lg:grid-cols-1">
+            <div>
+              <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.monthAvgLabel")}</dt>
+              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">{formatProductAmount(type, avg, f, t)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.bestMonth")}</dt>
+              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
+                {formatProductAmount(type, values[best], f, t)}
+                <span className="ml-1.5 text-sm font-normal text-gray-500 dark:text-gray-400">{f.formatDate(buckets[best].date, "monthYear")}</span>
+              </dd>
+            </div>
+          </dl>
+        )
       )}
     </div>
   );

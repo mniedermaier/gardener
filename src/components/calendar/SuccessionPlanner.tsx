@@ -77,16 +77,9 @@ export function SuccessionPlanner() {
   const unusedCandidates = candidates.filter((p) => !configs.some((c) => c.plantId === p.id));
   const hasBeds = gardens.some((g) => g.beds.length > 0);
 
-  // Without a bed the sowing tasks would have nowhere to go: one quiet line, not a card of chips.
-  if (!hasBeds) {
-    return (
-      <Card padding="sm">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          <span className="font-semibold text-gray-900 dark:text-gray-100">{t("succession.title")}</span> · {t("succession.noBeds")}
-        </p>
-      </Card>
-    );
-  }
+  // Without a bed the sowing tasks would have nowhere to go, and the season
+  // plan above already asks for a first bed: nothing to show yet.
+  if (!hasBeds) return null;
 
   return (
     <Card>

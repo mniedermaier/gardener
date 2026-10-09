@@ -203,10 +203,9 @@
       "never": "Noch kein Backup",
       "old_one": "Letztes Backup vor {{count}} Tag",
       "old_other": "Letztes Backup vor {{count}} Tagen",
-      "why": "Deine Daten liegen nur in diesem Browser. Eine Sicherung schützt vor Verlust und hilft beim Gerätewechsel.",
+      "why": "Deine Daten liegen nur auf diesem Gerät. Eine Sicherung schützt vor Verlust und hilft beim Gerätewechsel.",
       "action": "Backup herunterladen",
-      "later": "Später",
-      "whyApp": "Deine Daten liegen nur in dieser App auf diesem Gerät. Eine Sicherung schützt vor Verlust und hilft beim Gerätewechsel."
+      "later": "Später"
     },
     "forecastValue": "Prognose {{value}}",
     "roiValue": "Rendite {{value}}",
@@ -979,8 +978,8 @@
     },
     "reopenNamed": "„{{title}}“ wieder öffnen",
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
-    "untilRange": "je nach Beet bis {{range}}",
-    "fromRange": "je nach Beet ab {{range}}",
+    "untilRange": "Ende je nach Beet: {{range}}",
+    "fromRange": "Start je nach Beet: {{range}}",
     "upNextFrom": "Als Nächstes · ab {{date}}",
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …"
   },
@@ -1428,7 +1427,6 @@
     "yieldByPlant": "Ertrag nach Pflanze",
     "monthlyTitle": "Versorgung pro Monat",
     "annualCoverage": "Jahresabdeckung",
-    "fresh": "Garten, frisch",
     "stored": "Aus dem Vorrat",
     "months": "Monate haltbar",
     "winterGap": "Lagerlücke im Winter",
@@ -1456,7 +1454,6 @@
     "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen: frisch laut Prognose und aus dem Vorrat.",
     "monthlyCaption": "Kalorienabdeckung pro Monat",
     "monthlyKgTitle": "Verfügbare Menge pro Monat",
-    "monthlyKgCaption": "Verfügbare Lebensmittel pro Monat in kg: aus dem Garten (frisch und aus dem Vorrat) und von den Tieren",
     "noWinterGap": "Von {{from}} bis {{to}} reicht dein geplanter Vorrat für mindestens ein Viertel des Bedarfs.",
     "noMonthCovered": "Dein Garten deckt bisher in keinem Monat {{percent}} des Bedarfs. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
     "ofNeed": "{{produced}} von {{needed}}",
@@ -1482,7 +1479,9 @@
     "emptyText_other": "{{count}} Personen brauchen rund {{kcal}} kcal am Tag. Sobald Beete bepflanzt oder Tiere hinzugefügt sind, siehst du hier, wie viel davon Garten und Tiere decken.",
     "monthlyDescFresh_one": "Anteil des Kalorienbedarfs von {{count}} Person laut Prognose. Im Vorrat liegt noch nichts.",
     "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Im Vorrat liegt noch nichts.",
-    "monthlyKgCaptionFresh": "Verfügbare Lebensmittel pro Monat in kg: frisch aus dem Garten und von den Tieren"
+    "harvested": "Geerntet",
+    "freshForecast": "Prognose frisch",
+    "monthlyKgCaptionSplit": "Bis {{month}} die erfasste Ernte, danach die Prognose aus der aktuellen Beetbelegung; dazu Vorrat und Tierprodukte."
   },
   "pests": {
     "title": "Schädlinge",
@@ -1530,7 +1529,7 @@
   "livestock": {
     "title": "Tiere",
     "addAnimal": "Tier hinzufügen",
-    "addProduct": "Produktion erfassen",
+    "addProduct": "Ertrag erfassen",
     "added": "{{name}} angelegt",
     "totalAnimals": "Tiere gesamt",
     "eggsThisWeek": "Eier, letzte 7 Tage",
@@ -1554,7 +1553,7 @@
     "liters": "Liter",
     "productionEntries_one": "{{count}} Eintrag",
     "productionEntries_other": "{{count}} Einträge",
-    "addHealth": "Gesundheitseintrag erfassen",
+    "addHealth": "Behandlung erfassen",
     "healthAdded": "Gesundheitseintrag erfasst",
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
@@ -1696,7 +1695,7 @@
     "eggsThisYear": "Eier dieses Jahr",
     "feedEntriesCount_one": "{{count}} Futtereintrag",
     "feedEntriesCount_other": "{{count}} Futtereinträge",
-    "chartDesc12": "Pro Monat ab dem ersten Eintrag, höchstens 12 Monate. Seltene Ernten wie Honig stehen als Liste darunter.",
+    "chartDesc12": "Eier pro Monat; Honig und Wachs als Liste darunter.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "Stück pro Monat",
@@ -1765,10 +1764,9 @@
     "tabTreatments": "Behandlungen",
     "costPerUnit": "Kosten je Einheit",
     "noEggsToday": "Heute noch keine Eier erfasst",
-    "addYield": "Ertrag erfassen",
     "notesPlaceholder": "z. B. Verhalten, Futtermarke …",
-    "monthValues": "Monatswerte",
-    "monthAvg": "Ø {{amount}} pro Monat mit Einträgen"
+    "monthAvgLabel": "Ø pro Monat",
+    "bestMonth": "Bester Monat"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2045,13 +2043,14 @@
       "sow_indoors": "Vorziehen",
       "sow_outdoors": "Direktsaat",
       "transplant": "Auspflanzen",
-      "plant_autumn": "Pflanzen",
+      "plant_autumn": "Auspflanzen",
       "sow_autumn": "Herbstsaat"
     },
     "showMore_one": "{{count}} weitere anzeigen",
     "showMore_other": "{{count}} weitere anzeigen",
     "bedCount_one": "{{count}} Beet",
-    "bedCount_other": "{{count}} Beete"
+    "bedCount_other": "{{count}} Beete",
+    "afterFrost": "Erst nach dem Frost"
   },
   "expenses": {
     "title": "Kosten",
@@ -2137,8 +2136,7 @@
     "sowing": "Aussaat",
     "generateTasks": "Zum Kalender hinzufügen",
     "nextSpring": "Für Staffelsaaten ist es dieses Jahr zu spät – einzelne Herbstsaaten stehen oben unter „Jetzt säen & pflanzen“. Hier planst du für das Frühjahr {{year}}.",
-    "pickNextSpring": "Kultur fürs nächste Frühjahr wählen",
-    "noBeds": "Staffelsaaten planst du, sobald ein Beet angelegt ist."
+    "pickNextSpring": "Kultur fürs nächste Frühjahr wählen"
   },
   "guilds": {
     "title": "Pflanzgilden",
