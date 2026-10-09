@@ -2414,7 +2414,7 @@
     "almostFull": "Storage is {{percent}}% full. Export a backup and remove old entries to free space."
   },
   "quickAdd": {
-    "title": "New",
+    "title": "Quick add",
     "harvest": "Log harvest",
     "task": "Add task",
     "journal": "Log journal entry",
@@ -2424,7 +2424,9 @@
     "pest": "Report problem",
     "pestHint": "Record an infestation or disease",
     "water": "Log watering",
-    "waterHint": "Amount and bed"
+    "waterHint": "Amount and bed",
+    "production": "Log yield",
+    "productionHint": "Eggs, honey, milk…"
   },
   "records": {
     "today": "Today",

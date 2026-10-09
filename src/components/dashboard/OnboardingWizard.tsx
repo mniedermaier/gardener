@@ -95,7 +95,7 @@ function GardenVignette() {
       <div className="mx-auto grid max-w-72 grid-cols-4 gap-2 rounded-xl border-4 border-earth-300 bg-earth-100 p-2 dark:border-earth-700 dark:bg-earth-900/40">
         {HERO_PLANTS.map((id) => (
           <span key={id} className="flex aspect-square items-center justify-center rounded-lg bg-white/70 dark:bg-white/5">
-            <PlantIconDisplay plantId={id} emoji="" size={36} />
+            <PlantIconDisplay plantId={id} emoji="" size={44} />
           </span>
         ))}
       </div>

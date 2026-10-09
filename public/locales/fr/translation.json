@@ -2531,7 +2531,7 @@
     "almostFull": "Stockage rempli à {{percent}} %. Exportez une sauvegarde et supprimez d'anciennes entrées."
   },
   "quickAdd": {
-    "title": "Nouveau",
+    "title": "Ajout rapide",
     "harvest": "Noter une récolte",
     "task": "Ajouter une tâche",
     "journal": "Noter une entrée au journal",
@@ -2541,7 +2541,9 @@
     "pest": "Signaler un problème",
     "pestHint": "Noter une attaque ou une maladie",
     "water": "Saisir un arrosage",
-    "waterHint": "Quantité et planche"
+    "waterHint": "Quantité et planche",
+    "production": "Saisir une production",
+    "productionHint": "Œufs, miel, lait…"
   },
   "records": {
     "today": "Aujourd’hui",

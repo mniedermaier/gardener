@@ -2414,7 +2414,7 @@
     "almostFull": "Speicher zu {{percent}} % belegt. Ein Backup und das Aufräumen alter Einträge schaffen Platz."
   },
   "quickAdd": {
-    "title": "Neu",
+    "title": "Schnell erfassen",
     "harvest": "Ernte erfassen",
     "task": "Aufgabe hinzufügen",
     "journal": "Tagebucheintrag erfassen",
@@ -2424,7 +2424,9 @@
     "pest": "Problem melden",
     "pestHint": "Befall oder Krankheit festhalten",
     "water": "Gießen erfassen",
-    "waterHint": "Menge und Beet"
+    "waterHint": "Menge und Beet",
+    "production": "Ertrag erfassen",
+    "productionHint": "Eier, Honig, Milch …"
   },
   "records": {
     "today": "Heute",

@@ -51,14 +51,14 @@ export function QuickAdd({ hidden = false }: QuickAddProps) {
       )}
       <Modal open={open} onClose={() => setOpen(false)} title={t("quickAdd.title")}>
         <ul className="-mx-1 grid gap-1">
-          {QUICK_ACTIONS.map(({ to, icon: Icon, labelKey, hintKey }) => (
+          {QUICK_ACTIONS.map(({ to, icon: Icon, labelKey, hintKey, tone }) => (
             <li key={to}>
               <button
                 type="button"
                 onClick={() => go(to)}
                 className="flex min-h-14 w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-white/5"
               >
-                <span className={`inline-flex size-10 shrink-0 items-center justify-center rounded-lg ${TONE_SOFT.brand}`} aria-hidden="true">
+                <span className={`inline-flex size-10 shrink-0 items-center justify-center rounded-lg ${TONE_SOFT[tone]}`} aria-hidden="true">
                   <Icon size={20} />
                 </span>
                 <span className="min-w-0">
