@@ -788,7 +788,7 @@
    "date": "2026-07-02",
    "weightGrams": 350,
    "quality": 4,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "notes": "Knackig, zwei Stück geplatzt"
   },
   {
    "id": "h5",
@@ -824,8 +824,7 @@
    "plantId": "cucumber",
    "date": "2026-07-31",
    "weightGrams": 400,
-   "quality": 4,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "quality": 4
   },
   {
    "id": "h9",
@@ -862,7 +861,7 @@
    "date": "2026-08-16",
    "weightGrams": 450,
    "quality": 4,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "notes": "Erste Ernte nach dem Gewitter"
   },
   {
    "id": "h13",
@@ -898,8 +897,7 @@
    "plantId": "parsley",
    "date": "2026-08-26",
    "weightGrams": 60,
-   "quality": 4,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "quality": 4
   },
   {
    "id": "h17",
@@ -936,7 +934,7 @@
    "date": "2026-09-05",
    "weightGrams": 1800,
    "quality": 4,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "notes": "Etwas kleiner als letzte Woche"
   },
   {
    "id": "h21",
@@ -973,7 +971,7 @@
    "date": "2026-09-17",
    "weightGrams": 2400,
    "quality": 5,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "notes": "Für Salat und zum Einlegen"
   },
   {
    "id": "h25",
@@ -1009,8 +1007,7 @@
    "plantId": "chard",
    "date": "2026-10-02",
    "weightGrams": 400,
-   "quality": 4,
-   "notes": "Sehr aromatisch, kaum Schädlinge"
+   "quality": 4
   },
   {
    "id": "h29",

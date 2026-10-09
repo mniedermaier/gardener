@@ -23,6 +23,7 @@ import { DateField } from "@/components/ui/DateField";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Badge } from "@/components/ui/Badge";
 import { Menu } from "@/components/ui/Menu";
+import { IconButton } from "@/components/ui/IconButton";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -81,6 +82,7 @@ export function PestTracker() {
     [pests, filter],
   );
   const activeCount = pests.filter((p) => !p.resolved).length;
+  const severeCount = pests.filter((p) => !p.resolved && p.severity >= 4).length;
 
   const openAdd = useCallback((params: AddParams = {}) => {
     setEditingId(null);
@@ -144,7 +146,10 @@ export function PestTracker() {
     <div>
       <PageHeader
         title={t("pests.title")}
-        description={t("pests.subtitle")}
+        // Live status once there is something to report; the purpose line before that.
+        description={pests.length > 0
+          ? (severeCount > 0 ? t("pests.summarySevere", { active: activeCount, severe: severeCount }) : t("pests.summary", { count: activeCount }))
+          : t("pests.subtitle")}
         // While the empty state shows, its button is the one way in.
         actions={pests.length > 0 ? (
           <Button onClick={openAddPlain}>
@@ -214,8 +219,13 @@ export function PestTracker() {
                         </>
                       ) : undefined
                     }
-                    // All actions in one menu, so the text keeps the row's width.
+                    // The main row action stays visible from sm up (design system: row
+                    // actions as IconButton); phones keep it in the menu so the text keeps its width.
                     actions={
+                      <>
+                      {!pest.resolved && (
+                        <IconButton icon={Check} label={t("pests.resolve")} onClick={() => handleResolve(pest)} className="hidden sm:inline-flex" />
+                      )}
                       <Menu
                         label={t("common.moreActions")}
                         items={[
@@ -227,6 +237,7 @@ export function PestTracker() {
                           { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void handleDelete(pest) },
                         ]}
                       />
+                      </>
                     }
                   />
                 );

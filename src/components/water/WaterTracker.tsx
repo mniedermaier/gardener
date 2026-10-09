@@ -144,11 +144,16 @@ export function WaterTracker() {
       groups.set(ws, [...(groups.get(ws) ?? []), e]);
     }
     const chart = [...perWeek.entries()].map(([ws, v]) => ({ ws: new Date(ws), ...v }));
-    const avg = chart.reduce((s, w) => s + w.water, 0) / CHART_WEEKS;
+    // Average only over weeks since the first record: weeks before logging
+    // started are not "0 l watered", they are unknown.
+    const firstWeek = Math.min(...groups.keys(), thisWeek.getTime());
+    const avgWeeks = chart.filter((w) => w.ws.getTime() >= firstWeek);
+    const avg = avgWeeks.reduce((s, w) => s + w.water, 0) / Math.max(1, avgWeeks.length);
+    const avgWeekCount = Math.max(1, avgWeeks.length);
     const weeks = [...groups.entries()]
       .sort((a, b) => b[0] - a[0])
       .map(([ws, entries]) => [new Date(ws), entries.sort((a, b) => b.date.localeCompare(a.date))] as const);
-    return { week, weekRain, month, monthRain, avg, chart, weeks };
+    return { week, weekRain, month, monthRain, avg, avgWeekCount, chart, weeks };
   }, [now, waterEntries]);
 
   const [weeksShown, setWeeksShown] = useState(4);
@@ -206,7 +211,7 @@ export function WaterTracker() {
                 value: formatVolume(data.month),
                 hint: data.monthRain ? t("water.plusRain", { amount: formatVolume(data.monthRain) }) : t("water.onlyWatering"),
               },
-              { label: t("water.avgPerWeek"), value: formatVolume(data.avg), hint: t("water.lastWeeks", { count: CHART_WEEKS }) },
+              { label: t("water.avgPerWeek"), value: formatVolume(data.avg), hint: t("water.lastWeeks", { count: data.avgWeekCount }) },
             ]}
           />
 
@@ -256,7 +261,8 @@ export function WaterTracker() {
                         key={e.id}
                         onClick={() => openEdit(e)}
                         leading={<span className="inline-flex size-8 items-center justify-center rounded-lg bg-info/10 text-info"><Icon size={16} aria-hidden="true" /></span>}
-                        title={beds.label(e.bedId) ?? t("water.unknownBed")}
+                        // Rain falls on the whole garden, whatever bed it was logged against.
+                        title={rain ? t("water.wholeGarden") : beds.label(e.bedId) ?? t("water.unknownBed")}
                         meta={[
                           t(`water.methods.${e.method}`),
                           e.duration ? t("water.minutesCount", { count: e.duration }) : null,

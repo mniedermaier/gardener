@@ -1,4 +1,4 @@
-import { Bandage, Beef, Bird, ClipboardList, Egg, Flame, HeartCrack, Hexagon, Milk, PawPrint, Pill, PillBottle, Rabbit, Spool, Stethoscope, Syringe, Thermometer, type LucideIcon } from "lucide-react";
+import { Bandage, Beef, Bird, ClipboardList, Egg, Flame, HeartCrack, Hexagon, Milk, PawPrint, Pill, Rabbit, Spool, Stethoscope, Syringe, Thermometer, Worm, type LucideIcon } from "lucide-react";
 import type { AnimalType, HealthEventType, ProductType } from "@/types/animal";
 import type { Tone } from "@/components/ui/tone";
 
@@ -24,11 +24,11 @@ export const PRODUCT_ICON: Record<ProductType, LucideIcon> = {
 
 export const HEALTH_ICON: Record<HealthEventType, LucideIcon> = {
   vaccination: Syringe,
-  deworming: Pill,
+  deworming: Worm,
   illness: Thermometer,
   injury: Bandage,
   checkup: Stethoscope,
-  treatment: PillBottle,
+  treatment: Pill, // PillBottle read as a trash can at 16 px
   death: HeartCrack,
   other: ClipboardList,
 };

@@ -839,7 +839,7 @@
       "hatchLegend": "Rayado: bajo cubierta",
       "bedFirstHint": "Crea un bancal y podrás planificar {{plant}} enseguida.",
       "sowNoteBedFirst": "{{note}} – crea un bancal antes",
-      "yieldPerPlant": "≈ {{value}} por planta"
+      "yieldPerPlant": "≈ {{value}} por planta con marco completo"
     },
     "sowNowFilter": "Sembrar ahora"
   },
@@ -1011,12 +1011,12 @@
     },
     "reopenNamed": "Reabrir «{{title}}»",
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
-    "untilRange": "Fin según el bancal: {{range}}",
-    "fromRange": "Inicio según el bancal: {{range}}",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
     "notesPlaceholder": "p. ej. herramientas, avisos…",
     "afterFrostWindow": "tras las noches de helada: {{range}}",
-    "timelineEmptyLine": "Tu plan de temporada necesita un bancal."
+    "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
+    "untilByBed": "hasta el {{date}} (según el bancal)",
+    "fromByBed": "desde el {{date}} (según el bancal)"
   },
   "settings": {
     "title": "Ajustes",
@@ -1610,7 +1610,11 @@
     "namePlaceholders": {
       "pest": "ej. Pulgones, babosas…",
       "disease": "ej. Oídio, mildiu…"
-    }
+    },
+    "summary_one": "{{count}} activo",
+    "summary_other": "{{count}} activos",
+    "summary_many": "{{count}} activos",
+    "summarySevere": "{{active}} activos · {{severe}} graves"
   },
   "livestock": {
     "title": "Animales",
@@ -1890,7 +1894,8 @@
     "singleEntries": "Registros individuales",
     "singleEntriesRange_one": "último mes",
     "singleEntriesRange_other": "últimos {{count}} meses",
-    "singleEntriesRange_many": "últimos {{count}} meses"
+    "singleEntriesRange_many": "últimos {{count}} meses",
+    "eggTrend": "{{value}} frente a la semana media"
   },
   "seeds": {
     "title": "Semillas",
@@ -2251,7 +2256,9 @@
     "duplicatesSkipped_other": "{{count}} entradas duplicadas no se han contado.",
     "fromFeedLog": "incl. {{amount}} del registro de pienso",
     "fromHealthLog": "incl. {{amount}} del registro de salud",
-    "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado."
+    "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado.",
+    "fromFeedBook": "del registro de alimentación",
+    "fromHealthBook": "del registro de salud"
   },
   "succession": {
     "pick": "Elegir cultivo",
@@ -2461,7 +2468,8 @@
     "sparkLabel_other": "Riego de las últimas {{count}} semanas, esta semana {{amount}}",
     "sparkLabel_many": "Riego de las últimas {{count}} semanas, esta semana {{amount}}",
     "notesPlaceholder": "p. ej. suelo aún húmedo, bidón vacío…",
-    "chooseBed": "Elige un bancal…"
+    "chooseBed": "Elige un bancal…",
+    "wholeGarden": "Todo el huerto"
   },
   "storage": {
     "full": "Almacenamiento lleno: los cambios ya no se guardan. Exporta una copia y elimina entradas antiguas.",
@@ -2559,7 +2567,7 @@
     "compositionLabel": "Huerto {{garden}}, productos animales {{animals}} de la necesidad anual",
     "fromGarden": "Huerto",
     "fromAnimals": "Productos animales",
-    "surplusNote": "Excedente, no contado: {{items}}.",
+    "surplusNote": "Excedente previsto (rendimiento anual típico), no contabilizado: {{items}}.",
     "notCovered": "Sin cubrir"
   }
 }

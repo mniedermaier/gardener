@@ -285,11 +285,13 @@ export function HarvestLog() {
             ]}
           />
 
-          {/* items-start: each card as tall as its content — no empty band under the chart. */}
-          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-            <Card className="min-w-0">
+          {/* Equal heights side by side; the chart centres in its card instead of
+              leaving a band under it, and the crop list keeps its own height. */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card className="flex min-w-0 flex-col">
               {/* The subtitle names the range actually drawn (from the first harvest month, 3–12 months). */}
               <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint", { month: formatDate(stats.months[0].date, "monthYear") })} />
+              <div className="flex flex-1 flex-col justify-center">
               <BarChart
                 caption={t("harvest.perMonth")}
                 categoryLabel={t("harvest.month")}
@@ -300,6 +302,7 @@ export function HarvestLog() {
                 formatTick={kgTick}
                 marker={{ index: stats.months.length - 1, label: t("charts.today") }}
               />
+              </div>
             </Card>
 
             <Card className="min-w-0">
