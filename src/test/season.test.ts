@@ -320,3 +320,13 @@ describe("autumnPhaseWindows", () => {
     expect(autumnPhaseWindows("lambs_lettuce", 2026, 0, "outdoor_bed", byId("lambs_lettuce")).some((w) => w.phase === "harvest")).toBe(true);
   });
 });
+
+describe("continuous croppers end at the autumn frost", () => {
+  const byId = (id: string) => (plantsData as Plant[]).find((p) => p.id === id)!;
+  it("rosemary does not outlast thyme planted the same day", () => {
+    const season = { lastFrostDate: "2026-05-15", now: new Date(2026, 9, 9), protectionWeeks: 0 };
+    const rosemary = plantedHarvestWindow(byId("rosemary"), ["2026-05-08"], season)!;
+    const thyme = plantedHarvestWindow(byId("thyme"), ["2026-05-08"], season)!;
+    expect(rosemary.end.getTime()).toBe(thyme.end.getTime());
+  });
+});

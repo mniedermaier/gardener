@@ -144,7 +144,7 @@ export function plantedHarvestWindow(
   let end = addDays(Math.max(...times), plant.harvestDaysMax);
   if (season && isContinuousCropper(plant)) {
     const seasonEnd = addWeeks(estimateFirstFrost(seasonFrost(season.lastFrostDate, season.now)), season.protectionWeeks);
-    if (isAfter(seasonEnd, end)) end = seasonEnd;
+    end = seasonEnd; // bears until the frost — not shorter, not longer (same rule as getPhaseWindows)
   }
   return { start, end };
 }
@@ -176,7 +176,7 @@ export function getHarvestReady(
         let grace = HARVEST_GRACE_DAYS;
         if (isContinuousCropper(plant)) {
           const seasonEnd = addWeeks(autumnFrost, protection);
-          if (isAfter(seasonEnd, to)) { to = seasonEnd; grace = 0; }
+          to = seasonEnd; grace = 0; // until the frost, never past it
         }
         // Window open, and at most three weeks past its end.
         if (isBefore(day, from) || isAfter(day, addDays(to, grace))) continue;

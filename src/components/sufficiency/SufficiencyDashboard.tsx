@@ -262,7 +262,7 @@ export function SufficiencyDashboard() {
                   const Icon = NUTRIENT_ICON[key];
                   // Grams via formatWeight (kg from 1000 g); vitamin C in mg below 1 g, else in g.
                   const amount = (v: number) => key === "vitaminC"
-                    ? (v < 1000 ? `${f.formatNumber(v, { maximumFractionDigits: 0 })} mg` : f.formatWeight(v / 1000, "g"))
+                    ? (v < 1000 ? `${f.formatNumber(v, { maximumFractionDigits: 0 })} mg` : `${f.formatNumber(v / 1000, { maximumFractionDigits: v < 10_000 ? 1 : 0 })} g`)
                     : f.formatWeight(v);
                   const label = t(`sufficiency.nutrients.${key}`);
                   return (

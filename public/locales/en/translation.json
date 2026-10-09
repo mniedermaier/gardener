@@ -2038,10 +2038,10 @@
     "staleHint_one": "{{count}} soil test is older than 5 months – retest in spring.",
     "staleHint_other": "{{count}} soil tests are older than 5 months – retest in spring.",
     "nutrientsPpm": "Nutrients (ppm)",
-    "staleHintPlanned_one": "{{count}} soil test is older than 5 months – the next one is planned for {{date}}.",
-    "staleHintPlanned_other": "{{count}} soil tests are older than 5 months – the next one is planned for {{date}}.",
-    "staleHintPlannedBed_one": "{{count}} soil test is older than 5 months – planned sample: {{bed}} · {{date}}.",
-    "staleHintPlannedBed_other": "{{count}} soil tests are older than 5 months – planned sample: {{bed}} · {{date}}."
+    "staleHintPlanned_one": "{{count}} soil test is older than 5 months – the next one is planned for {{date}}",
+    "staleHintPlanned_other": "{{count}} soil tests are older than 5 months – the next one is planned for {{date}}",
+    "staleHintPlannedBed_one": "{{count}} soil test is older than 5 months – planned sample: {{bed}} · {{date}}",
+    "staleHintPlannedBed_other": "{{count}} soil tests are older than 5 months – planned sample: {{bed}} · {{date}}"
   },
   "preservation": {
     "title": "Preservation guide",

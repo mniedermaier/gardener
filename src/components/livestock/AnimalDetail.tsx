@@ -230,7 +230,7 @@ export function AnimalDetail() {
         value={tab}
         onChange={setTab}
         items={[
-          // Not "Produktion/Futter/Gesundheit": those name the section tabs above, which leave this animal.
+          // Named like the sections (one concept, one name): the same records, filtered to this animal.
           { value: "production", label: t("livestock.tabYields"), count: products.length },
           { value: "feed", label: t("livestock.tabFeedings"), count: feeds.length },
           { value: "health", label: t("livestock.tabTreatments"), count: health.length },

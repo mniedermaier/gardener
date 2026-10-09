@@ -134,7 +134,7 @@ export function useFrostAffectedText(summary: FrostSummary | null | undefined): 
 }
 
 /**
- * "Vlies-Aufgabe anlegen": turns a frost warning into a task due on the first
+ * "Vlies-Aufgabe hinzufügen": turns a frost warning into a task due on the first
  * frost night, with undo. Once planned, the button opens that task instead.
  */
 export function FrostTaskButton({ summary, className }: { summary: FrostSummary; className?: string }) {
