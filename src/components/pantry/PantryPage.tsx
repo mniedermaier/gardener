@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { ChoiceTiles } from "@/components/ui/ChoiceTiles";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle, Archive, Check, CookingPot, FlaskRound, Lightbulb, Package, Pencil, Plus, RotateCcw, Snowflake, Sun, Trash2, Warehouse, type LucideIcon,
@@ -30,7 +31,6 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { KeyFigures } from "@/components/ui/charts";
 import { Tabs } from "@/components/ui/Tabs";
-import { LABEL_CLASS } from "@/components/ui/Field";
 import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
@@ -71,53 +71,6 @@ const num = (s: string) => Number(s.trim().replace(",", "."));
 function MethodIcon({ method }: { method: PreservationMethod }) {
   const Icon = METHOD_ICON[method];
   return <Icon size={12} aria-hidden="true" className="shrink-0" />;
-}
-
-/** Radio cards for the preservation method (icon + name), arrow keys move. */
-function MethodPicker({ label, value, options, onChange }: { label: string; value: PreservationMethod; options: PreservationMethod[]; onChange: (m: PreservationMethod) => void }) {
-  const { t } = useTranslation();
-  const refs = useRef<Array<HTMLButtonElement | null>>([]);
-  const onKeyDown = (e: KeyboardEvent, i: number) => {
-    const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
-    if (!delta) return;
-    e.preventDefault();
-    const next = (i + delta + options.length) % options.length;
-    onChange(options[next]);
-    refs.current[next]?.focus();
-  };
-  return (
-    <div>
-      <p className={LABEL_CLASS}>{label}</p>
-      {/* Same tile as the planner and livestock pickers (icon inline); three columns
-          everywhere, so five methods fill two rows without a lone tile. */}
-      <div role="radiogroup" aria-label={label} className="grid grid-cols-3 gap-2">
-        {options.map((m, i) => {
-          const Icon = METHOD_ICON[m];
-          const selected = m === value;
-          return (
-            <button
-              key={m}
-              ref={(el) => { refs.current[i] = el; }}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              tabIndex={selected ? 0 : -1}
-              onClick={() => onChange(m)}
-              onKeyDown={(e) => onKeyDown(e, i)}
-              className={`flex min-h-11 min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2 text-left text-xs leading-tight font-medium transition-colors sm:gap-2 sm:px-3 sm:text-sm ${
-                selected
-                  ? "border-garden-600 bg-garden-50 text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
-                  : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
-              }`}
-            >
-              <Icon size={16} aria-hidden="true" className="shrink-0" />
-              <span className="min-w-0 break-words hyphens-auto">{t(`preservation.methods.${m}`)}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
 }
 
 export function PantryPage() {
@@ -508,7 +461,7 @@ export function PantryPage() {
               so no shelf life is promised for nothing. */}
           {draft.plantId && (
             <div>
-              <MethodPicker label={t("pantry.method")} value={draft.method} options={draftMethods} onChange={(method) => patch({ method, unitKind: draft.unitKind === DEFAULT_UNIT[draft.method] ? DEFAULT_UNIT[method] : draft.unitKind })} />
+              <ChoiceTiles label={t("pantry.method")} value={draft.method} options={draftMethods.map((m) => ({ value: m, label: t(`preservation.methods.${m}`), icon: METHOD_ICON[m] }))} onChange={(method) => patch({ method, unitKind: draft.unitKind === DEFAULT_UNIT[draft.method] ? DEFAULT_UNIT[method] : draft.unitKind })} />
               <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                 {t("pantry.methodSummary", { shelf: shelfText, date: formatDate(expiresDate, "short"), yield: formatPercent(PRESERVATION_YIELD[draft.method]) })}
               </p>

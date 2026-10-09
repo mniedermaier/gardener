@@ -57,6 +57,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
     <div role="radiogroup" aria-label={label} className={`${width} gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-white/5 ${className}`}>
       {options.map((o, i) => {
         const selected = o.value === value;
+        // Nothing chosen yet: the first segment keeps the tab stop.
+        const tabStop = selected || (i === 0 && !options.some((x) => x.value === value));
         const Icon = o.icon;
         return (
           <button
@@ -65,7 +67,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange, l
             type="button"
             role="radio"
             aria-checked={selected}
-            tabIndex={selected ? 0 : -1}
+            tabIndex={tabStop ? 0 : -1}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
             className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1 font-medium transition-colors ${o.compact ? "flex-none whitespace-nowrap sm:flex-1" : segment} ${box} ${

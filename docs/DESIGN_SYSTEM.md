@@ -85,7 +85,9 @@ covered here, copy the pattern from the reference page
      task type "Sonstiges", health "Kontrolle", pest kind "Schädling", bed
      environment "Freilandbeet", pantry method once a plant is chosen. A wrong value that
      would be a silent data error never starts preselected (the species of a new
-     animal, the plant symbol — new custom plants start on a neutral sprout).
+     animal; a custom plant's category, sun, water and sowing timing; the
+     source of seed). The plant symbol starts on the neutral sprout, shown as
+     the first, selected tile and named next to the label.
      **Scales** (harvest quality, pest severity) start unset: a preset value
      would be counted as an answer (it would inflate "Ø Qualität"). An unset
      optional scale is simply not stored; a required one keeps Save disabled
@@ -106,11 +108,16 @@ covered here, copy the pattern from the reference page
      with the shared hint `common.costHint` ("Fließt in die Bilanz …").
    - Save stays disabled until the required fields are valid.
    - **Choosing a type:** up to 3 options → `SegmentedControl`; up to 8 →
-     icon tiles in a grid (animal species, health "Art", bed environment);
-     more than 8 → `Select` (task type, plant). A tile grid never ends with a
-     lone tile: pick the column count so rows fill (8 → 4 × 2, 7 → 4 + 3), or
-     let an odd last tile span the row on phones. Each tile's icon must be
-     distinct; if no fitting glyph exists, use the species' main product.
+     `ui/ChoiceTiles` (animal species, health "Art", bed environment, pantry
+     method); more than 8 → `Select` (task type, plant). `ChoiceTiles` picks
+     the column count so no row ends with a lone tile (8 → 4 × 2, 7 → 4 + 3,
+     5 → 3 + 2) and spans an odd last tile on phones; from `sm` the icon sits
+     above the label and labels wrap whole words — never truncated, never
+     hyphenated. Each tile's icon must be distinct; if no fitting glyph exists,
+     use the species' main product. Don't hand-roll tile grids.
+   - **Empty option of a `Select`:** "X wählen …" when a value is still to be
+     chosen (required, or optional but "not specified yet": "Familie wählen …");
+     "Kein(e) X" when "none" is itself a valid answer ("Kein Beet", "Kein Tier").
    - Scale endpoint captions are short single words ("Gering" … "Stark").
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation
