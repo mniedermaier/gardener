@@ -15,35 +15,41 @@ interface MonthStripProps {
   currentLabel?: string;
   /** Accessible name / table caption. */
   caption: string;
+  /**
+   * Ratio from which a month counts as covered (e.g. 0.25). Below it the tints
+   * stay muted, so 6 % never looks "well covered"; only months that reach it
+   * get the bright fill.
+   */
+  threshold?: number;
   className?: string;
 }
 
 /** Sequential single-hue ramp, light → dark; text switches for contrast. */
 const STEPS = [
   "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300",
-  // Dark: wide steps on gray-900 (900/60 and 800 looked the same), dark text on the top step.
-  "bg-garden-100 text-garden-900 dark:bg-garden-900/40 dark:text-garden-100",
-  "bg-garden-200 text-garden-900 dark:bg-garden-700/70 dark:text-white",
+  // Steps 1–2: below the threshold, muted tints.
+  "bg-garden-50 text-garden-900 dark:bg-garden-500/10 dark:text-garden-200",
+  "bg-garden-100 text-garden-900 dark:bg-garden-500/20 dark:text-garden-100",
+  // Steps 3–4: the threshold is reached — bright fill, dark text on the top step in dark mode.
   "bg-garden-400 text-white dark:bg-garden-500 dark:text-gray-950",
   "bg-garden-600 text-white dark:bg-garden-300 dark:text-gray-950",
 ];
 /**
- * Step of a value on the strip's own range (at least 0–10 %): in a garden that
- * covers 3–7 % the tint still tells the weak from the strong months. The
- * printed value carries the absolute number.
+ * Step of a value on an absolute scale: the threshold splits muted (below)
+ * from bright (reached), so the colour agrees with the note under the strip.
+ * The printed value carries the exact number.
  */
-const step = (v: number, top: number) => {
+const step = (v: number, threshold: number) => {
   if (v <= 0.005) return 0;
-  const n = v / top;
-  return n < 0.25 ? 1 : n < 0.5 ? 2 : n < 0.8 ? 3 : 4;
+  if (v < threshold) return v < threshold / 2 ? 1 : 2;
+  return v < Math.min(1, threshold * 2.5) ? 3 : 4;
 };
 
 /**
  * 12-month heatmap strip (one hue, five steps). The value is printed in each
  * cell, so the colour only reinforces it. Wraps to 2 rows of 6 on phones.
  */
-export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthNames, formatValue, current, currentLabel, caption, className = "" }: MonthStripProps) {
-  const top = Math.max(0.1, ...values);
+export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthNames, formatValue, current, currentLabel, caption, threshold = 0.25, className = "" }: MonthStripProps) {
   return (
     <figure className={className}>
       <ol className="grid grid-cols-6 gap-1 sm:grid-cols-12" aria-hidden="true">
@@ -54,7 +60,7 @@ export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthN
               <span className="h-4 text-[11px] leading-4 font-semibold text-gray-900 dark:text-gray-100">{i === current ? currentLabel : ""}</span>
             )}
             <span
-              className={`flex h-10 w-full items-center justify-center rounded-md text-xs font-medium tabular-nums ${STEPS[step(v, top)]} ${
+              className={`flex h-10 w-full items-center justify-center rounded-md text-xs font-medium tabular-nums ${STEPS[step(v, threshold)]} ${
                 i === current ? "outline-1 outline-offset-2 outline-dashed outline-gray-900/50 dark:outline-white/50" : ""
               }`}
             >

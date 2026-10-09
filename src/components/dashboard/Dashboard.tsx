@@ -228,7 +228,7 @@ export function Dashboard() {
                         <time key="d" dateTime={h.date}>{formatDate(h.date, "short")}</time>,
                         h.quality > 0 && (
                           <span key="q" className="inline-flex items-center gap-0.5 align-top" aria-label={t("dashboard.quality", { count: h.quality })}>
-                            <Star size={11} aria-hidden="true" className="fill-current text-gray-400" />{h.quality}
+                            <Star size={11} aria-hidden="true" className="fill-current text-amber-500 dark:text-amber-400" />{h.quality}
                           </span>
                         ),
                       ]}

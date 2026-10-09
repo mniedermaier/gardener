@@ -1424,8 +1424,8 @@
     "needMore": "-{{kg}} kg (besoin de +{{m2}} m²)",
     "cropPlan": "Plan de culture",
     "animalProducts": "Produits animaux",
-    "coverageForecast": "Objectif de quantité · prévision",
-    "coverageActual": "Objectif de quantité · récolté",
+    "coverageForecast": "Prévision · en poids",
+    "coverageActual": "Récolté à ce jour",
     "ofTarget": "sur {{kg}} d’objectif annuel",
     "actualKg": "{{kg}} des cultures du plan enregistrés",
     "areaNeeded": "{{area}} nécessaires",
@@ -1510,9 +1510,9 @@
     "coverageDesc_one": "Prévision sur un an, besoins de {{count}} personne.",
     "coverageDesc_other": "Prévision sur un an, besoins de {{count}} personnes.",
     "coverageDesc_many": "Prévision sur un an, besoins de {{count}} personnes.",
-    "monthlyDesc_one": "Part des besoins caloriques de {{count}} personne, en frais et en réserve (prévision).",
-    "monthlyDesc_other": "Part des besoins caloriques de {{count}} personnes, en frais et en réserve (prévision).",
-    "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes, en frais et en réserve (prévision).",
+    "monthlyDesc_one": "Part des besoins caloriques de {{count}} personne : en frais selon la prévision et en réserve.",
+    "monthlyDesc_other": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
+    "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "monthlyCaption": "Couverture calorique par mois",
     "monthlyKgTitle": "Quantité disponible par mois",
     "monthlyKgCaption": "Aliments disponibles par mois en kg : du jardin (frais et en réserve) et des animaux",
@@ -1541,9 +1541,9 @@
     "emptyText_one": "Une personne a besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
     "emptyText_other": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
     "emptyText_many": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
-    "monthlyDescFresh_one": "Part des besoins caloriques de {{count}} personne (prévision). La récolte ne suffit pas encore pour faire des réserves.",
-    "monthlyDescFresh_other": "Part des besoins caloriques de {{count}} personnes (prévision). La récolte ne suffit pas encore pour faire des réserves.",
-    "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). La récolte ne suffit pas encore pour faire des réserves.",
+    "monthlyDescFresh_one": "Part des besoins caloriques de {{count}} personne (prévision). Rien en réserve pour l’instant.",
+    "monthlyDescFresh_other": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
+    "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
     "monthlyKgCaptionFresh": "Aliments disponibles par mois en kg : frais du jardin et des animaux"
   },
   "pests": {
@@ -1912,8 +1912,8 @@
     "invalidNumber": "Saisissez un nombre valide",
     "invalidYear": "Saisissez une année entre 1950 et aujourd’hui",
     "years_many": "{{count}} ans",
-    "orOnionSets": "ou bulbilles",
-    "notesPlaceholder": "p. ex. taux de germination, origine…"
+    "notesPlaceholder": "p. ex. taux de germination, origine…",
+    "onionSets": "Bulbilles"
   },
   "soil": {
     "title": "Sol",
@@ -2479,8 +2479,8 @@
     "forecast": "Prévision",
     "actualShort": "enregistré {{value}}",
     "actualVsForecast": "Enregistré {{actual}} sur {{forecast}} prévus",
-    "selfSufficiencyForecast": "Autonomie · prévision annuelle",
-    "selfSufficiencyActual": "Autonomie · enregistrée à ce jour",
+    "selfSufficiencyForecast": "Prévision annuelle · en calories",
+    "selfSufficiencyActual": "Enregistré à ce jour",
     "caloriesFor_one": "Besoins caloriques de {{count}} personne",
     "caloriesFor_other": "Besoins caloriques de {{count}} personnes",
     "caloriesFor_many": "Besoins caloriques de {{count}} personnes",
@@ -2506,7 +2506,7 @@
     "compositionLabel": "Jardin {{garden}}, produits animaux {{animals}} du besoin annuel",
     "fromGarden": "Jardin",
     "fromAnimals": "Produits animaux",
-    "surplusNote": "Selon la prévision annuelle, au-delà de la consommation habituelle, donc non compté : {{items}}.",
+    "surplusNote": "Surplus, non compté : {{items}}.",
     "notCovered": "Non couvert"
   }
 }

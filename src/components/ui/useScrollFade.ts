@@ -24,9 +24,16 @@ export function useScrollFade<T extends HTMLElement>(activeSelector: string, act
     if (!el) return;
     const frame = requestAnimationFrame(measure);
     el.addEventListener("scroll", measure, { passive: true });
+    // The row keeps its own size while its content grows (labels arriving with
+    // the translations, web fonts, counts): observe the items too, and measure
+    // again once the fonts are in, or the fade would never appear.
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
     ro?.observe(el);
+    for (const child of Array.from(el.children)) ro?.observe(child);
+    let alive = true;
+    void document.fonts?.ready.then(() => { if (alive) measure(); });
     return () => {
+      alive = false;
       cancelAnimationFrame(frame);
       el.removeEventListener("scroll", measure);
       ro?.disconnect();
@@ -46,7 +53,7 @@ export function useScrollFade<T extends HTMLElement>(activeSelector: string, act
   const fadeClass = edges.start && edges.end
     ? "[mask-image:linear-gradient(to_right,transparent,#000_32px,#000_calc(100%-48px),transparent)]"
     : edges.end
-      ? "[mask-image:linear-gradient(to_right,#000_calc(100%-56px),transparent)]"
+      ? "[mask-image:linear-gradient(to_right,#000_calc(100%-72px),transparent_calc(100%-8px))]"
       : edges.start
         ? "[mask-image:linear-gradient(to_right,transparent,#000_32px)]"
         : "";

@@ -1424,8 +1424,8 @@
     "needMore": "-{{kg}} kg (necesitas +{{m2}} m²)",
     "cropPlan": "Plan de cultivo",
     "animalProducts": "Productos animales",
-    "coverageForecast": "Objetivo de cantidad · previsión",
-    "coverageActual": "Objetivo de cantidad · cosechado",
+    "coverageForecast": "Previsión · por peso",
+    "coverageActual": "Cosechado hasta hoy",
     "ofTarget": "de {{kg}} de objetivo anual",
     "actualKg": "{{kg}} de cultivos del plan registrados",
     "areaNeeded": "harían falta {{area}}",
@@ -1510,9 +1510,9 @@
     "coverageDesc_one": "Previsión para un año, necesidad de {{count}} persona.",
     "coverageDesc_other": "Previsión para un año, necesidad de {{count}} personas.",
     "coverageDesc_many": "Previsión para un año, necesidad de {{count}} personas.",
-    "monthlyDesc_one": "Parte de las calorías que necesita {{count}} persona, fresco y de reserva (previsión).",
-    "monthlyDesc_other": "Parte de las calorías que necesitan {{count}} personas, fresco y de reserva (previsión).",
-    "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas, fresco y de reserva (previsión).",
+    "monthlyDesc_one": "Parte de las calorías que necesita {{count}} persona: fresco según la previsión y de reserva.",
+    "monthlyDesc_other": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
+    "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
     "monthlyCaption": "Cobertura calórica por mes",
     "monthlyKgTitle": "Alimentos disponibles por mes",
     "monthlyKgCaption": "Alimentos disponibles por mes en kg: del huerto (frescos y de reserva) y de los animales",
@@ -1541,9 +1541,9 @@
     "emptyText_one": "Una persona necesita unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
     "emptyText_other": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
     "emptyText_many": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
-    "monthlyDescFresh_one": "Parte de las calorías que necesita {{count}} persona (previsión). La cosecha aún no alcanza para guardar.",
-    "monthlyDescFresh_other": "Parte de las calorías que necesitan {{count}} personas (previsión). La cosecha aún no alcanza para guardar.",
-    "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). La cosecha aún no alcanza para guardar.",
+    "monthlyDescFresh_one": "Parte de las calorías que necesita {{count}} persona (previsión). Aún no hay nada en reserva.",
+    "monthlyDescFresh_other": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
+    "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
     "monthlyKgCaptionFresh": "Alimentos disponibles por mes en kg: frescos del huerto y de los animales"
   },
   "pests": {
@@ -1912,8 +1912,8 @@
     "invalidNumber": "Introduce un número válido",
     "invalidYear": "Introduce un año entre 1950 y hoy",
     "years_many": "{{count}} años",
-    "orOnionSets": "o bulbillos",
-    "notesPlaceholder": "p. ej. tasa de germinación, origen…"
+    "notesPlaceholder": "p. ej. tasa de germinación, origen…",
+    "onionSets": "Bulbillos"
   },
   "soil": {
     "title": "Suelo",
@@ -2479,8 +2479,8 @@
     "forecast": "Previsión",
     "actualShort": "registrado {{value}}",
     "actualVsForecast": "Registrado {{actual}} de {{forecast}} previstos",
-    "selfSufficiencyForecast": "Autosuficiencia · previsión anual",
-    "selfSufficiencyActual": "Autosuficiencia · registrada hasta hoy",
+    "selfSufficiencyForecast": "Previsión anual · por calorías",
+    "selfSufficiencyActual": "Registrado hasta hoy",
     "caloriesFor_one": "Calorías necesarias para {{count}} persona",
     "caloriesFor_other": "Calorías necesarias para {{count}} personas",
     "caloriesFor_many": "Calorías necesarias para {{count}} personas",
@@ -2506,7 +2506,7 @@
     "compositionLabel": "Huerto {{garden}}, productos animales {{animals}} de la necesidad anual",
     "fromGarden": "Huerto",
     "fromAnimals": "Productos animales",
-    "surplusNote": "Según la previsión anual supera el consumo habitual, por eso no se cuenta: {{items}}.",
+    "surplusNote": "Excedente, no contado: {{items}}.",
     "notCovered": "Sin cubrir"
   }
 }

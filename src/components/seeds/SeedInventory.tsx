@@ -222,8 +222,8 @@ export function SeedInventory() {
                 >
                   <PlantIconDisplay plantId={id} emoji={plant.icon} size={22} />
                   {getPlantName(id)}
-                  {vegetative && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">· {t("seeds.plantingStock")}</span>}
-                  {id === "onion" && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">· {t("seeds.orOnionSets")}</span>}
+                  {vegetative && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{t("seeds.plantingStock")}</span>}
+                  {id === "onion" && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{t("seeds.onionSets")}</span>}
                   <Plus size={14} aria-hidden="true" className="text-gray-500" />
                 </button>
               );
