@@ -1,3 +1,4 @@
+import { daysSince } from "@/lib/format";
 import { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HardDriveDownload } from "lucide-react";
@@ -38,8 +39,8 @@ export const BackupHint = memo(function BackupHint({ now }: { now: Date }) {
   const entries = harvests.length + journalEntries.length + tasks.filter((x) => x.completedDate).length;
   const hasContent = gardens.some((g) => g.beds.length > 0) || entries + animalCount + expenseCount > 0;
   const worthKeeping = hasContent && (now.getTime() - firstUse >= 7 * DAY || entries >= 20);
-  const daysSince = lastBackupDate ? Math.floor((now.getTime() - new Date(lastBackupDate).getTime()) / DAY) : null;
-  const stale = daysSince === null || daysSince >= 14;
+  const daysSinceBackup = lastBackupDate ? daysSince(lastBackupDate, now) : null;
+  const stale = daysSinceBackup === null || daysSinceBackup >= 14;
 
   if (!worthKeeping || !stale || snoozedUntil > now.getTime()) return null;
 
@@ -65,7 +66,7 @@ export const BackupHint = memo(function BackupHint({ now }: { now: Date }) {
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {daysSince === null ? t("dashboard.backup.never") : t("dashboard.backup.old", { count: daysSince })}
+          {daysSinceBackup === null ? t("dashboard.backup.never") : t("dashboard.backup.old", { count: daysSinceBackup })}
         </p>
         <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t("dashboard.backup.why")}</p>
         <div className="mt-3 flex flex-wrap gap-2">

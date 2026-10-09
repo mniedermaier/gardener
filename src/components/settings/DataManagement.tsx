@@ -1,3 +1,4 @@
+import { daysSince } from "@/lib/format";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Upload, FileSpreadsheet, ShieldCheck, HardDrive, GitMerge, Replace, TriangleAlert } from "lucide-react";
@@ -12,7 +13,6 @@ import { exportAllData, exportHarvestsCsv, exportExpensesCsv, type GardenerExpor
 import { importAllData, validateExportFile, type ImportMode, type ImportResult } from "@/lib/dataImport";
 
 const STAT_KEYS = ["gardens", "tasks", "harvests", "journalEntries", "expenses"] as const;
-const DAY = 24 * 60 * 60 * 1000;
 
 /** Backup status, full backup/restore and CSV exports. The destructive "delete all" lives in the settings danger zone. */
 export function DataManagement() {
@@ -57,7 +57,7 @@ export function DataManagement() {
   };
 
   // Same threshold as the hint on "Heute" (BackupHint): two weeks old = time for a new one.
-  const stale = lastBackupDate !== null && today.getTime() - new Date(lastBackupDate).getTime() >= 14 * DAY;
+  const stale = lastBackupDate !== null && daysSince(lastBackupDate, today) >= 14;
 
   return (
     <div className="space-y-5">
@@ -73,7 +73,7 @@ export function DataManagement() {
               <>
                 {/* Same phrase as the reminder on "Heute"; the exact date on hover. */}
                 <time dateTime={lastBackupDate} title={formatDate(lastBackupDate, "date")} className="font-medium">
-                  {t("dashboard.backup.old", { count: Math.max(0, Math.round((today.getTime() - new Date(lastBackupDate).getTime()) / DAY)) })}
+                  {t("dashboard.backup.old", { count: daysSince(lastBackupDate, today) })}
                 </time>
                 {stale && <span className="block text-xs text-gray-600 dark:text-gray-300">{t("dataManagement.backupStale")}</span>}
               </>

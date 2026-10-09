@@ -256,3 +256,9 @@ export function createFormatter(lang?: string) {
 }
 
 export type Formatter = ReturnType<typeof createFormatter>;
+
+/** Whole calendar days from an ISO date to `now` (never negative) — one count for every "vor n Tagen". */
+export function daysSince(iso: string, now: Date = new Date()): number {
+  const d = toDate(iso);
+  return d ? Math.max(0, differenceInCalendarDays(now, d)) : 0;
+}
