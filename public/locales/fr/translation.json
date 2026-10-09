@@ -2420,7 +2420,8 @@
     "scrollRight": "Défiler vers la droite",
     "quickPick": "Cultures courantes",
     "quickInGarden": "Au jardin",
-    "quickCommon": "Courantes"
+    "quickCommon": "Courantes",
+    "sameBed": "Même planche"
   },
   "water": {
     "title": "Arrosage",

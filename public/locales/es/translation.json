@@ -2420,7 +2420,8 @@
     "scrollRight": "Desplazar a la derecha",
     "quickPick": "Cultivos habituales",
     "quickInGarden": "En tu huerto",
-    "quickCommon": "Habituales"
+    "quickCommon": "Habituales",
+    "sameBed": "Mismo bancal"
   },
   "water": {
     "title": "Riego",

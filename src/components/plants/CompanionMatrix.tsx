@@ -280,6 +280,18 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
 
   if (!selected) return null;
 
+  // Colour follows the meaning: an unfavourable neighbour in the same bed as
+  // the selected plant is a conflict (warning), elsewhere in the garden only a
+  // fact (neutral); good neighbours in the garden stay brand.
+  const selectedBeds = new Set(bedsByPlant.get(selected?.id ?? "") ?? []);
+  const gardenBadge = (id: string, kind: "good" | "bad") => {
+    const beds = bedsByPlant.get(id);
+    if (!beds) return undefined;
+    const shared = beds.filter((b) => selectedBeds.has(b));
+    if (kind === "bad" && shared.length > 0) return <Badge tone="warning" size="sm">{[t("companions.sameBed"), ...shared].join(" · ")}</Badge>;
+    return <Badge tone={kind === "good" ? "brand" : "neutral"} size="sm">{[t("plants.inGarden"), ...beds].join(" · ")}</Badge>;
+  };
+
   const group = (items: Plant[], kind: "good" | "bad") => (
     <List
       header={
@@ -301,7 +313,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
             leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={26} />}
             title={names.get(p.id)}
             // The meta slot always means the category; garden context (with its beds) is the badge.
-            badges={bedsByPlant.has(p.id) ? <Badge tone="brand" size="sm">{[t("plants.inGarden"), ...(bedsByPlant.get(p.id) ?? [])].join(" · ")}</Badge> : undefined}
+            badges={gardenBadge(p.id, kind)}
             meta={[t(`plants.category.${p.category}`)]}
             onClick={() => onSelect(p.id)}
           />

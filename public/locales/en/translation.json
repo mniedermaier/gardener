@@ -2312,7 +2312,8 @@
     "scrollRight": "Scroll right",
     "quickPick": "Common crops",
     "quickInGarden": "In your garden",
-    "quickCommon": "Common"
+    "quickCommon": "Common",
+    "sameBed": "Same bed"
   },
   "water": {
     "title": "Watering",
