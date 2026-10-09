@@ -2343,7 +2343,7 @@
     "viewLabel": "View",
     "byPlant": "By plant",
     "focusLabel": "Highlight plant",
-    "focusNone": "Highlight plant …",
+    "focusNone": "Choose a plant…",
     "emptyFilter": "No plant matches the search.",
     "scrollForMore_one": "Scroll sideways for all {{count}} plant",
     "scrollForMore_other": "Scroll sideways for all {{count}} plants",

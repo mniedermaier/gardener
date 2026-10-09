@@ -2455,7 +2455,7 @@
     "viewLabel": "Vue",
     "byPlant": "Par plante",
     "focusLabel": "Mettre une plante en évidence",
-    "focusNone": "Mettre en évidence …",
+    "focusNone": "Choisir une plante…",
     "emptyFilter": "Aucune plante ne correspond à la recherche.",
     "scrollForMore_one": "Faites défiler pour voir {{count}} plante",
     "scrollForMore_other": "Faites défiler pour voir les {{count}} plantes",

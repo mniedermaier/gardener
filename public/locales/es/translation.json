@@ -2455,7 +2455,7 @@
     "viewLabel": "Vista",
     "byPlant": "Por planta",
     "focusLabel": "Resaltar planta",
-    "focusNone": "Resaltar planta …",
+    "focusNone": "Elige una planta…",
     "emptyFilter": "Ninguna planta coincide con la búsqueda.",
     "scrollForMore_one": "Desplázate a la derecha para ver {{count}} planta",
     "scrollForMore_other": "Desplázate a la derecha para ver las {{count}} plantas",
