@@ -33,8 +33,10 @@ covered here, copy the pattern from the reference page
    a `SegmentedControl` gets a visible `LABEL_CLASS` caption above it. Dialog rules:
    - **Optional fields** pass `optional` to the primitive (`Input`, `Select`,
      `Textarea`, `DatePicker`, `PlantCombobox`), which appends a muted
-     "(optional)". Never write "(optional)" or "optional" into a label or hint;
-     required fields stay unmarked.
+     "(optional)" — or " · optional" when the label already ends in a bracket
+     ("Kosten (€) · optional"), so there are never two pairs of brackets. Never
+     write "(optional)" or "optional" into a label or hint; required fields
+     stay unmarked.
    - **Units** sit in the label in parentheses: "Kosten (€)", "Menge (l)",
      "Dauer (Min.)", "Ernte ab (Tage)". Placeholders are plain example numbers
      ("z. B. 4,00"), never a currency string. Every numeric field shows such an
@@ -61,7 +63,11 @@ covered here, copy the pattern from the reference page
      `mode="future"` (Heute/Morgen/+1 Woche/Datum …) for tasks; the last
      segment is always "Datum …" with the calendar icon (icon only on phones in
      the four-segment future mode, so nothing wraps). A native `DatePicker`
-     only for one-off dates such as "Im Bestand seit".
+     only for one-off dates such as "Im Bestand seit". The date field is
+     labelled "Datum" when it is simply when the record happened; a specific
+     "<Verb> am" only where a record has more than one date and the label
+     says which one ("Eingelagert am" vs. haltbar bis, "Bemerkt am" vs. the
+     treatment date).
    - **Field order:** what the record is about first (Pflanze in harvest,
      pantry, seeds and pests; the animal in livestock dialogs), then the
      details, then Datum, then Notizen. Tasks are the exception: the due date
@@ -79,7 +85,11 @@ covered here, copy the pattern from the reference page
      value when that value is the common case and harmless if kept (expense
      category, task type "Sonstiges", health "Kontrolle"). A wrong value that
      would be a silent data error never starts preselected (the species of a new
-     animal). A choice that
+     animal, the plant symbol — new custom plants start on a neutral sprout).
+     **Scales** (harvest quality, pest severity) start unset: a preset value
+     would be counted as an answer (it would inflate "Ø Qualität"). An unset
+     optional scale is simply not stored; a required one keeps Save disabled
+     until chosen. A choice that
      depends on an earlier field appears only once that field is set (pantry
      method after the plant).
    - **Prefilled numbers** only where the default is a real, typical value the

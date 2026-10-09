@@ -330,7 +330,8 @@ export function WaterTracker() {
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15"
                     }`}
                   >
-                    {formatVolume(l)}
+                    {/* The unit is in the field label: plain numbers (rule 9). */}
+                    {l}
                   </button>
                 );
               })}

@@ -31,6 +31,9 @@ export function sowingDraftOf(p: Pick<Plant, "sowIndoorsWeeks" | "sowOutdoorsWee
 }
 
 /** Symbol a new custom plant starts with, by category, until the user picks one. */
+/** Shown until the user picks a symbol: a sprout says "a plant", not "a carrot". */
+export const NEUTRAL_ICON = "🌱";
+
 export const CATEGORY_ICON: Record<PlantCategory, string> = {
   vegetable: "carrot",
   fruit: "strawberry",

@@ -775,11 +775,11 @@
       "namePlaceholder": "e.g. Ginger",
       "daysAfterSowing": "Both counted from sowing.",
       "family": "Plant family",
-      "familyUnknown": "Not sure",
+      "familyUnknown": "Choose a family…",
       "sowMode": "Sowing",
       "sowDirect": "Direct in the bed",
       "sowIndoors": "Start indoors",
-      "sowWhen": "Sow",
+      "sowWhen": "Sow from",
       "indoorsWhen": "Start indoors",
       "transplantWhen": "Plant out",
       "atFrost": "At the last frost",
@@ -858,7 +858,7 @@
     "moreAlerts_other": "{{count}} more alerts",
     "updatedAt": "Updated {{time}}",
     "windValue": "{{speed}} km/h",
-    "forecastDesc": "Low and high; the tick marks the frost threshold of {{threshold}}. “Frost” means 0 °C or colder, “Frost risk” up to {{threshold}} (ground frost possible).",
+    "forecastDesc": "Low and high per day.",
     "rainChance": "Rain {{percent}}",
     "rangeLabel": "{{min}} to {{max}}",
     "frost": "Frost",
@@ -904,7 +904,8 @@
     "dayArcLabel": "Sunrise {{sunrise}}, sunset {{sunset}}, {{hours}} of daylight",
     "daylightLeft": "{{hours}} h of daylight left",
     "afterSunset": "Sun set at {{time}}",
-    "beforeSunrise": "Sunrise at {{time}}"
+    "beforeSunrise": "Sunrise at {{time}}",
+    "forecastHow": "The tick marks the frost threshold of {{threshold}}. “Frost” means 0 °C or colder, “Frost risk” up to {{threshold}} (ground frost possible)."
   },
   "calendar": {
     "subtitle": "What's coming up in the garden, sorted by due date.",
@@ -1122,7 +1123,7 @@
       "expenses_other": "{{count}} expenses"
     },
     "backupStale": "Older than two weeks – a fresh backup is worth it.",
-    "nothingYet": "Nothing to back up yet. Once you add beds or records, a backup is worth it."
+    "nothingYet": "So far only your garden and settings. A backup pays off once beds or entries are added."
   },
   "alerts": {
     "frostTitle": "Frost warning: {{temp}}",
@@ -1258,7 +1259,7 @@
     "added": "Entry saved",
     "updated": "Changes saved",
     "deleted": "Entry deleted",
-    "needTitle": "Enter a title",
+    "needTitle": "Enter an observation or a title.",
     "titlePlaceholder": "e.g. First frost, tomatoes pruned…",
     "photos": "Photos",
     "photoN": "Photo {{n}}",
@@ -1476,7 +1477,7 @@
       "animals": "Animals",
       "preserve": "Preserving & seeds"
     },
-    "emptyTitle": "Nothing to calculate yet",
+    "emptyTitle": "Your need is known – coverage is still missing",
     "toPlanner": "Open planner",
     "toLivestock": "Add animals",
     "coverageDesc_one": "Forecast for one year, needs of {{count}} person.",
@@ -1506,13 +1507,15 @@
     "shelfLife_other": "keeps {{count}} months",
     "kcalCounted": "{{kcal}} kcal counted",
     "surplus": "surplus {{amount}}",
-    "emptyText_one": "One person needs about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
-    "emptyText_other": "{{count}} people need about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
     "monthlyDescFresh_one": "Share of the calorie needs of {{count}} person (forecast). Nothing in storage yet.",
     "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). Nothing in storage yet.",
     "harvested": "Harvested",
     "freshForecast": "Fresh forecast",
-    "monthlyKgCaptionSplit": "Up to {{month}} the logged harvest; from {{month}} the forecast from the current beds, plus stored food and animal products."
+    "monthlyKgCaptionSplit": "Up to {{month}} the logged harvest; from {{month}} the forecast from the current beds, plus stored food and animal products.",
+    "emptyNeed_one": "One person needs about {{kg}} of vegetables and fruit a year, which takes roughly {{area}} of beds.",
+    "emptyNeed_other": "{{count}} people need about {{kg}} of vegetables and fruit a year, which takes roughly {{area}} of beds.",
+    "emptyMissing": "Add beds or animals to see how much of it you cover yourself.",
+    "emptyFoodplanLink": "See the need in the food plan"
   },
   "pests": {
     "title": "Pests",
@@ -1575,7 +1578,7 @@
     "animalsTab": "Animals",
     "noProducts": "Log eggs, honey or milk to see trends and value.",
     "animalName": "Name",
-    "namePlaceholder": "e.g. Henriette, Hive 1…",
+    "namePlaceholder": "e.g. Laying flock, Hive 1…",
     "count": "Number of animals",
     "selectAnimal": "Animal",
     "quantity": "Quantity",
@@ -1872,7 +1875,7 @@
     "missingStatHint": "Planted but not in stock",
     "shoppingListHint": "Annual crops in your beds with no seed or planting stock in the inventory. Perennials such as rosemary or berries are left out.",
     "addFor": "Add {{name}}",
-    "emptyTitle": "No seeds logged yet",
+    "emptyTitle": "No seeds added yet",
     "emptyText": "Log your seed packets. You will see what your beds are missing and when older seed needs a germination test.",
     "filterLabel": "Filter seeds",
     "unitCount": {
@@ -2250,7 +2253,7 @@
     "hoursShort": "{{hours}} h",
     "caption": "Daylight per month: longest in {{longest}} ({{longestHours}}), shortest in {{shortest}} ({{shortestHours}})",
     "yearlyDesc": "Below about 10 hours of daylight hardly anything grows – get winter crops established before then.",
-    "growthLimit": "10 h"
+    "growthLimit": "Growth limit 10 h"
   },
   "common": {
     "save": "Save",
@@ -2298,7 +2301,8 @@
     "optionalMark": "(optional)",
     "notesPlaceholder": "e.g. observations, variety, weather…",
     "costHint": "Counts towards the balance under Costs.",
-    "more": "More"
+    "more": "More",
+    "optionalWord": "optional"
   },
   "companions": {
     "title": "Companions",

@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/Toast";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlantName } from "@/hooks/usePlantName";
 import type { Plant, PlantCategory, SunRequirement, WaterNeed } from "@/types/plant";
-import { CATEGORY_ICON, DEFAULT_SOWING, sowingDraftOf, sowingFields, type SowingDraft } from "@/lib/customPlant";
+import { DEFAULT_SOWING, NEUTRAL_ICON, sowingDraftOf, sowingFields, type SowingDraft } from "@/lib/customPlant";
 import { familyNameKeys, type PlantFamily } from "@/data/plantFamilies";
 
 // The icon of a custom plant is the id of a catalogue SVG, so custom plants look
@@ -43,7 +43,7 @@ interface Draft {
   harvestMax: number;
 }
 
-const EMPTY: Draft = { name: "", category: "vegetable", family: "", sowing: DEFAULT_SOWING, icon: CATEGORY_ICON.vegetable, iconTouched: false, sun: "full", water: "medium", spacingCm: 30, harvestMin: 60, harvestMax: 90 };
+const EMPTY: Draft = { name: "", category: "vegetable", family: "", sowing: DEFAULT_SOWING, icon: NEUTRAL_ICON, iconTouched: false, sun: "full", water: "medium", spacingCm: 30, harvestMin: 60, harvestMax: 90 };
 
 const FAMILIES = (Object.keys(familyNameKeys) as PlantFamily[]).filter((f) => f !== "other");
 
@@ -138,6 +138,34 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
     >
       <div className="space-y-4">
         <Input label={t("plants.customName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("plants.form.namePlaceholder")} autoFocus />
+        {/* Symbol right after the name: it is identity, not a detail. */}
+        <div>
+          {/* The chosen symbol is named next to the label: no silent default. */}
+          <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t("plants.customIcon")}
+            {ICONS.includes(draft.icon) && <span className="font-normal text-gray-600 dark:text-gray-400">: {getPlantName(draft.icon)}</span>}
+          </span>
+          {/* 16 icons: 6 per row on phones (3 short rows of 44 px targets — 8 per row would drop below 44 px at 390 px), 8 × 2 across the full field width on wider screens. An old emoji icon stays selectable as an extra tile. */}
+          <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">
+            {(ICONS.includes(draft.icon) ? ICONS : [...ICONS, draft.icon]).map((ic) => (
+              <button
+                key={ic}
+                type="button"
+                onClick={() => patch({ icon: ic, iconTouched: true })}
+                aria-label={ICONS.includes(ic) ? getPlantName(ic) : ic}
+                title={ICONS.includes(ic) ? getPlantName(ic) : undefined}
+                aria-pressed={draft.icon === ic}
+                className={`flex h-11 items-center justify-center rounded-lg border ${
+                  draft.icon === ic
+                    ? "border-garden-500 bg-garden-50 ring-1 ring-garden-500 dark:bg-garden-500/15"
+                    : "border-gray-200 hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10"
+                }`}
+              >
+                <PlantIconDisplay plantId={ic} emoji={ic} size={28} />
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Select
@@ -145,7 +173,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             value={draft.category}
             onChange={(e) => {
               const category = e.target.value as PlantCategory;
-              setDraft((d) => ({ ...d, category, icon: d.iconTouched ? d.icon : CATEGORY_ICON[category] }));
+              patch({ category });
             }}
             options={(["vegetable", "fruit", "berry", "herb", "flower"] as const).map((c) => ({ value: c, label: t(`plants.category.${c}`) }))}
           />
@@ -200,7 +228,6 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
         <Input
           label={t("plants.form.spacingCm")}
           inputMode="numeric"
-          wrapperClassName="sm:w-1/2"
           value={String(draft.spacingCm || "")}
           onChange={(e) => patch({ spacingCm: Number(e.target.value.replace(/\D/g, "")) })}
         />
@@ -226,33 +253,6 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           />
         </div>
 
-        <div>
-          {/* The chosen symbol is named next to the label: no silent default. */}
-          <span id="custom-plant-icon-label" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t("plants.customIcon")}
-            {ICONS.includes(draft.icon) && <span className="font-normal text-gray-600 dark:text-gray-400">: {getPlantName(draft.icon)}</span>}
-          </span>
-          {/* 16 icons: 6 per row on phones (3 short rows of 44 px targets — 8 per row would drop below 44 px at 390 px), 8 × 2 across the full field width on wider screens. An old emoji icon stays selectable as an extra tile. */}
-          <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">
-            {(ICONS.includes(draft.icon) ? ICONS : [...ICONS, draft.icon]).map((ic) => (
-              <button
-                key={ic}
-                type="button"
-                onClick={() => patch({ icon: ic, iconTouched: true })}
-                aria-label={ICONS.includes(ic) ? getPlantName(ic) : ic}
-                title={ICONS.includes(ic) ? getPlantName(ic) : undefined}
-                aria-pressed={draft.icon === ic}
-                className={`flex h-11 items-center justify-center rounded-lg border ${
-                  draft.icon === ic
-                    ? "border-garden-500 bg-garden-50 ring-1 ring-garden-500 dark:bg-garden-500/15"
-                    : "border-gray-200 hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10"
-                }`}
-              >
-                <PlantIconDisplay plantId={ic} emoji={ic} size={28} />
-              </button>
-            ))}
-          </div>
-        </div>
 
       </div>
     </Modal>

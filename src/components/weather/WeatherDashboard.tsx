@@ -20,7 +20,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { TONE_SOFT } from "@/components/ui/tone";
-import { RangeBar } from "@/components/ui/charts";
+import { HowCalculated, RangeBar } from "@/components/ui/charts";
 import { SunlightWidget } from "./SunlightWidget";
 import { DayArc } from "./DayArc";
 import { FrostTaskButton, frostLabelKey, frostTone, useDayLabel, useFrostAffectedText, useFrostSummary } from "./frost";
@@ -300,7 +300,11 @@ export function WeatherDashboard() {
 
           <Card padding="none" className="order-2 lg:col-span-3">
             <div className="px-4 pt-4 sm:px-6 sm:pt-5">
-              <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })} />
+              <CardHeader title={t("weather.forecast")} description={t("weather.forecastDesc")} />
+              {/* Frost vs. Frostgefahr explained on demand: the list starts higher on a phone. */}
+              <HowCalculated className="-mt-2 mb-3">
+                <p>{t("weather.forecastHow", { threshold: f.formatTemperature(alertConfig.frostThresholdC) })}</p>
+              </HowCalculated>
             </div>
             <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
               {days.map((day) => {
