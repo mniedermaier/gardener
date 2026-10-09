@@ -22,7 +22,7 @@ import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { useToday } from "@/hooks/useToday";
 
 /** A crop whose forecast reaches less than this share of its target gets "Große Lücke". */
-const BIG_GAP_SHARE = 0.25;
+const BIG_GAP_SHARE = 0.1;
 
 export function FoodPlan() {
   const now = useToday();
@@ -42,8 +42,6 @@ export function FoodPlan() {
     [gardens, plantMap, gridCellSizeCm, harvests, householdSize, year],
   );
   const { selfSufficiency } = useGardenMetrics();
-  // Rows are sorted by gap: the first three qualifying crops get "Große Lücke".
-  const bigGapIds = new Set(plan.rows.filter((r) => r.deficitKg > 0.05 && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE).slice(0, 3).map((r) => r.plantId));
   const animalForecast = useMemo(() => getForecastProducts(animals), [animals]);
   const deficits = plan.rows.filter((r) => r.deficitKg > 0.05);
   // Crops with neither area nor harvest: collapsed into one group instead of
@@ -161,10 +159,9 @@ export function FoodPlan() {
                   const covered = r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg;
                   const gap = r.deficitKg > 0.05;
                   // "Große Lücke" by a rule, not by rank: the forecast reaches less
-                  // than a quarter of the target (two crops with the same figures
+                  // than a tenth of the target (two crops with the same figures
                   // always get the same badge).
-                  // …and only on the three largest, so the badge still tells rows apart.
-                  const bigGap = gap && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE && bigGapIds.has(r.plantId);
+                  const bigGap = gap && r.targetKg > 0 && r.forecastKg < r.targetKg * BIG_GAP_SHARE;
                   return (
                     <ListRow
                       key={r.plantId}
