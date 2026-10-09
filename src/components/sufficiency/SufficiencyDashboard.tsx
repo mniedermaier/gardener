@@ -204,8 +204,11 @@ export function SufficiencyDashboard() {
                 <p>{t("sufficiency.noWinterGap", { from: monthLong[STORAGE_MONTHS[0]], to: monthLong[STORAGE_MONTHS[STORAGE_MONTHS.length - 1]] })}</p>
               )}
             </div>
-            <div className="mt-6">
-              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.seasonKgTitle", { year: now.getFullYear() })}</h3>
+          </Card>
+
+          {/* Kilograms get their own card: the card above is about calories (DS: one unit per card). */}
+          <Card>
+            <CardHeader title={t("sufficiency.seasonKgTitle", { year: now.getFullYear() })} description={t("sufficiency.seasonKgDesc")} />
               <BarChart
                 // Garden: logged harvest up to this month (solid), forecast after it
                 // (hatched) — past months match the harvest log. Stored food and
@@ -239,7 +242,6 @@ export function SufficiencyDashboard() {
                 caption={t("sufficiency.monthlyKgCaptionLogged")}
                 categoryLabel={t("charts.month")}
               />
-            </div>
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-2">

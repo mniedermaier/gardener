@@ -1525,7 +1525,8 @@
     "emptyNeedShort_one": "One person needs about {{kg}} a year. Add beds or animals to see how much of it you cover yourself.",
     "emptyNeedShort_other": "{{count}} people need about {{kg}} a year. Add beds or animals to see how much of it you cover yourself.",
     "typicalYearTitle": "Typical year (forecast)",
-    "seasonKgTitle": "Season {{year}}: logged, forecast from today"
+    "seasonKgTitle": "Season {{year}}: logged, forecast from today",
+    "seasonKgDesc": "Yields in kg: logged up to today, forecast after."
   },
   "pests": {
     "title": "Pests",
@@ -2201,7 +2202,9 @@
     "openHealthBook": "Open in health log",
     "notesPlaceholder": "e.g. shop, invoice number…",
     "sourceFeed": "Feed log",
-    "sourceHealth": "Health"
+    "sourceHealth": "Health",
+    "alsoInFeedBook": "also in feed log",
+    "alsoInHealthBook": "also in health"
   },
   "succession": {
     "pick": "Pick a crop",

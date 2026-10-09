@@ -1596,7 +1596,8 @@
     "emptyNeedShort_other": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
     "emptyNeedShort_many": "{{count}} personnes ont besoin d’environ {{kg}} par an. Ajoute des planches ou des animaux pour voir ce que tu couvres toi-même.",
     "typicalYearTitle": "Année type (prévision)",
-    "seasonKgTitle": "Saison {{year}} : saisi, prévision à partir d’aujourd’hui"
+    "seasonKgTitle": "Saison {{year}} : saisi, prévision à partir d’aujourd’hui",
+    "seasonKgDesc": "Récoltes en kg : saisies jusqu’à aujourd’hui, prévision ensuite."
   },
   "pests": {
     "title": "Ravageurs",
@@ -2307,7 +2308,9 @@
     "openHealthBook": "Ouvrir dans la santé",
     "notesPlaceholder": "p. ex. magasin, numéro de facture…",
     "sourceFeed": "Alimentation",
-    "sourceHealth": "Santé"
+    "sourceHealth": "Santé",
+    "alsoInFeedBook": "aussi dans l’alimentation",
+    "alsoInHealthBook": "aussi dans la santé"
   },
   "succession": {
     "pick": "Choisir une culture",

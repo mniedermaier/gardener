@@ -76,9 +76,9 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
         : t(`calendar.${key}`, { date: formatDate(groups[0]?.date ?? new Date(), "short") });
       return [when, bedLabel(allBeds)].filter((x): x is string => !!x);
     }
-    // At most two groups keep the row short: the outer date and the other end.
-    const shownGroups = groups.length > 2 ? [groups[0], groups[groups.length - 1]] : groups;
-    const parts = shownGroups.map((g) => {
+    // Every bed group with its own date (meta parts wrap whole) — dropping one
+    // would contradict the planner palette for that bed.
+    const parts = groups.map((g) => {
       const beds = bedLabel(g.beds) ?? "";
       return after
         ? t("calendar.bedRange", { beds, range: formatDateRange(after, g.date) })

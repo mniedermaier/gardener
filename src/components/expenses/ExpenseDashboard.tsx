@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat, type LucideIcon, HeartPulse } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat, type LucideIcon, HeartPulse, Link2 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -337,7 +337,7 @@ export function ExpenseDashboard() {
                     title={e.description}
                     meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")]}
                     // Same bill also in a livestock log: counted once, marked with the same source badge.
-                    badges={balance.costs.matchedExpenses[e.id] ? <SourceBadge source={balance.costs.matchedExpenses[e.id]} /> : undefined}
+                    badges={balance.costs.matchedExpenses[e.id] ? <SourceBadge source={balance.costs.matchedExpenses[e.id]} linked /> : undefined}
                     trailing={f.formatCurrency(e.amountCents / 100)}
                     onClick={() => openEdit(e)}
                     actions={
@@ -397,7 +397,13 @@ export function ExpenseDashboard() {
 }
 
 /** Where a cost also lives: one small outline badge, the same for log rows and linked expenses. */
-function SourceBadge({ source }: { source: "feed" | "health" }) {
+/**
+ * Where a cost row comes from: "Futterbuch" for entries made only in the feed
+ * log, "auch im Futterbuch" (link icon) for a manual expense matched to one —
+ * two meanings, two labels, so "davon x € aus dem Futterbuch" adds up.
+ */
+function SourceBadge({ source, linked = false }: { source: "feed" | "health"; linked?: boolean }) {
   const { t } = useTranslation();
-  return <Badge variant="outline" size="sm" icon={source === "feed" ? Wheat : HeartPulse}>{t(source === "feed" ? "expenses.sourceFeed" : "expenses.sourceHealth")}</Badge>;
+  const key = source === "feed" ? (linked ? "expenses.alsoInFeedBook" : "expenses.sourceFeed") : (linked ? "expenses.alsoInHealthBook" : "expenses.sourceHealth");
+  return <Badge variant="outline" size="sm" icon={linked ? Link2 : source === "feed" ? Wheat : HeartPulse}>{t(key)}</Badge>;
 }

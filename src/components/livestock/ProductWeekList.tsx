@@ -90,7 +90,18 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
   const typeCount = new Set(products.map((p) => p.type)).size;
   const [showAll, setShowAll] = useState(false);
   const allWeeks = groupByWeek(products);
-  const weeks = initialWeeks !== undefined && !showAll ? allWeeks.slice(0, initialWeeks) : allWeeks;
+  // Cut after whole months only: a month card never shows part of its weeks,
+  // so its header total always matches the rows under it.
+  const weeks = (() => {
+    if (initialWeeks === undefined || showAll || allWeeks.length <= initialWeeks) return allWeeks;
+    const months = weeksByMonth(allWeeks);
+    const out: typeof allWeeks = [];
+    for (const m of months) {
+      if (out.length >= initialWeeks) break;
+      out.push(...m.weeks);
+    }
+    return out;
+  })();
   const hiddenWeeks = allWeeks.length - weeks.length;
   // The header adds up exactly the weeks listed under it (ISO weeks belong to
   // the month of their Thursday), over all weeks — also those behind

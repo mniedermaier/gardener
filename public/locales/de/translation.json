@@ -1525,7 +1525,8 @@
     "emptyNeedShort_one": "Eine Person braucht rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst.",
     "emptyNeedShort_other": "{{count}} Personen brauchen rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst.",
     "typicalYearTitle": "Typisches Jahr (Prognose)",
-    "seasonKgTitle": "Saison {{year}}: erfasst, ab heute Prognose"
+    "seasonKgTitle": "Saison {{year}}: erfasst, ab heute Prognose",
+    "seasonKgDesc": "Erträge in kg: bis heute erfasst, danach Prognose."
   },
   "pests": {
     "title": "Schädlinge",
@@ -2201,7 +2202,9 @@
     "openHealthBook": "In Gesundheit öffnen",
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
     "sourceFeed": "Futterbuch",
-    "sourceHealth": "Gesundheit"
+    "sourceHealth": "Gesundheit",
+    "alsoInFeedBook": "auch im Futterbuch",
+    "alsoInHealthBook": "auch in Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",

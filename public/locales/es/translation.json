@@ -1596,7 +1596,8 @@
     "emptyNeedShort_other": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
     "emptyNeedShort_many": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
     "typicalYearTitle": "Año típico (previsión)",
-    "seasonKgTitle": "Temporada {{year}}: registrado, desde hoy previsión"
+    "seasonKgTitle": "Temporada {{year}}: registrado, desde hoy previsión",
+    "seasonKgDesc": "Rendimientos en kg: registrados hasta hoy, luego previsión."
   },
   "pests": {
     "title": "Plagas",
@@ -2307,7 +2308,9 @@
     "openHealthBook": "Abrir en salud",
     "notesPlaceholder": "p. ej. tienda, número de factura…",
     "sourceFeed": "Alimentación",
-    "sourceHealth": "Salud"
+    "sourceHealth": "Salud",
+    "alsoInFeedBook": "también en alimentación",
+    "alsoInHealthBook": "también en salud"
   },
   "succession": {
     "pick": "Elegir cultivo",
