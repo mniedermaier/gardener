@@ -1001,11 +1001,9 @@
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
     "upNextFrom": "Coming up next · from {{date}}",
     "notesPlaceholder": "e.g. tools, reminders…",
-    "afterFrostWindow": "after the frost nights: {{range}}",
+    "afterFrostWindow": "{{range}} (after frost)",
     "timelineEmptyLine": "Your season plan needs a bed.",
-    "untilByBed": "until {{date}} in “{{bed}}”",
-    "fromByBed": "from {{date}} in “{{bed}}”",
-    "afterFrostByBed": "{{range}} in “{{bed}}”"
+    "bedPlus": "{{bed}} +{{more}}"
   },
   "settings": {
     "title": "Settings",

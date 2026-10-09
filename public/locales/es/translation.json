@@ -1033,11 +1033,9 @@
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
     "notesPlaceholder": "p. ej. herramientas, avisos…",
-    "afterFrostWindow": "tras las noches de helada: {{range}}",
+    "afterFrostWindow": "{{range}} (tras la helada)",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
-    "untilByBed": "hasta el {{date}} en «{{bed}}»",
-    "fromByBed": "desde el {{date}} en «{{bed}}»",
-    "afterFrostByBed": "{{range}} en «{{bed}}»"
+    "bedPlus": "{{bed}} +{{more}}"
   },
   "settings": {
     "title": "Ajustes",

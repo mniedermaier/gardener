@@ -1001,11 +1001,9 @@
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
     "upNextFrom": "Als Nächstes · ab {{date}}",
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
-    "afterFrostWindow": "nach den Frostnächten: {{range}}",
+    "afterFrostWindow": "{{range}} (nach Frost)",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
-    "untilByBed": "bis {{date}} im Beet „{{bed}}“",
-    "fromByBed": "ab {{date}} im Beet „{{bed}}“",
-    "afterFrostByBed": "{{range}} im Beet „{{bed}}“"
+    "bedPlus": "{{bed}} +{{more}}"
   },
   "settings": {
     "title": "Einstellungen",

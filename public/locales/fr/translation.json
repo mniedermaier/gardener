@@ -1033,11 +1033,9 @@
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
     "upNextFrom": "Ensuite · dès le {{date}}",
     "notesPlaceholder": "p. ex. outils, rappels…",
-    "afterFrostWindow": "après les nuits de gel : {{range}}",
+    "afterFrostWindow": "{{range}} (après le gel)",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
-    "untilByBed": "jusqu’au {{date}} dans « {{bed}} »",
-    "fromByBed": "à partir du {{date}} dans « {{bed}} »",
-    "afterFrostByBed": "{{range}} dans « {{bed}} »"
+    "bedPlus": "{{bed}} +{{more}}"
   },
   "settings": {
     "title": "Paramètres",

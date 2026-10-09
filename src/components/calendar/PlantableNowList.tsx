@@ -67,26 +67,27 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const meta = (item: AgendaPlantRow, afterFrost: boolean): string[] => {
     const key = item.kind === "now" ? "until" : "from";
     const groups = groupAgendaBedsByDate(item);
-    const beds = bedLabel(groups.flatMap((g) => g.beds));
-    let when: string;
+    const allBeds = groups.flatMap((g) => g.beds);
+    // Two parts, glossary style: the date, then the beds. When beds differ, the
+    // bed that sets the date leads ("bis 15. Nov. · Gewächshaus +3"), so the
+    // row never names one bed and "4 Beete" at once.
+    const bedsWith = (setter?: string) => {
+      if (!setter || allBeds.length < 2) return bedLabel(allBeds);
+      return t("calendar.bedPlus", { bed: setter, more: allBeds.length - 1 });
+    };
     if (afterFrost && lastFrostNight) {
       // Only the days between the last frost night and the window's end count.
-      // Beds can close on different days: name the one that sets the end (like
-      // untilByBed), so the calendar agrees with the planner palette per bed.
       const end = windowEnd(item);
-      const range = t("calendar.afterFrostWindow", { range: formatDateRange(addDays(lastFrostNight, 1), end) });
       const setter = groups.length > 1 ? groups.find((g) => g.date.getTime() === end.getTime())?.beds[0]?.name : undefined;
-      when = setter ? t("calendar.afterFrostByBed", { range, bed: setter }) : range;
-    } else if (groups.length === 1) {
-      when = t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") });
-    } else {
-      const dates = groups.map((g) => g.date.getTime());
-      const outer = key === "until" ? Math.max(...dates) : Math.min(...dates);
-      // Name the bed that sets the outer date ("bis 15. Nov. (Gewächshaus)").
-      const setter = groups.find((g) => g.date.getTime() === outer)?.beds[0]?.name ?? "";
-      when = t(`calendar.${key}ByBed`, { date: formatDate(new Date(outer), "short"), bed: setter });
+      return [t("calendar.afterFrostWindow", { range: formatDateRange(addDays(lastFrostNight, 1), end) }), bedsWith(setter)].filter((x): x is string => !!x);
     }
-    return [when, beds].filter((x): x is string => !!x);
+    if (groups.length === 1) {
+      return [t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") }), bedLabel(allBeds)].filter((x): x is string => !!x);
+    }
+    const dates = groups.map((g) => g.date.getTime());
+    const outer = key === "until" ? Math.max(...dates) : Math.min(...dates);
+    const setter = groups.find((g) => g.date.getTime() === outer)?.beds[0]?.name;
+    return [t(`calendar.${key}`, { date: formatDate(new Date(outer), "short") }), bedsWith(setter)].filter((x): x is string => !!x);
   };
 
   const items = useVisibleAgendaRows(now, soon);
