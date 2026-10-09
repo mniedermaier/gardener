@@ -75,11 +75,18 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const getPlantName = usePlantName();
   const isDark = theme === "dark" || (theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
+  // Where focus goes back to after Esc or a click outside. Opened with Ctrl+K
+  // from nowhere (focus on <body>), that is the visible search button in the
+  // top bar. Choosing an item navigates instead and leaves focus to the page.
+  const returnFocus = useRef<HTMLElement | null>(null);
+
   // Open/close the native dialog; reset the query each time it opens.
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open && !dialog.open) {
+      const prev = document.activeElement;
+      returnFocus.current = prev instanceof HTMLElement && prev !== document.body ? prev : null;
       dialog.showModal();
       inputRef.current?.focus();
     } else if (!open && dialog.open) {
@@ -90,21 +97,33 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
+    let dismissed = false;
+    const handleCancel = () => { dismissed = true; };
     const handleClose = () => {
       setQuery("");
       setDebounced("");
       setActive(0);
       onClose();
+      if (dismissed) {
+        const fallback = [...document.querySelectorAll<HTMLElement>("[data-palette-trigger]")].find((el) => el.offsetParent !== null);
+        (returnFocus.current?.isConnected ? returnFocus.current : fallback)?.focus();
+      }
+      dismissed = false;
     };
     // A click on the backdrop lands on the <dialog> itself and closes it.
     const handleBackdrop = (e: MouseEvent) => {
       if (e.target !== dialog) return;
       const r = dialog.getBoundingClientRect();
-      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        dismissed = true;
+        onClose();
+      }
     };
+    dialog.addEventListener("cancel", handleCancel);
     dialog.addEventListener("close", handleClose);
     dialog.addEventListener("click", handleBackdrop);
     return () => {
+      dialog.removeEventListener("cancel", handleCancel);
       dialog.removeEventListener("close", handleClose);
       dialog.removeEventListener("click", handleBackdrop);
     };

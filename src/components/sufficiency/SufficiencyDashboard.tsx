@@ -360,16 +360,18 @@ function Composition() {
   if (ss.forecastKcal <= 0) return null;
   const garden = ss.forecastPlantKcal / ss.needKcal;
   const animals = ss.forecastAnimalKcal / ss.needKcal;
-  const scale = Math.max(garden + animals, 0.0001);
+  // On the scale of the whole year's need (100 %), so 4 % looks like 4 % — not like a full bar.
+  const scale = Math.max(garden + animals, 1);
+  const open = Math.max(0, 1 - garden - animals);
   const surplus = surplusItems(ss.forecastSurplusKg, f, t);
   return (
     <Card>
       <CardHeader title={t("metrics.compositionTitle")} description={t("metrics.compositionDesc")} />
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-white/10" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, 1), animals: f.formatPercent(animals, 1) })}>
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/15" role="img" aria-label={t("metrics.compositionLabel", { garden: f.formatPercent(garden, 1), animals: f.formatPercent(animals, 1) })}>
         <span className="h-full bg-garden-600 dark:bg-garden-400" style={{ width: `${(garden / scale) * 100}%` }} />
         <span className="h-full bg-earth-400 dark:bg-earth-300" style={{ width: `${(animals / scale) * 100}%` }} />
       </div>
-      <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+      <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-garden-600 dark:bg-garden-400" />{t("metrics.fromGarden")}</dt>
           <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(garden, 1)}</dd>
@@ -377,6 +379,10 @@ function Composition() {
         <div>
           <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-earth-400 dark:bg-earth-300" />{t("metrics.fromAnimals")}</dt>
           <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(animals, 1)}</dd>
+        </div>
+        <div>
+          <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><span aria-hidden="true" className="size-2.5 rounded-sm bg-gray-200 dark:bg-white/15" />{t("metrics.notCovered")}</dt>
+          <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(open, 1)}</dd>
         </div>
       </dl>
       {surplus.length > 0 && <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { items: surplus.join(", ") })}</p>}

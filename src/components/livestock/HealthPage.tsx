@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Syringe, Trash2 } from "lucide-react";
-import { differenceInCalendarDays } from "date-fns";
+import { addDays, differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
@@ -61,18 +61,28 @@ export function HealthPage() {
       if (!cur || h.date > cur) lastVacc.set(h.animalId, h.date);
     }
     const due: { animalId: string; lastDate?: string; days?: number }[] = [];
+    let vaccinable = 0;
+    /** Earliest day a covered group needs its next shot. */
+    let nextDue: Date | null = null;
     for (const a of animals) {
       if (!VACCINATED_TYPES.includes(a.type)) continue;
+      vaccinable += 1;
       const last = lastVacc.get(a.id);
       const d = last ? toDate(last) : null;
       const days = d ? differenceInCalendarDays(now, d) : undefined;
       if (days === undefined || days > VACCINATION_INTERVAL_DAYS) due.push({ animalId: a.id, lastDate: last, days });
+      else if (d) {
+        const next = addDays(d, VACCINATION_INTERVAL_DAYS);
+        if (!nextDue || next < nextDue) nextDue = next;
+      }
     }
     return {
       cost: healthEvents.reduce((s, h) => s + (h.cost ?? 0), 0),
       losses: healthEvents.filter((h) => h.type === "death").length,
       last: healthEvents.reduce<string | undefined>((m, h) => (!m || h.date > m ? h.date : m), undefined),
       due,
+      vaccinable,
+      nextDue: nextDue as Date | null,
     };
   }, [now, healthEvents, animals]);
 
@@ -94,9 +104,18 @@ export function HealthPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          {healthEvents.length > 0 && (
+          {(healthEvents.length > 0 || stats.vaccinable > 0) && (
             <KeyFigures
-              hero={{
+              // The figure that needs you: how many animal groups have current vaccination cover.
+              hero={stats.vaccinable > 0 ? {
+                label: t("livestock.health.vaccCoverage"),
+                value: t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable }),
+                icon: Syringe,
+                tone: stats.due.length > 0 ? "warning" : "positive",
+                hint: stats.due.length > 0
+                  ? t("livestock.health.dueNames", { names: stats.due.map((d) => animalMap.get(d.animalId)).filter((a) => !!a).map((a) => animalLabel(a!, t)).join(", ") })
+                  : stats.nextDue ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") }) : undefined,
+              } : {
                 label: t("livestock.health.totalEvents"),
                 value: f.formatNumber(healthEvents.length, { maximumFractionDigits: 0 }),
                 icon: ClipboardList,
@@ -105,6 +124,11 @@ export function HealthPage() {
               items={[
                 { label: t("livestock.health.totalCost"), value: f.formatCurrency(stats.cost) },
                 { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: stats.losses === 0 ? t("livestock.health.noLosses") : undefined },
+                ...(stats.vaccinable > 0 ? [{
+                  label: t("livestock.health.totalEvents"),
+                  value: f.formatNumber(healthEvents.length, { maximumFractionDigits: 0 }),
+                  hint: stats.last ? t("livestock.health.lastEntry", { date: f.formatDate(stats.last, "relative") }) : undefined,
+                }] : []),
               ]}
             />
           )}

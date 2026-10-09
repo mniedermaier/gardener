@@ -6,7 +6,7 @@ import { CloudRain, Droplets, Pencil, Plus, Trash2 } from "lucide-react";
 import { addWeeks, endOfWeek, getISOWeek, startOfMonth, startOfWeek, subWeeks } from "date-fns";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { toDate, toISODate, todayISO } from "@/lib/format";
 import type { WaterEntry } from "@/types/water";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -19,7 +19,7 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { BarChart, KeyFigures, Sparkline } from "@/components/ui/charts";
 import { useBeds } from "@/components/records/useBeds";
@@ -39,7 +39,8 @@ const weekStart = (d: Date) => startOfWeek(d, { weekStartsOn: 1 });
 export function WaterTracker() {
   const now = useToday();
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate, formatVolume, locale } = useFormat();
   const { waterEntries, addWaterEntry, updateWaterEntry, deleteWaterEntry } = useStore(
     useShallow((s) => ({ waterEntries: s.waterEntries, addWaterEntry: s.addWaterEntry, updateWaterEntry: s.updateWaterEntry, deleteWaterEntry: s.deleteWaterEntry })),
@@ -64,7 +65,7 @@ export function WaterTracker() {
     setDialogOpen(true);
   }, [beds, lastEntry]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const openEdit = (e: WaterEntry) => {
@@ -107,7 +108,8 @@ export function WaterTracker() {
   };
 
   const handleDelete = async (e: WaterEntry) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [beds.label(e.bedId), formatVolume(e.liters), formatDate(e.date)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("water", what))) return;
     deleteWaterEntry(e.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = e;
@@ -194,7 +196,7 @@ export function WaterTracker() {
               {
                 label: t("water.wateredInMonth", { month: monthName }),
                 value: formatVolume(data.month),
-                hint: data.monthRain ? t("water.rainSeparate", { amount: formatVolume(data.monthRain) }) : t("water.onlyWatering"),
+                hint: data.monthRain ? t("water.plusRain", { amount: formatVolume(data.monthRain) }) : t("water.onlyWatering"),
               },
               { label: t("water.avgPerWeek"), value: formatVolume(data.avg), hint: t("water.lastWeeks", { count: CHART_WEEKS }) },
             ]}
@@ -207,7 +209,7 @@ export function WaterTracker() {
               categoryLabel={t("water.week")}
               series={[
                 { label: t("water.irrigation"), color: "sky" },
-                { label: t("water.methods.rain"), color: "muted" },
+                { label: t("water.methods.rain"), color: "rain", dotted: true },
               ]}
               data={data.chart.map((w) => ({
                 key: String(w.ws.getTime()),

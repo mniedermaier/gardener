@@ -235,8 +235,9 @@
     "mapPin": {
       "harvest": "Prêt à récolter",
       "task": "Tâche à faire",
-      "frost": "Gel attendu"
-    }
+      "frost": "Gel pour les cultures sensibles"
+    },
+    "mapFrostPlants": "Gel : risque pour {{plants}}"
   },
   "search": {
     "placeholder": "Rechercher plantes, tâches, journal...",
@@ -306,7 +307,7 @@
     "variety": "Variété",
     "varietyPlaceholder": "ex : San Marzano, Brandywine...",
     "plantedDate": "Date de plantation",
-    "confirmDeleteGarden": "Supprimer ce jardin avec toutes ses planches ?",
+    "confirmDeleteGarden": "Toutes ses planches seront aussi supprimées. Vous pourrez encore l’annuler juste après.",
     "placeMode": "Placement de {{plant}} : cliquez sur les cases pour placer, Échap pour annuler",
     "share": "Partager le plan du jardin",
     "shareCopied": "Lien de partage copié",
@@ -504,7 +505,11 @@
       "other": "Autres"
     },
     "sheetMore": "Détails, variété et notes",
-    "sheetLess": "Afficher moins"
+    "sheetLess": "Afficher moins",
+    "placingHintClick": "Cliquez sur des cases libres. ✓ bon voisin, ⚠ voisin défavorable.",
+    "inspectHintClick": "Cliquez sur une plante pour l’examiner. Pour planter, choisissez d’abord une plante.",
+    "dragPlantClick": "Cliquez sur une plante, puis sur des cases de la planche – ou glissez-la dans la planche.",
+    "emptyBedsTextClick": "Indiquez taille et type (pleine terre, carré surélevé, serre …). Placez ensuite les plantes en cliquant ou en glissant."
   },
   "plants": {
     "title": "Plantes",
@@ -725,6 +730,10 @@
       "endive": {
         "name": "Endive",
         "description": "Salade légèrement amère. Blanchir les cœurs pour une saveur plus douce."
+      },
+      "lambs_lettuce": {
+        "name": "Mâche",
+        "description": "Salade d’hiver rustique. Semis de juillet à début octobre, récolte de l’automne au printemps."
       }
     },
     "customIcon": "Icône",
@@ -1025,14 +1034,18 @@
       "desc": "Cette action est irréversible.",
       "action": "Supprimer toutes les données",
       "actionDesc": "Supprime jardins, récoltes, animaux et paramètres de cet appareil. Téléchargez d’abord une sauvegarde.",
-      "confirm": "Supprimer toutes les données de cet appareil ? Sans sauvegarde, elles seront perdues."
+      "confirm": "Sans sauvegarde, jardins, récoltes, animaux et réglages seront perdus. Cette action est irréversible.",
+      "confirmTitle": "Supprimer toutes les données de cet appareil ?"
     },
     "weatherReady": "Prévisions pour {{place}} actives",
     "weatherYourLocation": "votre lieu",
     "weatherNeedsLocation": "Indiquez un lieu ci-dessus et Gardener charge les prévisions",
     "weatherSource": "Données météo :",
     "weatherAdvanced": "Avancé : utiliser votre propre clé OpenWeatherMap",
-    "weatherProviderActive": "Fournisseur actif : {{provider}}. Avec une clé, Gardener utilise OpenWeatherMap ; sans clé, Open-Meteo."
+    "weatherProviderActive": "Fournisseur actif : {{provider}}. Avec une clé, Gardener utilise OpenWeatherMap ; sans clé, Open-Meteo.",
+    "weatherKeyRejected": "Clé refusée – Open-Meteo est utilisé. Vérifiez la clé OpenWeatherMap ou supprimez-la.",
+    "weatherOwmUnavailable": "OpenWeatherMap est injoignable pour l’instant – Open-Meteo est utilisé.",
+    "weatherKeyChecking": "Vérification de la clé…"
   },
   "dataManagement": {
     "title": "Données et sauvegarde",
@@ -1101,15 +1114,16 @@
     "frostGroupTitle_other": "Risque de gel {{count}} nuits, jusqu’à {{temp}} ({{day}})",
     "frostGroupTitle_many": "Risque de gel {{count}} nuits, jusqu’à {{temp}} ({{day}})",
     "frostAffected_one": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
-    "frostAffected_other": "{{count}} cultures concernées, p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
-    "frostAffected_many": "{{count}} cultures concernées, p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
+    "frostAffected_other": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
+    "frostAffected_many": "{{count}} cultures concernées ({{beds}}), p. ex. {{plants}}. Couvrir d’un voile ou rentrer à l’abri.",
     "frostAdvice": "Couvre les plantes sensibles d’un voile et attends avant de repiquer.",
     "greenhouseFrostDesc": "Jour le plus froid : {{date}}, {{outside}} dehors. Même la serre non chauffée risque de geler (environ {{temp}}). Doubler le voile sur les plantes sensibles ou chauffer hors gel. Hypothèse : environ {{buffer}} de plus qu'à l'extérieur.",
     "fleeceTask": "Ajouter la tâche voile",
     "fleeceTaskTitle": "Poser le voile d’hivernage",
     "fleeceTaskDesc": "Nuits de gel prévues : {{nights}}. Couvrez les cultures sensibles le soir, découvrez-les le matin.",
     "fleeceTaskAdded": "Tâche « Poser le voile d’hivernage » ajoutée pour {{day}}",
-    "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}"
+    "fleeceTaskPlanned": "Tâche voile prévue pour {{day}}",
+    "frostAffectedAll": "Concerné : {{plants}}. Couvrir d’un voile ou rentrer à l’abri."
   },
   "harvest": {
     "title": "Récolte",
@@ -1588,7 +1602,11 @@
         "rabbit": "Lapins : VHD et myxomatose, tous les six à douze mois selon le vaccin.",
         "ruminant": "Chèvres et moutons : vaccin contre les clostridies, rappel le plus souvent annuel – voyez avec votre vétérinaire.",
         "other": "L’intervalle dépend du vaccin – voyez avec votre vétérinaire."
-      }
+      },
+      "vaccCoverage": "Groupes d’animaux vaccinés",
+      "vaccCoverageValue": "{{covered}} sur {{total}}",
+      "nextDue": "Prochain rappel à partir du {{date}}",
+      "dueNames": "Vérifier la vaccination : {{names}}"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1626,7 +1644,7 @@
     "backToHerd": "Retour au cheptel",
     "herd": "Cheptel",
     "deleted": "{{name}} supprimé",
-    "confirmDeleteAnimal": "Supprimer cet animal avec toutes ses entrées de production, d’alimentation et de santé ?",
+    "confirmDeleteAnimal": "Toutes ses entrées de production, d’alimentation et de santé seront aussi supprimées. Vous pourrez encore l’annuler juste après.",
     "animalType": "Espèce",
     "acquired": "Depuis",
     "sinceDate": "depuis {{date}}",
@@ -1739,7 +1757,8 @@
     "ofExpectedToDate": "sur ~{{amount}} attendus",
     "productThisYear": "{{product}} cette année",
     "eggWeeksLabel": "Œufs par semaine sur les 8 dernières semaines, moy. {{avg}}",
-    "eggWeeksAvg": "Moy. {{avg}} par semaine sur les 8 dernières semaines"
+    "eggWeeksAvg": "Moy. {{avg}} par semaine sur les 8 dernières semaines",
+    "singleHarvests": "Récoltes ponctuelles ({{months}} derniers mois)"
   },
   "seeds": {
     "title": "Semences",
@@ -1807,7 +1826,8 @@
     "needPlant": "Choisissez une plante",
     "invalidNumber": "Saisissez un nombre valide",
     "invalidYear": "Saisissez une année entre 1950 et aujourd’hui",
-    "years_many": "{{count}} ans"
+    "years_many": "{{count}} ans",
+    "orOnionSets": "ou bulbilles"
   },
   "soil": {
     "title": "Sol",
@@ -2023,7 +2043,10 @@
     },
     "showMore_one": "Afficher {{count}} de plus",
     "showMore_many": "Afficher {{count}} de plus",
-    "showMore_other": "Afficher {{count}} de plus"
+    "showMore_other": "Afficher {{count}} de plus",
+    "bedCount_one": "{{count}} planche",
+    "bedCount_many": "{{count}} planches",
+    "bedCount_other": "{{count}} planches"
   },
   "expenses": {
     "title": "Coûts",
@@ -2179,7 +2202,25 @@
     "favorite": "Favori",
     "undo": "Annuler",
     "moreActions": "Plus d'actions",
-    "all": "Tous"
+    "all": "Tous",
+    "confirmDeleteUndo": "Vous pourrez encore l’annuler juste après.",
+    "deleteNamed": {
+      "harvest": "Supprimer la récolte « {{name}} » ?",
+      "journal": "Supprimer l’entrée « {{name}} » ?",
+      "pest": "Supprimer le relevé « {{name}} » ?",
+      "seed": "Supprimer les semences « {{name}} » ?",
+      "pantry": "Supprimer la réserve « {{name}} » ?",
+      "expense": "Supprimer la dépense « {{name}} » ?",
+      "water": "Supprimer l’arrosage « {{name}} » ?",
+      "task": "Supprimer la tâche « {{name}} » ?",
+      "soilTest": "Supprimer l’analyse de sol « {{name}} » ?",
+      "amendment": "Supprimer l’amendement « {{name}} » ?",
+      "product": "Supprimer l’entrée de production « {{name}} » ?",
+      "feed": "Supprimer l’entrée d’alimentation « {{name}} » ?",
+      "health": "Supprimer l’entrée de santé « {{name}} » ?",
+      "animal": "Supprimer l’animal « {{name}} » ?",
+      "garden": "Supprimer le jardin « {{name}} » ?"
+    }
   },
   "companions": {
     "title": "Associations",
@@ -2338,16 +2379,17 @@
     "howNeed": "Autonomie = part du besoin calorique de ton foyer ({{kcal}} kcal par personne et par jour) couverte en un an par le jardin et les animaux (100 % au maximum).",
     "meterLegend": "Barre pleine = enregistré, hachurée = prévision.",
     "pricesEditable": "Vous pouvez ajuster le prix par œuf, kg ou litre dans Coûts.",
-    "expectedToDate": "attendu à ce jour : {{value}}",
-    "actualVsToDateShort": "enregistré {{actual}} · attendu à ce jour {{expected}}",
+    "expectedToDate": "objectif à ce jour : {{value}}",
+    "actualVsToDateShort": "enregistré {{actual}} · objectif à ce jour {{expected}}",
     "howCap": "Les produits animaux ne comptent que jusqu’à la consommation habituelle (par personne et par an environ 240 œufs, 1 kg de miel, 52 kg de viande, 300 l de lait). Le miel est calorique mais n’est pas un aliment de base : deux ruches donnent environ 40 kg, un foyer en mange 1 à 2 kg. Le reste est un surplus à échanger ou vendre et ne te nourrit pas. Légumes et fruits comptent en entier.",
-    "howToDate": "Attendu à ce jour : la part de la prévision annuelle qui devrait déjà être rentrée – pour chaque culture sa fenêtre de récolte depuis la dernière gelée, le miel de mai à août, les œufs répartis sur l’année. Si l’enregistré est bien en dessous, il manque souvent des entrées.",
+    "howToDate": "Objectif à ce jour : la part de la prévision annuelle qui devrait déjà être rentrée – pour chaque culture sa fenêtre de récolte depuis la dernière gelée, le miel de mai à août, les œufs répartis sur l’année. Si l’enregistré est bien en dessous, il manque souvent des entrées.",
     "howVsFoodPlan": "Le plan alimentaire mesure autre chose : des kilos face à un objectif de quantité pour 20 légumes et fruits, sans produits animaux. Son « objectif de quantité » diffère donc de cette valeur calorique.",
     "compositionTitle": "De quoi se compose la prévision",
     "compositionDesc": "Part du besoin calorique annuel, par origine.",
     "compositionLabel": "Jardin {{garden}}, produits animaux {{animals}} du besoin annuel",
     "fromGarden": "Jardin",
     "fromAnimals": "Produits animaux",
-    "surplusNote": "Non compté car au-delà de la consommation habituelle : {{items}}."
+    "surplusNote": "Non compté car au-delà de la consommation habituelle : {{items}}.",
+    "notCovered": "Non couvert"
   }
 }

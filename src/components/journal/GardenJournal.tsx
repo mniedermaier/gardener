@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 import { todayISO } from "@/lib/format";
 import { putPhoto, deletePhotos } from "@/lib/photoStore";
@@ -24,7 +24,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LABEL_CLASS } from "@/components/ui/Field";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useBeds } from "@/components/records/useBeds";
@@ -83,7 +83,8 @@ const parseTags = (s: string) => [...new Set(s.split(",").map((x) => x.trim().re
 
 export function GardenJournal() {
   const { t } = useTranslation();
-  const { confirm, toast } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate } = useFormat();
   const { journalEntries, gardens, animals, addJournalEntry, updateJournalEntry, deleteJournalEntry } = useStore(useShallow((s) => ({
     journalEntries: s.journalEntries, gardens: s.gardens, animals: s.animals,
@@ -121,7 +122,7 @@ export function GardenJournal() {
     setDialogOpen(true);
   }, []);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   // Deep link from the command palette: #/journal?entry=<id> scrolls to the entry and highlights it.
@@ -216,7 +217,7 @@ export function GardenJournal() {
   };
 
   const handleDelete = async (entry: JournalEntry) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("journal", entry.title.trim() || formatDate(entry.date)))) return;
     deleteJournalEntry(entry.id);
     setDialogOpen(false);
     // Keep the photos until the undo window has passed.

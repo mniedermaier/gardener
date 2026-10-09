@@ -23,7 +23,7 @@ import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Tabs } from "@/components/ui/Tabs";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Tone } from "@/components/ui/tone";
 import { DateField } from "@/components/ui/DateField";
 import { useBeds } from "@/components/records/useBeds";
@@ -62,7 +62,8 @@ const emptyAmend = (bedId = ""): AmendDraft => ({ bedId, date: todayISO(), type:
 export function SoilManagement() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate, formatNumber, formatWeight, formatCurrency, locale } = useFormat();
   const { soilTests, amendments, addSoilTest, updateSoilTest, deleteSoilTest, addAmendment, updateAmendment, deleteAmendment } = useStore(
     useShallow((s) => ({
@@ -117,7 +118,7 @@ export function SoilManagement() {
   };
 
   const removeTest = async (s: SoilTest) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("soilTest", [beds.label(s.bedId), formatDate(s.date)].filter(Boolean).join(" · ")))) return;
     deleteSoilTest(s.id);
     setTestOpen(false);
     const { id: _id, ...rest } = s;
@@ -162,7 +163,7 @@ export function SoilManagement() {
   };
 
   const removeAmend = async (a: Amendment) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("amendment", [a.material, beds.label(a.bedId), formatDate(a.date)].filter(Boolean).join(" · ")))) return;
     deleteAmendment(a.id);
     setAmendOpen(false);
     const { id: _id, ...rest } = a;
@@ -237,11 +238,11 @@ export function SoilManagement() {
                 <article key={s.id} className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-gray-900">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                         <button type="button" onClick={() => openEditTest(s)} className="text-left after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-xl focus-visible:after:outline-2 focus-visible:after:outline-focus">
                           {bedName(s.bedId)}
                         </button>
-                      </h3>
+                      </h2>
                       <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-gray-500 dark:text-gray-400">
                         <time dateTime={s.date}>{formatDate(s.date)}</time>
                         {beds.byId.has(s.bedId) && (

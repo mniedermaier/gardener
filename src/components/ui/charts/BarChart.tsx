@@ -1,5 +1,5 @@
 import { useId, useMemo, useState, type KeyboardEvent } from "react";
-import { HatchPattern, Legend } from "./Legend";
+import { DotPattern, HatchPattern, Legend } from "./Legend";
 import { axisLabelStep, niceScale, SERIES_FILL, SERIES_TEXT, useElementWidth, type SeriesColor } from "./scale";
 
 export interface BarDatum {
@@ -17,6 +17,8 @@ export interface BarSeries {
   color: SeriesColor;
   /** Hatched fill: use for forecasts/estimates so the meaning is not colour-only. */
   hatched?: boolean;
+  /** Dotted fill: a second measured series of the same family (rain beside watering). */
+  dotted?: boolean;
 }
 
 export interface BarChartProps {
@@ -105,7 +107,7 @@ export function BarChart({
         {width === 0 ? <div style={{ height }} aria-hidden="true" /> : (
         <svg width={width} height={height} aria-hidden="true" className="block max-w-full">
           <defs>
-            {series.map((s, i) => s.hatched && <HatchPattern key={i} id={`${uid}-h${i}`} />)}
+            {series.map((s, i) => (s.hatched ? <HatchPattern key={i} id={`${uid}-h${i}`} className={SERIES_TEXT[s.color]} /> : s.dotted ? <DotPattern key={i} id={`${uid}-h${i}`} className={SERIES_TEXT[s.color]} /> : null))}
           </defs>
           {/* grid + y ticks */}
           {ticks.map((t, i) => (
@@ -130,8 +132,9 @@ export function BarChart({
                   const y1 = y(acc);
                   const h = Math.max(1, y0 - y1 - (k < lastIdx ? 2 : 0));
                   const s = series[k];
-                  const fill = s.hatched ? `url(#${uid}-h${k})` : undefined;
-                  const cls = s.hatched ? SERIES_TEXT[s.color] : SERIES_FILL[s.color];
+                  const patterned = s.hatched || s.dotted;
+                  const fill = patterned ? `url(#${uid}-h${k})` : undefined;
+                  const cls = patterned ? SERIES_TEXT[s.color] : SERIES_FILL[s.color];
                   const r = k === lastIdx ? Math.min(4, barW / 2, h) : 0;
                   const x0 = cx - barW / 2;
                   const top0 = y0 - h;
@@ -199,7 +202,7 @@ export function BarChart({
         <Legend
           className="mt-2"
           items={[
-            ...series.map((s) => ({ label: s.label, color: s.color, swatch: s.hatched ? ("hatched" as const) : ("solid" as const) })),
+            ...series.map((s) => ({ label: s.label, color: s.color, swatch: s.hatched ? ("hatched" as const) : s.dotted ? ("dotted" as const) : ("solid" as const) })),
             ...(target ? [{ label: target.label, color: "muted" as const, swatch: "line" as const }] : []),
           ]}
         />

@@ -80,6 +80,69 @@ export const GREENHOUSE_NIGHT_BUFFER_C: Record<GreenhouseConfig["material"], num
   plastic: 1,
 };
 
+/** Beds under cover: frost reaches them only as noted in `frostReachesBed`. */
+export const PROTECTED_ENVIRONMENTS: Bed["environmentType"][] = ["greenhouse", "polytunnel", "cold_frame", "windowsill"];
+
+/** Tender crops sown straight into the bed after the last frost. */
+const TENDER_DIRECT_SOWN = new Set(["bean", "corn", "sunflower"]);
+
+/**
+ * Frost-tender = set out only *after* the last frost (transplantWeeks > 0) or a
+ * tender direct sowing (bean, maize, sunflower). Hardy crops planted at the
+ * frost date (chard, leek, celery: transplantWeeks 0), winter vegetables and
+ * perennial herbs stand a few degrees below zero; rosemary is borderline
+ * but survives a light frost.
+ */
+export function isFrostSensitive(plant: Pick<Plant, "id" | "harvestDaysMax" | "transplantWeeks">): boolean {
+  return plant.harvestDaysMax < 365 && plant.id !== "rosemary" && ((plant.transplantWeeks ?? -1) > 0 || TENDER_DIRECT_SOWN.has(plant.id));
+}
+
+/**
+ * Does the forecast frost reach into this bed? Open beds (incl. raised beds and
+ * containers) at the frost threshold; an unheated greenhouse once the coldest
+ * night stays at or below 0 °C inside (outside minimum + material buffer, as in
+ * the greenhouse cold warning); other covered beds not.
+ */
+export function frostReachesBed(bed: Pick<Bed, "environmentType" | "greenhouseConfig">, frost: Pick<FrostSummary, "coldest"> | null): boolean {
+  if (!frost) return false;
+  if (!PROTECTED_ENVIRONMENTS.includes(bed.environmentType)) return true;
+  const gh = bed.greenhouseConfig;
+  if (bed.environmentType === "greenhouse" && gh && !gh.heated) return frost.coldest.tempMin + (GREENHOUSE_NIGHT_BUFFER_C[gh.material] ?? 1) <= 0;
+  return false;
+}
+
+export interface BedFrostRisk {
+  bedId: string;
+  /** Frost-tender crops of the bed, unique, in bed order. */
+  plantIds: string[];
+}
+
+/**
+ * Single source of "which crops does this frost hurt": the frost pins on the
+ * garden map, "Betroffen sind …" on the weather page and the frost hint on
+ * "Heute" all read it. A bed is at risk when the frost reaches it **and** it
+ * holds at least one frost-tender crop — winter-hardy beds get no pin.
+ */
+export function frostRiskByBed(beds: Bed[], plantMap: Map<string, Plant>, frost: Pick<FrostSummary, "coldest"> | null): BedFrostRisk[] {
+  if (!frost) return [];
+  const risks: BedFrostRisk[] = [];
+  for (const bed of beds) {
+    if (!frostReachesBed(bed, frost)) continue;
+    const ids: string[] = [];
+    for (const c of bed.cells) {
+      const plant = plantMap.get(c.plantId);
+      if (plant && !ids.includes(plant.id) && isFrostSensitive(plant)) ids.push(plant.id);
+    }
+    if (ids.length > 0) risks.push({ bedId: bed.id, plantIds: ids });
+  }
+  return risks;
+}
+
+/** The affected crops of all beds at risk, unique, in bed order. */
+export function frostAffectedPlants(risks: BedFrostRisk[]): string[] {
+  return [...new Set(risks.flatMap((r) => r.plantIds))];
+}
+
 /**
  * On a sunny day a closed greenhouse gets far warmer than the air outside.
  * Warn when the outside maximum comes within this many degrees of the

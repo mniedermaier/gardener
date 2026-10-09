@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronRight, Coffee, ExternalLink, MapPin, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
 import { estimateLastFrost } from "@/lib/location";
-import { getWeatherProvider, isWeatherConfigured } from "@/lib/weather";
+import { fetchWeather, getOwmKeyStatus, getWeatherProvider, isWeatherConfigured, subscribeOwmKeyStatus } from "@/lib/weather";
 import { clearAllData } from "@/lib/dataImport";
 import { useFormat } from "@/hooks/useFormat";
 import { Card } from "@/components/ui/Card";
@@ -115,14 +115,34 @@ export function SettingsPage() {
   };
 
   const handleClearAll = async () => {
-    const ok = await confirm(t("settings.danger.confirm"), { confirmLabel: t("settings.danger.action") });
+    const ok = await confirm({ title: t("settings.danger.confirmTitle"), message: t("settings.danger.confirm"), confirmLabel: t("settings.danger.action") });
     if (ok) clearAllData();
   };
 
   const frostYear = Number(store.lastFrostDate.slice(0, 4)) || now.getFullYear();
   const frostEstimate = store.locationLat !== null && elevation !== undefined ? estimateLastFrost(store.locationLat, elevation, frostYear) : null;
   const hasLocation = isWeatherConfigured(store.locationLat, store.locationLon);
-  const provider = getWeatherProvider(store.weatherApiKey);
+  const configuredProvider = getWeatherProvider(store.weatherApiKey);
+  // The provider that actually delivers: a rejected or unreachable key falls
+  // back to Open-Meteo (lib/weather.ts), and Settings must say so.
+  const keyStatus = useSyncExternalStore(subscribeOwmKeyStatus, () => getOwmKeyStatus(store.weatherApiKey));
+  const provider = configuredProvider === "openweathermap" && (keyStatus === "auth" || keyStatus === "unavailable") ? "open-meteo" : configuredProvider;
+  // A key nobody has used yet this session is checked once, after typing stops.
+  const checkKey = configuredProvider === "openweathermap" && keyStatus === undefined && hasLocation;
+  useEffect(() => {
+    if (!checkKey || store.locationLat === null || store.locationLon === null) return;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => {
+      fetchWeather({ lat: store.locationLat!, lon: store.locationLon!, apiKey: store.weatherApiKey, locale: store.locale, t, signal: ctrl.signal }).catch(() => {});
+    }, 800);
+    return () => { clearTimeout(timer); ctrl.abort(); };
+  }, [checkKey, store.locationLat, store.locationLon, store.weatherApiKey, store.locale, t]);
+  const providerStatus =
+    configuredProvider !== "openweathermap" ? t("settings.weatherProviderActive", { provider: "Open-Meteo" })
+    : keyStatus === "auth" ? t("settings.weatherKeyRejected")
+    : keyStatus === "unavailable" ? t("settings.weatherOwmUnavailable")
+    : keyStatus === "ok" ? t("settings.weatherProviderActive", { provider: "OpenWeatherMap" })
+    : hasLocation ? t("settings.weatherKeyChecking") : t("settings.weatherProviderActive", { provider: "OpenWeatherMap" });
 
   return (
     <div className="pb-8">
@@ -229,8 +249,8 @@ export function SettingsPage() {
                 {t("settings.weatherAdvanced")}
               </summary>
               <div className="space-y-3 pt-2 pl-6">
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {t("settings.weatherProviderActive", { provider: provider === "openweathermap" ? "OpenWeatherMap" : "Open-Meteo" })}
+                <p role="status" className={`text-sm ${keyStatus === "auth" ? "font-medium text-warning-strong" : "text-gray-600 dark:text-gray-300"}`}>
+                  {providerStatus}
                 </p>
                 <Input
                   label={t("settings.apiKey")}

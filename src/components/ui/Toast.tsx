@@ -1,6 +1,8 @@
-import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useRef, Suspense, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { X, CheckCircle, AlertTriangle, Info } from "lucide-react";
+import { Modal } from "./Modal";
+import { Button } from "./Button";
 
 export type ToastType = "success" | "warning" | "error" | "info";
 
@@ -12,6 +14,11 @@ export interface ToastOptions {
 }
 
 export interface ConfirmOptions {
+  /**
+   * Dialog heading. Name the object: "„Tomate · 1,9 kg“ löschen?"
+   * (common.confirmDeleteNamed). Without a title the message becomes the heading.
+   */
+  title?: string;
   /** Label of the confirming button. Default: common.confirm */
   confirmLabel?: string;
   /** Destructive confirmation (red button). Default true. */
@@ -25,10 +32,21 @@ interface Toast {
   action?: ToastOptions["action"];
 }
 
+/** Object form of confirm(): confirm({ title, message, confirmLabel, danger }). */
+export interface ConfirmRequest extends ConfirmOptions {
+  message?: string;
+}
+
 interface ToastContextValue {
   toast: (message: string, type?: ToastType, options?: ToastOptions) => void;
-  confirm: (message: string, options?: ConfirmOptions) => Promise<boolean>;
+  confirm: (message: string | ConfirmRequest, options?: ConfirmOptions) => Promise<boolean>;
 }
+
+/** Toasts kept at once; on phones only the newest is shown (see below). */
+const MAX_TOASTS = 2;
+
+/** Route part of the hash ("#/planner?bed=x" → "/planner"). */
+const routeOf = () => window.location.hash.replace(/^#/, "").split("?")[0] || "/";
 
 const ToastContext = createContext<ToastContextValue>({
   toast: () => {},
@@ -37,6 +55,29 @@ const ToastContext = createContext<ToastContextValue>({
 
 export function useToast() {
   return useContext(ToastContext);
+}
+
+/** Object kinds with a named delete confirmation (common.deleteNamed.*). */
+export type DeleteKind =
+  | "harvest" | "journal" | "pest" | "seed" | "pantry" | "expense" | "water" | "task"
+  | "soilTest" | "amendment" | "product" | "feed" | "health" | "animal" | "garden";
+
+/**
+ * Delete confirmation that names the object: "Ernte „Tomate · 1,9 kg“ löschen?".
+ * The text defaults to the undo hint, since every delete offers "Rückgängig".
+ */
+export function useConfirmDelete() {
+  const { confirm } = useToast();
+  const { t } = useTranslation(undefined, { useSuspense: false });
+  return useCallback(
+    (kind: DeleteKind, name: string, message?: string) =>
+      confirm({
+        title: t(`common.deleteNamed.${kind}`, { name }),
+        message: message ?? t("common.confirmDeleteUndo"),
+        confirmLabel: t("common.delete"),
+      }),
+    [confirm, t],
+  );
 }
 
 const ICONS = {
@@ -62,10 +103,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
   const [confirmState, setConfirmState] = useState<{
-    message: string;
+    title: string;
+    message?: string;
     options: ConfirmOptions;
     resolve: (value: boolean) => void;
   } | null>(null);
+  // Keeps the text while the dialog closes, so it does not flash empty.
+  const [lastConfirm, setLastConfirm] = useState(confirmState);
 
   const dismiss = useCallback((id: number) => {
     clearTimeout(timers.current.get(id));
@@ -75,14 +119,44 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const addToast = useCallback((message: string, type: ToastType = "success", options: ToastOptions = {}) => {
     const id = nextId++;
-    setToasts((prev) => [...prev, { id, message, type, action: options.action }]);
+    setToasts((prev) => {
+      const next = [...prev, { id, message, type, action: options.action }];
+      // Never pile up: the oldest toasts make room for the new one.
+      for (const old of next.slice(0, Math.max(0, next.length - MAX_TOASTS))) {
+        clearTimeout(timers.current.get(old.id));
+        timers.current.delete(old.id);
+      }
+      return next.slice(-MAX_TOASTS);
+    });
     const duration = options.duration ?? (options.action ? 6000 : 3000);
     timers.current.set(id, setTimeout(() => dismiss(id), duration));
   }, [dismiss]);
 
-  const confirmFn = useCallback((message: string, options: ConfirmOptions = {}): Promise<boolean> => {
+  // A page change clears plain notices; toasts with a running undo action
+  // may follow the user to the next page until their timer runs out.
+  useEffect(() => {
+    let route = routeOf();
+    const onHashChange = () => {
+      const next = routeOf();
+      if (next === route) return;
+      route = next;
+      setToasts((prev) => {
+        const keep = prev.filter((t) => t.action);
+        for (const t of prev) if (!t.action) { clearTimeout(timers.current.get(t.id)); timers.current.delete(t.id); }
+        return keep.length === prev.length ? prev : keep;
+      });
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  const confirmFn = useCallback((request: string | ConfirmRequest, options: ConfirmOptions = {}): Promise<boolean> => {
+    const { message, ...opts } = typeof request === "string" ? { ...options, message: request } : { ...request, ...options };
+    const title = opts.title ?? message ?? "";
     return new Promise((resolve) => {
-      setConfirmState({ message, options, resolve });
+      const next = { title, message: opts.title ? message : undefined, options: opts, resolve };
+      setConfirmState(next);
+      setLastConfirm(next);
     });
   }, []);
 
@@ -91,24 +165,26 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setConfirmState(null);
   };
 
-  const danger = confirmState?.options.danger ?? true;
+  const shown = confirmState ?? lastConfirm;
+  const danger = shown?.options.danger ?? true;
 
   return (
     <ToastContext.Provider value={{ toast: addToast, confirm: confirmFn }}>
       {children}
 
       {/* Toast stack — above the bottom nav on mobile, bottom right on desktop */}
-      <div className="pointer-events-none fixed inset-x-4 bottom-safe-nav z-[60] flex flex-col items-stretch gap-2 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-96" aria-live="polite">
-        {toasts.map((t) => {
+      <div className="pointer-events-none fixed inset-x-4 bottom-safe-nav z-[60] mx-auto flex max-w-sm flex-col items-stretch gap-2 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:mx-0 sm:w-96 sm:max-w-none" aria-live="polite">
+        {toasts.map((t, i) => {
           const Icon = ICONS[t.type];
           return (
             <div
               key={t.id}
               role={t.type === "error" ? "alert" : "status"}
-              className="pointer-events-auto flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-lg dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"
+              // Phones show only the newest toast, compact, so it does not cover the bed.
+              className={`pointer-events-auto items-center gap-2 rounded-xl border border-gray-200 bg-white py-1.5 pr-1.5 pl-3 text-sm text-gray-900 shadow-lg sm:gap-3 sm:py-3 sm:pr-4 sm:pl-4 dark:border-white/10 dark:bg-gray-800 dark:text-gray-100 ${i < toasts.length - 1 ? "hidden sm:flex" : "flex"}`}
             >
               <Icon size={18} aria-hidden="true" className={`shrink-0 ${ICON_TONE[t.type]}`} />
-              <span className="flex-1">{t.message}</span>
+              <span className="line-clamp-2 flex-1 sm:line-clamp-none">{t.message}</span>
               {t.action && (
                 <button
                   type="button"
@@ -134,32 +210,30 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         })}
       </div>
 
-      {/* Confirm dialog */}
-      {confirmState && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center">
-          <div role="presentation" className="absolute inset-0 bg-black/50" onClick={() => handleConfirm(false)} />
-          <div role="alertdialog" aria-modal="true" aria-label={confirmState.message} className="relative mx-4 w-full max-w-sm rounded-xl border border-transparent bg-white p-6 shadow-xl dark:border-white/10 dark:bg-gray-900">
-            <p className="mb-5 text-sm text-gray-800 dark:text-gray-200">{confirmState.message}</p>
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => handleConfirm(false)}
-                className="min-h-10 rounded-lg px-4 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
-              >
+      {/* Confirm dialog: a <dialog> via Modal, so Esc cancels, focus stays
+          trapped and returns to the trigger. Initial focus sits on "Abbrechen"
+          so an accidental Enter never deletes. */}
+      <Suspense fallback={null}>
+        <Modal
+          open={confirmState !== null}
+          onClose={() => handleConfirm(false)}
+          role="alertdialog"
+          title={shown?.title ?? ""}
+          description={shown?.message}
+          footer={
+            <>
+              <Button variant="secondary" data-autofocus onClick={() => handleConfirm(false)}>
                 {translate("common.cancel")}
-              </button>
-              <button
-                type="button"
-                autoFocus
-                onClick={() => handleConfirm(true)}
-                className={`min-h-10 rounded-lg px-4 text-sm font-medium ${danger ? "bg-danger text-white hover:brightness-110 dark:text-gray-950" : "bg-garden-600 text-white hover:bg-garden-700"}`}
-              >
-                {confirmState.options.confirmLabel ?? translate("common.confirm")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              </Button>
+              <Button variant={danger ? "danger" : "primary"} onClick={() => handleConfirm(true)}>
+                {shown?.options.confirmLabel ?? translate("common.confirm")}
+              </Button>
+            </>
+          }
+        >
+          {null}
+        </Modal>
+      </Suspense>
     </ToastContext.Provider>
   );
 }

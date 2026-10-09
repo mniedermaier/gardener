@@ -189,19 +189,19 @@ export function SeasonTimeline() {
       {/* Mobile: agenda list instead of an unreadable Gantt */}
       <div className="space-y-4 sm:hidden">
         {filterSelect}
-        <List header={`${t("calendar.nowDue")} · ${agenda.now.length}`}>
+        <List headingLevel={2} header={`${t("calendar.nowDue")} · ${agenda.now.length}`}>
           {agenda.now.length > 0
             ? agenda.now.map((a) => agendaRow(a, "now"))
             : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t("calendar.nothingNow")}</li>}
         </List>
-        <List header={`${t("calendar.next4Weeks")} · ${agenda.next.length}`}>
+        <List headingLevel={2} header={`${t("calendar.next4Weeks")} · ${agenda.next.length}`}>
           {agenda.next.length > 0
             ? agenda.next.map((a) => agendaRow(a, "next"))
             : <li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{plantableCount > 0 ? t("calendar.nothingNextPlanted", { count: plantableCount }) : t("calendar.nothingNext")}</li>}
         </List>
         {sowingList}
         {agenda.later.length > 0 && (
-          <List header={t("calendar.upNext")}>
+          <List headingLevel={2} header={t("calendar.upNext")}>
             {agenda.later.map((a) => agendaRow(a, "next"))}
           </List>
         )}

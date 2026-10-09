@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks } from "lucide-react";
-import { addWeeks, parseISO, startOfDay } from "date-fns";
+import { parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -21,10 +21,11 @@ import { List } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Task, TaskType } from "@/types/task";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import { downloadIcal } from "@/lib/ical";
+import { getPlantingTaskDates } from "@/lib/advisor";
 import { groupTasksByDue, type TaskGroup } from "@/lib/tasks";
 import { useTaskActions } from "@/hooks/useTaskActions";
 import { TaskRow } from "./TaskRow";
@@ -48,6 +49,7 @@ interface Draft {
 export function TaskCalendar() {
   const { t } = useTranslation();
   const { toast, confirm } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { tasks, gardens, lastFrostDate, addTask, updateTask, deleteTask, generateTasks } = useStore(
     useShallow((s) => ({
       tasks: s.tasks, gardens: s.gardens, lastFrostDate: s.lastFrostDate,
@@ -129,18 +131,16 @@ export function TaskCalendar() {
     for (const garden of gardens) {
       const plantings: Array<{ plantId: string; bedId: string; type: TaskType; title: string; dueDate: string }> = [];
       for (const bed of garden.beds) {
-        const effectiveFrostDate = addWeeks(frostDate, -getFrostProtectionWeeks(bed));
+        // Same windows as the bed's palette "Jetzt" (lib/advisor), incl. autumn sowing and planting.
+        const context = { environmentType: bed.environmentType ?? "outdoor_bed", frostProtectionWeeks: getFrostProtectionWeeks(bed) };
         for (const plantId of new Set(bed.cells.map((c) => c.plantId))) {
           const plant = plantMap.get(plantId);
           if (!plant) continue;
           const name = getPlantName(plantId);
-          const add = (type: TaskType, weeks: number | null) => {
-            if (weeks === null) return;
-            plantings.push({ plantId, bedId: bed.id, type, title: t("calendar.generatedTitle", { action: t(`calendar.taskTypes.${type}`), plant: name }), dueDate: toISODate(addWeeks(effectiveFrostDate, weeks)) });
-          };
-          add("sow_indoors", plant.sowIndoorsWeeks);
-          add("sow_outdoors", plant.sowOutdoorsWeeks);
-          add("transplant", plant.transplantWeeks);
+          for (const { type, action, date } of getPlantingTaskDates(plant, frostDate, context)) {
+            const label = action === type ? t(`calendar.taskTypes.${type}`) : t(`advisor.actions.${action}`);
+            plantings.push({ plantId, bedId: bed.id, type, title: t("calendar.generatedTitle", { action: label, plant: name }), dueDate: toISODate(date) });
+          }
         }
       }
       if (plantings.length > 0) {
@@ -181,7 +181,7 @@ export function TaskCalendar() {
   };
 
   const handleDelete = async (task: Task) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("task", task.title))) return;
     deleteTask(task.id);
     setDialogOpen(false);
     toast(t("calendar.taskDeleted"), "success", { action: { label: t("common.undo"), onClick: () => restore(task) } });
@@ -292,7 +292,7 @@ export function TaskCalendar() {
           ) : (
             <div className="space-y-4">
               {groups.map(({ group, tasks: list }) => (
-                <List key={group} header={<span className={group === "overdue" ? "text-danger" : undefined}>{groupLabel(group, list.length)}</span>}>
+                <List key={group} headingLevel={2} header={<span className={group === "overdue" ? "text-danger" : undefined}>{groupLabel(group, list.length)}</span>}>
                   {list.map((task) => (
                     <TaskRow
                       key={task.id}

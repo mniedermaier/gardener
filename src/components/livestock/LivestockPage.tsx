@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { AnimalCard } from "./AnimalCard";
 import { ProductionChart } from "./ProductionChart";
 import { AnimalDialog, animalLabel, formatProductAmount, herdSummary } from "./shared";
@@ -29,7 +29,8 @@ export function LivestockPage() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { animals, animalProducts, feedEntries, healthEvents, addProduct, deleteProduct, deleteAnimal, restoreAnimal } = useStore(
     useShallow((s) => ({
       animals: s.animals, animalProducts: s.animalProducts, feedEntries: s.feedEntries, healthEvents: s.healthEvents,
@@ -94,7 +95,7 @@ export function LivestockPage() {
   };
 
   const removeAnimal = async (animal: Animal) => {
-    if (!(await confirm(t("livestock.confirmDeleteAnimal"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("animal", animalLabel(animal, t), t("livestock.confirmDeleteAnimal")))) return;
     const snapshot = {
       animal,
       products: animalProducts.filter((p) => p.animalId === animal.id),

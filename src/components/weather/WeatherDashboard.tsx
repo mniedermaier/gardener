@@ -8,13 +8,11 @@ import {
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { usePlantMap } from "@/hooks/usePlants";
-import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { toDate, todayISO } from "@/lib/format";
 import { getAllAlerts, groupAlerts, type AlertGroup, type FrostSummary, type WeatherAlert } from "@/lib/weatherAlerts";
 import { fetchWeather as fetchWeather_, getWeatherProvider, isWeatherConfigured, WeatherAuthError } from "@/lib/weather";
 import type { Plant } from "@/types/plant";
-import type { Bed } from "@/types/garden";
 import type { WeatherData } from "@/types/weather";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +25,7 @@ import { TONE_SOFT, type Tone } from "@/components/ui/tone";
 import { RangeBar } from "@/components/ui/charts";
 import { SunlightWidget } from "./SunlightWidget";
 import { DayArc } from "./DayArc";
-import { FrostTaskButton, useDayLabel, useFrostSummary } from "./frost";
+import { FrostTaskButton, useDayLabel, useFrostAffectedText, useFrostSummary } from "./frost";
 
 const ALERT_ICON: Record<WeatherAlert["type"], LucideIcon> = {
   frost: Snowflake,
@@ -60,24 +58,11 @@ function dayPhrase(date: string, locale: string): string {
   return d ? new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "short" }).format(d) : date;
 }
 
-/** Tender crops sown straight into the bed after the last frost. */
-const TENDER_DIRECT_SOWN = new Set(["bean", "corn", "sunflower"]);
-/** Protected beds get their own greenhouse warning; frost hits the open beds. */
-const PROTECTED: Bed["environmentType"][] = ["greenhouse", "polytunnel", "cold_frame", "windowsill"];
-
-/**
- * Frost-tender crops = set out only *after* the last frost (transplantWeeks > 0)
- * or tender direct sowings. Hardy crops planted at the frost date (chard,
- * leek, celery: transplantWeeks 0) stand a few degrees below zero.
- */
-function frostSensitive(plants: Plant[]): Plant[] {
-  return plants.filter((p) => p.harvestDaysMax < 365 && p.id !== "rosemary" && ((p.transplantWeeks ?? -1) > 0 || TENDER_DIRECT_SOWN.has(p.id)));
-}
-
-function AlertCallout({ group, sensitive, frost }: { group: AlertGroup; sensitive: string[]; frost: { summary: FrostSummary; title: string } | null }) {
+function AlertCallout({ group, frost }: { group: AlertGroup; frost: { summary: FrostSummary; title: string } | null }) {
   const { t } = useTranslation();
   const f = useFormat();
   const dayLabel = useDayLabel();
+  const affected = useFrostAffectedText(frost?.summary);
   const Icon = ALERT_ICON[group.type];
   const tone = SEVERITY_TONE[group.severity];
   const fmtParams = (p?: Record<string, string | number>) => {
@@ -103,7 +88,7 @@ function AlertCallout({ group, sensitive, frost }: { group: AlertGroup; sensitiv
           ))}
         </span>
         <span className="mt-1.5 block">
-          {sensitive.length > 0 ? t("alerts.frostAffected", { plants: sensitive.slice(0, 4).join(", "), count: sensitive.length }) : t("alerts.frostAdvice")}
+          {affected}
         </span>
         {frost && <FrostTaskButton summary={frost.summary} className="mt-2.5" />}
       </>
@@ -136,7 +121,6 @@ export function WeatherDashboard() {
   const navigate = useNavigate();
   const { weatherApiKey, locationLat, locationLon, locationName, alerts: alertConfig, gardens, addWeatherHistory } = useStore(useShallow((s) => ({ weatherApiKey: s.weatherApiKey, locationLat: s.locationLat, locationLon: s.locationLon, locationName: s.locationName, alerts: s.alerts, gardens: s.gardens, addWeatherHistory: s.addWeatherHistory })));
   const plantMap = usePlantMap();
-  const plantName = usePlantName();
   const [weather, setWeather] = useState<WeatherData | null>(() => {
     try {
       const cached = sessionStorage.getItem("gardener-weather");
@@ -159,12 +143,6 @@ export function WeatherDashboard() {
   const groups = useMemo(() => groupAlerts(allAlerts), [allAlerts]);
   const weekly = allAlerts.find((a) => a.type === "weekly");
   const frost = useFrostSummary(weather?.forecast);
-  const sensitive = useMemo(() => {
-    const ids = new Set<string>();
-    for (const b of allBeds) if (!PROTECTED.includes(b.environmentType)) for (const c of b.cells) ids.add(c.plantId);
-    const open = [...ids].map((id) => plantMap.get(id)).filter((p): p is Plant => !!p);
-    return frostSensitive(open).map((p) => plantName(p.id));
-  }, [allBeds, plantMap, plantName]);
 
   const provider = fallback ? "open-meteo" : getWeatherProvider(weatherApiKey);
   // Each request has a key; `loading` is derived (no setState inside the effect body).
@@ -237,7 +215,8 @@ export function WeatherDashboard() {
     <div>
       <PageHeader
         title={t("weather.title")}
-        description={weekly ? t(weekly.descriptionKey, { ...weekly.descriptionParams, minTemp: f.formatTemperature(Number(weekly.descriptionParams?.minTemp)), maxTemp: f.formatTemperature(Number(weekly.descriptionParams?.maxTemp)) }) : t("weather.subtitle")}
+        // The frost card already says it: the subtitle then stays general instead of repeating it.
+        description={weekly && !groups.some((g) => g.type === "frost") ? t(weekly.descriptionKey, { ...weekly.descriptionParams, minTemp: f.formatTemperature(Number(weekly.descriptionParams?.minTemp)), maxTemp: f.formatTemperature(Number(weekly.descriptionParams?.maxTemp)) }) : t("weather.subtitle")}
       />
 
       {fallback && weather && (
@@ -265,7 +244,7 @@ export function WeatherDashboard() {
 
       {visible.length > 0 && (
         <section aria-label={t("weather.alertsLabel")} className="mb-6 space-y-2">
-          {visible.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} frost={frost} />)}
+          {visible.map((g) => <AlertCallout key={g.id} group={g} frost={frost} />)}
           {hidden.length > 0 && (
             <details className="group">
               <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-md px-1 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 [&::-webkit-details-marker]:hidden">
@@ -273,7 +252,7 @@ export function WeatherDashboard() {
                 {t("weather.moreAlerts", { count: hidden.length })}
               </summary>
               <div className="mt-2 space-y-2">
-                {hidden.map((g) => <AlertCallout key={g.id} group={g} sensitive={sensitive} frost={frost} />)}
+                {hidden.map((g) => <AlertCallout key={g.id} group={g} frost={frost} />)}
               </div>
             </details>
           )}

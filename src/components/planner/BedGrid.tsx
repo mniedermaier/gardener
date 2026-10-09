@@ -213,17 +213,23 @@ export const MiniBedGrid = memo(function MiniBedGrid({ bed, plantMap, conflicts,
       const plantId = byKey.get(key);
       const plant = plantId ? plantMap.get(plantId) : undefined;
       const isPath = paths.has(key);
-      const shadow = conflictShadow(conflicts.get(key))?.replaceAll("3px", "2px");
+      const conflict = !!plant && !!conflicts.get(key)?.partners.length;
       cells.push(
         <span
           key={key}
           className={cn(
-            "flex items-center justify-center rounded-[3px]",
+            "relative flex items-center justify-center rounded-[3px]",
             isPath ? "bg-gray-300/70 dark:bg-white/15" : plant ? "bg-(--tint)/15 dark:bg-(--tint)/[0.12]" : "bg-white/70 dark:bg-white/[0.06]",
           )}
-          style={{ width: cell, height: cell, ...(plant ? { "--tint": plant.color } : {}), ...(shadow ? { boxShadow: shadow } : {}) } as CSSProperties}
+          style={{ width: cell, height: cell, ...(plant ? { "--tint": plant.color } : {}) } as CSSProperties}
         >
           {plant && <PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={icon} />}
+          {/* The same ⚠ as in the editor and on the card's "ungünstige Nachbarn" badge — no unexplained edge marks. */}
+          {conflict && (
+            <span className="absolute -top-1 -right-1 flex size-3 items-center justify-center rounded-full bg-warning text-white ring-1 ring-white dark:text-gray-950 dark:ring-gray-900">
+              <TriangleAlert size={8} strokeWidth={3} />
+            </span>
+          )}
           {isPath && cell >= 20 && <Footprints size={10} aria-hidden="true" className="text-gray-500" />}
         </span>,
       );

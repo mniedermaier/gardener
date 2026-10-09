@@ -3,7 +3,7 @@ import plantsData from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
 import type { Bed, Garden } from "@/types/garden";
 import { getPhaseWindows, getHarvestReady, seasonFrost, suitsEnvironment } from "@/lib/season";
-import { getPlantableNow, getSowingAgenda } from "@/lib/advisor";
+import { getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda } from "@/lib/advisor";
 import { recommendBedPlanting } from "@/lib/bedRecommendation";
 import { groupTasksByDue, nextDue, taskGroup } from "@/lib/tasks";
 import type { Task } from "@/types/task";
@@ -129,5 +129,82 @@ describe("task groups (dashboard and task page)", () => {
     expect(nextDue(task("w", "2026-10-05", { recurring: { interval: "weekly" } }), monday)).toBe("2026-10-12");
     expect(nextDue(task("d", "2026-09-20", { recurring: { interval: "daily" } }), monday)).toBe("2026-10-06");
     expect(nextDue(task("u", "2026-10-05", { recurring: { interval: "weekly", until: "2026-10-10" } }), monday)).toBeNull();
+  });
+});
+
+describe("autumn season: tasks, palette, garden agenda agree", () => {
+  const OCT_9 = new Date(2026, 9, 9);
+  const FROST = "2026-05-15";
+  const ids = (items: { plantId: string }[]) => items.map((i) => i.plantId);
+  const raised = { environmentType: "raised_bed" as const, frostProtectionWeeks: 1 };
+  const glass = { environmentType: "greenhouse" as const, frostProtectionWeeks: 4 };
+
+  it("offers winter spinach, lamb's lettuce, winter lettuce, garlic and onion sets for a raised bed in early October", () => {
+    const palette = ids(getPlantableNow(plants, FROST, { now: OCT_9, ...raised }));
+    expect(palette).toEqual(expect.arrayContaining(["spinach", "lambs_lettuce", "lettuce", "garlic", "onion"]));
+    for (const shrub of ["currant", "raspberry"]) expect(palette).not.toContain(shrub);
+  });
+
+  it("keeps winter salads going under glass, but no garlic or onion sets there", () => {
+    const palette = ids(getPlantableNow(plants, FROST, { now: new Date(2026, 9, 25), ...glass }));
+    expect(palette).toEqual(expect.arrayContaining(["spinach", "lambs_lettuce", "lettuce"]));
+    expect(palette).not.toContain("garlic");
+    expect(palette).not.toContain("onion");
+  });
+
+  it("closes the open-ground autumn sowing in mid-October; frost protection extends it", () => {
+    const late = new Date(2026, 9, 14);
+    expect(ids(getPlantableNow(plants, FROST, { now: late, environmentType: "outdoor_bed" }))).not.toContain("spinach");
+    expect(ids(getPlantableNow(plants, FROST, { now: late, ...raised }))).toContain("spinach");
+    expect(ids(getPlantableNow(plants, FROST, { now: new Date(2026, 10, 10), ...glass }))).toContain("spinach");
+  });
+
+  it("garden agenda is exactly the union of the bed palettes, with the beds named", () => {
+    const beds = [
+      { id: "hb", name: "Hochbeet", ...raised },
+      { id: "gh", name: "Gewächshaus", ...glass },
+      { id: "kk", name: "Kübel", environmentType: "container" as const, frostProtectionWeeks: 0 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    for (const bed of beds) {
+      for (const p of getPlantableNow(plants, FROST, { now: OCT_9, ...bed })) {
+        const row = agenda.now.find((r) => r.plantId === p.plantId && r.action === p.action);
+        expect(row, `${p.plantId} in ${bed.name}`).toBeDefined();
+        expect(row!.beds!.map((b) => b.id)).toContain(bed.id);
+      }
+    }
+    for (const row of agenda.now) {
+      if (row.action === "sow_indoors") continue;
+      for (const b of row.beds!) {
+        const bed = beds.find((x) => x.id === b.id)!;
+        expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...bed }))).toContain(row.plantId);
+      }
+    }
+    expect(agenda.now.find((r) => r.plantId === "spinach")!.beds!.map((b) => b.id)).toEqual(["hb", "gh", "kk"]);
+    expect(agenda.now.find((r) => r.plantId === "garlic")!.beds!.map((b) => b.id)).toEqual(["hb", "kk"]);
+  });
+
+  it("a sowing task the bed is due for is offered by that bed's palette on its due date", () => {
+    // "Wintersalat & Spinat säen · Hochbeet" due on Oct 10.
+    const due = new Date(2026, 9, 10);
+    expect(ids(getPlantableNow(plants, FROST, { now: due, ...raised }))).toEqual(expect.arrayContaining(["spinach", "lettuce"]));
+  });
+
+  it("generated planting tasks fall inside a window the bed's palette offers", () => {
+    const frost = new Date(2026, 4, 15);
+    const cases: Array<[string, typeof raised | typeof glass]> = [
+      ["spinach", raised], ["lambs_lettuce", raised], ["garlic", raised], ["onion", raised], ["carrot", raised],
+      ["tomato", glass], ["lettuce", glass], ["spinach", glass],
+    ];
+    for (const [id, bed] of cases) {
+      const dates = getPlantingTaskDates(P(id), frost, bed);
+      expect(dates.length, id).toBeGreaterThan(0);
+      for (const d of dates) {
+        if (d.type === "sow_indoors") continue; // not an in-bed action
+        expect(ids(getPlantableNow(plants, FROST, { now: d.date, ...bed })), `${id} ${d.action} ${d.date.toDateString()}`).toContain(id);
+      }
+    }
+    expect(getPlantingTaskDates(P("garlic"), frost, glass)).toHaveLength(0);
+    expect(getPlantingTaskDates(P("spinach"), frost, raised).some((d) => d.action === "sow_autumn")).toBe(true);
   });
 });

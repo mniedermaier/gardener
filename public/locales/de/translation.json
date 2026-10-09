@@ -223,8 +223,9 @@
     "mapPin": {
       "harvest": "Erntereif",
       "task": "Aufgabe fällig",
-      "frost": "Frost erwartet"
-    }
+      "frost": "Frost für empfindliche Kulturen"
+    },
+    "mapFrostPlants": "Frost: {{plants}} gefährdet"
   },
   "onboarding": {
     "stepOf": "Schritt {{current}} von {{total}}",
@@ -293,7 +294,7 @@
     "variety": "Sorte",
     "varietyPlaceholder": "z.B. San Marzano, Ochsenherz...",
     "plantedDate": "Pflanzdatum",
-    "confirmDeleteGarden": "Diesen Garten mit allen Beeten löschen?",
+    "confirmDeleteGarden": "Alle Beete dieses Gartens werden mitgelöscht. Direkt danach kannst du das noch rückgängig machen.",
     "placeMode": "Platziere {{plant}}: auf Felder klicken, Esc zum Abbrechen",
     "share": "Gartenplan teilen",
     "shareCopied": "Teilen-Link kopiert",
@@ -486,7 +487,11 @@
       "other": "Sonstige"
     },
     "sheetMore": "Details, Sorte & Notizen",
-    "sheetLess": "Weniger anzeigen"
+    "sheetLess": "Weniger anzeigen",
+    "placingHintClick": "Klicke auf freie Felder. ✓ guter Nachbar, ⚠ ungünstiger Nachbar.",
+    "inspectHintClick": "Klicke auf eine Pflanze, um sie anzusehen. Zum Setzen erst eine Pflanze auswählen.",
+    "dragPlantClick": "Anklicken und dann Felder im Beet anklicken – oder direkt ins Beet ziehen.",
+    "emptyBedsTextClick": "Gib Größe und Art an (Freiland, Hochbeet, Gewächshaus …). Danach setzt du Pflanzen per Klick oder Ziehen."
   },
   "plants": {
     "title": "Pflanzen",
@@ -707,6 +712,10 @@
       "endive": {
         "name": "Endivie",
         "description": "Leicht bitterer Salat. Herzen bleichen für milderes Aroma."
+      },
+      "lambs_lettuce": {
+        "name": "Feldsalat",
+        "description": "Winterharter Wintersalat. Aussaat Juli bis Anfang Oktober, Ernte von Herbst bis Frühjahr."
       }
     },
     "customIcon": "Symbol",
@@ -996,14 +1005,18 @@
       "desc": "Diese Aktion lässt sich nicht rückgängig machen.",
       "action": "Alle Daten löschen",
       "actionDesc": "Entfernt Gärten, Ernten, Tiere und Einstellungen von diesem Gerät. Lade vorher ein Backup herunter.",
-      "confirm": "Wirklich alle Daten auf diesem Gerät löschen? Ohne Backup sind sie verloren."
+      "confirm": "Gärten, Ernten, Tiere und Einstellungen sind ohne Backup verloren. Das lässt sich nicht rückgängig machen.",
+      "confirmTitle": "Alle Daten auf diesem Gerät löschen?"
     },
     "weatherReady": "Vorhersage für {{place}} ist aktiv",
     "weatherYourLocation": "deinen Standort",
     "weatherNeedsLocation": "Lege oben einen Standort fest, dann lädt Gardener die Vorhersage",
     "weatherSource": "Wetterdaten:",
     "weatherAdvanced": "Erweitert: eigenen OpenWeatherMap-Schlüssel verwenden",
-    "weatherProviderActive": "Aktiver Anbieter: {{provider}}. Mit Schlüssel nutzt Gardener OpenWeatherMap, ohne Schlüssel Open-Meteo."
+    "weatherProviderActive": "Aktiver Anbieter: {{provider}}. Mit Schlüssel nutzt Gardener OpenWeatherMap, ohne Schlüssel Open-Meteo.",
+    "weatherKeyRejected": "Schlüssel abgelehnt – Open-Meteo wird verwendet. Prüfe den OpenWeatherMap-Schlüssel oder lösche ihn.",
+    "weatherOwmUnavailable": "OpenWeatherMap ist gerade nicht erreichbar – Open-Meteo wird verwendet.",
+    "weatherKeyChecking": "Schlüssel wird geprüft …"
   },
   "dataManagement": {
     "title": "Daten & Backup",
@@ -1065,14 +1078,15 @@
     "frostGroupTitle_one": "Frostgefahr in {{count}} Nacht, bis {{temp}} ({{day}})",
     "frostGroupTitle_other": "Frostgefahr in {{count}} Nächten, bis {{temp}} ({{day}})",
     "frostAffected_one": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
-    "frostAffected_other": "Betroffen sind {{count}} Kulturen, z. B. {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
+    "frostAffected_other": "Betroffen sind {{count}} Kulturen ({{beds}}), z. B. {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
     "frostAdvice": "Empfindliche Pflanzen mit Vlies abdecken und mit dem Auspflanzen warten.",
     "greenhouseFrostDesc": "Kältester Tag: {{date}}, draußen {{outside}}. Auch im unbeheizten Haus droht dann Frost (etwa {{temp}}). Empfindliche Pflanzen doppelt mit Vlies abdecken oder frostfrei heizen. Annahme: rund {{buffer}} wärmer als draußen.",
     "fleeceTask": "Vlies-Aufgabe anlegen",
     "fleeceTaskTitle": "Vlies auflegen",
     "fleeceTaskDesc": "Frostnächte laut Vorhersage: {{nights}}. Empfindliche Kulturen am Abend abdecken, morgens lüften.",
     "fleeceTaskAdded": "Aufgabe „Vlies auflegen“ für {{day}} angelegt",
-    "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant"
+    "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant",
+    "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen."
   },
   "harvest": {
     "title": "Ernte",
@@ -1525,7 +1539,11 @@
         "rabbit": "Kaninchen: RHD (Chinaseuche) und Myxomatose, je nach Impfstoff halbjährlich bis jährlich.",
         "ruminant": "Ziegen und Schafe: Clostridien-Schutz, Auffrischung meist jährlich – mit dem Tierarzt abstimmen.",
         "other": "Den Abstand gibt der Impfstoff vor – mit dem Tierarzt abstimmen."
-      }
+      },
+      "vaccCoverage": "Tiergruppen mit Impfschutz",
+      "vaccCoverageValue": "{{covered}} von {{total}}",
+      "nextDue": "Nächste Auffrischung ab {{date}}",
+      "dueNames": "Impfung prüfen: {{names}}"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1563,7 +1581,7 @@
     "backToHerd": "Zurück zum Bestand",
     "herd": "Bestand",
     "deleted": "{{name}} gelöscht",
-    "confirmDeleteAnimal": "Tier mit allen Produktions-, Futter- und Gesundheitseinträgen löschen?",
+    "confirmDeleteAnimal": "Alle Produktions-, Futter- und Gesundheitseinträge dieses Tiers werden mitgelöscht. Direkt danach kannst du das noch rückgängig machen.",
     "animalType": "Tierart",
     "acquired": "Seit",
     "sinceDate": "seit {{date}}",
@@ -1662,7 +1680,8 @@
     "ofExpectedToDate": "von ~{{amount}} erwartet",
     "productThisYear": "{{product}} dieses Jahr",
     "eggWeeksLabel": "Eier pro Woche, letzte 8 Wochen, Ø {{avg}}",
-    "eggWeeksAvg": "Ø {{avg}} pro Woche in den letzten 8 Wochen"
+    "eggWeeksAvg": "Ø {{avg}} pro Woche in den letzten 8 Wochen",
+    "singleHarvests": "Einzelne Ernten (letzte {{months}} Monate)"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1725,7 +1744,8 @@
     "cost": "Kosten",
     "needPlant": "Bitte eine Pflanze wählen",
     "invalidNumber": "Bitte eine gültige Zahl eingeben",
-    "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben"
+    "invalidYear": "Bitte ein Jahr zwischen 1950 und heute eingeben",
+    "orOnionSets": "oder Steckzwiebeln"
   },
   "soil": {
     "title": "Boden",
@@ -1936,7 +1956,9 @@
       "sow_autumn": "Herbstsaat"
     },
     "showMore_one": "{{count}} weitere anzeigen",
-    "showMore_other": "{{count}} weitere anzeigen"
+    "showMore_other": "{{count}} weitere anzeigen",
+    "bedCount_one": "{{count}} Beet",
+    "bedCount_other": "{{count}} Beete"
   },
   "expenses": {
     "title": "Kosten",
@@ -2087,7 +2109,25 @@
     "favorite": "Favorit",
     "undo": "Rückgängig",
     "moreActions": "Weitere Aktionen",
-    "all": "Alle"
+    "all": "Alle",
+    "confirmDeleteUndo": "Direkt danach kannst du das noch rückgängig machen.",
+    "deleteNamed": {
+      "harvest": "Ernte „{{name}}“ löschen?",
+      "journal": "Eintrag „{{name}}“ löschen?",
+      "pest": "Befund „{{name}}“ löschen?",
+      "seed": "Saatgut „{{name}}“ löschen?",
+      "pantry": "Vorrat „{{name}}“ löschen?",
+      "expense": "Ausgabe „{{name}}“ löschen?",
+      "water": "Gießeintrag „{{name}}“ löschen?",
+      "task": "Aufgabe „{{name}}“ löschen?",
+      "soilTest": "Bodentest „{{name}}“ löschen?",
+      "amendment": "Bodenverbesserung „{{name}}“ löschen?",
+      "product": "Produktionseintrag „{{name}}“ löschen?",
+      "feed": "Futtereintrag „{{name}}“ löschen?",
+      "health": "Gesundheitseintrag „{{name}}“ löschen?",
+      "animal": "Tier „{{name}}“ löschen?",
+      "garden": "Garten „{{name}}“ löschen?"
+    }
   },
   "companions": {
     "title": "Pflanzpartner",
@@ -2236,16 +2276,17 @@
     "howNeed": "Selbstversorgung = Anteil des Kalorienbedarfs deines Haushalts ({{kcal}} kcal pro Person und Tag), den Garten und Tiere im Jahr decken (höchstens 100 %).",
     "meterLegend": "Voller Balken = erfasst, schraffiert = Prognose.",
     "pricesEditable": "Die Preise pro Ei, kg oder Liter kannst du unter Kosten anpassen.",
-    "expectedToDate": "erwartet bis heute: {{value}}",
-    "actualVsToDateShort": "erfasst {{actual}} · erwartet bis heute {{expected}}",
+    "expectedToDate": "Soll bis heute: {{value}}",
+    "actualVsToDateShort": "erfasst {{actual}} · Soll bis heute {{expected}}",
     "howCap": "Tierprodukte zählen nur bis zum üblichen Verbrauch (pro Person und Jahr etwa 240 Eier, 1 kg Honig, 52 kg Fleisch, 300 l Milch). Honig ist kalorienreich, aber kein Grundnahrungsmittel: Zwei Völker liefern rund 40 kg, ein Haushalt isst davon 1–2 kg. Was darüber liegt, ist Überschuss zum Tauschen oder Verkaufen und macht dich nicht satter. Gemüse und Obst zählen voll.",
-    "howToDate": "Erwartet bis heute: der Teil der Jahresprognose, der bis heute hereinkommen sollte – je Kultur ihr Erntefenster ab dem letzten Frost, Honig Mai bis August, Eier gleichmäßig übers Jahr. Liegt „bisher erfasst“ deutlich darunter, fehlen meist Einträge.",
+    "howToDate": "Soll bis heute: der Teil der Jahresprognose, der bis heute hereinkommen sollte – je Kultur ihr Erntefenster ab dem letzten Frost, Honig Mai bis August, Eier gleichmäßig übers Jahr. Liegt „bisher erfasst“ deutlich darunter, fehlen meist Einträge.",
     "howVsFoodPlan": "Der Ernährungsplan misst etwas anderes: Kilogramm gegen ein Mengenziel für 20 Gemüse- und Obstkulturen, ohne Tierprodukte. Sein „Mengenziel“ weicht deshalb von diesem Kalorienwert ab.",
     "compositionTitle": "Woraus die Prognose besteht",
     "compositionDesc": "Anteil am Kalorienbedarf des Jahres, nach Herkunft.",
     "compositionLabel": "Garten {{garden}}, Tierprodukte {{animals}} des Jahresbedarfs",
     "fromGarden": "Garten",
     "fromAnimals": "Tierprodukte",
-    "surplusNote": "Nicht eingerechnet, weil über dem üblichen Verbrauch: {{items}}."
+    "surplusNote": "Nicht eingerechnet, weil über dem üblichen Verbrauch: {{items}}.",
+    "notCovered": "Nicht gedeckt"
   }
 }

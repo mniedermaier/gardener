@@ -18,7 +18,7 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { ANIMAL_ICON, HEALTH_ICON, PRODUCT_ICON } from "./icons";
 import { TONE_SOFT, type Tone } from "@/components/ui/tone";
@@ -89,35 +89,35 @@ function animalOptions(animals: Animal[], t: TFunction) {
 /** Delete + undo toast for the three record kinds. */
 export function useRecordActions() {
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
+  const f = useFormat();
   const s = useStore(useShallow((st) => ({
     addProduct: st.addProduct, deleteProduct: st.deleteProduct,
     addFeedEntry: st.addFeedEntry, deleteFeedEntry: st.deleteFeedEntry,
     addHealthEvent: st.addHealthEvent, deleteHealthEvent: st.deleteHealthEvent,
   })));
-  const ask = useCallback(() => confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }), [confirm, t]);
-
   const deleteProduct = useCallback(async (p: AnimalProduct) => {
-    if (!(await ask())) return false;
+    if (!(await confirmDelete("product", `${t(`livestock.products.${p.type}`)} · ${formatProductAmount(p.type, p.quantity, f, t)} · ${f.formatDate(p.date)}`))) return false;
     s.deleteProduct(p.id);
     const { id: _id, ...rest } = p;
     toast(t("livestock.productDeleted"), "success", { action: { label: t("common.undo"), onClick: () => s.addProduct(rest) } });
     return true;
-  }, [ask, s, t, toast]);
-  const deleteFeed = useCallback(async (f: FeedEntry) => {
-    if (!(await ask())) return false;
-    s.deleteFeedEntry(f.id);
-    const { id: _id, ...rest } = f;
+  }, [confirmDelete, f, s, t, toast]);
+  const deleteFeed = useCallback(async (fe: FeedEntry) => {
+    if (!(await confirmDelete("feed", `${fe.feedType} · ${f.formatDate(fe.date)}`))) return false;
+    s.deleteFeedEntry(fe.id);
+    const { id: _id, ...rest } = fe;
     toast(t("livestock.feedDeleted"), "success", { action: { label: t("common.undo"), onClick: () => s.addFeedEntry(rest) } });
     return true;
-  }, [ask, s, t, toast]);
+  }, [confirmDelete, f, s, t, toast]);
   const deleteHealth = useCallback(async (h: HealthEvent) => {
-    if (!(await ask())) return false;
+    if (!(await confirmDelete("health", [h.description.trim() || t(`livestock.healthTypes.${h.type}`), f.formatDate(h.date)].join(" · ")))) return false;
     s.deleteHealthEvent(h.id);
     const { id: _id, ...rest } = h;
     toast(t("livestock.healthDeleted"), "success", { action: { label: t("common.undo"), onClick: () => s.addHealthEvent(rest) } });
     return true;
-  }, [ask, s, t, toast]);
+  }, [confirmDelete, f, s, t, toast]);
   return { deleteProduct, deleteFeed, deleteHealth };
 }
 
@@ -377,7 +377,8 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
 
 export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boolean; onClose: () => void; animal?: Animal; onDeleted?: () => void }) {
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const s = useStore(useShallow((st) => ({
     addAnimal: st.addAnimal, updateAnimal: st.updateAnimal, deleteAnimal: st.deleteAnimal, restoreAnimal: st.restoreAnimal,
   })));
@@ -420,7 +421,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
 
   const remove = async () => {
     if (!animal) return;
-    if (!(await confirm(t("livestock.confirmDeleteAnimal"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("animal", animalLabel(animal, t), t("livestock.confirmDeleteAnimal")))) return;
     const st = useStore.getState();
     const snapshot = {
       animal,

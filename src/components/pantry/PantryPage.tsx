@@ -9,7 +9,7 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { toDate, toISODate, todayISO } from "@/lib/format";
 import type { PreservationMethod } from "@/types/plant";
 import type { PantryItem, PantryUnit } from "@/types/pantry";
@@ -18,7 +18,7 @@ import { resolvePantryUnit } from "@/lib/pantryUnits";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
+import { Modal, focusFirstInvalid } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -28,10 +28,10 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures } from "@/components/ui/charts";
 import { Tabs } from "@/components/ui/Tabs";
 import { LABEL_CLASS } from "@/components/ui/Field";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
@@ -121,7 +121,8 @@ function MethodPicker({ label, value, options, onChange }: { label: string; valu
 export function PantryPage() {
   const now = useToday();
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate, formatWeight, formatNumber, formatCurrency, formatPercent, locale } = useFormat();
   const { pantryItems, addPantryItem, updatePantryItem, deletePantryItem, consumePantryItem } = useStore(
     useShallow((s) => ({
@@ -162,7 +163,7 @@ export function PantryPage() {
     setDialogOpen(true);
   }, [plantMap, methodsFor]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const local = (n: number) => n.toLocaleString(locale, { useGrouping: false, maximumFractionDigits: 2 });
@@ -191,7 +192,7 @@ export function PantryPage() {
 
   const handleSave = () => {
     setSubmitted(true);
-    if (!draft.plantId || !(quantityNum > 0) || errors.units || errors.cost) return;
+    if (!draft.plantId || !(quantityNum > 0) || errors.units || errors.cost) { focusFirstInvalid(); return; }
     const fields = {
       plantId: draft.plantId, method: draft.method, quantityKg: quantityNum,
       units: unitsNum || undefined,
@@ -218,7 +219,8 @@ export function PantryPage() {
   };
 
   const handleDelete = async (item: PantryItem) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [item.label?.trim() || getPlantName(item.plantId), item.units ? unitText(item.units, item) : formatWeight(item.quantityKg * 1000)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("pantry", what))) return;
     deletePantryItem(item.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = item;
@@ -289,12 +291,15 @@ export function PantryPage() {
           </Card>
         ) : (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <StatCard label={t("pantry.totalStored")} value={formatWeight(stats.kg * 1000)} icon={Archive} />
-              <StatCard label={t("pantry.totalUnits")} value={formatNumber(stats.units)} icon={Package} tone="neutral" />
-              <StatCard label={t("pantry.expiringSoon")} value={formatNumber(stats.soon)} icon={AlertTriangle} tone={stats.soon ? "warning" : "neutral"} hint={t("pantry.withinDays", { count: SOON_DAYS })} />
-              <StatCard label={t("pantry.expired")} value={formatNumber(stats.expired)} icon={AlertTriangle} tone={stats.expired ? "danger" : "neutral"} />
-            </div>
+            <KeyFigures
+              hero={{ label: t("pantry.totalStored"), value: formatWeight(stats.kg * 1000), icon: Archive, tone: "brand" }}
+              // Only figures that say something: no "Abgelaufen 0".
+              items={[
+                ...(stats.units > 0 ? [{ label: t("pantry.totalUnits"), value: formatNumber(stats.units) }] : []),
+                ...(stats.soon > 0 ? [{ label: t("pantry.expiringSoon"), value: formatNumber(stats.soon), hint: t("pantry.withinDays", { count: SOON_DAYS }) }] : []),
+                ...(stats.expired > 0 ? [{ label: t("pantry.expired"), value: formatNumber(stats.expired) }] : []),
+              ]}
+            />
 
             {stats.expired > 0 && (
               <div role="status" className="flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-gray-800 dark:text-gray-200">
@@ -483,6 +488,7 @@ export function PantryPage() {
               plants={preservable}
               value={draft.plantId}
               autoFocus={!draft.plantId}
+              invalid={Boolean(errors.plant)}
               onChange={({ plantId }) => {
                 const ms = methodsFor(plantId);
                 patch({ plantId, method: ms.includes(draft.method) ? draft.method : ms[0] });

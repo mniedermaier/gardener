@@ -46,7 +46,7 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
       <div className="flex items-start gap-3">
         <EnvironmentChip type={envType} />
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
             <button
               type="button"
               onClick={() => onOpen(bed.id)}
@@ -54,7 +54,7 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
             >
               {bed.name}
             </button>
-          </h3>
+          </h2>
           <p className="truncate text-xs text-gray-500 dark:text-gray-400">
             {[size, t(`planner.environmentTypes.${envType}`), t("season.plants", { count: bed.cells.length })].join(" · ")}
           </p>

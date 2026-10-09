@@ -1,18 +1,18 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlaskConical, Package, Pencil, Plus, ShoppingCart, Sprout, Trash2, Wallet } from "lucide-react";
+import { FlaskConical, Package, Pencil, Plus, ShoppingCart, Sprout, Trash2 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { needsNewStock, propagation, seedViability, type Viability } from "@/lib/seedViability";
 import type { SeedItem, SeedSource, SeedUnit } from "@/types/seed";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
+import { Modal, focusFirstInvalid } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -21,9 +21,9 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures } from "@/components/ui/charts";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
 
@@ -53,7 +53,8 @@ const num = (s: string) => Number(s.trim().replace(",", "."));
 
 export function SeedInventory() {
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatCurrency, formatNumber, locale } = useFormat();
   const { seeds, gardens, addSeed, updateSeed, deleteSeed } = useStore(
     useShallow((s) => ({ seeds: s.seeds, gardens: s.gardens, addSeed: s.addSeed, updateSeed: s.updateSeed, deleteSeed: s.deleteSeed })),
@@ -77,7 +78,7 @@ export function SeedInventory() {
     setDialogOpen(true);
   }, [plantMap]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const openEdit = (s: SeedItem) => {
@@ -123,7 +124,7 @@ export function SeedInventory() {
 
   const handleSave = () => {
     setSubmitted(true);
-    if (!draft.plantId || errors.quantity || errors.year || errors.cost) return;
+    if (!draft.plantId || errors.quantity || errors.year || errors.cost) { focusFirstInvalid(); return; }
     const fields = {
       plantId: draft.plantId,
       variety: draft.variety.trim() || undefined,
@@ -146,7 +147,8 @@ export function SeedInventory() {
   };
 
   const handleDelete = async (seed: SeedItem) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [getPlantName(seed.plantId), seed.variety?.trim(), String(seed.yearAcquired)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("seed", what))) return;
     deleteSeed(seed.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = seed;
@@ -185,12 +187,19 @@ export function SeedInventory() {
       />
 
       {seeds.length > 0 && (
-        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label={t("seeds.items")} value={formatNumber(seeds.length)} icon={Package} />
-          <StatCard label={t("seeds.testRecommended")} value={formatNumber(testCount)} icon={FlaskConical} tone={testCount ? "warning" : "neutral"} hint={t("seeds.testHintShort")} />
-          <StatCard label={t("seeds.missingStat")} value={formatNumber(missing.length)} icon={ShoppingCart} tone="info" hint={t("seeds.missingStatHint")} />
-          <StatCard label={t("seeds.totalCost")} value={formatCurrency(totalCost)} icon={Wallet} tone="neutral" />
-        </div>
+        <KeyFigures
+          className="mb-6"
+          // The shopping gap is what the page is about; with nothing missing
+          // the stock itself leads. Zero counts are left out.
+          hero={missing.length > 0
+            ? { label: t("seeds.missingStat"), value: formatNumber(missing.length), hint: t("seeds.missingStatHint"), icon: ShoppingCart, tone: "info" }
+            : { label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand" }}
+          items={[
+            ...(missing.length > 0 ? [{ label: t("seeds.items"), value: formatNumber(seeds.length) }] : []),
+            ...(testCount > 0 ? [{ label: t("seeds.testRecommended"), value: formatNumber(testCount), hint: t("seeds.testHintShort") }] : []),
+            ...(totalCost > 0 ? [{ label: t("seeds.totalCost"), value: formatCurrency(totalCost) }] : []),
+          ]}
+        />
       )}
 
       {missing.length > 0 && (
@@ -212,6 +221,7 @@ export function SeedInventory() {
                   <PlantIconDisplay plantId={id} emoji={plant.icon} size={22} />
                   {getPlantName(id)}
                   {vegetative && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">· {t("seeds.plantingStock")}</span>}
+                  {id === "onion" && <span className="text-xs font-normal text-gray-500 dark:text-gray-400">· {t("seeds.orOnionSets")}</span>}
                   <Plus size={14} aria-hidden="true" className="text-gray-500" />
                 </button>
               );
@@ -315,6 +325,7 @@ export function SeedInventory() {
               plants={plants}
               value={draft.plantId}
               autoFocus={!draft.plantId}
+              invalid={Boolean(errors.plant)}
               onChange={({ plantId }) => patch({ plantId, ...(propagation(plantMap.get(plantId)) === "vegetative" && draft.unit !== "grams" ? { unit: "grams" as const } : {}) })}
               hint={draftVegetative ? t("seeds.vegetativeHint", { name: getPlantName(draft.plantId) }) : undefined}
             />

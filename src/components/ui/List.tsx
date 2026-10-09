@@ -7,6 +7,8 @@ interface ListProps {
   header?: ReactNode;
   /** Accessible name when there is no visible header. */
   label?: string;
+  /** Level of the header heading. 3 (default) inside a titled card or section, 2 directly under the page h1. */
+  headingLevel?: 2 | 3;
   className?: string;
 }
 
@@ -14,13 +16,14 @@ interface ListProps {
  * One card holding rows separated by hairlines — instead of a card per row.
  * No overflow-hidden on purpose: row menus must be able to overflow the card.
  */
-export function List({ children, header, label, className = "" }: ListProps) {
+export function List({ children, header, label, headingLevel = 3, className = "" }: ListProps) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <section className={`rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900 ${className}`} aria-label={header ? undefined : label}>
       {header && (
-        <h3 className="sticky top-0 z-10 rounded-t-xl border-b border-gray-200 bg-gray-50/95 px-4 py-2 text-xs font-semibold text-gray-600 backdrop-blur dark:border-white/10 dark:bg-gray-900/95 dark:text-gray-400">
+        <Heading className="sticky top-0 z-10 rounded-t-xl border-b border-gray-200 bg-gray-50/95 px-4 py-2 text-xs font-semibold text-gray-600 backdrop-blur dark:border-white/10 dark:bg-gray-900/95 dark:text-gray-400">
           {header}
-        </h3>
+        </Heading>
       )}
       <ul className="divide-y divide-gray-100 dark:divide-white/5">{children}</ul>
     </section>

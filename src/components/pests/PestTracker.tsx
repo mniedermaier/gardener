@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO } from "@/lib/format";
 import type { PestEntry } from "@/types/pest";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
@@ -27,7 +27,7 @@ import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Tone } from "@/components/ui/tone";
 
 type Severity = PestEntry["severity"];
@@ -53,7 +53,8 @@ const emptyDraft = (plantId: string): Draft => ({
 
 export function PestTracker() {
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate } = useFormat();
   const { pests, addPest, updatePest, deletePest } = useStore(
     useShallow((s) => ({ pests: s.pests, addPest: s.addPest, updatePest: s.updatePest, deletePest: s.deletePest }))
@@ -85,7 +86,7 @@ export function PestTracker() {
     setDialogOpen(true);
   }, [beds]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const openEdit = (pest: PestEntry) => {
@@ -124,7 +125,8 @@ export function PestTracker() {
   };
 
   const handleDelete = async (pest: PestEntry) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [pest.name, pest.plantId ? getPlantName(pest.plantId) : null, formatDate(pest.date)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("pest", what))) return;
     deletePest(pest.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = pest;

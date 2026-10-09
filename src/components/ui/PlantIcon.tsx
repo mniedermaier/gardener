@@ -410,6 +410,17 @@ const PLANT_SVGS: Record<string, string> = {
     <path d="M6 11Q9 8 12 8T18 11" stroke="#84cc16" stroke-width="0.5" fill="none" opacity="0.5"/>
     <path d="M7 13Q10 10 12 10T17 13" stroke="#84cc16" stroke-width="0.4" fill="none" opacity="0.4"/>
     <path d="M8 9Q10 6 12 6T16 9" stroke="#84cc16" stroke-width="0.4" fill="none" opacity="0.4"/>`,
+
+  // Feldsalat: a low rosette of spoon-shaped leaves.
+  lambs_lettuce: `
+    <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#3f6212" transform="rotate(-150 12 14)"/>
+    <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#3f6212" transform="rotate(150 12 14)"/>
+    <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#4d7c0f" transform="rotate(-80 12 14)"/>
+    <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#4d7c0f" transform="rotate(80 12 14)"/>
+    <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#65a30d" transform="rotate(-28 12 14)"/>
+    <ellipse cx="12" cy="8" rx="3" ry="5.5" fill="#65a30d" transform="rotate(28 12 14)"/>
+    <path d="M12 14L9.2 8.8M12 14L14.8 8.8M12 14L6.6 13M12 14L17.4 13" stroke="#365314" stroke-width="0.5" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="12" cy="14" r="1.6" fill="#84cc16"/>`,
 };
 
 import { memo, useId, useMemo } from "react";

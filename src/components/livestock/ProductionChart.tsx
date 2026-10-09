@@ -39,13 +39,17 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
     return { buckets, perType };
   }, [now, animalProducts, months]);
 
-  const types = PRODUCT_TYPES.filter((ty) => perType.get(ty)?.some((v) => v > 0));
-  if (types.length === 0) {
+  const present = PRODUCT_TYPES.filter((ty) => perType.get(ty)?.some((v) => v > 0));
+  if (present.length === 0) {
     return <p className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.noChartData")}</p>;
   }
+  // A chart needs a course: products harvested in one or two months only (honey, wax) are listed instead.
+  const types = present.filter((ty) => perType.get(ty)!.filter((v) => v > 0).length >= 3);
+  const sparse = present.filter((ty) => !types.includes(ty));
 
   return (
-    <div className={`grid gap-6 ${types.length > 1 ? "lg:grid-cols-2" : ""}`}>
+    <div className="space-y-6">
+    {types.length > 0 && <div className={`grid gap-6 ${types.length > 1 ? "lg:grid-cols-2" : ""}`}>
       {types.map((type) => {
         const values = perType.get(type)!;
         const Icon = PRODUCT_ICON[type];
@@ -78,6 +82,29 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
           </div>
         );
       })}
+    </div>}
+    {sparse.length > 0 && (
+      <div>
+        <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("livestock.singleHarvests", { months })}</h3>
+        <ul className="divide-y divide-gray-100 text-sm dark:divide-white/5">
+          {sparse.map((type) => {
+            const Icon = PRODUCT_ICON[type];
+            const values = perType.get(type)!;
+            const entries = buckets
+              .map((b, i) => ({ b, v: values[i] }))
+              .filter((x) => x.v > 0)
+              .map((x) => `${formatProductAmount(type, x.v, f, t)} (${f.formatDate(x.b.date, "monthYear")})`);
+            return (
+              <li key={type} className="flex items-center gap-2 py-2">
+                <Icon size={16} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t(`livestock.products.${type}`)}</span>
+                <span className="text-gray-600 tabular-nums dark:text-gray-300">{entries.join(", ")}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    )}
     </div>
   );
 }

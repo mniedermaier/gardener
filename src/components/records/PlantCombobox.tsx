@@ -34,6 +34,8 @@ interface PlantComboboxProps {
   optional?: boolean;
   hint?: string;
   autoFocus?: boolean;
+  /** Marks the field invalid (aria-invalid) so a failed save can focus it. */
+  invalid?: boolean;
 }
 
 /**
@@ -42,7 +44,7 @@ interface PlantComboboxProps {
  * bed in one go. Typing filters by plant or bed name. WAI-ARIA combobox with
  * an inline listbox (no popover clipping inside dialogs and bottom sheets).
  */
-export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange, optional, hint, autoFocus }: PlantComboboxProps) {
+export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange, optional, hint, autoFocus, invalid }: PlantComboboxProps) {
   const { t } = useTranslation();
   const getPlantName = usePlantName();
   const id = useId();
@@ -135,6 +137,7 @@ export function PlantCombobox({ label, plants, beds = [], value, bedId, onChange
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={activeId}
+          aria-invalid={invalid || undefined}
           aria-describedby={hint ? `${id}-hint` : undefined}
           autoComplete="off"
           autoFocus={autoFocus}

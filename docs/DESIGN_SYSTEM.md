@@ -73,7 +73,7 @@ When you migrate a page, **lower the baseline numbers** in that file.
 | `gray-50…950` | **Overridden**: warm stone neutrals with a slight moss tint at the dark end. Keep using `gray-*`. |
 | `garden-50…950` | Brand, deep sage/forest green. `garden-600` (#2f6b3a) = primary button, focus ring. Dark text: `garden-300/400`. |
 | `earth-50…700` | Warm accent (sparingly: illustrations, soil). |
-| `water-100…600` | Muted steel blue for water amounts (the `sky` chart series) and greenhouse glass on the garden map. Never a status colour. |
+| `water-100…600` | Muted steel blue for water amounts (the `sky` chart series; its pale, dotted sibling `rain` for rain) and greenhouse glass on the garden map. Never a status colour. |
 | `positive` `warning` `danger` `info` | Semantic tones. **One variable each, swapped automatically in `.dark`**. So `bg-danger/10 text-danger` works in both themes without a `dark:` class. |
 | `focus` | Focus ring colour (`outline-focus`). |
 | `shadow-xs` | Default for surfaces. Use `shadow-lg` only for floating things (menus, toasts). |
@@ -304,7 +304,7 @@ theme-aware, use tabular figures and ship a text alternative.
 | `MonthStrip` | 12-month heatmap (one hue, 5 steps) with the value printed in each cell; outlines the current month. |
 | `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are `earth`; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. |
 | `Sparkline` | Tiny trend line for stat tiles (`label` = summary for screen readers). |
-| `Legend`, `HatchPattern` | Swatches: solid = recorded, hatched = forecast, line = target. |
+| `Legend`, `HatchPattern`, `DotPattern` | Swatches: solid = recorded, hatched = forecast, dotted = a second measured series of the same family (rain beside watering, `rain` colour), line = target. |
 | `HowCalculated` | `<details>` "Wie berechnet?" under a metric. Every KPI that is computed gets one. |
 
 ```tsx

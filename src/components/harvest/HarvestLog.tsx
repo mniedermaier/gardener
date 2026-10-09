@@ -7,13 +7,13 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
+import { useOpenAddParamsOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO, toDate, toISODate } from "@/lib/format";
 import type { HarvestEntry } from "@/types/harvest";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
+import { Modal, focusFirstInvalid } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -21,12 +21,11 @@ import { Menu } from "@/components/ui/Menu";
 import { List, ListRow } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { StatCard } from "@/components/ui/StatCard";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { DateField } from "@/components/ui/DateField";
 import { PlantCombobox } from "@/components/records/PlantCombobox";
-import { BarChart } from "@/components/ui/charts";
+import { BarChart, KeyFigures } from "@/components/ui/charts";
 import { QualityInput, QualityStars, type Quality } from "@/components/records/Quality";
 import { useBeds } from "@/components/records/useBeds";
 import { useAddFromUrl, type AddParams } from "@/components/records/useAddFromUrl";
@@ -72,7 +71,8 @@ function parseAmount(text: string): number {
 export function HarvestLog() {
   const now = useToday();
   const { t } = useTranslation();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { formatDate, formatWeight, formatNumber, locale } = useFormat();
   const { harvests, addHarvest, updateHarvest, deleteHarvest } = useStore(
     useShallow((s) => ({ harvests: s.harvests, addHarvest: s.addHarvest, updateHarvest: s.updateHarvest, deleteHarvest: s.deleteHarvest })),
@@ -114,7 +114,7 @@ export function HarvestLog() {
     setDialogOpen(true);
   }, [plantMap, beds, defaultUnit]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
-  useOpenAddOnNavigate(openAddPlain);
+  useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);
 
   const openEdit = (h: HarvestEntry) => {
@@ -141,7 +141,7 @@ export function HarvestLog() {
 
   const handleSave = () => {
     setSubmitted(true);
-    if (!draft.plantId || Number.isNaN(grams) || grams < 0 || (!grams && !countNum)) return;
+    if (!draft.plantId || Number.isNaN(grams) || grams < 0 || (!grams && !countNum)) { focusFirstInvalid(); return; }
     const fields = {
       plantId: draft.plantId,
       bedId: draft.bedId,
@@ -170,7 +170,8 @@ export function HarvestLog() {
   };
 
   const handleDelete = async (h: HarvestEntry) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    const what = [getPlantName(h.plantId), amountText(h.weightGrams, h.count), formatDate(h.date)].filter(Boolean).join(" · ");
+    if (!(await confirmDelete("harvest", what))) return;
     deleteHarvest(h.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = h;
@@ -254,23 +255,28 @@ export function HarvestLog() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("harvest.totalWeight")} value={formatWeight(stats.total)} hint={t("harvest.harvestsCount", { count: harvests.length })} icon={Apple} />
-            <StatCard label={t("harvest.last30")} value={formatWeight(stats.last30)} />
-            <StatCard
-              label={t("harvest.avgQuality")}
-              value={formatNumber(stats.avgQuality)}
-              unit={t("harvest.outOfFive")}
-              hint={<QualityStars value={Math.round(stats.avgQuality)} />}
-            />
-            {top && (
-              <StatCard
-                label={t("harvest.topCrop")}
-                value={<span className="block truncate">{getPlantName(top[0])}</span>}
-                hint={top[1].grams ? formatWeight(top[1].grams) : t("harvest.pieces", { count: top[1].count })}
-              />
-            )}
-          </div>
+          <KeyFigures
+            hero={{
+              label: t("harvest.totalWeight"),
+              value: formatWeight(stats.total),
+              hint: t("harvest.harvestsCount", { count: harvests.length }),
+              icon: Apple,
+              tone: "brand",
+            }}
+            items={[
+              { label: t("harvest.last30"), value: formatWeight(stats.last30) },
+              {
+                label: t("harvest.avgQuality"),
+                value: <>{formatNumber(stats.avgQuality)} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{t("harvest.outOfFive")}</span></>,
+                hint: <QualityStars value={Math.round(stats.avgQuality)} />,
+              },
+              ...(top ? [{
+                label: t("harvest.topCrop"),
+                value: <span className="block truncate">{getPlantName(top[0])}</span>,
+                hint: top[1].grams ? formatWeight(top[1].grams) : t("harvest.pieces", { count: top[1].count }),
+              }] : []),
+            ]}
+          />
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card className="min-w-0">
@@ -400,6 +406,7 @@ export function HarvestLog() {
               value={draft.plantId}
               bedId={draft.bedId}
               autoFocus={!draft.plantId}
+              invalid={Boolean(plantError)}
               onChange={({ plantId, bedId }) => {
                 const hosts = beds.beds.filter((b) => b.plantIds.has(plantId));
                 patch({

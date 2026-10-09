@@ -58,6 +58,7 @@ export const plantFamilyMap: Record<string, PlantFamily> = {
   arugula: "brassicaceae",
   squash: "cucurbitaceae",
   asparagus: "other",
+  lambs_lettuce: "other", // Feldsalat: Geißblattgewächse (früher Baldriangewächse), fruchtfolgeneutral
   pak_choi: "brassicaceae",
   endive: "asteraceae",
 };

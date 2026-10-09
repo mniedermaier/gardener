@@ -25,13 +25,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { List, ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Bed, CellPlanting, Garden } from "@/types/garden";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import { generateShareUrl } from "@/lib/sharing";
 import { toISODate } from "@/lib/format";
-import { getPlantableNow } from "@/lib/advisor";
+import { getGardenSowingAgenda, getPlantableNow } from "@/lib/advisor";
+import { usePointerFine } from "./usePointerFine";
 import { validatePlacement, analyzeNeighbours, getCellConflicts, getPlacementHints } from "@/lib/placementValidation";
 import { recommendBedPlanting, getRecommendedPlants, type PlantingStrategy, type PlantingDirection } from "@/lib/bedRecommendation";
 import { CropRotation } from "./CropRotation";
@@ -60,6 +61,7 @@ function fitZoom(bed: Bed): number {
 
 export function GardenPlanner() {
   const { t } = useTranslation();
+  const pointerFine = usePointerFine();
   const { formatDate } = useFormat();
   const location = useLocation();
   const navigate = useNavigate();
@@ -79,6 +81,7 @@ export function GardenPlanner() {
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const { toast, confirm } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { pushUndo, undo, canUndo } = useUndo();
 
   // Fall back to the first garden: a stale selection must not hide the beds.
@@ -100,7 +103,8 @@ export function GardenPlanner() {
     const id = (location.state as { placePlantId?: string } | null)?.placePlantId;
     return (id && plantMap.get(id)) || null;
   });
-  const singleBed = (activeGarden?.beds.length ?? 0) === 1;
+  // One bed, or a deep link into a bed (?bed=… from "Jetzt säen"): place right away; else pick the bed first.
+  const singleBed = (activeGarden?.beds.length ?? 0) === 1 || !!openBed;
   const [placingPlant, setPlacingPlant] = useState<Plant | null>(singleBed ? initialPlant : null);
   const [pathMode, setPathMode] = useState(false);
   const [inspectKey, setInspectKey] = useState<string | null>(null);
@@ -208,9 +212,15 @@ export function GardenPlanner() {
     () => (openBed && placingPlant ? getPlacementHints(placingPlant.id, openBed, plantMap) : undefined),
     [openBed, placingPlant, plantMap],
   );
+  // In a bed: that bed's type and protection. On the overview: the union of all beds of the
+  // garden (the same agenda as "Heute" and the calendar), so it never says less than a bed would.
   const plantableNow = useMemo(
-    () => getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks, environmentType: openBed?.environmentType }),
-    [plants, lastFrostDate, frostWeeks, openBed?.environmentType],
+    () => openBed
+      ? getPlantableNow(plants, lastFrostDate, { frostProtectionWeeks: frostWeeks, environmentType: openBed.environmentType })
+      : getGardenSowingAgenda(plants, lastFrostDate, (activeGarden?.beds ?? []).map((b) => ({
+          id: b.id, name: b.name, environmentType: b.environmentType ?? "outdoor_bed", frostProtectionWeeks: getFrostProtectionWeeks(b),
+        }))).now.filter((r) => r.action !== "sow_indoors"),
+    [plants, lastFrostDate, frostWeeks, openBed, activeGarden?.beds],
   );
   const bedFitIds = useMemo(
     () => (openBed ? getRecommendedPlants(openBed, plants, { gridCellSizeCm, lastFrostDate }).map((r) => r.plant.id) : []),
@@ -483,7 +493,7 @@ export function GardenPlanner() {
   const handleDeleteGarden = async () => {
     const garden = activeGarden;
     if (!garden) return;
-    if (!(await confirm(t("planner.confirmDeleteGarden"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("garden", garden.name, t("planner.confirmDeleteGarden")))) return;
     const index = gardens.findIndex((g) => g.id === garden.id);
     deleteGarden(garden.id);
     closeBed();
@@ -613,7 +623,7 @@ export function GardenPlanner() {
         {variant === "desktop" && (
           <div className="mb-3">
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("planner.paletteTitle")}</h2>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t("planner.dragPlant")}</p>
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{pointerFine ? t("planner.dragPlantClick") : t("planner.dragPlant")}</p>
           </div>
         )}
         <PlantPalette
@@ -780,7 +790,7 @@ export function GardenPlanner() {
                 <EmptyState
                   icon={Fence}
                   title={t("planner.emptyBedsTitle")}
-                  description={t("planner.emptyBedsText")}
+                  description={pointerFine ? t("planner.emptyBedsTextClick") : t("planner.emptyBedsText")}
                   action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.newBed")}</Button>}
                 />
               </Card>

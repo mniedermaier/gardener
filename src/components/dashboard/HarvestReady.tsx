@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Apple, LayoutGrid, Plus } from "lucide-react";
@@ -12,11 +12,14 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
 
+const LIMIT = 5;
+
 export const HarvestReady = memo(function HarvestReady({ items }: { items: HarvestReadyItem[] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
+  const [expanded, setExpanded] = useState(false);
 
   if (items.length === 0) {
     return (
@@ -35,9 +38,13 @@ export const HarvestReady = memo(function HarvestReady({ items }: { items: Harve
     );
   }
 
+  // Five rows, then "6 weitere anzeigen": the tab count always matches what can be reached.
+  const shown = expanded || items.length <= LIMIT + 1 ? items : items.slice(0, LIMIT);
+  const hidden = items.length - shown.length;
+
   return (
     <ul className="divide-y divide-gray-100 dark:divide-white/5">
-      {items.slice(0, 6).map((r) => {
+      {shown.map((r) => {
         const plant = plantMap.get(r.plantId);
         return (
           <ListRow
@@ -62,6 +69,17 @@ export const HarvestReady = memo(function HarvestReady({ items }: { items: Harve
           />
         );
       })}
+      {hidden > 0 && (
+        <li>
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="flex min-h-11 w-full items-center px-4 text-left text-sm font-medium text-garden-700 hover:underline dark:text-garden-300"
+          >
+            {t("advisor.showMore", { count: hidden })}
+          </button>
+        </li>
+      )}
     </ul>
   );
 });

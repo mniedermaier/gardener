@@ -71,6 +71,52 @@ export interface FetchWeatherOptions {
   fetchImpl?: typeof fetch;
 }
 
+// ------------------------------------------------------------------ key status
+
+/**
+ * What the last request with an OpenWeatherMap key found out: "ok", "auth"
+ * (key rejected, Open-Meteo used instead) or "unavailable" (OWM down, Open-Meteo
+ * used). Kept per key for the session so Settings can name the provider that
+ * actually delivers the weather.
+ */
+export type OwmKeyStatus = "ok" | "auth" | "unavailable";
+
+const OWM_STATUS_KEY = "gardener-owm-status";
+const owmListeners = new Set<() => void>();
+
+function readOwmStatus(): Record<string, OwmKeyStatus> {
+  try {
+    return JSON.parse(sessionStorage.getItem(OWM_STATUS_KEY) ?? "{}") as Record<string, OwmKeyStatus>;
+  } catch {
+    return {};
+  }
+}
+
+function setOwmKeyStatus(apiKey: string | null | undefined, status: OwmKeyStatus): void {
+  const key = apiKey?.trim();
+  if (!key) return;
+  const all = readOwmStatus();
+  if (all[key] === status) return;
+  try {
+    sessionStorage.setItem(OWM_STATUS_KEY, JSON.stringify({ ...all, [key]: status }));
+  } catch {
+    // Session storage blocked: the status is just not remembered.
+  }
+  owmListeners.forEach((l) => l());
+}
+
+/** Status of the given key, undefined while no request has used it yet. */
+export function getOwmKeyStatus(apiKey: string | null | undefined): OwmKeyStatus | undefined {
+  const key = apiKey?.trim();
+  return key ? readOwmStatus()[key] : undefined;
+}
+
+/** For useSyncExternalStore: notifies when a key status changes. */
+export function subscribeOwmKeyStatus(listener: () => void): () => void {
+  owmListeners.add(listener);
+  return () => owmListeners.delete(listener);
+}
+
 /**
  * Fetches from the configured provider. A failing OpenWeatherMap (rejected
  * key, outage) never leaves the user without weather: the call falls back to
@@ -80,12 +126,17 @@ export interface FetchWeatherOptions {
 export async function fetchWeather(opts: FetchWeatherOptions): Promise<WeatherResult> {
   if (getWeatherProvider(opts.apiKey) !== "openweathermap") return fetchOpenMeteo(opts);
   try {
-    return await fetchOpenWeatherMap(opts);
+    const result = await fetchOpenWeatherMap(opts);
+    setOwmKeyStatus(opts.apiKey, "ok");
+    return result;
   } catch (e) {
     if ((e as Error).name === "AbortError") throw e;
+    if (e instanceof WeatherAuthError) setOwmKeyStatus(opts.apiKey, "auth");
     try {
       const result = await fetchOpenMeteo(opts);
-      return { ...result, fallback: e instanceof WeatherAuthError ? "auth" : "unavailable" };
+      const fallback = e instanceof WeatherAuthError ? "auth" : "unavailable";
+      setOwmKeyStatus(opts.apiKey, fallback);
+      return { ...result, fallback };
     } catch (e2) {
       if ((e2 as Error).name === "AbortError") throw e2;
       throw e;

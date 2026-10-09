@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
-import type { PlantableNow, PlantableSoon } from "@/lib/advisor";
+import type { AgendaBed, PlantableNow, PlantableSoon } from "@/lib/advisor";
 import { ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { PhaseBadge, actionPhase } from "@/components/ui/phase";
@@ -23,6 +23,9 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [expanded, setExpanded] = useState(false);
+  /** "Hochbeet Süd", "Hochbeet Süd, Gewächshaus", "3 Beete". */
+  const bedLabel = (beds?: AgendaBed[]) =>
+    !beds || beds.length === 0 ? null : beds.length <= 2 ? beds.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: beds.length });
 
   const items: Item[] = [...now.map((item) => ({ kind: "now" as const, item })), ...soon.map((item) => ({ kind: "soon" as const, item }))];
   const shown = expanded ? items : items.slice(0, limit);
@@ -40,8 +43,16 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
             leading={<PlantIconDisplay plantId={plant.id} emoji={plant.icon} size={28} />}
             title={getPlantName(item.plantId)}
             badges={<PhaseBadge phase={actionPhase(item.action)} label={t(`advisor.actions.${item.action}`)} />}
-            meta={kind === "now" ? t("calendar.until", { date: formatDate(date, "short") }) : t("calendar.from", { date: formatDate(date, "short") })}
-            onClick={() => navigate(`/plants?plant=${encodeURIComponent(plant.id)}`)}
+            meta={[
+              kind === "now" ? t("calendar.until", { date: formatDate(date, "short") }) : t("calendar.from", { date: formatDate(date, "short") }),
+              bedLabel(item.beds),
+            ].filter(Boolean).join(" · ")}
+            onClick={() => {
+              // With beds: straight to placing it (one bed: that bed; several: pick one). Indoors: the plant.
+              const beds = item.beds ?? [];
+              if (beds.length === 0) navigate(`/plants?plant=${encodeURIComponent(plant.id)}`);
+              else navigate(beds.length === 1 ? `/planner?bed=${encodeURIComponent(beds[0].id)}` : "/planner", { state: { placePlantId: plant.id } });
+            }}
           />
         );
       })}

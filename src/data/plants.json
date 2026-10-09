@@ -1636,5 +1636,37 @@
       "isolationDistanceM": 100,
       "seedViabilityYears": 5
     }
+  },
+  {
+    "id": "lambs_lettuce",
+    "category": "vegetable",
+    "sowIndoorsWeeks": null,
+    "sowOutdoorsWeeks": -6,
+    "transplantWeeks": null,
+    "harvestDaysMin": 60,
+    "harvestDaysMax": 90,
+    "spacingCm": 5,
+    "rowSpacingCm": 15,
+    "sunRequirement": "partial",
+    "waterNeed": "medium",
+    "companions": [
+      "onion",
+      "radish",
+      "strawberry"
+    ],
+    "antagonists": [],
+    "color": "#65a30d",
+    "icon": "🌱",
+    "caloriesPer100g": 21,
+    "proteinPer100g": 2,
+    "vitaminCPer100g": 38,
+    "fiberPer100g": 1.5,
+    "expectedYieldKgPerM2": 0.8,
+    "preservationMethods": [],
+    "seedSaving": {
+      "difficulty": "easy",
+      "isolationDistanceM": 50,
+      "seedViabilityYears": 4
+    }
   }
 ]

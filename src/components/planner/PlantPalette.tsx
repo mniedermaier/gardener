@@ -86,7 +86,11 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
   const recommended = useMemo(() => {
     if (plantableNow.length > 0) {
       return plantableNow
-        .map((r) => ({ plant: plantById.get(r.plantId), reason: t(`palette.reason.${r.action}`, { date: formatDate(r.until, "short") }) }))
+        .map((r) => ({
+          plant: plantById.get(r.plantId),
+          // Garden level: name the beds it suits ("Herbstsaat bis 17. Okt. · Hochbeet Süd").
+          reason: [t(`palette.reason.${r.action}`, { date: formatDate(r.until, "short") }), r.beds?.length ? r.beds.map((b) => b.name).join(", ") : null].filter(Boolean).join(" · "),
+        }))
         .filter((r): r is { plant: Plant; reason: string } => !!r.plant);
     }
     return bedFitIds

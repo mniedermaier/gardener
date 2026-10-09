@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { useFormat } from "@/hooks/useFormat";
 import type { GlanceState } from "@/hooks/useWeatherGlance";
 import { todayISO } from "@/lib/format";
-import { FrostTaskButton, useFrostSummary } from "@/components/weather/frost";
+import { FrostTaskButton, useFrostAffectedText, useFrostSummary } from "@/components/weather/frost";
 
 const ICONS: Record<string, LucideIcon> = {
   "01": Sun, "02": CloudSun, "03": Cloud, "04": Cloud, "09": CloudDrizzle, "10": CloudRain, "11": CloudLightning, "13": CloudSnow, "50": CloudFog,
@@ -43,6 +43,8 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
   const [today] = useState(todayISO);
   // Same summary as the weather page (lib/weatherAlerts summarizeFrost).
   const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
+  // Names the same crops and beds as the map pins and the weather page.
+  const affected = useFrostAffectedText(frost?.summary);
 
   const more = (
     <Link to="/weather" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
@@ -112,7 +114,7 @@ export const WeatherCard = memo(function WeatherCard({ glance }: { glance: Glanc
           <p className="flex items-start gap-2">
             <Snowflake size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
             <span>
-              <span className="font-medium">{frost.title}.</span> {t("dashboard.frostAdvice")}
+              <span className="font-medium">{frost.title}.</span> {affected}
             </span>
           </p>
           <FrostTaskButton summary={frost.summary} className="mt-2 ml-6 bg-white dark:bg-gray-900" />

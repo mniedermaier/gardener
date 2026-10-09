@@ -223,8 +223,9 @@
     "mapPin": {
       "harvest": "Ready to harvest",
       "task": "Task due",
-      "frost": "Frost expected"
-    }
+      "frost": "Frost for tender crops"
+    },
+    "mapFrostPlants": "Frost: {{plants}} at risk"
   },
   "search": {
     "placeholder": "Search plants, tasks, journal...",
@@ -293,7 +294,7 @@
     "variety": "Variety",
     "varietyPlaceholder": "e.g. San Marzano, Brandywine...",
     "plantedDate": "Planted date",
-    "confirmDeleteGarden": "Delete this garden with all its beds?",
+    "confirmDeleteGarden": "All beds in this garden are deleted with it. You can still undo this right afterwards.",
     "placeMode": "Placing {{plant}}: click cells to place, Esc to cancel",
     "share": "Share garden plan",
     "shareCopied": "Share link copied",
@@ -486,7 +487,11 @@
       "other": "Other"
     },
     "sheetMore": "Details, variety & notes",
-    "sheetLess": "Show less"
+    "sheetLess": "Show less",
+    "placingHintClick": "Click free cells. ✓ good neighbour, ⚠ unfavourable neighbour.",
+    "inspectHintClick": "Click a plant to inspect it. To plant, choose a plant first.",
+    "dragPlantClick": "Click a plant, then click cells in the bed – or drag it into the bed.",
+    "emptyBedsTextClick": "Set its size and type (open ground, raised bed, greenhouse …). Then place plants by clicking or dragging."
   },
   "plants": {
     "title": "Plants",
@@ -707,6 +712,10 @@
       "endive": {
         "name": "Endive",
         "description": "Slightly bitter salad green. Blanch hearts for milder flavor."
+      },
+      "lambs_lettuce": {
+        "name": "Lamb's lettuce",
+        "description": "Hardy winter salad. Sow from July to early October, harvest from autumn to spring."
       }
     },
     "customIcon": "Icon",
@@ -996,14 +1005,18 @@
       "desc": "This cannot be undone.",
       "action": "Delete all data",
       "actionDesc": "Removes gardens, harvests, animals and settings from this device. Download a backup first.",
-      "confirm": "Delete all data on this device? Without a backup it is gone for good."
+      "confirm": "Gardens, harvests, animals and settings are lost without a backup. This cannot be undone.",
+      "confirmTitle": "Delete all data on this device?"
     },
     "weatherReady": "Forecast for {{place}} is active",
     "weatherYourLocation": "your location",
     "weatherNeedsLocation": "Set a location above and Gardener loads the forecast",
     "weatherSource": "Weather data:",
     "weatherAdvanced": "Advanced: use your own OpenWeatherMap key",
-    "weatherProviderActive": "Active provider: {{provider}}. With a key Gardener uses OpenWeatherMap, without one Open-Meteo."
+    "weatherProviderActive": "Active provider: {{provider}}. With a key Gardener uses OpenWeatherMap, without one Open-Meteo.",
+    "weatherKeyRejected": "Key rejected – Open-Meteo is used instead. Check the OpenWeatherMap key or remove it.",
+    "weatherOwmUnavailable": "OpenWeatherMap is unreachable right now – Open-Meteo is used instead.",
+    "weatherKeyChecking": "Checking key …"
   },
   "dataManagement": {
     "title": "Data & backup",
@@ -1065,14 +1078,15 @@
     "frostGroupTitle_one": "Frost risk on {{count}} night, down to {{temp}} ({{day}})",
     "frostGroupTitle_other": "Frost risk on {{count}} nights, down to {{temp}} ({{day}})",
     "frostAffected_one": "Affected: {{plants}}. Cover with fleece or bring indoors.",
-    "frostAffected_other": "{{count}} crops affected, e.g. {{plants}}. Cover with fleece or bring indoors.",
+    "frostAffected_other": "{{count}} crops affected ({{beds}}), e.g. {{plants}}. Cover with fleece or bring indoors.",
     "frostAdvice": "Cover tender plants with fleece and hold off on transplanting.",
     "greenhouseFrostDesc": "Coldest day: {{date}}, {{outside}} outside. Even the unheated house will likely freeze (about {{temp}}). Cover tender plants with a double layer of fleece or heat frost-free. Assumption: about {{buffer}} warmer than outside.",
     "fleeceTask": "Add fleece task",
     "fleeceTaskTitle": "Cover with fleece",
     "fleeceTaskDesc": "Frost nights in the forecast: {{nights}}. Cover tender crops in the evening, uncover in the morning.",
     "fleeceTaskAdded": "Task “Cover with fleece” added for {{day}}",
-    "fleeceTaskPlanned": "Fleece task planned for {{day}}"
+    "fleeceTaskPlanned": "Fleece task planned for {{day}}",
+    "frostAffectedAll": "Affected: {{plants}}. Cover with fleece or bring indoors."
   },
   "harvest": {
     "title": "Harvest",
@@ -1525,7 +1539,11 @@
         "rabbit": "Rabbits: RHD and myxomatosis, every six to twelve months depending on the vaccine.",
         "ruminant": "Goats and sheep: clostridial vaccine, usually boosted yearly – check with your vet.",
         "other": "The interval depends on the vaccine – check with your vet."
-      }
+      },
+      "vaccCoverage": "Animal groups vaccinated",
+      "vaccCoverageValue": "{{covered}} of {{total}}",
+      "nextDue": "Next booster from {{date}}",
+      "dueNames": "Check vaccination: {{names}}"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1563,7 +1581,7 @@
     "backToHerd": "Back to herd",
     "herd": "Herd",
     "deleted": "{{name}} deleted",
-    "confirmDeleteAnimal": "Delete this animal with all its production, feed and health entries?",
+    "confirmDeleteAnimal": "All production, feed and health entries of this animal are deleted with it. You can still undo this right afterwards.",
     "animalType": "Animal type",
     "acquired": "Since",
     "sinceDate": "since {{date}}",
@@ -1662,7 +1680,8 @@
     "ofExpectedToDate": "of ~{{amount}} expected",
     "productThisYear": "{{product}} this year",
     "eggWeeksLabel": "Eggs per week over the last 8 weeks, avg. {{avg}}",
-    "eggWeeksAvg": "Avg. {{avg}} per week over the last 8 weeks"
+    "eggWeeksAvg": "Avg. {{avg}} per week over the last 8 weeks",
+    "singleHarvests": "Single harvests (last {{months}} months)"
   },
   "seeds": {
     "title": "Seeds",
@@ -1725,7 +1744,8 @@
     "cost": "Cost",
     "needPlant": "Choose a plant",
     "invalidNumber": "Enter a valid number",
-    "invalidYear": "Enter a year between 1950 and today"
+    "invalidYear": "Enter a year between 1950 and today",
+    "orOnionSets": "or onion sets"
   },
   "soil": {
     "title": "Soil",
@@ -1936,7 +1956,9 @@
       "sow_autumn": "Autumn sowing"
     },
     "showMore_one": "Show {{count}} more",
-    "showMore_other": "Show {{count}} more"
+    "showMore_other": "Show {{count}} more",
+    "bedCount_one": "{{count}} bed",
+    "bedCount_other": "{{count}} beds"
   },
   "expenses": {
     "title": "Costs",
@@ -2087,7 +2109,25 @@
     "favorite": "Favourite",
     "undo": "Undo",
     "moreActions": "More actions",
-    "all": "All"
+    "all": "All",
+    "confirmDeleteUndo": "You can still undo this right afterwards.",
+    "deleteNamed": {
+      "harvest": "Delete harvest “{{name}}”?",
+      "journal": "Delete entry “{{name}}”?",
+      "pest": "Delete record “{{name}}”?",
+      "seed": "Delete seeds “{{name}}”?",
+      "pantry": "Delete stock item “{{name}}”?",
+      "expense": "Delete expense “{{name}}”?",
+      "water": "Delete watering “{{name}}”?",
+      "task": "Delete task “{{name}}”?",
+      "soilTest": "Delete soil test “{{name}}”?",
+      "amendment": "Delete amendment “{{name}}”?",
+      "product": "Delete production entry “{{name}}”?",
+      "feed": "Delete feeding “{{name}}”?",
+      "health": "Delete health record “{{name}}”?",
+      "animal": "Delete animal “{{name}}”?",
+      "garden": "Delete garden “{{name}}”?"
+    }
   },
   "companions": {
     "title": "Companions",
@@ -2236,16 +2276,17 @@
     "howNeed": "Self-sufficiency = the share of your household's calorie need ({{kcal}} kcal per person per day) that garden and animals cover in a year (at most 100%).",
     "meterLegend": "Solid bar = recorded, hatched = forecast.",
     "pricesEditable": "You can adjust the price per egg, kg or litre on the Costs page.",
-    "expectedToDate": "expected by today: {{value}}",
-    "actualVsToDateShort": "recorded {{actual}} · expected by today {{expected}}",
+    "expectedToDate": "target to date: {{value}}",
+    "actualVsToDateShort": "recorded {{actual}} · target to date {{expected}}",
     "howCap": "Animal products count only up to typical consumption (per person and year about 240 eggs, 1 kg honey, 52 kg meat, 300 l milk). Honey is calorie-dense but not a staple: two colonies give about 40 kg, a household eats 1–2 kg of it. Anything above is surplus to swap or sell and does not feed you. Vegetables and fruit count in full.",
-    "howToDate": "Expected by today: the part of the annual forecast that should be in by now – each crop's harvest window from the last frost, honey May to August, eggs evenly over the year. If “recorded so far” is well below it, entries are usually missing.",
+    "howToDate": "Target to date: the part of the annual forecast that should be in by now – each crop's harvest window from the last frost, honey May to August, eggs evenly over the year. If “recorded so far” is well below it, entries are usually missing.",
     "howVsFoodPlan": "The food plan measures something else: kilograms against a quantity target for 20 vegetable and fruit crops, without animal products. Its “quantity target” therefore differs from this calorie figure.",
     "compositionTitle": "What the forecast is made of",
     "compositionDesc": "Share of the annual calorie need, by source.",
     "compositionLabel": "Garden {{garden}}, animal products {{animals}} of the annual need",
     "fromGarden": "Garden",
     "fromAnimals": "Animal products",
-    "surplusNote": "Not counted because above typical consumption: {{items}}."
+    "surplusNote": "Not counted because above typical consumption: {{items}}.",
+    "notCovered": "Not covered"
   }
 }

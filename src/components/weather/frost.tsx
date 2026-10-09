@@ -8,18 +8,23 @@ import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useToday } from "@/hooks/useToday";
 import { toDate, toISODate } from "@/lib/format";
-import { summarizeFrost, type FrostSummary } from "@/lib/weatherAlerts";
+import { usePlantMap } from "@/hooks/usePlants";
+import { usePlantName } from "@/hooks/usePlantName";
+import { PROTECTED_ENVIRONMENTS, frostAffectedPlants, frostRiskByBed, summarizeFrost, type BedFrostRisk, type FrostSummary } from "@/lib/weatherAlerts";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 
-/** "Heute", "Morgen", then the short weekday ("Mi") — the day names of the forecast list. */
-export function useDayLabel(): (iso: string) => string {
+/**
+ * "Heute", "Morgen", then the short weekday ("Mi") — the day names of the
+ * forecast list. `inline` for the middle of a sentence ("für heute angelegt").
+ */
+export function useDayLabel(): (iso: string, inline?: boolean) => string {
   const today = useToday();
   const f = useFormat();
-  return useCallback((iso: string) => {
+  return useCallback((iso: string, inline = false) => {
     const d = toDate(iso);
     const diff = d ? differenceInCalendarDays(d, today) : -1;
-    return diff >= 0 && diff < 2 ? f.formatDate(iso, "relative") : f.formatDate(iso, "weekday");
+    return diff >= 0 && diff < 2 ? f.formatDate(iso, inline ? "relativeInline" : "relative") : f.formatDate(iso, "weekday");
   }, [today, f]);
 }
 
@@ -40,10 +45,48 @@ export function useFrostSummary(forecast: { date: string; tempMin: number }[] | 
     const title = t("alerts.frostGroupTitle", {
       count: summary.nights.length,
       temp: f.formatTemperature(summary.coldest.tempMin),
-      day: dayLabel(summary.coldest.date),
+      day: dayLabel(summary.coldest.date, true),
     });
     return { summary, title };
   }, [forecast, threshold, today, t, f, dayLabel]);
+}
+
+/**
+ * Which beds and crops the frost hurts (lib/weatherAlerts `frostRiskByBed`),
+ * over all gardens: the same answer for the map pins, the hint on "Heute" and
+ * "Betroffen sind …" on the weather page.
+ */
+export function useFrostRisk(summary: FrostSummary | null | undefined): { byBed: Map<string, BedFrostRisk>; plantIds: string[] } {
+  const gardens = useStore((s) => s.gardens);
+  const plantMap = usePlantMap();
+  return useMemo(() => {
+    const risks = frostRiskByBed(gardens.flatMap((g) => g.beds), plantMap, summary ?? null);
+    return { byBed: new Map(risks.map((r) => [r.bedId, r])), plantIds: frostAffectedPlants(risks) };
+  }, [gardens, plantMap, summary]);
+}
+
+/**
+ * The one sentence naming what the frost hurts, on "Heute" and on the weather
+ * page: "Betroffen: Kürbis, Buschbohne, Mais (Kartoffelacker). Mit Vlies …".
+ * Without tender crops in reach it falls back to the general advice.
+ */
+export function useFrostAffectedText(summary: FrostSummary | null | undefined): string {
+  const { t } = useTranslation();
+  const plantName = usePlantName();
+  const gardens = useStore((s) => s.gardens);
+  const { byBed, plantIds } = useFrostRisk(summary);
+  return useMemo(() => {
+    if (plantIds.length === 0) return t("alerts.frostAdvice");
+    // Open beds first: they get the full frost, a greenhouse only part of it.
+    const beds = gardens.flatMap((g) => g.beds).filter((b) => byBed.has(b.id))
+      .sort((a, b) => Number(PROTECTED_ENVIRONMENTS.includes(a.environmentType)) - Number(PROTECTED_ENVIRONMENTS.includes(b.environmentType)));
+    if (plantIds.length > 4) {
+      const first = [...new Set(beds.flatMap((b) => byBed.get(b.id)!.plantIds))].slice(0, 3).map(plantName);
+      return t("alerts.frostAffected", { plants: first.join(", "), count: plantIds.length, beds: beds.map((b) => b.name).join(", ") });
+    }
+    const parts = beds.map((b) => `${byBed.get(b.id)!.plantIds.map(plantName).join(", ")} (${b.name})`);
+    return t("alerts.frostAffectedAll", { plants: parts.join("; ") });
+  }, [byBed, plantIds, gardens, plantName, t]);
 }
 
 /**
@@ -68,7 +111,7 @@ export function FrostTaskButton({ summary, className }: { summary: FrostSummary;
     return (
       <Button variant="ghost" size="sm" className={className} onClick={() => navigate(`/tasks?task=${encodeURIComponent(existing.id)}`)}>
         <CalendarCheck size={16} aria-hidden="true" />
-        {t("alerts.fleeceTaskPlanned", { day: dayLabel(due) })}
+        {t("alerts.fleeceTaskPlanned", { day: dayLabel(due, true) })}
       </Button>
     );
   }
@@ -81,11 +124,11 @@ export function FrostTaskButton({ summary, className }: { summary: FrostSummary;
       title,
       dueDate: due,
       description: t("alerts.fleeceTaskDesc", {
-        nights: summary.nights.map((n) => `${dayLabel(n.date)} ${f.formatTemperature(n.tempMin)}`).join(", "),
+        nights: summary.nights.map((n) => `${dayLabel(n.date, true)} ${f.formatTemperature(n.tempMin)}`).join(", "),
       }),
     });
     const added = useStore.getState().tasks.at(-1);
-    toast(t("alerts.fleeceTaskAdded", { day: dayLabel(due) }), "success", {
+    toast(t("alerts.fleeceTaskAdded", { day: dayLabel(due, true) }), "success", {
       action: added ? { label: t("common.undo"), onClick: () => deleteTask(added.id) } : undefined,
     });
   };

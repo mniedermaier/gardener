@@ -59,6 +59,9 @@ async function scrollTo(trigger: Locator, where: "center" | "bottom") {
 
 const flipped = { count: 0 };
 
+/** Accessible name of a collapsed group row (livestock.showEntries). */
+const EXPAND = /Einträge anzeigen/;
+
 async function checkMenu(page: Page, trigger: Locator, label: string, problems: string[], expectFlip: boolean) {
   const covered = await blocker(trigger);
   if (covered) {
@@ -118,6 +121,12 @@ for (const vp of VIEWPORTS) {
         await expect(page.locator("main h1").first()).toBeVisible({ timeout: 10_000 });
         await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 10_000 });
         const triggers = page.locator('main [aria-haspopup="menu"]');
+        // Aggregated lists (production: one row per week) show their entries,
+        // and with them the row menus, only when a group is expanded.
+        if ((await triggers.count()) === 0) {
+          const expanders = page.locator("main").getByRole("button", { name: EXPAND });
+          for (let i = 0; i < Math.min(2, await expanders.count()); i++) await expanders.first().click();
+        }
         const n = await triggers.count();
         if (n === 0) {
           problems.push(`${route}: no row menu found`);

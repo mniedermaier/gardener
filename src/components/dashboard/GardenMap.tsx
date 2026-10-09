@@ -8,7 +8,8 @@ import { usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { taskGroup } from "@/lib/tasks";
-import { GREENHOUSE_NIGHT_BUFFER_C, type FrostSummary } from "@/lib/weatherAlerts";
+import type { FrostSummary } from "@/lib/weatherAlerts";
+import { useFrostRisk } from "@/components/weather/frost";
 import { familyColors, plantFamilyMap } from "@/data/plantFamilies";
 import type { Bed, EnvironmentType, Garden } from "@/types/garden";
 import type { HarvestReadyItem } from "@/lib/season";
@@ -19,8 +20,10 @@ import { useElementWidth } from "@/components/ui/charts/scale";
 // ------------------------------------------------------------------ layout
 
 const GAP_X = 16;
-const GAP_Y = 20;
+const GAP_Y = 10;
 const LABEL_H = 22;
+/** Strip above each row for the pins, so they never cover the top row of crops. */
+const PIN_H = 30;
 /** A bed's slot is at least this wide so its name stays readable. */
 const MIN_SLOT = 76;
 
@@ -58,6 +61,7 @@ export function packBeds(beds: Bed[], width: number, maxHeight: number): { u: nu
     let y = 0;
     const placed: PlacedBed[] = [];
     for (const row of rows) {
+      y += PIN_H;
       const rowH = Math.max(...row.map((p) => p.h));
       const rowW = row.reduce((s, p) => s + p.slot, 0) + GAP_X * (row.length - 1);
       const offset = Math.max(0, (width - rowW) / 2);
@@ -109,17 +113,6 @@ function Pin({ kind, count }: { kind: PinKind; count?: number }) {
   );
 }
 
-const PROTECTED: EnvironmentType[] = ["greenhouse", "polytunnel", "cold_frame", "windowsill"];
-
-/** Does the forecast frost reach into this bed? Open beds at the threshold; unheated greenhouses below 0 °C inside. */
-function frostReaches(bed: Bed, frost: FrostSummary | null): boolean {
-  if (!frost || bed.cells.length === 0) return false;
-  if (!PROTECTED.includes(bed.environmentType)) return true;
-  const gh = bed.greenhouseConfig;
-  if (bed.environmentType === "greenhouse" && gh && !gh.heated) return frost.coldest.tempMin + (GREENHOUSE_NIGHT_BUFFER_C[gh.material] ?? 1) <= 0;
-  return false;
-}
-
 // ------------------------------------------------------------------ component
 
 interface GardenMapProps {
@@ -140,12 +133,14 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
   const plantMap = usePlantMap();
   const plantName = usePlantName();
   const tasks = useStore(useShallow((s) => s.tasks));
+  // Same beds and crops as the frost warning (lib/weatherAlerts frostRiskByBed).
+  const frostRisk = useFrostRisk(frost);
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const narrow = width > 0 && width < 480;
 
   const status = useMemo(() => {
-    const map = new Map<string, { harvest: string[]; tasks: number; frost: boolean }>();
-    for (const bed of garden.beds) map.set(bed.id, { harvest: [], tasks: 0, frost: frostReaches(bed, frost) });
+    const map = new Map<string, { harvest: string[]; tasks: number; frost: string[] }>();
+    for (const bed of garden.beds) map.set(bed.id, { harvest: [], tasks: 0, frost: frostRisk.byBed.get(bed.id)?.plantIds ?? [] });
     for (const h of harvestReady) map.get(h.bedId)?.harvest.push(h.plantId);
     for (const task of tasks) {
       if (!task.bedId || task.completedDate) continue;
@@ -156,7 +151,7 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
       }
     }
     return map;
-  }, [garden.beds, harvestReady, tasks, now, frost]);
+  }, [garden.beds, harvestReady, tasks, now, frostRisk]);
 
   const { u, placed, height } = useMemo(
     () => packBeds(garden.beds, Math.max(0, width - 32), narrow ? 340 : 250),
@@ -169,7 +164,7 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
   for (const s of status.values()) {
     if (s.harvest.length) present.add("harvest");
     if (s.tasks) present.add("task");
-    if (s.frost) present.add("frost");
+    if (s.frost.length) present.add("frost");
   }
 
   return (
@@ -194,13 +189,13 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
           <ul aria-label={t("dashboard.mapLabel")} className="relative" style={{ height }}>
             {placed.map(({ bed, x, y, w, h, slot }) => {
               const s = status.get(bed.id)!;
-              const pins = PIN_ORDER.filter((k) => (k === "harvest" ? s.harvest.length > 0 : k === "task" ? s.tasks > 0 : s.frost));
+              const pins = PIN_ORDER.filter((k) => (k === "harvest" ? s.harvest.length > 0 : k === "task" ? s.tasks > 0 : s.frost.length > 0));
               const parts = [
                 bed.name,
                 t("dashboard.mapPlants", { count: bed.cells.length }),
                 s.harvest.length ? t("dashboard.mapRipe", { plants: [...new Set(s.harvest)].map(plantName).join(", ") }) : null,
                 s.tasks ? t("dashboard.mapTasks", { count: s.tasks }) : null,
-                s.frost ? t("dashboard.mapFrost") : null,
+                s.frost.length ? t("dashboard.mapFrostPlants", { plants: s.frost.map(plantName).join(", ") }) : null,
               ].filter(Boolean);
               const paths = new Set(bed.paths ?? []);
               return (
@@ -237,7 +232,8 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
                         );
                       })}
                       {pins.length > 0 && (
-                        <span className="absolute -top-4 -right-2 flex gap-1" aria-hidden="true">
+                        // Above the bed (space reserved by packBeds), never on the crops.
+                        <span className="absolute bottom-full left-1/2 mb-1.5 flex -translate-x-1/2 gap-1" aria-hidden="true">
                           {pins.map((k) => <Pin key={k} kind={k} count={k === "task" ? s.tasks : undefined} />)}
                         </span>
                       )}

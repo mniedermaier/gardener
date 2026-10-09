@@ -15,13 +15,12 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { Select } from "@/components/ui/Select";
-import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductionChart } from "./ProductionChart";
 import { PRODUCT_ICON } from "./icons";
-import { IconTile, ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
-import { groupByMonth } from "./groupByMonth";
+import { ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
+import { ProductWeekList } from "./ProductWeekList";
 import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
 
@@ -79,7 +78,6 @@ export function ProductionPage() {
   const yearFigures = (hasLayers ? herdTypes : herdTypes.slice(1)).map(yearFigure);
 
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
-  const groups = groupByMonth(filtered);
 
   const addButton = (
     <Button onClick={openAdd} disabled={animals.length === 0}>
@@ -123,37 +121,29 @@ export function ProductionPage() {
                   )}
                 </div>
               )}
-              {groups.length === 0 ? (
+              {filtered.length === 0 ? (
                 <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
-              ) : groups.map((g) => (
-                <List key={g.key} header={`${f.formatDate(g.date, "monthYear")} · ${t("livestock.entriesHint", { count: g.items.length })}`}>
-                  {g.items.map((p) => {
+              ) : (
+                <ProductWeekList
+                  products={filtered}
+                  entryMeta={(p) => { const animal = animalMap.get(p.animalId); return animal && animals.length > 1 ? animalLabel(animal, t) : null; }}
+                  onOpen={(p) => setDialog({ open: true, entry: p })}
+                  renderActions={(p) => {
                     const animal = animalMap.get(p.animalId);
                     return (
-                      <ListRow
-                        key={p.id}
-                        leading={<IconTile icon={PRODUCT_ICON[p.type]} />}
-                        title={t(`livestock.products.${p.type}`)}
-                        meta={[animal ? animalLabel(animal, t) : null, f.formatDate(p.date, "relative")].filter(Boolean).join(" · ")}
-                        description={p.notes}
-                        trailing={formatProductAmount(p.type, p.unit === "g" ? p.quantity / 1000 : p.quantity, f, t)}
-                        onClick={() => setDialog({ open: true, entry: p })}
-                        actions={
-                          <Menu
-                            label={t("common.moreActions")}
-                            items={[
-                              { label: t("common.edit"), icon: Pencil, onSelect: () => setDialog({ open: true, entry: p }) },
-                              ...(animal ? [{ label: t("livestock.openAnimal"), icon: Bird, onSelect: () => navigate(`/livestock/${animal.id}`) }] : []),
-                              "separator" as const,
-                              { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void deleteProduct(p) },
-                            ]}
-                          />
-                        }
+                      <Menu
+                        label={t("common.moreActions")}
+                        items={[
+                          { label: t("common.edit"), icon: Pencil, onSelect: () => setDialog({ open: true, entry: p }) },
+                          ...(animal ? [{ label: t("livestock.openAnimal"), icon: Bird, onSelect: () => navigate(`/livestock/${animal.id}`) }] : []),
+                          "separator" as const,
+                          { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void deleteProduct(p) },
+                        ]}
                       />
                     );
-                  })}
-                </List>
-              ))}
+                  }}
+                />
+              )}
             </section>
           )}
         </div>

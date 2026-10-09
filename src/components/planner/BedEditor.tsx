@@ -16,6 +16,7 @@ import { EnvironmentChip } from "./environment";
 import { EditableBedGrid, type GridMode } from "./BedGrid";
 import { BedStats } from "./BedStats";
 import { GuildPicker } from "./GuildPicker";
+import { usePointerFine } from "./usePointerFine";
 
 interface Props {
   gardenId: string;
@@ -54,6 +55,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
     selectedKey, zoom, feedback, onZoom, onActivate, onBack, onStopMode, onSelectCell, onEdit, onAutoFill, onPathMode, onClear, onDuplicate, onDelete,
   } = props;
   const { t } = useTranslation();
+  const fine = usePointerFine();
   const { formatNumber, formatPercent } = useFormat();
   const getPlantName = usePlantName();
   const envType = bed.environmentType ?? "outdoor_bed";
@@ -125,7 +127,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
             </span>
             <span className="min-w-0 flex-1">
               <span className="font-semibold">{t("planner.placing", { plant: getPlantName(placingPlant.id) })}</span>
-              <span className="block text-xs text-garden-800 sm:inline sm:pl-2 dark:text-garden-200">{t("planner.placingHint")}</span>
+              <span className="block text-xs text-garden-800 sm:inline sm:pl-2 dark:text-garden-200">{fine ? t("planner.placingHintClick") : t("planner.placingHint")}</span>
             </span>
             <Button size="sm" onClick={onStopMode}>
               <Check size={16} aria-hidden="true" />
@@ -144,7 +146,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
         ) : (
           <>
             <MousePointerClick size={16} aria-hidden="true" className="shrink-0" />
-            <span className="min-w-0 flex-1 text-xs sm:text-sm">{t("planner.inspectHint")}</span>
+            <span className="min-w-0 flex-1 text-xs sm:text-sm">{fine ? t("planner.inspectHintClick") : t("planner.inspectHint")}</span>
           </>
         )}
       </div>

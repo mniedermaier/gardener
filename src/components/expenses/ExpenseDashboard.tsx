@@ -26,7 +26,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
 import { CompareBars, HowCalculated, KeyFigures, Meter } from "@/components/ui/charts";
 import { DateField } from "@/components/ui/DateField";
@@ -64,7 +64,8 @@ export function ExpenseDashboard() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { expenses, harvests, addExpense, updateExpense, deleteExpense } = useStore(
     useShallow((s) => ({ expenses: s.expenses, harvests: s.harvests, addExpense: s.addExpense, updateExpense: s.updateExpense, deleteExpense: s.deleteExpense })),
   );
@@ -111,7 +112,7 @@ export function ExpenseDashboard() {
   };
 
   const remove = async (e: Expense) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("expense", `${e.description} · ${f.formatCurrency(e.amountCents / 100)}`))) return;
     deleteExpense(e.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = e;

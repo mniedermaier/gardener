@@ -235,8 +235,9 @@
     "mapPin": {
       "harvest": "Listo para cosechar",
       "task": "Tarea pendiente",
-      "frost": "Se espera helada"
-    }
+      "frost": "Helada para cultivos sensibles"
+    },
+    "mapFrostPlants": "Helada: riesgo para {{plants}}"
   },
   "search": {
     "placeholder": "Buscar plantas, tareas, diario...",
@@ -306,7 +307,7 @@
     "variety": "Variedad",
     "varietyPlaceholder": "ej. San Marzano, Brandywine...",
     "plantedDate": "Fecha de plantación",
-    "confirmDeleteGarden": "¿Eliminar este huerto con todos sus bancales?",
+    "confirmDeleteGarden": "También se eliminarán todos sus bancales. Justo después aún podrás deshacerlo.",
     "placeMode": "Colocando {{plant}}: haz clic en las casillas para colocar, Esc para cancelar",
     "share": "Compartir plan de huerto",
     "shareCopied": "Enlace copiado",
@@ -504,7 +505,11 @@
       "other": "Otras"
     },
     "sheetMore": "Detalles, variedad y notas",
-    "sheetLess": "Mostrar menos"
+    "sheetLess": "Mostrar menos",
+    "placingHintClick": "Haz clic en casillas libres. ✓ buen vecino, ⚠ vecino desfavorable.",
+    "inspectHintClick": "Haz clic en una planta para verla. Para plantar, elige primero una planta.",
+    "dragPlantClick": "Haz clic en una planta y luego en casillas del bancal, o arrástrala al bancal.",
+    "emptyBedsTextClick": "Indica tamaño y tipo (al aire libre, bancal elevado, invernadero…). Después coloca plantas haciendo clic o arrastrando."
   },
   "plants": {
     "title": "Plantas",
@@ -725,6 +730,10 @@
       "endive": {
         "name": "Endivia",
         "description": "Verdura de ensalada ligeramente amarga. Blanquear los corazones para un sabor más suave."
+      },
+      "lambs_lettuce": {
+        "name": "Canónigos",
+        "description": "Ensalada de invierno resistente a las heladas. Siembra de julio a principios de octubre, cosecha de otoño a primavera."
       }
     },
     "customIcon": "Icono",
@@ -1025,14 +1034,18 @@
       "desc": "Esta acción no se puede deshacer.",
       "action": "Borrar todos los datos",
       "actionDesc": "Elimina huertos, cosechas, animales y ajustes de este dispositivo. Descarga antes una copia.",
-      "confirm": "¿Borrar todos los datos de este dispositivo? Sin copia se perderán."
+      "confirm": "Sin copia de seguridad se perderán huertos, cosechas, animales y ajustes. No se puede deshacer.",
+      "confirmTitle": "¿Eliminar todos los datos de este dispositivo?"
     },
     "weatherReady": "Previsión para {{place}} activa",
     "weatherYourLocation": "tu ubicación",
     "weatherNeedsLocation": "Indica una ubicación arriba y Gardener cargará la previsión",
     "weatherSource": "Datos meteorológicos:",
     "weatherAdvanced": "Avanzado: usar tu propia clave de OpenWeatherMap",
-    "weatherProviderActive": "Proveedor activo: {{provider}}. Con clave, Gardener usa OpenWeatherMap; sin clave, Open-Meteo."
+    "weatherProviderActive": "Proveedor activo: {{provider}}. Con clave, Gardener usa OpenWeatherMap; sin clave, Open-Meteo.",
+    "weatherKeyRejected": "Clave rechazada: se usa Open-Meteo. Revisa la clave de OpenWeatherMap o elimínala.",
+    "weatherOwmUnavailable": "OpenWeatherMap no está disponible ahora: se usa Open-Meteo.",
+    "weatherKeyChecking": "Comprobando la clave…"
   },
   "dataManagement": {
     "title": "Datos y copia de seguridad",
@@ -1101,15 +1114,16 @@
     "frostGroupTitle_other": "Riesgo de helada en {{count}} noches, hasta {{temp}} ({{day}})",
     "frostGroupTitle_many": "Riesgo de helada en {{count}} noches, hasta {{temp}} ({{day}})",
     "frostAffected_one": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
-    "frostAffected_other": "{{count}} cultivos afectados, p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
-    "frostAffected_many": "{{count}} cultivos afectados, p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
+    "frostAffected_other": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
+    "frostAffected_many": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
     "frostAdvice": "Cubre las plantas sensibles con manta térmica y espera para trasplantar.",
     "greenhouseFrostDesc": "Día más frío: {{date}}, {{outside}} fuera. Incluso en el invernadero sin calefacción puede helar (unos {{temp}}). Cubre las plantas sensibles con doble manta térmica o calienta para evitar heladas. Supuesto: unos {{buffer}} más que fuera.",
     "fleeceTask": "Añadir tarea: manta térmica",
     "fleeceTaskTitle": "Cubrir con manta térmica",
     "fleeceTaskDesc": "Noches de helada previstas: {{nights}}. Cubre los cultivos sensibles por la tarde y destápalos por la mañana.",
     "fleeceTaskAdded": "Tarea «Cubrir con manta térmica» añadida para {{day}}",
-    "fleeceTaskPlanned": "Tarea de manta térmica para {{day}}"
+    "fleeceTaskPlanned": "Tarea de manta térmica para {{day}}",
+    "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto."
   },
   "harvest": {
     "title": "Cosecha",
@@ -1588,7 +1602,11 @@
         "rabbit": "Conejos: RHD y mixomatosis, cada seis a doce meses según la vacuna.",
         "ruminant": "Cabras y ovejas: vacuna contra clostridios, normalmente refuerzo anual; consúltalo con tu veterinario.",
         "other": "El intervalo depende de la vacuna; consúltalo con tu veterinario."
-      }
+      },
+      "vaccCoverage": "Grupos de animales vacunados",
+      "vaccCoverageValue": "{{covered}} de {{total}}",
+      "nextDue": "Próximo refuerzo a partir del {{date}}",
+      "dueNames": "Revisar vacunación: {{names}}"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1626,7 +1644,7 @@
     "backToHerd": "Volver a los animales",
     "herd": "Animales",
     "deleted": "{{name}} eliminado",
-    "confirmDeleteAnimal": "¿Eliminar este animal con todos sus registros de producción, pienso y salud?",
+    "confirmDeleteAnimal": "También se eliminarán todos sus registros de producción, pienso y salud. Justo después aún podrás deshacerlo.",
     "animalType": "Tipo de animal",
     "acquired": "Desde",
     "sinceDate": "desde {{date}}",
@@ -1739,7 +1757,8 @@
     "ofExpectedToDate": "de ~{{amount}} esperados",
     "productThisYear": "{{product}} este año",
     "eggWeeksLabel": "Huevos por semana en las últimas 8 semanas, media {{avg}}",
-    "eggWeeksAvg": "Media de {{avg}} por semana en las últimas 8 semanas"
+    "eggWeeksAvg": "Media de {{avg}} por semana en las últimas 8 semanas",
+    "singleHarvests": "Cosechas puntuales (últimos {{months}} meses)"
   },
   "seeds": {
     "title": "Semillas",
@@ -1807,7 +1826,8 @@
     "needPlant": "Elige una planta",
     "invalidNumber": "Introduce un número válido",
     "invalidYear": "Introduce un año entre 1950 y hoy",
-    "years_many": "{{count}} años"
+    "years_many": "{{count}} años",
+    "orOnionSets": "o bulbillos"
   },
   "soil": {
     "title": "Suelo",
@@ -2023,7 +2043,10 @@
     },
     "showMore_one": "Mostrar {{count}} más",
     "showMore_many": "Mostrar {{count}} más",
-    "showMore_other": "Mostrar {{count}} más"
+    "showMore_other": "Mostrar {{count}} más",
+    "bedCount_one": "{{count}} bancal",
+    "bedCount_many": "{{count}} bancales",
+    "bedCount_other": "{{count}} bancales"
   },
   "expenses": {
     "title": "Costes",
@@ -2179,7 +2202,25 @@
     "favorite": "Favorito",
     "undo": "Deshacer",
     "moreActions": "Más acciones",
-    "all": "Todos"
+    "all": "Todos",
+    "confirmDeleteUndo": "Justo después aún podrás deshacerlo.",
+    "deleteNamed": {
+      "harvest": "¿Eliminar la cosecha «{{name}}»?",
+      "journal": "¿Eliminar la entrada «{{name}}»?",
+      "pest": "¿Eliminar el registro «{{name}}»?",
+      "seed": "¿Eliminar las semillas «{{name}}»?",
+      "pantry": "¿Eliminar la conserva «{{name}}»?",
+      "expense": "¿Eliminar el gasto «{{name}}»?",
+      "water": "¿Eliminar el riego «{{name}}»?",
+      "task": "¿Eliminar la tarea «{{name}}»?",
+      "soilTest": "¿Eliminar el análisis de suelo «{{name}}»?",
+      "amendment": "¿Eliminar la enmienda «{{name}}»?",
+      "product": "¿Eliminar el registro de producción «{{name}}»?",
+      "feed": "¿Eliminar el registro de alimento «{{name}}»?",
+      "health": "¿Eliminar el registro de salud «{{name}}»?",
+      "animal": "¿Eliminar el animal «{{name}}»?",
+      "garden": "¿Eliminar el huerto «{{name}}»?"
+    }
   },
   "companions": {
     "title": "Asociaciones",
@@ -2338,16 +2379,17 @@
     "howNeed": "Autosuficiencia = parte de la necesidad calórica de tu hogar ({{kcal}} kcal por persona y día) que huerto y animales cubren en un año (como máximo 100 %).",
     "meterLegend": "Barra llena = registrado, rayada = previsión.",
     "pricesEditable": "Puedes ajustar el precio por huevo, kg o litro en Costes.",
-    "expectedToDate": "esperado hasta hoy: {{value}}",
-    "actualVsToDateShort": "registrado {{actual}} · esperado hasta hoy {{expected}}",
+    "expectedToDate": "objetivo a la fecha: {{value}}",
+    "actualVsToDateShort": "registrado {{actual}} · objetivo a la fecha {{expected}}",
     "howCap": "Los productos animales cuentan solo hasta el consumo habitual (por persona y año unos 240 huevos, 1 kg de miel, 52 kg de carne, 300 l de leche). La miel es muy calórica, pero no es un alimento básico: dos colmenas dan unos 40 kg y un hogar consume 1–2 kg. Lo que excede es excedente para intercambiar o vender y no te alimenta. Hortalizas y fruta cuentan por completo.",
-    "howToDate": "Esperado hasta hoy: la parte de la previsión anual que debería haber llegado ya – para cada cultivo su ventana de cosecha desde la última helada, miel de mayo a agosto, huevos repartidos en el año. Si lo registrado queda muy por debajo, suelen faltar registros.",
+    "howToDate": "Objetivo a la fecha: la parte de la previsión anual que debería haber llegado ya – para cada cultivo su ventana de cosecha desde la última helada, miel de mayo a agosto, huevos repartidos en el año. Si lo registrado queda muy por debajo, suelen faltar registros.",
     "howVsFoodPlan": "El plan de alimentación mide otra cosa: kilos frente a un objetivo de cantidad para 20 hortalizas y frutas, sin productos animales. Por eso su «objetivo de cantidad» difiere de este valor calórico.",
     "compositionTitle": "De qué se compone la previsión",
     "compositionDesc": "Parte de la necesidad calórica anual, según su origen.",
     "compositionLabel": "Huerto {{garden}}, productos animales {{animals}} de la necesidad anual",
     "fromGarden": "Huerto",
     "fromAnimals": "Productos animales",
-    "surplusNote": "No se cuenta por superar el consumo habitual: {{items}}."
+    "surplusNote": "No se cuenta por superar el consumo habitual: {{items}}.",
+    "notCovered": "Sin cubrir"
   }
 }

@@ -6,7 +6,11 @@ import {
   generateWateringAdvice,
   generateWeeklySummary,
   getAllAlerts,
+  frostRiskByBed,
+  frostAffectedPlants,
+  isFrostSensitive,
 } from "@/lib/weatherAlerts";
+import plantsData from "@/data/plants.json";
 import type { WeatherForecastItem } from "@/types/weather";
 import type { Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
@@ -210,5 +214,45 @@ describe("summarizeFrost", () => {
   });
   it("returns null without frost nights", () => {
     expect(summarizeFrost(days, -10, "2026-10-05")).toBeNull();
+  });
+});
+
+describe("frost risk per bed (map pins, warning and weather page share it)", () => {
+  const plantMap = new Map((plantsData as Plant[]).map((p) => [p.id, p]));
+  const cells = (...ids: string[]) => ids.map((plantId, i) => ({ cellX: i, cellY: 0, plantId }));
+  const bed = (id: string, environmentType: Bed["environmentType"], plantIds: string[], extra: Partial<Bed> = {}): Bed =>
+    ({ id, name: id, x: 0, y: 0, width: 4, height: 4, environmentType, cells: cells(...plantIds), ...extra }) as Bed;
+  const glass = (heated: boolean): Partial<Bed> => ({
+    greenhouseConfig: { material: "polycarbonate", heated, ventilation: "manual", minTempC: 5, maxTempC: 35, frostProtectionWeeks: 4 },
+  });
+  const beds = [
+    bed("hochbeet", "raised_bed", ["lettuce", "radish", "carrot", "spinach", "chard", "onion", "beetroot"]),
+    bed("gh", "greenhouse", ["tomato", "pepper", "cucumber"], glass(false)),
+    bed("acker", "outdoor_bed", ["potato", "pumpkin", "bean", "corn"]),
+    bed("kuebel", "container", ["rosemary", "thyme", "parsley", "chives"]),
+  ];
+  const frost = (tempMin: number) => ({ coldest: { date: "2026-10-11", tempMin } });
+
+  it("pins only beds with frost-tender crops — winter-hardy beds and herbs stay calm", () => {
+    const risks = frostRiskByBed(beds, plantMap, frost(-1));
+    expect(risks.map((r) => r.bedId)).toEqual(["acker"]);
+    expect(risks[0].plantIds).toEqual(["pumpkin", "bean", "corn"]);
+    expect(frostAffectedPlants(risks)).toEqual(["pumpkin", "bean", "corn"]);
+  });
+
+  it("reaches into an unheated greenhouse only when it freezes inside", () => {
+    // polycarbonate keeps ≈ 2 °C: −1 outside stays above 0 inside, −6 does not.
+    expect(frostRiskByBed(beds, plantMap, frost(-6)).map((r) => r.bedId)).toEqual(["gh", "acker"]);
+    const heated = [bed("gh", "greenhouse", ["tomato"], glass(true))];
+    expect(frostRiskByBed(heated, plantMap, frost(-10))).toHaveLength(0);
+  });
+
+  it("no frost, no risk", () => {
+    expect(frostRiskByBed(beds, plantMap, null)).toHaveLength(0);
+  });
+
+  it("knows tender from hardy crops", () => {
+    for (const id of ["tomato", "pumpkin", "bean", "corn", "basil", "cucumber"]) expect(isFrostSensitive(plantMap.get(id)!), id).toBe(true);
+    for (const id of ["spinach", "chard", "carrot", "rosemary", "thyme", "chives", "garlic", "kale", "leek", "lambs_lettuce"]) expect(isFrostSensitive(plantMap.get(id)!), id).toBe(false);
   });
 });
