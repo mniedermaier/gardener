@@ -797,8 +797,13 @@
       "viability_other": "Viable for {{count}} years",
       "isolation": "Isolation distance {{distance}} m",
       "harvestDaysUnit": "days",
-      "yourStock": "Your stock"
-    }
+      "yourStock": "Your stock",
+      "openField": "Open field",
+      "seasonFor": "Dates for",
+      "seasonDescProtected_one": "Dates for {{place}}: {{count}} week earlier than in the open field.",
+      "seasonDescProtected_other": "Dates for {{place}}: {{count}} weeks earlier than in the open field."
+    },
+    "createBedFirst": "Create a bed first"
   },
   "weather": {
     "title": "Weather",
@@ -1949,7 +1954,6 @@
     "recommended": "Recommended",
     "filter": "Filter",
     "now": "Now",
-    "fruitBerries": "Fruit",
     "listLabel": "Plants",
     "nowHint": "Plantable now – based on your frost date and the bed type.",
     "offSeasonHint": "Nothing is in season right now. These plants suit the bed well.",
@@ -2199,7 +2203,12 @@
     "focusNone": "Highlight plant …",
     "emptyFilter": "No plant matches the search.",
     "scrollForMore_one": "Scroll sideways for all {{count}} plant",
-    "scrollForMore_other": "Scroll sideways for all {{count}} plants"
+    "scrollForMore_other": "Scroll sideways for all {{count}} plants",
+    "scopeLabel": "Crops",
+    "scopeGarden": "In the garden",
+    "scopeAll": "All",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right"
   },
   "water": {
     "title": "Watering",

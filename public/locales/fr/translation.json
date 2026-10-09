@@ -819,8 +819,14 @@
       "viability_other": "Germe pendant {{count}} ans",
       "isolation": "Distance d’isolement {{distance}} m",
       "harvestDaysUnit": "jours",
-      "yourStock": "Votre stock"
-    }
+      "yourStock": "Votre stock",
+      "openField": "Plein champ",
+      "seasonFor": "Dates pour",
+      "seasonDescProtected_one": "Dates pour {{place}} : {{count}} semaine plus tôt qu’en plein champ.",
+      "seasonDescProtected_other": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ.",
+      "seasonDescProtected_many": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ."
+    },
+    "createBedFirst": "Créer d’abord une planche"
   },
   "weather": {
     "title": "Météo",
@@ -2033,7 +2039,6 @@
     "recommended": "Recommandé",
     "filter": "Filtre",
     "now": "Maintenant",
-    "fruitBerries": "Fruits",
     "listLabel": "Plantes",
     "nowHint": "À planter maintenant – selon votre date de gel et le type de planche.",
     "offSeasonHint": "Ce n’est pas la saison de plantation. Ces plantes conviennent bien à la planche.",
@@ -2296,7 +2301,12 @@
     "emptyFilter": "Aucune plante ne correspond à la recherche.",
     "scrollForMore_one": "Faites défiler pour voir {{count}} plante",
     "scrollForMore_other": "Faites défiler pour voir les {{count}} plantes",
-    "scrollForMore_many": "Faites défiler pour voir les {{count}} plantes"
+    "scrollForMore_many": "Faites défiler pour voir les {{count}} plantes",
+    "scopeLabel": "Cultures",
+    "scopeGarden": "Au jardin",
+    "scopeAll": "Toutes",
+    "scrollLeft": "Défiler vers la gauche",
+    "scrollRight": "Défiler vers la droite"
   },
   "water": {
     "title": "Arrosage",

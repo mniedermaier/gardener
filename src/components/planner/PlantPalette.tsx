@@ -137,7 +137,7 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
             { value: "all", label: t("common.all") },
             { value: "vegetable", label: t("plants.category.vegetable") },
             { value: "herb", label: t("plants.category.herb") },
-            { value: "fruit", label: t("palette.fruitBerries") },
+            { value: "fruit", label: t("plants.category.berry") },
           ]}
         />
       </div>

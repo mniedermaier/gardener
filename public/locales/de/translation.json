@@ -797,8 +797,13 @@
       "viability_other": "{{count}} Jahre keimfähig",
       "isolation": "Isolationsabstand {{distance}} m",
       "harvestDaysUnit": "Tagen",
-      "yourStock": "Dein Bestand"
-    }
+      "yourStock": "Dein Bestand",
+      "openField": "Freiland",
+      "seasonFor": "Termine für",
+      "seasonDescProtected_one": "Termine für {{place}}: {{count}} Woche früher als im Freiland.",
+      "seasonDescProtected_other": "Termine für {{place}}: {{count}} Wochen früher als im Freiland."
+    },
+    "createBedFirst": "Erst ein Beet anlegen"
   },
   "weather": {
     "title": "Wetter",
@@ -1949,7 +1954,6 @@
     "recommended": "Empfohlen",
     "filter": "Filter",
     "now": "Jetzt",
-    "fruitBerries": "Obst",
     "listLabel": "Pflanzen",
     "nowHint": "Jetzt pflanzbar – nach deinem Frosttermin und dem Beettyp.",
     "offSeasonHint": "Gerade ist keine Pflanzzeit. Diese Pflanzen passen gut zum Beet.",
@@ -2199,7 +2203,12 @@
     "focusNone": "Pflanze hervorheben …",
     "emptyFilter": "Keine Pflanze passt zur Suche.",
     "scrollForMore_one": "Seitlich scrollen für alle {{count}} Pflanze",
-    "scrollForMore_other": "Seitlich scrollen für alle {{count}} Pflanzen"
+    "scrollForMore_other": "Seitlich scrollen für alle {{count}} Pflanzen",
+    "scopeLabel": "Kulturen",
+    "scopeGarden": "Im Garten",
+    "scopeAll": "Alle",
+    "scrollLeft": "Nach links scrollen",
+    "scrollRight": "Nach rechts scrollen"
   },
   "water": {
     "title": "Bewässerung",

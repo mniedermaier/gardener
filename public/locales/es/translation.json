@@ -819,8 +819,14 @@
       "viability_other": "Germinan {{count}} años",
       "isolation": "Distancia de aislamiento {{distance}} m",
       "harvestDaysUnit": "días",
-      "yourStock": "Lo que tienes"
-    }
+      "yourStock": "Lo que tienes",
+      "openField": "Al aire libre",
+      "seasonFor": "Fechas para",
+      "seasonDescProtected_one": "Fechas para {{place}}: {{count}} semana antes que al aire libre.",
+      "seasonDescProtected_other": "Fechas para {{place}}: {{count}} semanas antes que al aire libre.",
+      "seasonDescProtected_many": "Fechas para {{place}}: {{count}} semanas antes que al aire libre."
+    },
+    "createBedFirst": "Crea primero un bancal"
   },
   "weather": {
     "title": "Tiempo",
@@ -2033,7 +2039,6 @@
     "recommended": "Recomendado",
     "filter": "Filtro",
     "now": "Ahora",
-    "fruitBerries": "Fruta",
     "listLabel": "Plantas",
     "nowHint": "Se puede plantar ahora, según tu fecha de heladas y el tipo de bancal.",
     "offSeasonHint": "Ahora no es época de plantar. Estas plantas encajan bien en el bancal.",
@@ -2296,7 +2301,12 @@
     "emptyFilter": "Ninguna planta coincide con la búsqueda.",
     "scrollForMore_one": "Desplázate a la derecha para ver {{count}} planta",
     "scrollForMore_other": "Desplázate a la derecha para ver las {{count}} plantas",
-    "scrollForMore_many": "Desplázate a la derecha para ver las {{count}} plantas"
+    "scrollForMore_many": "Desplázate a la derecha para ver las {{count}} plantas",
+    "scopeLabel": "Cultivos",
+    "scopeGarden": "En el huerto",
+    "scopeAll": "Todos",
+    "scrollLeft": "Desplazar a la izquierda",
+    "scrollRight": "Desplazar a la derecha"
   },
   "water": {
     "title": "Riego",
