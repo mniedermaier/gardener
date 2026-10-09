@@ -78,7 +78,8 @@
       "water": "Riego",
       "sufficiency": "Autosuficiencia",
       "expenses": "Costes",
-      "settings": "Ajustes"
+      "settings": "Ajustes",
+      "import": "Importar"
     },
     "group": {
       "garden": "Huerto",
@@ -119,7 +120,7 @@
         "tasks": "Tareas",
         "journal": "Diario"
       },
-      "logHarvestFor": "Registrar cosecha: {{name}}",
+      "logHarvestFor": "{{name}} · Registrar cosecha",
       "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} casilla",
       "cellCount_many": "{{count}} casillas",
@@ -766,7 +767,9 @@
       "spacingCm": "Distancia de plantación (cm)",
       "harvestMin": "Cosecha más temprana (días)",
       "harvestMax": "Cosecha más tardía (días)",
-      "harvestError": "No puede ser menor que el valor más temprano."
+      "harvestError": "No puede ser menor que el valor más temprano.",
+      "namePlaceholder": "p. ej., jengibre",
+      "daysAfterSowing": "Días tras la siembra"
     },
     "detail": {
       "today": "Hoy",
@@ -785,12 +788,10 @@
       "partners": "Asociaciones",
       "allPartners": "Matriz de asociaciones",
       "noPartners": "No hay asociaciones conocidas.",
-      "inGarden": "En tu huerto",
       "plantCount_one": "{{count}} planta",
       "plantCount_many": "{{count}} plantas",
       "plantCount_other": "{{count}} plantas",
       "notPlanted": "Aún no está en tu huerto",
-      "notPlantedText": "Colócala en un bancal para obtener tareas y una previsión de cosecha.",
       "yourHarvests": "Tus cosechas",
       "harvestEntries_one": "{{count}} cosecha",
       "harvestEntries_many": "{{count}} cosechas",
@@ -804,7 +805,8 @@
       "viability_many": "Germinan {{count}} años",
       "viability_other": "Germinan {{count}} años",
       "isolation": "Distancia de aislamiento {{distance}} m",
-      "harvestDaysUnit": "días"
+      "harvestDaysUnit": "días",
+      "yourStock": "Lo que tienes"
     }
   },
   "weather": {
@@ -1066,7 +1068,7 @@
     "exportHarvestsCsv": "Cosechas en CSV",
     "exportExpensesCsv": "Gastos en CSV",
     "lastBackup": "Última copia",
-    "noBackup": "Aún no hay copia. Tus datos solo están en este navegador.",
+    "noBackup": "Aún no hay copia. Tus datos solo están en este dispositivo.",
     "exportSuccess": "Copia descargada",
     "importSuccess": "Datos restaurados",
     "importError": "La importación falló. No se ha cambiado nada.",
@@ -1094,7 +1096,9 @@
       "expenses_one": "{{count}} gasto",
       "expenses_other": "{{count}} gastos",
       "expenses_many": "{{count}} gastos"
-    }
+    },
+    "backupStale": "Tiene más de dos semanas: conviene hacer una copia nueva.",
+    "csvEmpty": "Cuando registres cosechas o gastos, podrás exportarlos aquí como CSV."
   },
   "alerts": {
     "frostTitle": "Aviso de helada: {{temp}}",
@@ -2268,7 +2272,10 @@
     "byPlant": "Por planta",
     "focusLabel": "Resaltar planta",
     "focusNone": "Resaltar planta …",
-    "emptyFilter": "Ninguna planta coincide con la búsqueda."
+    "emptyFilter": "Ninguna planta coincide con la búsqueda.",
+    "scrollForMore_one": "Desplázate a la derecha para ver {{count}} planta",
+    "scrollForMore_other": "Desplázate a la derecha para ver las {{count}} plantas",
+    "scrollForMore_many": "Desplázate a la derecha para ver las {{count}} plantas"
   },
   "water": {
     "title": "Riego",

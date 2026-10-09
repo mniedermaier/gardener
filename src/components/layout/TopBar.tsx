@@ -38,7 +38,8 @@ export function TopBar({ onMenuClick, onSearchClick }: TopBarProps) {
             <Sprout size={16} />
           </span>
           <span className="truncate text-base font-semibold text-gray-900 dark:text-gray-50">
-            {entry ? t(entry.labelKey) : t("app.title")}
+            {/* The import page sits under "Planer" in the sidebar, but its title must not claim to be the planner. */}
+            {pathname.startsWith("/import") ? t("shell.nav.import") : entry ? t(entry.labelKey) : t("app.title")}
           </span>
         </div>
 

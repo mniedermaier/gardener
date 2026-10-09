@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Check, TriangleAlert, Search, Info, ChevronRight, Grid3x3, ListTree } from "lucide-react";
@@ -140,11 +140,31 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
   onFocus: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  // Columns hidden on the right: a clear fade plus a footer line, so a half-cut
+  // column reads as "scroll for more" instead of the end of the matrix.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hiddenRight, setHiddenRight] = useState(false);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const measure = () => setHiddenRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    // The table itself too: filtering changes its width, not the scroller's.
+    if (el.firstElementChild) ro?.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      ro?.disconnect();
+    };
+  }, []);
   return (
     <Card padding="none" className="relative overflow-hidden">
-      {/* Fade on the right edge: there are more columns to scroll to */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-40 w-8 bg-gradient-to-l from-white dark:from-gray-900" aria-hidden="true" />
-      <div className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
+      {hiddenRight && (
+        <div className="pointer-events-none absolute top-0 right-0 bottom-10 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+      )}
+      <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
         <table className="border-separate border-spacing-0">
           <caption className="sr-only">{t("companions.title")}</caption>
           <thead>
@@ -187,6 +207,12 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
           </tbody>
         </table>
       </div>
+      {hiddenRight && (
+        <p className="flex h-10 items-center justify-end gap-1 border-t border-gray-100 px-4 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
+          {t("companions.scrollForMore", { count: plants.length })}
+          <ChevronRight size={14} aria-hidden="true" />
+        </p>
+      )}
     </Card>
   );
 }

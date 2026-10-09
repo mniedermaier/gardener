@@ -78,7 +78,8 @@
       "water": "Arrosage",
       "sufficiency": "Autosuffisance",
       "expenses": "Coûts",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "import": "Importer"
     },
     "group": {
       "garden": "Jardin",
@@ -119,7 +120,7 @@
         "tasks": "Tâches",
         "journal": "Journal"
       },
-      "logHarvestFor": "Noter une récolte : {{name}}",
+      "logHarvestFor": "{{name}} · Noter une récolte",
       "plantInBed": "{{plant}} · {{bed}}",
       "cellCount_one": "{{count}} case",
       "cellCount_many": "{{count}} cases",
@@ -766,7 +767,9 @@
       "spacingCm": "Espacement (cm)",
       "harvestMin": "Récolte au plus tôt (jours)",
       "harvestMax": "Récolte au plus tard (jours)",
-      "harvestError": "Ne peut pas être inférieur à la valeur la plus précoce."
+      "harvestError": "Ne peut pas être inférieur à la valeur la plus précoce.",
+      "namePlaceholder": "p. ex. gingembre",
+      "daysAfterSowing": "Jours après le semis"
     },
     "detail": {
       "today": "Aujourd’hui",
@@ -785,12 +788,10 @@
       "partners": "Associations",
       "allPartners": "Matrice des associations",
       "noPartners": "Aucune association connue.",
-      "inGarden": "Dans votre jardin",
       "plantCount_one": "{{count}} plante",
       "plantCount_many": "{{count}} plantes",
       "plantCount_other": "{{count}} plantes",
       "notPlanted": "Pas encore au jardin",
-      "notPlantedText": "Placez-la dans une planche pour obtenir des tâches et une prévision de récolte.",
       "yourHarvests": "Vos récoltes",
       "harvestEntries_one": "{{count}} récolte",
       "harvestEntries_many": "{{count}} récoltes",
@@ -804,7 +805,8 @@
       "viability_many": "Germe pendant {{count}} ans",
       "viability_other": "Germe pendant {{count}} ans",
       "isolation": "Distance d’isolement {{distance}} m",
-      "harvestDaysUnit": "jours"
+      "harvestDaysUnit": "jours",
+      "yourStock": "Votre stock"
     }
   },
   "weather": {
@@ -1066,7 +1068,7 @@
     "exportHarvestsCsv": "Récoltes en CSV",
     "exportExpensesCsv": "Dépenses en CSV",
     "lastBackup": "Dernière sauvegarde",
-    "noBackup": "Pas encore de sauvegarde. Vos données ne sont que dans ce navigateur.",
+    "noBackup": "Pas encore de sauvegarde. Vos données ne sont que sur cet appareil.",
     "exportSuccess": "Sauvegarde téléchargée",
     "importSuccess": "Données restaurées",
     "importError": "Échec de l’import. Rien n’a été modifié.",
@@ -1094,7 +1096,9 @@
       "expenses_one": "{{count}} dépense",
       "expenses_other": "{{count}} dépenses",
       "expenses_many": "{{count}} dépenses"
-    }
+    },
+    "backupStale": "Plus de deux semaines – une nouvelle sauvegarde s’impose.",
+    "csvEmpty": "Dès que vous saisissez des récoltes ou des dépenses, vous pouvez les exporter ici en CSV."
   },
   "alerts": {
     "frostTitle": "Alerte gel : {{temp}}",
@@ -2268,7 +2272,10 @@
     "byPlant": "Par plante",
     "focusLabel": "Mettre une plante en évidence",
     "focusNone": "Mettre en évidence …",
-    "emptyFilter": "Aucune plante ne correspond à la recherche."
+    "emptyFilter": "Aucune plante ne correspond à la recherche.",
+    "scrollForMore_one": "Faites défiler pour voir {{count}} plante",
+    "scrollForMore_other": "Faites défiler pour voir les {{count}} plantes",
+    "scrollForMore_many": "Faites défiler pour voir les {{count}} plantes"
   },
   "water": {
     "title": "Arrosage",

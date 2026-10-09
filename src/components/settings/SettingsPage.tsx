@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, ChevronRight, CloudOff, Coffee, ExternalLink, Loader2, MapPin, RefreshCw, Sun, Moon, Monitor, Trash2, Sparkles } from "lucide-react";
+import { Check, ChevronRight, CloudOff, Coffee, ExternalLink, Loader2, MapPin, RefreshCw, Sun, Moon, Monitor, Trash2, Sparkles, TriangleAlert } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { applyTheme } from "@/lib/theme";
@@ -19,6 +20,7 @@ import { useToast } from "@/components/ui/Toast";
 import { DataManagement } from "./DataManagement";
 import { LocationPicker, type PickedLocation } from "./LocationPicker";
 import { useToday } from "@/hooks/useToday";
+import { useBackendAvailable } from "@/hooks/useBackendAvailable";
 
 type Locale = "de" | "en" | "es" | "fr";
 type Theme = "light" | "dark" | "system";
@@ -159,6 +161,12 @@ export function SettingsPage() {
     : fetchStatus === "error" && !checking ? t("settings.weatherKeyUnchecked")
     : t("settings.weatherKeyChecking");
 
+  const showSync = useBackendAvailable(store.backendUrl);
+  // App Store rule 3.1.1: no external tip links in the iOS app.
+  const showCoffee = !(Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios");
+  // A rejected or unreachable key needs the user; otherwise the key field stays folded away.
+  const keyProblem = configuredProvider === "openweathermap" && (keyStatus === "auth" || keyStatus === "unavailable");
+
   return (
     <div className="pb-8">
       <PageHeader
@@ -181,7 +189,9 @@ export function SettingsPage() {
           <div className="space-y-5">
             <div>
               <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("settings.language")}</p>
-              <SegmentedControl label={t("settings.language")} value={store.locale} onChange={handleLocaleChange} options={LANGUAGES} className="max-w-full overflow-x-auto" />
+              <div className="max-w-full overflow-x-auto">
+                <SegmentedControl label={t("settings.language")} value={store.locale} onChange={handleLocaleChange} options={LANGUAGES} />
+              </div>
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("settings.theme")}</p>
@@ -276,15 +286,19 @@ export function SettingsPage() {
                 </p>
               </div>
             </div>
-            <details className="group border-t border-gray-100 pt-3 dark:border-white/10" open={Boolean(store.weatherApiKey) || undefined}>
+            {keyProblem && (
+              <p role="status" className="flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2.5 text-sm font-medium text-warning dark:bg-warning/15">
+                <TriangleAlert size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+                {providerStatus}
+              </p>
+            )}
+            <details className="group border-t border-gray-100 pt-3 dark:border-white/10" open={keyProblem || undefined}>
               <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 [&::-webkit-details-marker]:hidden">
                 <ChevronRight size={16} aria-hidden="true" className="text-gray-500 transition-transform group-open:rotate-90 dark:text-gray-400" />
                 {t("settings.weatherAdvanced")}
               </summary>
               <div className="space-y-3 pt-2 pl-6">
-                <p role="status" className={`text-sm ${keyStatus === "auth" ? "font-medium text-warning-strong" : "text-gray-600 dark:text-gray-300"}`}>
-                  {providerStatus}
-                </p>
+                {!keyProblem && <p role="status" className="text-sm text-gray-600 dark:text-gray-300">{providerStatus}</p>}
                 <Input
                   label={t("settings.apiKey")}
                   type="password"
@@ -339,7 +353,7 @@ export function SettingsPage() {
           </div>
         </Section>
 
-        <Section id="settings-sync" title={t("settings.backend")} description={t("settings.backendDesc")}>
+        {showSync && <Section id="settings-sync" title={t("settings.backend")} description={t("settings.backendDesc")}>
           <Input
             label={t("settings.backendUrl")}
             type="url"
@@ -349,13 +363,13 @@ export function SettingsPage() {
             placeholder="http://localhost:3001"
             hint={t("settings.backendHint")}
           />
-        </Section>
+        </Section>}
 
         <Section id="settings-data" title={t("dataManagement.title")} description={t("settings.dataDesc")}>
           <DataManagement />
         </Section>
 
-        <Section id="settings-support" title={t("settings.coffeeTitle")} description={t("settings.coffeeDesc")}>
+        {showCoffee && <Section id="settings-support" title={t("settings.coffeeTitle")} description={t("settings.coffeeDesc")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-gray-600 dark:text-gray-400">{t("settings.coffeeText")}</p>
             <a
@@ -369,7 +383,7 @@ export function SettingsPage() {
               <ExternalLink size={14} aria-hidden="true" className="text-gray-500" />
             </a>
           </div>
-        </Section>
+        </Section>}
 
         <Section id="settings-danger" title={t("settings.danger.title")} description={t("settings.danger.desc")} tone="danger">
           <div className="flex flex-wrap items-center justify-between gap-3">
