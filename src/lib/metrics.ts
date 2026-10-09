@@ -14,7 +14,7 @@
  * All money values are **euros** (expenses are stored in cents and converted
  * here), all weights **grams** unless the name says Kg.
  */
-import type { Garden } from "@/types/garden";
+import type { Bed, Garden } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import type { HarvestEntry } from "@/types/harvest";
 import type { Expense, ExpenseCategory } from "@/types/expense";
@@ -89,11 +89,57 @@ export interface SeasonYield {
   byPlant: Record<string, number>;
 }
 
-/** Planted area per plant id in m² (all gardens, all beds). */
-export function plantedAreaByPlant(gardens: Garden[], gridCellSizeCm: number): Record<string, number> {
-  const cellArea = (gridCellSizeCm / 100) ** 2;
+/**
+ * Growing area one placed plant stands for, in m². A planner cell holds one
+ * plant, so a tomato (50 × 70 cm spacing) yields like 0,35 m², not like a
+ * 30 cm cell; small crops never count less than their cell. The one formula
+ * behind every forecast and the plant detail's "≈ x kg pro Pflanze".
+ */
+export function plantAreaM2(plant: Pick<Plant, "spacingCm" | "rowSpacingCm"> | undefined, gridCellSizeCm: number): number {
+  const cell = (gridCellSizeCm / 100) ** 2;
+  if (!plant) return cell;
+  return Math.max(cell, (plant.spacingCm / 100) * ((plant.rowSpacingCm || plant.spacingCm) / 100));
+}
+
+/** Expected yield of one plant at its recommended spacing, in kg (plantAreaM2 × expected kg/m²). */
+export function plantYieldKg(plant: Pick<Plant, "spacingCm" | "rowSpacingCm" | "expectedYieldKgPerM2"> | undefined, gridCellSizeCm: number): number {
+  return plant ? plantAreaM2(plant, gridCellSizeCm) * (plant.expectedYieldKgPerM2 ?? 0) : 0;
+}
+
+/**
+ * Credited growing area of every plant in a bed (m²): its plantAreaM2, scaled
+ * down evenly when the bed is planted denser than the spacing allows — a bed
+ * never yields from more area than it has (usable cells, paths excluded).
+ * 8 tomatoes in a 2 m² greenhouse therefore forecast ~2 m² of tomato, not 2,8 m².
+ */
+export function bedPlantAreas(
+  bed: Pick<Bed, "width" | "height" | "paths" | "cells">,
+  plantMap: Map<string, Plant> | null,
+  gridCellSizeCm: number,
+): Array<{ plantId: string; areaM2: number }> {
+  const cell = (gridCellSizeCm / 100) ** 2;
+  const raw = bed.cells.map((c) => ({ plantId: c.plantId, areaM2: plantAreaM2(plantMap?.get(c.plantId), gridCellSizeCm) }));
+  const usable = Math.max(1, bed.width * bed.height - new Set(bed.paths ?? []).size) * cell;
+  const sum = raw.reduce((s, r) => s + r.areaM2, 0);
+  const factor = sum > usable ? usable / sum : 1;
+  return factor === 1 ? raw : raw.map((r) => ({ plantId: r.plantId, areaM2: r.areaM2 * factor }));
+}
+
+/** Expected yield of a bed in kg (bedPlantAreas × expected kg/m²). */
+export function bedForecastKg(bed: Pick<Bed, "width" | "height" | "paths" | "cells">, plantMap: Map<string, Plant>, gridCellSizeCm: number): number {
+  return bedPlantAreas(bed, plantMap, gridCellSizeCm).reduce((s, r) => s + r.areaM2 * (plantMap.get(r.plantId)?.expectedYieldKgPerM2 ?? 0), 0);
+}
+
+/**
+ * Credited growing area per plant id in m² (all gardens, all beds), see
+ * bedPlantAreas. Without `plants` every plant counts as one cell.
+ */
+export function plantedAreaByPlant(gardens: Garden[], gridCellSizeCm: number, plants?: Plant[] | Map<string, Plant>): Record<string, number> {
+  const plantMap = plants ? (plants instanceof Map ? plants : new Map(plants.map((p) => [p.id, p]))) : null;
   const area: Record<string, number> = {};
-  for (const g of gardens) for (const b of g.beds) for (const c of b.cells) area[c.plantId] = (area[c.plantId] ?? 0) + cellArea;
+  for (const g of gardens) for (const b of g.beds) for (const r of bedPlantAreas(b, plantMap, gridCellSizeCm)) {
+    area[r.plantId] = (area[r.plantId] ?? 0) + r.areaM2;
+  }
   return area;
 }
 
@@ -110,12 +156,12 @@ export function getActualYield(harvests: HarvestEntry[], period: Period): Season
   return { source: "actual", totalGrams: total, byPlant };
 }
 
-/** Expected season yield of the current planting plan: area × expected kg/m². */
+/** Expected season yield of the current planting plan: growing area (plantAreaM2 per plant) × expected kg/m². */
 export function getForecastYield(gardens: Garden[], plants: Plant[] | Map<string, Plant>, gridCellSizeCm: number): SeasonYield {
   const plantMap = plants instanceof Map ? plants : new Map(plants.map((p) => [p.id, p]));
   const byPlant: Record<string, number> = {};
   let total = 0;
-  for (const [plantId, area] of Object.entries(plantedAreaByPlant(gardens, gridCellSizeCm))) {
+  for (const [plantId, area] of Object.entries(plantedAreaByPlant(gardens, gridCellSizeCm, plantMap))) {
     const kgPerM2 = plantMap.get(plantId)?.expectedYieldKgPerM2 ?? 0;
     const g = area * kgPerM2 * 1000;
     byPlant[plantId] = g;
@@ -259,6 +305,16 @@ export function animalProductValue(totals: ProductTotals, prices: Record<Product
   return total;
 }
 
+/** A cost from the livestock logs that counts in the breakdown (shown read-only in the expense list). */
+export interface CostLogEntry {
+  source: "feed" | "health";
+  id: string;
+  date: string;
+  /** € */
+  cost: number;
+  label: string;
+}
+
 export interface CostBreakdown {
   /** Expenses logged on the cost page, € */
   expenses: number;
@@ -280,6 +336,8 @@ export interface CostBreakdown {
   animals: number;
   /** Livestock log entries skipped because the same bill is already an expense. */
   duplicatesSkipped: number;
+  /** The livestock log entries counted in `feed`/`veterinary` (after de-duplication). */
+  logEntries: CostLogEntry[];
 }
 
 /** A log entry within this many days of an expense with the same amount is the same bill. */
@@ -310,12 +368,16 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
     duplicatesSkipped++;
     return true;
   };
-  const sumLog = (entries: { date: string; cost?: number }[], category: ExpenseCategory) =>
+  const logEntries: CostLogEntry[] = [];
+  const sumLog = (entries: { id: string; date: string; cost?: number; label: string }[], category: ExpenseCategory, source: CostLogEntry["source"]) =>
     entries
       .filter((x) => inPeriod(x.date, input.period) && (x.cost ?? 0) > 0 && !isDuplicate(category, x.date, x.cost ?? 0))
-      .reduce((s, x) => s + (x.cost ?? 0), 0);
-  const feed = sumLog(input.feedEntries ?? [], "animal_feed");
-  const veterinary = sumLog(input.healthEvents ?? [], "veterinary");
+      .reduce((s, x) => {
+        logEntries.push({ source, id: x.id, date: x.date, cost: x.cost ?? 0, label: x.label });
+        return s + (x.cost ?? 0);
+      }, 0);
+  const feed = sumLog((input.feedEntries ?? []).map((e) => ({ id: e.id, date: e.date, cost: e.cost, label: e.feedType })), "animal_feed", "feed");
+  const veterinary = sumLog((input.healthEvents ?? []).map((e) => ({ id: e.id, date: e.date, cost: e.cost, label: e.description })), "veterinary", "health");
 
   const byCategory = { ...expenseByCategory };
   if (feed > 0) byCategory.animal_feed = (byCategory.animal_feed ?? 0) + feed;
@@ -329,6 +391,7 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
     expenseByCategory,
     animals: (byCategory.animal_feed ?? 0) + (byCategory.veterinary ?? 0),
     duplicatesSkipped,
+    logEntries,
   };
 }
 
@@ -548,16 +611,15 @@ export function getSelfSufficiency(input: {
   if (input.period !== null && input.period === asOf.getFullYear()) {
     const year = input.period;
     const frost = input.lastFrostDate ?? `${year}-05-15`;
-    const cellArea = (input.gridCellSizeCm / 100) ** 2;
     let kcal = 0;
     for (const g of input.gardens)
       for (const b of g.beds) {
         const protection = getFrostProtectionWeeks(b);
-        for (const c of b.cells) {
-          const p = plantMap.get(c.plantId);
+        for (const r of bedPlantAreas(b, plantMap, input.gridCellSizeCm)) {
+          const p = plantMap.get(r.plantId);
           if (!p) continue;
           const [start, end] = harvestWindow(p, frost, protection, year);
-          kcal += cellArea * (p.expectedYieldKgPerM2 ?? 0) * 10 * (p.caloriesPer100g ?? 0) * elapsedShare(start, end, asOf);
+          kcal += r.areaM2 * (p.expectedYieldKgPerM2 ?? 0) * 10 * (p.caloriesPer100g ?? 0) * elapsedShare(start, end, asOf);
         }
       }
     for (const type of PRODUCT_TYPES) {
@@ -634,7 +696,7 @@ export function getCropPlan(input: {
   targets?: Record<string, number>;
 }): CropPlan {
   const plantMap = input.plants instanceof Map ? input.plants : new Map(input.plants.map((p) => [p.id, p]));
-  const area = plantedAreaByPlant(input.gardens, input.gridCellSizeCm);
+  const area = plantedAreaByPlant(input.gardens, input.gridCellSizeCm, plantMap);
   const actual = getActualYield(input.harvests, input.period).byPlant;
   const rows: CropPlanRow[] = [];
   for (const [plantId, perPerson] of Object.entries(input.targets ?? ANNUAL_KG_TARGETS)) {

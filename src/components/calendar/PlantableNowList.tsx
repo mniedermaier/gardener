@@ -40,8 +40,8 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   /**
    * Always two short parts: the date and the beds. One date for all beds:
    * "bis 17. Okt. · Hochbeet Süd". Dates that differ per bed (glass closes
-   * later): "Ende je nach Beet: 10. Okt.–15. Nov. · 4 Beete" (formatDateRange,
-   * one range style app-wide). Every action is a badge, never a meta part.
+   * later): the outer date with the qualifier, "bis 15. Nov. (je nach Beet) · 4 Beete"
+   * — the last chance for "now", the first for "soon".
    */
   const meta = (item: AgendaPlantRow, afterFrost: boolean): string[] => {
     const key = item.kind === "now" ? "until" : "from";
@@ -55,7 +55,8 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
       when = t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") });
     } else {
       const dates = groups.map((g) => g.date.getTime());
-      when = t(`calendar.${key}Range`, { range: formatDateRange(new Date(Math.min(...dates)), new Date(Math.max(...dates))) });
+      const outer = key === "until" ? Math.max(...dates) : Math.min(...dates);
+      when = t(`calendar.${key}ByBed`, { date: formatDate(new Date(outer), "short") });
     }
     return [when, beds].filter((x): x is string => !!x);
   };
@@ -76,8 +77,8 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
             title={getPlantName(item.plantId)}
             badges={item.actions.length > 0 ? (
               <>
-                {/* One badge per row ("Herbstsaat / Auspflanzen"), so rows never wrap into two badge lines. */}
-                <PhaseBadge phase={actionPhase(item.actions[0])} label={[...new Set(item.actions.map((a) => t(`advisor.actions.${a}`)))].join(" / ")} />
+                {/* One phase per row (the first action), so rows never wrap into two badge lines. */}
+                <PhaseBadge phase={actionPhase(item.actions[0])} label={t(`advisor.actions.${item.actions[0]}`)} />
                 {/* The window closes before the frost is over: no badge-plus-date contradiction, just this. */}
                 {frostBlocks(item, plant) && !windowAfterFrost(item) && (
                   <Badge tone="warning" size="sm">{t("advisor.afterFrost", { date: formatDate(addDays(lastFrostNight!, 1), "short") })}</Badge>

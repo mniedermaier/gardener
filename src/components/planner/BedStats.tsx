@@ -1,4 +1,5 @@
 import { memo, useMemo } from "react";
+import { bedForecastKg } from "@/lib/metrics";
 import { useTranslation } from "react-i18next";
 import type { Bed } from "@/types/garden";
 import type { Plant } from "@/types/plant";
@@ -24,15 +25,10 @@ export const BedStats = memo(function BedStats({ bed, plantMap, gridCellSizeCm, 
   const stats = useMemo(() => {
     const paths = new Set(bed.paths ?? []).size;
     const usable = Math.max(1, bed.width * bed.height - paths);
-    const cellAreaM2 = (gridCellSizeCm / 100) ** 2;
-    let yieldKg = 0;
+    // Same forecast as every other page (lib/metrics bedForecastKg).
+    const yieldKg = bedForecastKg(bed, plantMap, gridCellSizeCm);
     const species = new Set<string>();
-    for (const cell of bed.cells) {
-      const plant = plantMap.get(cell.plantId);
-      if (!plant) continue;
-      yieldKg += (plant.expectedYieldKgPerM2 ?? 0) * cellAreaM2;
-      species.add(cell.plantId);
-    }
+    for (const cell of bed.cells) if (plantMap.has(cell.plantId)) species.add(cell.plantId);
     return { occupancy: bed.cells.length / usable, species: species.size, yieldGrams: yieldKg * 1000 };
   }, [bed, plantMap, gridCellSizeCm]);
 

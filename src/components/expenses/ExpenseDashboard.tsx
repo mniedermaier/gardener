@@ -12,7 +12,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO } from "@/lib/format";
-import { DEFAULT_PRODUCT_PRICES, PRODUCT_TYPES, type Period } from "@/lib/metrics";
+import { DEFAULT_PRODUCT_PRICES, PRODUCT_TYPES, type CostLogEntry, type Period } from "@/lib/metrics";
 import type { Expense, ExpenseCategory } from "@/types/expense";
 import type { ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -123,16 +123,24 @@ export function ExpenseDashboard() {
     () => expenses.filter((e) => period === null || e.date.startsWith(`${period}-`)).sort((a, b) => b.date.localeCompare(a.date)),
     [expenses, period],
   );
+  // Costs from the feed and health logs count in the KPI, so they appear in the
+  // list too (read-only, marked with their source): month sums add up to the total.
+  type Row = { kind: "expense"; date: string; expense: Expense } | { kind: "log"; date: string; entry: CostLogEntry };
   const groups = useMemo(() => {
-    const out: { key: string; items: Expense[]; sum: number }[] = [];
-    for (const e of visible) {
-      const key = e.date.slice(0, 7);
+    const rows: Row[] = [
+      ...visible.map((e) => ({ kind: "expense" as const, date: e.date, expense: e })),
+      ...balance.costs.logEntries.map((entry) => ({ kind: "log" as const, date: entry.date, entry })),
+    ].sort((a, b) => b.date.localeCompare(a.date));
+    const out: { key: string; items: Row[]; sum: number }[] = [];
+    for (const r of rows) {
+      const key = r.date.slice(0, 7);
+      const amount = r.kind === "expense" ? r.expense.amountCents / 100 : r.entry.cost;
       const last = out[out.length - 1];
-      if (last?.key === key) { last.items.push(e); last.sum += e.amountCents / 100; }
-      else out.push({ key, items: [e], sum: e.amountCents / 100 });
+      if (last?.key === key) { last.items.push(r); last.sum += amount; }
+      else out.push({ key, items: [r], sum: amount });
     }
     return out;
-  }, [visible]);
+  }, [visible, balance.costs.logEntries]);
 
   // One breakdown (metrics.getCosts): livestock feed/vet logs are part of
   // the animal_feed/veterinary categories, with their origin as a note.
@@ -280,13 +288,29 @@ export function ExpenseDashboard() {
 
           <section aria-labelledby="expense-list" className="space-y-3">
             <h2 id="expense-list" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("expenses.entries")}</h2>
-            {visible.length === 0 ? (
+            {groups.length === 0 ? (
               <Card>
                 <EmptyState compact icon={ReceiptText} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
               </Card>
             ) : groups.map((g) => (
               <List key={g.key} header={`${f.formatDate(`${g.key}-01`, "monthYear")} · ${f.formatCurrency(g.sum)}`}>
-                {g.items.map((e) => (
+                {g.items.map((r) => {
+                  if (r.kind === "log") {
+                    const { entry } = r;
+                    return (
+                      <ListRow
+                        key={`${entry.source}-${entry.id}`}
+                        leading={<CategoryTile category={entry.source === "feed" ? "animal_feed" : "veterinary"} />}
+                        title={entry.label}
+                        meta={[t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook"), f.formatDate(entry.date, "relative")]}
+                        trailing={f.formatCurrency(entry.cost)}
+                        onClick={() => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health")}
+                        clickLabel={`${entry.label} · ${t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook")}`}
+                      />
+                    );
+                  }
+                  const e = r.expense;
+                  return (
                   <ListRow
                     key={e.id}
                     leading={<CategoryTile category={e.category} />}
@@ -305,7 +329,8 @@ export function ExpenseDashboard() {
                       />
                     }
                   />
-                ))}
+                  );
+                })}
               </List>
             ))}
           </section>

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { EggWeekHint } from "./EggWeekHint";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Bird, Egg, Plus, Coins } from "lucide-react";
@@ -151,8 +152,8 @@ export function LivestockPage() {
               label: t("livestock.eggsThisWeek"),
               value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
               icon: Egg,
-              visual: <Sparkline values={stats.eggWeeks} color="earth" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
-              hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
+              visual: <Sparkline values={stats.eggWeeks} color="brand" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
+              hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} />,
               to: "/livestock/production",
             } : { ...feedFigure, icon: Coins }}
             // A short summary that links on: the year totals and the monthly

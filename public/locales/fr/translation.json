@@ -840,7 +840,7 @@
       "hatchLegend": "Hachuré : sous abri",
       "bedFirstHint": "Ajoute une planche, puis place {{plant}} directement.",
       "sowNoteBedFirst": "{{note}} – ajoutez une planche d’ici là",
-      "yieldPerPlant": "≈ {{value}} par plante"
+      "yieldPerPlant": "≈ {{value}} par plante à espacement complet"
     },
     "sowNowFilter": "À semer"
   },
@@ -1012,12 +1012,12 @@
     },
     "reopenNamed": "Rouvrir « {{title}} »",
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
-    "untilRange": "Fin selon la planche : {{range}}",
-    "fromRange": "Début selon la planche : {{range}}",
     "upNextFrom": "Ensuite · dès le {{date}}",
     "notesPlaceholder": "p. ex. outils, rappels…",
     "afterFrostWindow": "après les nuits de gel : {{range}}",
-    "timelineEmptyLine": "Ton plan de saison a besoin d’une planche."
+    "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
+    "untilByBed": "jusqu’au {{date}} (selon la planche)",
+    "fromByBed": "à partir du {{date}} (selon la planche)"
   },
   "settings": {
     "title": "Paramètres",
@@ -1610,7 +1610,11 @@
     "namePlaceholders": {
       "pest": "ex : Pucerons, limaces…",
       "disease": "ex : Oïdium, mildiou…"
-    }
+    },
+    "summary_one": "{{count}} actif",
+    "summary_other": "{{count}} actifs",
+    "summary_many": "{{count}} actifs",
+    "summarySevere": "{{active}} actifs · {{severe}} graves"
   },
   "livestock": {
     "title": "Animaux",
@@ -1890,7 +1894,8 @@
     "singleEntries": "Saisies individuelles",
     "singleEntriesRange_one": "dernier mois",
     "singleEntriesRange_other": "{{count}} derniers mois",
-    "singleEntriesRange_many": "{{count}} derniers mois"
+    "singleEntriesRange_many": "{{count}} derniers mois",
+    "eggTrend": "{{value}} par rapport à la semaine moyenne"
   },
   "seeds": {
     "title": "Semences",
@@ -2251,7 +2256,9 @@
     "duplicatesSkipped_other": "{{count}} doublons n’ont pas été comptés.",
     "fromFeedLog": "dont {{amount}} du carnet d’alimentation",
     "fromHealthLog": "dont {{amount}} du suivi santé",
-    "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés."
+    "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés.",
+    "fromFeedBook": "du carnet d’alimentation",
+    "fromHealthBook": "du carnet de santé"
   },
   "succession": {
     "pick": "Choisir une culture",
@@ -2461,7 +2468,8 @@
     "sparkLabel_other": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
     "sparkLabel_many": "Arrosage des {{count}} dernières semaines, {{amount}} cette semaine",
     "notesPlaceholder": "p. ex. sol encore humide, récupérateur vide…",
-    "chooseBed": "Choisir une planche…"
+    "chooseBed": "Choisir une planche…",
+    "wholeGarden": "Tout le jardin"
   },
   "storage": {
     "full": "Stockage plein — les modifications ne sont plus enregistrées. Exportez une sauvegarde et supprimez d'anciennes entrées.",
@@ -2559,7 +2567,7 @@
     "compositionLabel": "Jardin {{garden}}, produits animaux {{animals}} du besoin annuel",
     "fromGarden": "Jardin",
     "fromAnimals": "Produits animaux",
-    "surplusNote": "Surplus, non compté : {{items}}.",
+    "surplusNote": "Excédent prévu (rendement annuel type), non compté : {{items}}.",
     "notCovered": "Non couvert"
   }
 }

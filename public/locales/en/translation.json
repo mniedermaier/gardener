@@ -816,7 +816,7 @@
       "hatchLegend": "Hatched: under glass",
       "bedFirstHint": "Add a bed, then you can place {{plant}} right away.",
       "sowNoteBedFirst": "{{note}} – add a bed before then",
-      "yieldPerPlant": "≈ {{value}} per plant"
+      "yieldPerPlant": "≈ {{value}} per plant at full spacing"
     },
     "sowNowFilter": "Sow now"
   },
@@ -982,12 +982,12 @@
     },
     "reopenNamed": "Reopen “{{title}}”",
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
-    "untilRange": "Ends by bed: {{range}}",
-    "fromRange": "Starts by bed: {{range}}",
     "upNextFrom": "Coming up next · from {{date}}",
     "notesPlaceholder": "e.g. tools, reminders…",
     "afterFrostWindow": "after the frost nights: {{range}}",
-    "timelineEmptyLine": "Your season plan needs a bed."
+    "timelineEmptyLine": "Your season plan needs a bed.",
+    "untilByBed": "until {{date}} (depending on bed)",
+    "fromByBed": "from {{date}} (depending on bed)"
   },
   "settings": {
     "title": "Settings",
@@ -1541,7 +1541,10 @@
     "namePlaceholders": {
       "pest": "e.g. Aphids, slugs…",
       "disease": "e.g. Powdery mildew, blight…"
-    }
+    },
+    "summary_one": "{{count}} active",
+    "summary_other": "{{count}} active",
+    "summarySevere": "{{active}} active · {{severe}} severe"
   },
   "livestock": {
     "title": "Animals",
@@ -1804,7 +1807,8 @@
     "quantityIn": "Quantity ({{unit}})",
     "singleEntries": "Individual entries",
     "singleEntriesRange_one": "last month",
-    "singleEntriesRange_other": "last {{count}} months"
+    "singleEntriesRange_other": "last {{count}} months",
+    "eggTrend": "{{value}} vs. average week"
   },
   "seeds": {
     "title": "Seeds",
@@ -2152,7 +2156,9 @@
     "duplicatesSkipped_one": "{{count}} duplicate entry was not counted.",
     "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
     "fromFeedLog": "incl. {{amount}} from the feed log",
-    "fromHealthLog": "incl. {{amount}} from health records"
+    "fromHealthLog": "incl. {{amount}} from health records",
+    "fromFeedBook": "from the feed log",
+    "fromHealthBook": "from the health record"
   },
   "succession": {
     "pick": "Pick a crop",
@@ -2351,7 +2357,8 @@
     "sparkLabel_one": "Watering over the last {{count}} week, {{amount}} this week",
     "sparkLabel_other": "Watering over the last {{count}} weeks, {{amount}} this week",
     "notesPlaceholder": "e.g. soil still moist, rain barrel empty…",
-    "chooseBed": "Choose a bed…"
+    "chooseBed": "Choose a bed…",
+    "wholeGarden": "Whole garden"
   },
   "storage": {
     "full": "Storage full — changes are no longer being saved. Export a backup and remove old entries.",
@@ -2445,7 +2452,7 @@
     "compositionLabel": "Garden {{garden}}, animal products {{animals}} of the annual need",
     "fromGarden": "Garden",
     "fromAnimals": "Animal products",
-    "surplusNote": "Surplus, not counted: {{items}}.",
+    "surplusNote": "Forecast surplus (typical annual yield), not counted: {{items}}.",
     "notCovered": "Not covered"
   }
 }

@@ -14,6 +14,7 @@ import { useAddBed } from "@/hooks/useAddBed";
 import { useFormat } from "@/hooks/useFormat";
 import { intlLocale } from "@/lib/format";
 import { getPhaseWindows, seasonFrost, type PhaseWindow } from "@/lib/season";
+import { plantYieldKg } from "@/lib/metrics";
 import { PHASE_META, PhaseSwatch, phaseFill } from "@/components/ui/phase";
 import type { Plant } from "@/types/plant";
 import { getFrostProtectionWeeks, type EnvironmentType } from "@/types/garden";
@@ -223,8 +224,8 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   const { formatNumber, formatWeight, formatDate } = useFormat();
   const allPlants = usePlants();
   const getPlantName = usePlantName();
-  const { gardens, harvests, seeds, lastFrostDate } = useStore(
-    useShallow((s) => ({ gardens: s.gardens, harvests: s.harvests, seeds: s.seeds, lastFrostDate: s.lastFrostDate })),
+  const { gardens, harvests, seeds, lastFrostDate, gridCellSizeCm } = useStore(
+    useShallow((s) => ({ gardens: s.gardens, harvests: s.harvests, seeds: s.seeds, lastFrostDate: s.lastFrostDate, gridCellSizeCm: s.gridCellSizeCm })),
   );
 
   const frost = useMemo(() => seasonFrost(lastFrostDate), [lastFrostDate]);
@@ -383,7 +384,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           value={plant.expectedYieldKgPerM2 ? formatNumber(plant.expectedYieldKgPerM2) : "–"}
           unit={plant.expectedYieldKgPerM2 ? t("plants.detail.yieldUnit") : undefined}
           hint={plant.expectedYieldKgPerM2
-            ? t("plants.detail.yieldPerPlant", { value: formatWeight(plant.expectedYieldKgPerM2 * (plant.spacingCm / 100) * (plant.rowSpacingCm / 100) * 1000) })
+            ? t("plants.detail.yieldPerPlant", { value: formatWeight(plantYieldKg(plant, gridCellSizeCm) * 1000) })
             : undefined}
         />
         <StatCard
@@ -420,41 +421,6 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
             )}
           </Card>
 
-          <Card>
-            <CardHeader
-              title={t("plants.detail.partners")}
-              actions={
-                <Button variant="ghost" size="sm" onClick={() => navigate(`/companions?plant=${encodeURIComponent(plant.id)}`)}>
-                  <Network size={16} aria-hidden="true" />
-                  {t("plants.detail.allPartners")}
-                </Button>
-              }
-            />
-            {good.length === 0 && bad.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t("plants.detail.noPartners")}</p>
-            ) : (
-              <div className="space-y-4">
-                {good.length > 0 && (
-                  <section>
-                    <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
-                      {t("plants.details.companions")}
-                    </h3>
-                    <PartnerChips ids={good} kind="good" onSelect={onSelectPlant} />
-                  </section>
-                )}
-                {bad.length > 0 && (
-                  <section>
-                    <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      <TriangleAlert size={14} aria-hidden="true" className="text-warning" />
-                      {t("plants.details.antagonists")}
-                    </h3>
-                    <PartnerChips ids={bad} kind="bad" onSelect={onSelectPlant} />
-                  </section>
-                )}
-              </div>
-            )}
-          </Card>
         </div>
 
         <div className="space-y-6">
@@ -479,14 +445,12 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               leading={<StockTile icon={Apple} />}
               title={t("plants.detail.yourHarvests")}
               onClick={harvestStats.count > 0 ? () => navigate("/harvest") : goHarvest}
-              // Weight, count and last date as meta parts of one size; only the "+" on the right, so the title keeps its width.
+              // Weight and count as meta parts, the last date on its own line: three parts
+              // wrapped in the narrow column and left a "·" hanging at the line end.
               meta={harvestStats.count > 0
-                ? [
-                  formatWeight(harvestStats.grams),
-                  t("plants.detail.harvestEntries", { count: harvestStats.count }),
-                  harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : null,
-                ]
+                ? [formatWeight(harvestStats.grams), t("plants.detail.harvestEntries", { count: harvestStats.count })]
                 : t("plants.detail.noHarvests")}
+              description={harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : undefined}
               // Nothing to harvest from while the crop stands in no bed (and none was harvested yet).
               actions={locations.length > 0 || harvestStats.count > 0 ? <IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} /> : undefined}
             />
@@ -532,6 +496,42 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               )}
             </Card>
           )}
+
+          <Card>
+            <CardHeader
+              title={t("plants.detail.partners")}
+              actions={
+                <Button variant="ghost" size="sm" onClick={() => navigate(`/companions?plant=${encodeURIComponent(plant.id)}`)}>
+                  <Network size={16} aria-hidden="true" />
+                  {t("plants.detail.allPartners")}
+                </Button>
+              }
+            />
+            {good.length === 0 && bad.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t("plants.detail.noPartners")}</p>
+            ) : (
+              <div className="space-y-4">
+                {good.length > 0 && (
+                  <section>
+                    <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
+                      {t("plants.details.companions")}
+                    </h3>
+                    <PartnerChips ids={good} kind="good" onSelect={onSelectPlant} />
+                  </section>
+                )}
+                {bad.length > 0 && (
+                  <section>
+                    <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <TriangleAlert size={14} aria-hidden="true" className="text-warning" />
+                      {t("plants.details.antagonists")}
+                    </h3>
+                    <PartnerChips ids={bad} kind="bad" onSelect={onSelectPlant} />
+                  </section>
+                )}
+              </div>
+            )}
+          </Card>
         </div>
       </div>
     </div>

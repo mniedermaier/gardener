@@ -3,7 +3,7 @@ import type { Garden } from "@/types/garden";
 import type { Animal } from "@/types/animal";
 import type { PantryItem } from "@/types/pantry";
 import { PRODUCT_NUTRITION } from "@/types/animal";
-import { capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
+import { bedPlantAreas, capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
 import { addWeeks, addDays, parseISO, getMonth } from "date-fns";
 import { getFrostProtectionWeeks } from "@/types/garden";
 
@@ -134,18 +134,18 @@ const SUGGESTIONS: Record<string, string> = {
 
 // --- Core Functions ---
 
+/** Credited growing area of one crop over all beds (lib/metrics bedPlantAreas; one cell per plant without `plants`). */
 export function estimatePlantArea(
   gardens: Garden[],
   plantId: string,
   gridCellSizeCm: number,
+  plants?: Map<string, Plant>,
 ): number {
-  let cellCount = 0;
-  for (const g of gardens) {
-    for (const b of g.beds) {
-      cellCount += b.cells.filter((c) => c.plantId === plantId).length;
-    }
+  let area = 0;
+  for (const g of gardens) for (const b of g.beds) {
+    for (const r of bedPlantAreas(b, plants ?? null, gridCellSizeCm)) if (r.plantId === plantId) area += r.areaM2;
   }
-  return cellCount * (gridCellSizeCm / 100) ** 2;
+  return area;
 }
 
 export function calculatePlantYield(
@@ -217,11 +217,11 @@ export function calculateSufficiency(
   for (const g of gardens) {
     for (const b of g.beds) {
       const protection = getFrostProtectionWeeks(b);
-      for (const c of b.cells) {
-        const existing = plantAreas.get(c.plantId) ?? { area: 0, protections: [] };
-        existing.area += (gridCellSizeCm / 100) ** 2;
+      for (const r of bedPlantAreas(b, plantMap, gridCellSizeCm)) {
+        const existing = plantAreas.get(r.plantId) ?? { area: 0, protections: [] };
+        existing.area += r.areaM2;
         if (!existing.protections.includes(protection)) existing.protections.push(protection);
-        plantAreas.set(c.plantId, existing);
+        plantAreas.set(r.plantId, existing);
       }
     }
   }

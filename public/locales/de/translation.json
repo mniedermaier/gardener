@@ -816,7 +816,7 @@
       "hatchLegend": "Schraffiert: unter Glas",
       "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein.",
       "sowNoteBedFirst": "{{note}} – lege bis dahin ein Beet an",
-      "yieldPerPlant": "≈ {{value}} pro Pflanze"
+      "yieldPerPlant": "≈ {{value}} pro Pflanze mit vollem Abstand"
     },
     "sowNowFilter": "Jetzt säen"
   },
@@ -982,12 +982,12 @@
     },
     "reopenNamed": "„{{title}}“ wieder öffnen",
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
-    "untilRange": "Ende je nach Beet: {{range}}",
-    "fromRange": "Start je nach Beet: {{range}}",
     "upNextFrom": "Als Nächstes · ab {{date}}",
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
     "afterFrostWindow": "nach den Frostnächten: {{range}}",
-    "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet."
+    "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
+    "untilByBed": "bis {{date}} (je nach Beet)",
+    "fromByBed": "ab {{date}} (je nach Beet)"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1541,7 +1541,10 @@
     "namePlaceholders": {
       "pest": "z. B. Blattläuse, Schnecken …",
       "disease": "z. B. Mehltau, Krautfäule …"
-    }
+    },
+    "summary_one": "{{count}} aktiv",
+    "summary_other": "{{count}} aktiv",
+    "summarySevere": "{{active}} aktiv · {{severe}} stark"
   },
   "livestock": {
     "title": "Tiere",
@@ -1804,7 +1807,8 @@
     "quantityIn": "Menge ({{unit}})",
     "singleEntries": "Einzeleinträge",
     "singleEntriesRange_one": "letzter Monat",
-    "singleEntriesRange_other": "letzte {{count}} Monate"
+    "singleEntriesRange_other": "letzte {{count}} Monate",
+    "eggTrend": "{{value}} zur Ø-Woche"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2152,7 +2156,9 @@
     "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
     "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
-    "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte"
+    "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte",
+    "fromFeedBook": "aus dem Futterbuch",
+    "fromHealthBook": "aus der Gesundheitsakte"
   },
   "succession": {
     "pick": "Kultur wählen",
@@ -2351,7 +2357,8 @@
     "sparkLabel_one": "Gießwasser der letzten {{count}} Woche, diese Woche {{amount}}",
     "sparkLabel_other": "Gießwasser der letzten {{count}} Wochen, diese Woche {{amount}}",
     "notesPlaceholder": "z. B. Boden noch feucht, Regentonne leer …",
-    "chooseBed": "Beet wählen …"
+    "chooseBed": "Beet wählen …",
+    "wholeGarden": "Ganzer Garten"
   },
   "storage": {
     "full": "Speicher voll — Änderungen werden nicht mehr gesichert. Exportiere ein Backup und lösche alte Einträge.",
@@ -2445,7 +2452,7 @@
     "compositionLabel": "Garten {{garden}}, Tierprodukte {{animals}} des Jahresbedarfs",
     "fromGarden": "Garten",
     "fromAnimals": "Tierprodukte",
-    "surplusNote": "Überschuss, nicht eingerechnet: {{items}}.",
+    "surplusNote": "Prognose-Überschuss (typischer Jahresertrag), nicht eingerechnet: {{items}}.",
     "notCovered": "Nicht gedeckt"
   }
 }

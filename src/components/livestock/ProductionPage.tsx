@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { EggWeekHint } from "./EggWeekHint";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Bird, Egg, Pencil, Plus, Trash2 } from "lucide-react";
@@ -99,10 +100,10 @@ export function ProductionPage() {
         value: (
           <span className="inline-flex items-end gap-3">
             {f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })}
-            <Sparkline values={eggWeeks} color="earth" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
+            <Sparkline values={eggWeeks} color="brand" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
           </span>
         ),
-        hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
+        hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} />,
       }]
     : [];
   const yearFigures = [...weekFigure, ...herdTypes.slice(1).map(yearFigure)];
