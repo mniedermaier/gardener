@@ -1895,7 +1895,8 @@
     "singleEntriesRange_one": "dernier mois",
     "singleEntriesRange_other": "{{count}} derniers mois",
     "singleEntriesRange_many": "{{count}} derniers mois",
-    "eggTrend": "{{value}} par rapport à la semaine moyenne"
+    "eggTrend": "{{value}} par rapport à la semaine moyenne",
+    "chooseAnimal": "Choisir un animal…"
   },
   "seeds": {
     "title": "Semences",

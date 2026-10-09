@@ -140,6 +140,17 @@ interface RecordDialogProps<T> {
   animalId?: string;
 }
 
+/**
+ * Which animal a new record starts on (DESIGN_SYSTEM rule 9: no silent
+ * preselection): the animal of the latest record of this kind, the only
+ * animal, or none — then "Tier wählen …" and Save stays disabled.
+ */
+function defaultAnimalId(animals: { id: string }[], records: { animalId: string; date: string }[]): string {
+  if (animals.length === 1) return animals[0].id;
+  const last = [...records].sort((a, b) => b.date.localeCompare(a.date)).find((r) => animals.some((a) => a.id === r.animalId));
+  return last?.animalId ?? "";
+}
+
 export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogProps<AnimalProduct>) {
   const { t } = useTranslation();
   const f = useFormat();
@@ -159,7 +170,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      const first = animalId ?? entry?.animalId ?? animals[0]?.id ?? "";
+      const first = animalId ?? entry?.animalId ?? defaultAnimalId(animals, useStore.getState().animalProducts);
       const a = animals.find((x) => x.id === first);
       setAid(first);
       setType(entry?.type ?? (a ? PRODUCT_TYPES_BY_ANIMAL[a.type][0] : "eggs"));
@@ -197,6 +208,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
           <Select
             label={t("livestock.selectAnimal")}
             value={aid}
+            placeholder={t("livestock.chooseAnimal")}
             onChange={(e) => {
               setAid(e.target.value);
               const a = animals.find((x) => x.id === e.target.value);
@@ -258,7 +270,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      setAid(animalId ?? entry?.animalId ?? animals[0]?.id ?? "");
+      setAid(animalId ?? entry?.animalId ?? defaultAnimalId(animals, useStore.getState().feedEntries));
       setFeedType(entry?.feedType ?? "");
       setQty(toField(entry?.quantity, f));
       setUnit(entry?.unit ?? "kg");
@@ -292,7 +304,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
       footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={t("common.save")} onDelete={entry ? () => void deleteFeed(entry).then((ok) => ok && onClose()) : undefined} />}
     >
       <div className="space-y-4">
-        {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
+        {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} placeholder={t("livestock.chooseAnimal")} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
         <Input label={t("livestock.feedType")} value={feedType} onChange={(e) => setFeedType(e.target.value)} placeholder={t("livestock.feedTypePlaceholder")} autoFocus />
         {/* Same pattern as the harvest weight: the field plus an inline unit toggle (DESIGN_SYSTEM rule 9). */}
         <div className="flex items-end gap-2">
@@ -346,7 +358,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
   if (openKey !== openedFor) {
     setOpenedFor(openKey);
     if (open) {
-      setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? animals[0]?.id ?? "");
+      setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? defaultAnimalId(animals, useStore.getState().healthEvents));
       setType(entry?.type ?? presetType ?? "checkup");
       setDesc(entry?.description ?? "");
       setCost(toField(entry?.cost, f));
@@ -379,7 +391,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
       footer={<DialogFooter onCancel={onClose} onSave={save} canSave={canSave} saveLabel={t("common.save")} onDelete={entry ? () => void deleteHealth(entry).then((ok) => ok && onClose()) : undefined} />}
     >
       <div className="space-y-4">
-        {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
+        {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} placeholder={t("livestock.chooseAnimal")} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
         <Select
           label={t("livestock.healthType")}
           value={type}

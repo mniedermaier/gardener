@@ -1808,7 +1808,8 @@
     "singleEntries": "Individual entries",
     "singleEntriesRange_one": "last month",
     "singleEntriesRange_other": "last {{count}} months",
-    "eggTrend": "{{value}} vs. average week"
+    "eggTrend": "{{value}} vs. average week",
+    "chooseAnimal": "Choose animal…"
   },
   "seeds": {
     "title": "Seeds",

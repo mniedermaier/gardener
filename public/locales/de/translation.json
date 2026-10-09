@@ -1808,7 +1808,8 @@
     "singleEntries": "Einzeleinträge",
     "singleEntriesRange_one": "letzter Monat",
     "singleEntriesRange_other": "letzte {{count}} Monate",
-    "eggTrend": "{{value}} zur Ø-Woche"
+    "eggTrend": "{{value}} zur Ø-Woche",
+    "chooseAnimal": "Tier wählen …"
   },
   "seeds": {
     "title": "Saatgut",

@@ -1895,7 +1895,8 @@
     "singleEntriesRange_one": "último mes",
     "singleEntriesRange_other": "últimos {{count}} meses",
     "singleEntriesRange_many": "últimos {{count}} meses",
-    "eggTrend": "{{value}} frente a la semana media"
+    "eggTrend": "{{value}} frente a la semana media",
+    "chooseAnimal": "Elegir animal…"
   },
   "seeds": {
     "title": "Semillas",
