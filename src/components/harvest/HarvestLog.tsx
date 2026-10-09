@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Apple, Pencil, Plus, Trash2, Hash } from "lucide-react";
 import { startOfMonth, subMonths, addMonths, differenceInCalendarDays, differenceInCalendarMonths } from "date-fns";
@@ -66,6 +66,25 @@ function rememberUnit(plantId: string, unit: Unit) {
 function parseAmount(text: string): number {
   const n = Number(text.trim().replace(",", "."));
   return Number.isFinite(n) ? n : NaN;
+}
+
+/** Takes the free height of a stretched flex column (at least `minHeight`) and hands it to a fixed-height child.
+ *  The child sits absolutely, so it never pushes the column taller than its siblings make it. */
+function FillHeight({ minHeight, children }: { minHeight: number; children: (height: number) => React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(minHeight);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(([e]) => setHeight(Math.max(minHeight, Math.floor(e.contentRect.height))));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [minHeight]);
+  return (
+    <div ref={ref} className="relative flex-1" style={{ minHeight }}>
+      <div className="absolute inset-0">{children(height)}</div>
+    </div>
+  );
 }
 
 export function HarvestLog() {
@@ -285,25 +304,25 @@ export function HarvestLog() {
             ]}
           />
 
-          {/* Equal heights side by side; the chart centres in its card instead of
-              leaving a band under it, and the crop list keeps its own height. */}
-          {/* Cards keep their own height: the chart card does not stretch into an empty band. */}
-          <div className="grid items-start gap-6 lg:grid-cols-2">
+          {/* Equal heights side by side: the chart grows into the height the crop list sets. */}
+          <div className="grid items-stretch gap-6 lg:grid-cols-2">
             <Card className="flex min-w-0 flex-col">
               {/* The subtitle names the range actually drawn (from the first harvest month, 3–12 months). */}
               <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint", { month: formatDate(stats.months[0].date, "monthYear") })} />
-              <div className="flex flex-1 flex-col">
+              <FillHeight minHeight={240}>
+                {(h) => (
               <BarChart
                 caption={t("harvest.perMonth")}
                 categoryLabel={t("harvest.month")}
                 series={[{ label: t("harvest.totalWeight"), color: "brand" }]}
-                height={240}
+                height={h}
                 data={stats.months.map((m) => ({ key: m.key, label: formatDate(m.date, "month"), fullLabel: formatDate(m.date, "monthYear"), values: [m.kg] }))}
                 formatValue={(kg) => formatWeight(kg * 1000)}
                 formatTick={kgTick}
                 marker={{ index: stats.months.length - 1, label: t("charts.today") }}
               />
-              </div>
+                )}
+              </FillHeight>
             </Card>
 
             <Card className="min-w-0">

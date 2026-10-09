@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlaskConical, Package, Pencil, Plus, ShoppingCart, Sprout, Trash2 } from "lucide-react";
+import { FlaskConical, Package, Pencil, Plus, Sprout, Trash2 } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
@@ -195,13 +195,10 @@ export function SeedInventory() {
       {seeds.length > 0 && (
         <KeyFigures
           className="mb-6"
-          // The shopping gap is what the page is about; with nothing missing
-          // the stock itself leads. Zero counts are left out.
-          hero={missing.length > 0
-            ? { label: t("seeds.missingStat"), value: formatNumber(missing.length), hint: t("seeds.missingStatHint"), icon: ShoppingCart, tone: "neutral" }
-            : { label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand", hint: itemsHint }}
+          // The stock leads; what is missing for the beds has its own card right
+          // below, so it is not repeated as a figure. Zero counts are left out.
+          hero={{ label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand", hint: itemsHint }}
           items={[
-            ...(missing.length > 0 ? [{ label: t("seeds.items"), value: formatNumber(seeds.length), hint: itemsHint }] : []),
             ...(testCount > 0 ? [{ label: t("seeds.testRecommended"), value: formatNumber(testCount), hint: t("seeds.testHintShort") }] : []),
             ...(totalCost > 0 ? [{ label: t("seeds.totalCost"), value: formatCurrency(totalCost) }] : []),
           ]}

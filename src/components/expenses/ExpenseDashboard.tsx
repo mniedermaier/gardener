@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat, type LucideIcon, HeartPulse } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -312,11 +309,12 @@ export function ExpenseDashboard() {
                         key={`${entry.source}-${entry.id}`}
                         leading={<CategoryTile category={entry.source === "feed" ? "animal_feed" : "veterinary"} />}
                         title={entry.label}
-                        // Category first like every other row, the origin as a short tag.
-                        meta={[t(`expenses.categories.${entry.source === "feed" ? "animal_feed" : "veterinary"}`), t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook"), f.formatDate(entry.date, "relative")]}
+                        // Category first like every other row; the source as one badge pattern.
+                        meta={[t(`expenses.categories.${entry.source === "feed" ? "animal_feed" : "veterinary"}`), f.formatDate(entry.date, "relative")]}
+                        badges={<SourceBadge source={entry.source} />}
                         trailing={f.formatCurrency(entry.cost)}
                         onClick={() => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health")}
-                        clickLabel={`${entry.label} · ${t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook")}`}
+                        clickLabel={`${entry.label} · ${t(entry.source === "feed" ? "expenses.sourceFeed" : "expenses.sourceHealth")}`}
                         // Same menu slot as the expense rows, so every amount lines up.
                         actions={
                           <Menu
@@ -337,12 +335,9 @@ export function ExpenseDashboard() {
                     key={e.id}
                     leading={<CategoryTile category={e.category} />}
                     title={e.description}
-                    meta={[
-                      t(`expenses.categories.${e.category}`),
-                      // Same bill also in a livestock log: counted once, said here.
-                      balance.costs.matchedExpenses[e.id] && t(balance.costs.matchedExpenses[e.id] === "feed" ? "expenses.alsoInFeedBook" : "expenses.alsoInHealthBook"),
-                      f.formatDate(e.date, "relative"),
-                    ]}
+                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")]}
+                    // Same bill also in a livestock log: counted once, marked with the same source badge.
+                    badges={balance.costs.matchedExpenses[e.id] ? <SourceBadge source={balance.costs.matchedExpenses[e.id]} /> : undefined}
                     trailing={f.formatCurrency(e.amountCents / 100)}
                     onClick={() => openEdit(e)}
                     actions={
@@ -399,4 +394,10 @@ export function ExpenseDashboard() {
       </Modal>
     </div>
   );
+}
+
+/** Where a cost also lives: one small outline badge, the same for log rows and linked expenses. */
+function SourceBadge({ source }: { source: "feed" | "health" }) {
+  const { t } = useTranslation();
+  return <Badge variant="outline" size="sm" icon={source === "feed" ? Wheat : HeartPulse}>{t(source === "feed" ? "expenses.sourceFeed" : "expenses.sourceHealth")}</Badge>;
 }

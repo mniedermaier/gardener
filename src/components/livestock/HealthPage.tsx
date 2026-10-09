@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Stethoscope, Trash2 } from "lucide-react";
+import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Stethoscope, Trash2, Syringe } from "lucide-react";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -116,6 +116,22 @@ export function HealthPage() {
     </Button>
   );
 
+  const costFigure = {
+    label: t("livestock.health.totalCost"),
+    value: f.formatCurrency(stats.cost),
+    icon: ClipboardList,
+    hint: stats.last ? t("livestock.health.lastEntry", { date: f.formatDate(stats.last, "relative") }) : undefined,
+  };
+  const vaccFigure = {
+    // The scope is named: only animals with a vaccination schedule (bees have none).
+    label: t("livestock.health.vaccCoverageScoped"),
+    value: t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable }),
+    icon: Syringe,
+    tone: stats.due.length > 0 ? ("warning" as const) : ("positive" as const),
+    hint: stats.due.length === 0 && stats.nextDue
+      ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") })
+      : t("livestock.health.vaccScopeHint", { count: stats.vaccinable }),
+  };
   return (
     <div>
       <PageHeader title={t("livestock.health.title")} description={t("livestock.health.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
@@ -126,29 +142,11 @@ export function HealthPage() {
         <div className="space-y-6">
           {(healthEvents.length > 0 || stats.vaccinable > 0) && (
             <KeyFigures
-              // Hero: what health care cost and when it was last done. A missing
-              // vaccination is a negative status — it lives in the warning card
-              // below, not as the page's biggest number.
-              hero={{
-                label: t("livestock.health.totalCost"),
-                value: f.formatCurrency(stats.cost),
-                icon: ClipboardList,
-                hint: stats.last ? t("livestock.health.lastEntry", { date: f.formatDate(stats.last, "relative") }) : undefined,
-              }}
+              // Hero: the status that asks for action — vaccination cover —
+              // when the herd has vaccinable animals; costs are secondary.
+              hero={stats.vaccinable > 0 ? vaccFigure : costFigure}
               items={[
-                ...(stats.vaccinable > 0 ? [{
-                  // The scope is named: only animals with a vaccination schedule (bees have none).
-                  // Neutral figure: the warning card below says what is due.
-                  label: t("livestock.health.vaccCoverageScoped"),
-                  value: (
-                    <span className="inline-flex flex-wrap items-center gap-2">
-                      {t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable })}
-                    </span>
-                  ),
-                  hint: stats.due.length === 0 && stats.nextDue
-                    ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") })
-                    : t("livestock.health.vaccScopeHint"),
-                }] : []),
+                ...(stats.vaccinable > 0 ? [costFigure] : []),
                 { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: t("livestock.health.lossesHint") },
               ]}
             />

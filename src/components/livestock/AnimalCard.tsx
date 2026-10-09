@@ -47,7 +47,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {t(`livestock.typeCount.${animal.type}`, { count: animal.count })}
             {" · "}
-            {t("livestock.sinceDate", { date: f.formatDate(animal.acquiredDate, "monthYear") })}
+            {t("livestock.sinceDate", { date: f.formatDate(animal.acquiredDate, "monthYearShort") })}
           </p>
         </div>
         <div className="relative z-10 -mr-2 -mt-1">
@@ -83,15 +83,14 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
             </div>
           );
         })}
+        {/* Same slots on every card: products first, then the feed costs (bees too). */}
+        <div>
+          <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>
+          <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatCurrency(feedCost)}</dd>
+        </div>
         {/* The expectation basis is the same for every product: said once, across both columns. */}
         {expectationBasis && yields.length > 0 && (
           <p className="col-span-2 -mt-1 text-xs text-gray-500 dark:text-gray-400">{t("livestock.expectedBasis", { date: f.formatDate(expectationBasis, "short") })}</p>
-        )}
-        {yields.length < 2 && (
-          <div>
-            <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>
-            <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatCurrency(feedCost)}</dd>
-          </div>
         )}
       </dl>
 

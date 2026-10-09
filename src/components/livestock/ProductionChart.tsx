@@ -165,13 +165,24 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
     ? `${f.formatDate(withData[0].b.date, "month")}–${f.formatDate(withData[withData.length - 1].b.date, "month")}`
     : withData.length === 1 ? f.formatDate(withData[0].b.date, "monthYear") : "";
   const best = values.reduce((bi, v, i, a) => (v > a[bi] ? i : bi), 0);
+  // With single entries (honey, wax) the list sits beside the chart.
+  if (sparseList) {
+    return (
+      <div className={`grid gap-6 lg:gap-8 ${values.length <= 4 ? "lg:grid-cols-[minmax(0,24rem)_1fr]" : "lg:grid-cols-[minmax(0,36rem)_1fr]"}`}>
+        {charts}
+        {sparseList}
+      </div>
+    );
+  }
+  // Otherwise the figures sit above a full-width chart (like the production
+  // page), and the first entry is named: the herd is older than its records.
+  const firstEntry = animalProducts.reduce<string | null>((min, p) => (min === null || p.date < min ? p.date : min), null);
+  const showSummary = values.filter((v) => v > 0).length > 1;
   return (
-    // Up to four months: a narrower chart column, so three or four bars don't spread thin.
-    <div className={`grid gap-6 lg:gap-8 ${values.length <= 4 ? "lg:grid-cols-[minmax(0,24rem)_1fr]" : "lg:grid-cols-[minmax(0,36rem)_1fr]"}`}>
-      {charts}
-      {sparseList || (
-        values.filter((v) => v > 0).length > 1 && (
-          <dl className="grid grid-cols-2 content-start gap-x-6 gap-y-4 text-sm lg:grid-cols-1">
+    <div className="space-y-4">
+      {(showSummary || firstEntry) && (
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:flex sm:gap-10">
+          {showSummary && (
             <div>
               <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.monthAvgLabel")}</dt>
               <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
@@ -179,6 +190,8 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
                 {avgRange && <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{avgRange}</span>}
               </dd>
             </div>
+          )}
+          {showSummary && (
             <div>
               <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.bestMonth")}</dt>
               <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
@@ -186,9 +199,16 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
                 <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(summaryBuckets[best].date, "monthYear")}</span>
               </dd>
             </div>
-          </dl>
-        )
+          )}
+          {firstEntry && (
+            <div>
+              <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.firstEntry")}</dt>
+              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">{f.formatDate(firstEntry, "date")}</dd>
+            </div>
+          )}
+        </dl>
       )}
+      {charts}
     </div>
   );
 }

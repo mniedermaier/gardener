@@ -520,7 +520,8 @@
       "rosaceae": "Rosáceas",
       "ericaceae": "Ericáceas",
       "grossulariaceae": "Grosulariáceas",
-      "other": "Otras"
+      "other": "Otras",
+      "caprifoliaceae": "Valerianáceas"
     },
     "sheetMore": "Detalles, variedad y notas",
     "sheetLess": "Mostrar menos",
@@ -1039,7 +1040,10 @@
     "notesPlaceholder": "p. ej. herramientas, avisos…",
     "afterFrostWindow": "{{range}} (tras las noches de helada)",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
-    "bedPlus": "{{bed}} y {{more}} bancales más"
+    "bedUntil": "{{beds}} hasta el {{date}}",
+    "bedFrom": "{{beds}} desde el {{date}}",
+    "bedRange": "{{beds}} {{range}}",
+    "afterFrostShort": "tras las noches de helada"
   },
   "settings": {
     "title": "Ajustes",
@@ -1556,7 +1560,6 @@
     "monthlyDesc_one": "Parte de las calorías que necesita {{count}} persona: fresco según la previsión y de reserva.",
     "monthlyDesc_other": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
     "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
-    "monthlyKgTitle": "Alimentos disponibles por mes",
     "noWinterGap": "De {{from}} a {{to}} tus reservas previstas cubren al menos una cuarta parte de la necesidad.",
     "noMonthCovered": "Tu huerto aún no cubre el {{percent}} de la necesidad en ningún mes. Las palancas de abajo muestran dónde más superficie aporta más.",
     "ofNeed": "{{produced}} de {{needed}}",
@@ -1591,7 +1594,9 @@
     "animalForecast": "Productos animales previstos",
     "emptyNeedShort_one": "Una persona necesita unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
     "emptyNeedShort_other": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
-    "emptyNeedShort_many": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú."
+    "emptyNeedShort_many": "{{count}} personas necesitan unos {{kg}} al año. Añade bancales o animales para ver cuánto cubres tú.",
+    "typicalYearTitle": "Año típico (previsión)",
+    "seasonKgTitle": "Temporada {{year}}: registrado, desde hoy previsión"
   },
   "pests": {
     "title": "Plagas",
@@ -1719,7 +1724,7 @@
     "health": {
       "title": "Salud",
       "totalEvents": "Total registros",
-      "totalCost": "Gastos de salud, todos los registros",
+      "totalCost": "Costes de salud en total",
       "losses": "Pérdidas",
       "overdueWarning": "Vacunación posiblemente vencida",
       "daysSince": "hace {{days}} días",
@@ -1748,9 +1753,11 @@
       "emptyTitle": "Vacunas y tratamientos bajo control",
       "notesPlaceholder": "p. ej. veterinario, próxima cita…",
       "vaccCoverageScoped": "Vacunación",
-      "vaccScopeHint": "Grupos con vacuna obligatoria",
       "addEntry": "Registrar entrada de salud",
-      "lossesHint": "desde el inicio"
+      "lossesHint": "desde el inicio",
+      "vaccScopeHint_one": "{{count}} grupo con vacunación",
+      "vaccScopeHint_other": "{{count}} grupos con vacunación",
+      "vaccScopeHint_many": "{{count}} grupos con vacunación"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1924,7 +1931,8 @@
     "eggTrend": "{{value}} frente a la semana media",
     "chooseAnimal": "Elegir animal…",
     "expectedBasis": "desde el primer registro el {{date}}",
-    "valueHint": "{{amount}} × {{price}}"
+    "valueHint": "{{amount}} × {{price}}",
+    "firstEntry": "Primer registro"
   },
   "seeds": {
     "title": "Semillas",
@@ -1967,8 +1975,6 @@
     "plantingStock": "Material de plantación",
     "plantingStockExplain": "Se propaga por tubérculos, dientes o esquejes; no hace falta prueba de germinación. Guárdalo en lugar fresco, seco y oscuro.",
     "vegetativeHint": "{{name}} se propaga por tubérculos, dientes o esquejes. Registra el material de plantación, p. ej. en gramos.",
-    "missingStat": "Falta para bancales",
-    "missingStatHint": "Plantado pero sin existencias",
     "shoppingListHint": "Cultivos anuales de tus bancales sin semillas ni material de plantación en el inventario. Las perennes como el romero o las bayas no aparecen.",
     "addFor": "Añadir {{name}}",
     "emptyTitle": "Aún no has añadido semillas",
@@ -2116,7 +2122,10 @@
     "staleHint_one": "{{count}} análisis tiene más de 5 meses: repítelo en primavera.",
     "staleHint_other": "{{count}} análisis tienen más de 5 meses: repítelos en primavera.",
     "staleHint_many": "{{count}} análisis tienen más de 5 meses: repítelos en primavera.",
-    "nutrientsPpm": "Nutrientes (ppm)"
+    "nutrientsPpm": "Nutrientes (ppm)",
+    "staleHintPlanned_one": "{{count}} análisis tiene más de 5 meses: el próximo está previsto para el {{date}}.",
+    "staleHintPlanned_other": "{{count}} análisis tienen más de 5 meses: el próximo está previsto para el {{date}}.",
+    "staleHintPlanned_many": "{{count}} análisis tienen más de 5 meses: el próximo está previsto para el {{date}}."
   },
   "preservation": {
     "title": "Guía de conservación",
@@ -2291,16 +2300,14 @@
     "howAnimals": "Animales {{total}}: {{expenses}} registrados como gastos, {{log}} del registro de pienso y de salud. Una factura anotada en ambos sitios (mismo importe, como mucho 3 días de diferencia) cuenta una vez.",
     "duplicatesSkipped_one": "{{count}} entrada duplicada no se ha contado.",
     "duplicatesSkipped_other": "{{count}} entradas duplicadas no se han contado.",
-    "fromFeedLog": "{{amount}} solo en el registro de alimento",
-    "fromHealthLog": "{{amount}} registrados en salud",
+    "fromFeedLog": "de ello {{amount}} del registro de alimento",
+    "fromHealthLog": "de ello {{amount}} de salud",
     "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado.",
-    "fromFeedBook": "del libro de alimentación",
-    "fromHealthBook": "de salud",
     "openFeedBook": "Abrir en el registro de alimento",
     "openHealthBook": "Abrir en salud",
     "notesPlaceholder": "p. ej. tienda, número de factura…",
-    "alsoInFeedBook": "también en el libro de alimentación",
-    "alsoInHealthBook": "también en salud"
+    "sourceFeed": "Alimentación",
+    "sourceHealth": "Salud"
   },
   "succession": {
     "pick": "Elegir cultivo",
@@ -2566,7 +2573,6 @@
     "beds_many": "{{count}} bancales",
     "plantings_many": "{{count}} plantaciones",
     "noLinkSubtitle": "Adopta planes de huerto desde un enlace compartido.",
-    "noLinkTitle": "Adoptar un huerto desde un enlace",
     "noLinkText": "¿Alguien ha compartido un plan de huerto contigo? Pega aquí el enlace o ábrelo directamente para ver la vista previa.",
     "pasteLabel": "Pegar enlace",
     "pastePlaceholder": "https://…#/import?t=…",
@@ -2613,7 +2619,10 @@
     "compositionLabel": "Huerto {{garden}}, productos animales {{animals}} de la necesidad anual",
     "fromGarden": "Huerto",
     "fromAnimals": "Productos animales",
-    "surplusNote": "Excedente previsto (rendimiento anual típico), no contabilizado: {{items}}.",
-    "notCovered": "Sin cubrir"
+    "notCovered": "Sin cubrir",
+    "compositionHint": "Las hortalizas tienen pocas calorías: patatas y calabazas elevan más la parte del huerto (ver mayores palancas).",
+    "surplusNote_one": "Más de lo que consume una persona; no contabilizado: {{items}}.",
+    "surplusNote_other": "Más de lo que consumen {{count}} personas; no contabilizado: {{items}}.",
+    "surplusNote_many": "Más de lo que consumen {{count}} personas; no contabilizado: {{items}}."
   }
 }

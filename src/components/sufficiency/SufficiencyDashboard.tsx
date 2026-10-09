@@ -133,7 +133,8 @@ export function SufficiencyDashboard() {
   // Recorded eggs, honey … per month (same source as Produktion): the past months' animal part.
   const loggedAnimal = getActualProductKgByMonth(animalProducts, animals, now.getFullYear());
   const hasLoggedAnimal = loggedAnimal.some((v) => v > 0);
-  const coverage = result.monthlyFood.map((m) => m.calories / Math.max(1, m.caloriesNeeded));
+  // Typical year (forecast basis, without today's pantry stock): matches the annual figure.
+  const coverage = result.monthlyFood.map((m) => m.typicalCalories / Math.max(1, m.caloriesNeeded));
 
   return (
     <div>
@@ -175,6 +176,7 @@ export function SufficiencyDashboard() {
 
           <Card>
             <CardHeader title={t("sufficiency.monthlyTitle")} description={t(hasStored ? "sufficiency.monthlyDesc" : "sufficiency.monthlyDescFresh", { count: householdSize })} />
+            <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.typicalYearTitle")}</h3>
             <MonthStrip
               values={coverage}
               monthLabels={monthShort}
@@ -202,7 +204,7 @@ export function SufficiencyDashboard() {
               )}
             </div>
             <div className="mt-6">
-              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.monthlyKgTitle")}</h3>
+              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("sufficiency.seasonKgTitle", { year: now.getFullYear() })}</h3>
               <BarChart
                 // Garden: logged harvest up to this month (solid), forecast after it
                 // (hatched) — past months match the harvest log. Stored food and
@@ -387,6 +389,7 @@ function Composition() {
   const { t } = useTranslation();
   const f = useFormat();
   const { selfSufficiency: ss } = useGardenMetrics();
+  const householdSize = useAnalysisPrefs((s) => s.householdSize);
   if (ss.forecastKcal <= 0) return null;
   // Same precision as the hero (a decimal below 10 %), and parts rounded so
   // they add up to it: "Garten + Tierprodukte" must equal the forecast above.
@@ -418,7 +421,9 @@ function Composition() {
           <dd className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{f.formatPercent(open, digits)}</dd>
         </div>
       </dl>
-      {surplus.length > 0 && <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { items: surplus.join(", ") })}</p>}
+      {/* Why the garden share is small: vegetables are low in calories (see "Größte Hebel"). */}
+      <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">{t("metrics.compositionHint")}</p>
+      {surplus.length > 0 && <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{t("metrics.surplusNote", { count: householdSize, items: surplus.join(", ") })}</p>}
     </Card>
   );
 }

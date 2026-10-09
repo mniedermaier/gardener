@@ -502,7 +502,8 @@
       "rosaceae": "Rosengewächse",
       "ericaceae": "Heidekrautgewächse",
       "grossulariaceae": "Stachelbeergewächse",
-      "other": "Sonstige"
+      "other": "Sonstige",
+      "caprifoliaceae": "Baldrian- und Geißblattgewächse"
     },
     "sheetMore": "Details, Sorte & Notizen",
     "sheetLess": "Weniger anzeigen",
@@ -1007,7 +1008,10 @@
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
     "afterFrostWindow": "{{range}} (nach den Frostnächten)",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
-    "bedPlus": "{{bed}} und {{more}} weitere Beete"
+    "bedUntil": "{{beds}} bis {{date}}",
+    "bedFrom": "{{beds}} ab {{date}}",
+    "bedRange": "{{beds}} {{range}}",
+    "afterFrostShort": "nach den Frostnächten"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1488,7 +1492,6 @@
     "coverageDesc_other": "Prognose für ein Jahr, Bedarf von {{count}} Personen.",
     "monthlyDesc_one": "Anteil des Kalorienbedarfs von {{count}} Person: frisch laut Prognose und aus dem Vorrat.",
     "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen: frisch laut Prognose und aus dem Vorrat.",
-    "monthlyKgTitle": "Verfügbare Menge pro Monat",
     "noWinterGap": "Von {{from}} bis {{to}} reicht dein geplanter Vorrat für mindestens ein Viertel des Bedarfs.",
     "noMonthCovered": "Dein Garten deckt bisher in keinem Monat {{percent}} des Bedarfs. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
     "ofNeed": "{{produced}} von {{needed}}",
@@ -1520,7 +1523,9 @@
     "animalLogged": "Tierprodukte erfasst",
     "animalForecast": "Tierprodukte Prognose",
     "emptyNeedShort_one": "Eine Person braucht rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst.",
-    "emptyNeedShort_other": "{{count}} Personen brauchen rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst."
+    "emptyNeedShort_other": "{{count}} Personen brauchen rund {{kg}} im Jahr. Lege Beete oder Tiere an, dann siehst du, wie viel du selbst deckst.",
+    "typicalYearTitle": "Typisches Jahr (Prognose)",
+    "seasonKgTitle": "Saison {{year}}: erfasst, ab heute Prognose"
   },
   "pests": {
     "title": "Schädlinge",
@@ -1646,7 +1651,7 @@
     "health": {
       "title": "Gesundheit",
       "totalEvents": "Einträge gesamt",
-      "totalCost": "Gesundheitskosten, alle Einträge",
+      "totalCost": "Gesundheitskosten gesamt",
       "losses": "Verluste",
       "overdueWarning": "Impfung möglicherweise fällig",
       "daysSince": "vor {{days}} Tagen",
@@ -1674,9 +1679,10 @@
       "emptyTitle": "Impfungen und Behandlungen im Blick",
       "notesPlaceholder": "z. B. Tierarzt, nächster Termin …",
       "vaccCoverageScoped": "Impfschutz",
-      "vaccScopeHint": "Tiergruppen mit Impfpflicht",
       "addEntry": "Gesundheitseintrag erfassen",
-      "lossesHint": "seit Bestandsbeginn"
+      "lossesHint": "seit Bestandsbeginn",
+      "vaccScopeHint_one": "{{count}} Tiergruppe mit Impfpflicht",
+      "vaccScopeHint_other": "{{count}} Tiergruppen mit Impfpflicht"
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1835,7 +1841,8 @@
     "eggTrend": "{{value}} zur Ø-Woche",
     "chooseAnimal": "Tier wählen …",
     "expectedBasis": "ab erstem Eintrag am {{date}}",
-    "valueHint": "{{amount}} × {{price}}"
+    "valueHint": "{{amount}} × {{price}}",
+    "firstEntry": "Erste Erfassung"
   },
   "seeds": {
     "title": "Saatgut",
@@ -1877,8 +1884,6 @@
     "plantingStock": "Pflanzgut",
     "plantingStockExplain": "Wird über Knollen, Zehen oder Ableger vermehrt – keine Keimprobe nötig. Kühl, trocken und dunkel lagern.",
     "vegetativeHint": "{{name}} wird über Knollen, Zehen oder Ableger vermehrt. Trage das Pflanzgut ein, z. B. in Gramm.",
-    "missingStat": "Fehlt für Beete",
-    "missingStatHint": "Gepflanzt, aber nicht vorrätig",
     "shoppingListHint": "Einjährige Kulturen in deinen Beeten ohne Saat- oder Pflanzgut im Vorrat. Mehrjährige wie Rosmarin oder Beeren sind nicht dabei.",
     "addFor": "{{name}} hinzufügen",
     "emptyTitle": "Noch kein Saatgut hinzugefügt",
@@ -2019,7 +2024,9 @@
     "testNotesPlaceholder": "z. B. Probenahme, Labor …",
     "staleHint_one": "{{count}} Bodentest ist älter als 5 Monate – im Frühjahr neu beproben.",
     "staleHint_other": "{{count}} Bodentests sind älter als 5 Monate – im Frühjahr neu beproben.",
-    "nutrientsPpm": "Nährstoffe (ppm)"
+    "nutrientsPpm": "Nährstoffe (ppm)",
+    "staleHintPlanned_one": "{{count}} Bodentest ist älter als 5 Monate – die nächste Probe ist für {{date}} geplant.",
+    "staleHintPlanned_other": "{{count}} Bodentests sind älter als 5 Monate – die nächste Probe ist für {{date}} geplant."
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2188,15 +2195,13 @@
     "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futterbuch und Gesundheitsakte. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
     "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
-    "fromFeedLog": "davon {{amount}} nur im Futterbuch",
-    "fromHealthLog": "{{amount}} unter Gesundheit erfasst",
-    "fromFeedBook": "aus dem Futterbuch",
-    "fromHealthBook": "aus Gesundheit",
+    "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
+    "fromHealthLog": "davon {{amount}} aus Gesundheit",
     "openFeedBook": "Im Futterbuch öffnen",
     "openHealthBook": "In Gesundheit öffnen",
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
-    "alsoInFeedBook": "auch im Futterbuch",
-    "alsoInHealthBook": "auch unter Gesundheit"
+    "sourceFeed": "Futterbuch",
+    "sourceHealth": "Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",
@@ -2449,7 +2454,6 @@
     "importAction": "Als neuen Garten anlegen",
     "done": "„{{name}}“ wurde angelegt",
     "noLinkSubtitle": "Gartenpläne aus einem Teilen-Link übernehmen.",
-    "noLinkTitle": "Garten aus einem Link übernehmen",
     "noLinkText": "Hat jemand einen Gartenplan mit dir geteilt? Füge den Link hier ein oder öffne ihn direkt, dann siehst du die Vorschau.",
     "pasteLabel": "Teilen-Link einfügen",
     "pastePlaceholder": "https://…#/import?t=…",
@@ -2494,7 +2498,9 @@
     "compositionLabel": "Garten {{garden}}, Tierprodukte {{animals}} des Jahresbedarfs",
     "fromGarden": "Garten",
     "fromAnimals": "Tierprodukte",
-    "surplusNote": "Prognose-Überschuss (typischer Jahresertrag), nicht eingerechnet: {{items}}.",
-    "notCovered": "Nicht gedeckt"
+    "notCovered": "Nicht gedeckt",
+    "compositionHint": "Gemüse ist kalorienarm – Kartoffeln und Kürbis heben den Garten-Anteil am stärksten (siehe Größte Hebel).",
+    "surplusNote_one": "Mehr als eine Person verbraucht – nicht eingerechnet: {{items}}.",
+    "surplusNote_other": "Mehr als {{count}} Personen verbrauchen – nicht eingerechnet: {{items}}."
   }
 }

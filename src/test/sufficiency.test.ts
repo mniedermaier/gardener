@@ -177,6 +177,14 @@ describe("pantry stock", () => {
     const withStock = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
     expect(withStock.annualCoveragePercent).toBe(without.annualCoveragePercent);
   });
+
+  it("keeps the typical-year calories free of today's pantry stock", () => {
+    const without = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [], now);
+    const withStock = calculateSufficiency([garden], [tomato, bean, potato], 2, 30, "2026-05-15", [], [item(6, "2027-03-31")], now);
+    // The month strip (typical year) must average to the annual forecast, so the stock stays out.
+    expect(withStock.monthlyFood.map((m) => m.typicalCalories)).toEqual(without.monthlyFood.map((m) => m.typicalCalories));
+    expect(withStock.monthlyFood[0].calories).toBeGreaterThan(withStock.monthlyFood[0].typicalCalories);
+  });
 });
 
 describe("loggedKgByMonth", () => {

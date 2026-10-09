@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/cn";
-import type { PlantableNow } from "@/lib/advisor";
+import { groupAgendaBedsByDate, type PlantableNow } from "@/lib/advisor";
 import type { Plant } from "@/types/plant";
 
 type Category = "recommended" | "all" | "vegetable" | "herb" | "fruit";
@@ -103,6 +103,19 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
           // window starts after the last frost night (or waits for it).
           const held = !!plant && !!lastFrostNight && holds(plant, [r.action]);
           const after = lastFrostNight ? addDays(lastFrostNight, 1) : null;
+          // Beds whose windows close on different days (glass closes later): one part
+          // per bed group, latest first — the same split the calendar shows.
+          const groups = r.beds?.length ? [...groupAgendaBedsByDate({ date: r.until, beds: r.beds })].sort((x, y) => y.date.getTime() - x.date.getTime()) : [];
+          if (groups.length > 1) {
+            const shown = groups.length > 2 ? [groups[0], groups[groups.length - 1]] : groups;
+            const label = (bs: typeof r.beds) => (bs!.length <= 2 ? bs!.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: bs!.length }));
+            const parts = shown.map((g) =>
+              held && after
+                ? t("calendar.bedRange", { beds: label(g.beds), range: formatDateRange(after, g.date) })
+                : t("calendar.bedUntil", { beds: label(g.beds), date: formatDate(g.date, "short") }),
+            );
+            return { plant, reason: [held && after ? t("calendar.afterFrostShort") : t(`advisor.actions.${r.action}`), ...parts].join(" · ") };
+          }
           const when = held && after
             ? after <= r.until
               ? t("calendar.afterFrostWindow", { range: formatDateRange(after, r.until) })

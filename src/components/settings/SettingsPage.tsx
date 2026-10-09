@@ -45,7 +45,7 @@ function Section({ id, title, description, children, tone }: { id: string; title
   return (
     <section aria-labelledby={id} className="grid gap-3 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-8">
       <div className="md:pt-1">
-        <h2 id={id} className={`text-base font-semibold ${tone === "danger" ? "text-danger" : "text-gray-900 dark:text-gray-100"}`}>{title}</h2>
+        <h2 id={id} className={`text-xl font-semibold ${tone === "danger" ? "text-danger" : "text-gray-900 dark:text-gray-100"}`}>{title}</h2>
         {description && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
       </div>
       <Card className={tone === "danger" ? "border-danger/30 dark:border-danger/30" : ""}>{children}</Card>

@@ -502,7 +502,8 @@
       "rosaceae": "Rose family",
       "ericaceae": "Heath family",
       "grossulariaceae": "Gooseberry family",
-      "other": "Other"
+      "other": "Other",
+      "caprifoliaceae": "Valerian family"
     },
     "sheetMore": "Details, variety & notes",
     "sheetLess": "Show less",
@@ -1007,7 +1008,10 @@
     "notesPlaceholder": "e.g. tools, reminders…",
     "afterFrostWindow": "{{range}} (after the frost nights)",
     "timelineEmptyLine": "Your season plan needs a bed.",
-    "bedPlus": "{{bed}} and {{more}} more beds"
+    "bedUntil": "{{beds}} until {{date}}",
+    "bedFrom": "{{beds}} from {{date}}",
+    "bedRange": "{{beds}} {{range}}",
+    "afterFrostShort": "after the frost nights"
   },
   "settings": {
     "title": "Settings",
@@ -1488,7 +1492,6 @@
     "coverageDesc_other": "Forecast for one year, needs of {{count}} people.",
     "monthlyDesc_one": "Share of the calorie needs of {{count}} person: fresh from the forecast and from storage.",
     "monthlyDesc_other": "Share of the calorie needs of {{count}} people: fresh from the forecast and from storage.",
-    "monthlyKgTitle": "Food available per month",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
     "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
     "ofNeed": "{{produced}} of {{needed}}",
@@ -1520,7 +1523,9 @@
     "animalLogged": "Animal products logged",
     "animalForecast": "Animal products forecast",
     "emptyNeedShort_one": "One person needs about {{kg}} a year. Add beds or animals to see how much of it you cover yourself.",
-    "emptyNeedShort_other": "{{count}} people need about {{kg}} a year. Add beds or animals to see how much of it you cover yourself."
+    "emptyNeedShort_other": "{{count}} people need about {{kg}} a year. Add beds or animals to see how much of it you cover yourself.",
+    "typicalYearTitle": "Typical year (forecast)",
+    "seasonKgTitle": "Season {{year}}: logged, forecast from today"
   },
   "pests": {
     "title": "Pests",
@@ -1646,7 +1651,7 @@
     "health": {
       "title": "Health",
       "totalEvents": "Total entries",
-      "totalCost": "Health costs, all entries",
+      "totalCost": "Health costs in total",
       "losses": "Losses",
       "overdueWarning": "Vaccination possibly overdue",
       "daysSince": "{{days}} days ago",
@@ -1674,9 +1679,10 @@
       "emptyTitle": "Keep track of vaccinations and treatments",
       "notesPlaceholder": "e.g. vet, next appointment…",
       "vaccCoverageScoped": "Vaccination",
-      "vaccScopeHint": "Animal groups that require vaccination",
       "addEntry": "Log health entry",
-      "lossesHint": "since the herd started"
+      "lossesHint": "since the herd started",
+      "vaccScopeHint_one": "{{count}} group with vaccinations",
+      "vaccScopeHint_other": "{{count}} groups with vaccinations"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1835,7 +1841,8 @@
     "eggTrend": "{{value}} vs. average week",
     "chooseAnimal": "Choose animal…",
     "expectedBasis": "since the first entry on {{date}}",
-    "valueHint": "{{amount}} × {{price}}"
+    "valueHint": "{{amount}} × {{price}}",
+    "firstEntry": "First entry"
   },
   "seeds": {
     "title": "Seeds",
@@ -1877,8 +1884,6 @@
     "plantingStock": "Planting stock",
     "plantingStockExplain": "Grown from tubers, cloves or cuttings – no germination test needed. Store cool, dry and dark.",
     "vegetativeHint": "{{name}} is grown from tubers, cloves or cuttings. Log the planting stock, e.g. in grams.",
-    "missingStat": "Missing for beds",
-    "missingStatHint": "Planted but not in stock",
     "shoppingListHint": "Annual crops in your beds with no seed or planting stock in the inventory. Perennials such as rosemary or berries are left out.",
     "addFor": "Add {{name}}",
     "emptyTitle": "No seeds added yet",
@@ -2019,7 +2024,9 @@
     "testNotesPlaceholder": "e.g. sampling spot, lab…",
     "staleHint_one": "{{count}} soil test is older than 5 months – retest in spring.",
     "staleHint_other": "{{count}} soil tests are older than 5 months – retest in spring.",
-    "nutrientsPpm": "Nutrients (ppm)"
+    "nutrientsPpm": "Nutrients (ppm)",
+    "staleHintPlanned_one": "{{count}} soil test is older than 5 months – the next one is planned for {{date}}.",
+    "staleHintPlanned_other": "{{count}} soil tests are older than 5 months – the next one is planned for {{date}}."
   },
   "preservation": {
     "title": "Preservation guide",
@@ -2188,15 +2195,13 @@
     "howAnimals": "Animals {{total}}: {{expenses}} recorded as expenses, {{log}} from the feed log and health records. A bill recorded in both places (same amount, at most 3 days apart) counts once.",
     "duplicatesSkipped_one": "{{count}} duplicate entry was not counted.",
     "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
-    "fromFeedLog": "{{amount}} of it only in the feed log",
-    "fromHealthLog": "{{amount}} logged under health",
-    "fromFeedBook": "from the feed book",
-    "fromHealthBook": "from health",
+    "fromFeedLog": "{{amount}} of it from the feed log",
+    "fromHealthLog": "{{amount}} of it from health",
     "openFeedBook": "Open in feed log",
     "openHealthBook": "Open in health log",
     "notesPlaceholder": "e.g. shop, invoice number…",
-    "alsoInFeedBook": "also in the feed book",
-    "alsoInHealthBook": "also under health"
+    "sourceFeed": "Feed log",
+    "sourceHealth": "Health"
   },
   "succession": {
     "pick": "Pick a crop",
@@ -2449,7 +2454,6 @@
     "importAction": "Add as new garden",
     "done": "“{{name}}” was created",
     "noLinkSubtitle": "Take over garden plans from a share link.",
-    "noLinkTitle": "Take over a garden from a link",
     "noLinkText": "Has someone shared a garden plan with you? Paste the link here or open it directly to see the preview.",
     "pasteLabel": "Paste share link",
     "pastePlaceholder": "https://…#/import?t=…",
@@ -2494,7 +2498,9 @@
     "compositionLabel": "Garden {{garden}}, animal products {{animals}} of the annual need",
     "fromGarden": "Garden",
     "fromAnimals": "Animal products",
-    "surplusNote": "Forecast surplus (typical annual yield), not counted: {{items}}.",
-    "notCovered": "Not covered"
+    "notCovered": "Not covered",
+    "compositionHint": "Vegetables are low in calories – potatoes and squash raise the garden share most (see biggest levers).",
+    "surplusNote_one": "More than one person eats – not counted: {{items}}.",
+    "surplusNote_other": "More than {{count}} people eat – not counted: {{items}}."
   }
 }
