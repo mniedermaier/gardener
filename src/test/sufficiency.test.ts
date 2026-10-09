@@ -194,3 +194,20 @@ describe("loggedKgByMonth", () => {
     expect(kg.reduce((a, b) => a + b, 0)).toBeCloseTo(9.5);
   });
 });
+
+describe("recorded animal products per month", () => {
+  it("counts edible kg of food products per month and skips wax", async () => {
+    const { getActualProductKgByMonth } = await import("@/lib/metrics");
+    const animals = [{ id: "h", type: "chicken", count: 6, acquiredDate: "2026-01-01" }] as never[];
+    const products = [
+      { id: "1", animalId: "h", type: "eggs", date: "2026-08-03", quantity: 10, unit: "pieces" },
+      { id: "2", animalId: "h", type: "honey", date: "2026-07-20", quantity: 2, unit: "kg" },
+      { id: "3", animalId: "h", type: "wax", date: "2026-07-20", quantity: 0.4, unit: "kg" },
+      { id: "4", animalId: "h", type: "eggs", date: "2025-08-03", quantity: 99, unit: "pieces" },
+    ] as never[];
+    const m = getActualProductKgByMonth(products, animals, 2026);
+    expect(m[7]).toBeCloseTo(10 * 0.06);
+    expect(m[6]).toBeCloseTo(2);
+    expect(m.reduce((a, b) => a + b, 0)).toBeCloseTo(2.6);
+  });
+});

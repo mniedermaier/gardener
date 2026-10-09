@@ -1438,7 +1438,8 @@
     "byCaloriesHint": "inkl. Tierprodukte",
     "rowMissing": "fehlen {{kg}}",
     "rowExtraArea": "+{{area}}",
-    "rowCovered": "Ziel laut Prognose erreicht"
+    "rowCovered": "Ziel laut Prognose erreicht",
+    "rowNothingLogged": "noch nichts erfasst"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1484,7 +1485,6 @@
     "coverageDesc_other": "Prognose für ein Jahr, Bedarf von {{count}} Personen.",
     "monthlyDesc_one": "Anteil des Kalorienbedarfs von {{count}} Person: frisch laut Prognose und aus dem Vorrat.",
     "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen: frisch laut Prognose und aus dem Vorrat.",
-    "monthlyCaption": "Kalorienabdeckung pro Monat laut Jahresprognose",
     "monthlyKgTitle": "Verfügbare Menge pro Monat",
     "noWinterGap": "Von {{from}} bis {{to}} reicht dein geplanter Vorrat für mindestens ein Viertel des Bedarfs.",
     "noMonthCovered": "Dein Garten deckt bisher in keinem Monat {{percent}} des Bedarfs. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
@@ -1511,11 +1511,14 @@
     "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Im Vorrat liegt noch nichts.",
     "harvested": "Geerntet",
     "freshForecast": "Prognose frisch",
-    "monthlyKgCaptionSplit": "Bis {{month}} die erfasste Ernte; ab {{month}} die Prognose aus der Beetbelegung, dazu Vorrat und Tierprodukte.",
     "emptyNeed_one": "Eine Person braucht rund {{kg}} Gemüse und Obst im Jahr, dafür wären etwa {{area}} Beetfläche nötig.",
     "emptyNeed_other": "{{count}} Personen brauchen rund {{kg}} Gemüse und Obst im Jahr, dafür wären etwa {{area}} Beetfläche nötig.",
     "emptyMissing": "Es fehlen noch Beete oder Tiere, um zu zeigen, wie viel davon du selbst deckst.",
-    "emptyFoodplanLink": "Bedarf im Ernährungsplan ansehen"
+    "emptyFoodplanLink": "Bedarf im Ernährungsplan ansehen",
+    "monthlyKgCaptionLogged": "Bis heute erfasst, danach Prognose (schraffiert): Ernte aus der Beetbelegung, Vorrat und Tierprodukte.",
+    "monthlyCaptionTypical": "Typisches Jahr (Prognose): Kalorienabdeckung pro Monat",
+    "animalLogged": "Tierprodukte erfasst",
+    "animalForecast": "Tierprodukte Prognose"
   },
   "pests": {
     "title": "Schädlinge",
@@ -1780,7 +1783,7 @@
     "openAnimal": "Tier öffnen",
     "entriesHint_one": "{{count}} Eintrag",
     "entriesHint_other": "{{count}} Einträge",
-    "costSplit": "Futter {{feed}} · Tierarzt {{vet}}",
+    "costSplit": "Futter {{feed}} · Tierarzt {{vet}}",
     "balance": "Bilanz",
     "howValue": "Wert = erfasste Produkte × Preis pro Einheit (Standard: Ei 0,35 €, Honig 12 €/kg, Milch 1,40 €/l, Fleisch 14 €/kg). Kosten = Futter + Tierarzt dieses Tieres.",
     "costPer": {
@@ -1802,7 +1805,7 @@
     "weekShort": "KW {{week}}",
     "showEntries": "Einträge anzeigen",
     "hideEntries": "Einträge ausblenden",
-    "ofExpectedToDate": "erwartet ~{{amount}} (bis heute)",
+    "ofExpectedToDate": "erwartet ~{{amount}} (bis heute)",
     "productThisYear": "{{product}} dieses Jahr",
     "eggWeeksLabel": "Eier je 7 Tage, letzte 8 Wochen, Ø {{avg}}",
     "eggWeeksAvg": "Ø {{avg}}/Woche · 8 Wochen",
@@ -1829,7 +1832,8 @@
     "singleEntriesRange_other": "letzte {{count}} Monate",
     "eggTrend": "{{value}} zur Ø-Woche",
     "chooseAnimal": "Tier wählen …",
-    "expectedBasis": "ab erstem Eintrag am {{date}}"
+    "expectedBasis": "ab erstem Eintrag am {{date}}",
+    "valueHint": "{{amount}} × {{price}}"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2180,15 +2184,15 @@
     "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futterbuch und Gesundheitsakte. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
     "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
-    "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
-    "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte",
-    "fromFeedBook": "Futterbuch",
-    "fromHealthBook": "Gesundheit",
+    "fromFeedLog": "{{amount}} im Futterbuch erfasst",
+    "fromHealthLog": "{{amount}} unter Gesundheit erfasst",
+    "fromFeedBook": "aus dem Futterbuch",
+    "fromHealthBook": "aus Gesundheit",
     "openFeedBook": "Im Futterbuch öffnen",
     "openHealthBook": "In Gesundheit öffnen",
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
     "alsoInFeedBook": "auch im Futterbuch",
-    "alsoInHealthBook": "auch in Gesundheit"
+    "alsoInHealthBook": "auch unter Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",

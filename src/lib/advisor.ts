@@ -121,12 +121,28 @@ function autumnWindows(plantId: string, year: number, protection: number, env?: 
  * sowing, autumn planting = planting out), so the season chart can draw them
  * next to the spring windows of the same phase.
  */
-export function autumnPhaseWindows(plantId: string, year: number, protection: number, env?: EnvironmentType): Array<{ phase: "sowOutdoors" | "transplant"; start: Date; end: Date }> {
-  return autumnWindows(plantId, year, protection, env).map((w) => ({
+export function autumnPhaseWindows(
+  plantId: string,
+  year: number,
+  protection: number,
+  env?: EnvironmentType,
+  plant?: Pick<Plant, "harvestDaysMin" | "harvestDaysMax">,
+): Array<{ phase: "sowOutdoors" | "transplant" | "harvest"; start: Date; end: Date }> {
+  const windows = autumnWindows(plantId, year, protection, env);
+  const out: Array<{ phase: "sowOutdoors" | "transplant" | "harvest"; start: Date; end: Date }> = windows.map((w) => ({
     phase: w.action === "sow_autumn" ? "sowOutdoors" : "transplant",
     start: w.start,
     end: w.end,
   }));
+  // The autumn sowing has its own harvest: days to maturity counted from that
+  // window (wrapping into next year), so lamb's lettuce sown in September is
+  // harvested in autumn/winter, not in the spring window's May–July.
+  if (plant && windows.length > 0 && plant.harvestDaysMax < 200) {
+    const first = Math.min(...windows.map((w) => w.start.getTime()));
+    const last = Math.max(...windows.map((w) => w.end.getTime()));
+    out.push({ phase: "harvest", start: addDays(new Date(first), plant.harvestDaysMin), end: addDays(new Date(last), plant.harvestDaysMax) });
+  }
+  return out;
 }
 
 function windowsFor(plant: Plant, frost: Date, year: number, protection: number, includeIndoor: boolean, env?: EnvironmentType): Window[] {

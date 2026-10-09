@@ -96,8 +96,23 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
   return (
     <div className="space-y-3">
       {weeksByMonth(weeks).map((g) => (
-        // The entry count lives on the week rows only, not again in the month header.
-        <List key={g.key} header={f.formatDate(g.date, "monthYear")}>
+        // Month total right-aligned, the same pattern as Futter, Ernte and Bewässerung.
+        <List
+          key={g.key}
+          header={
+            <span className="flex items-center justify-between gap-2">
+              <span>{f.formatDate(g.date, "monthYear")}</span>
+              <span className="font-medium tabular-nums">
+                {PRODUCT_TYPES.filter((ty) => g.weeks.some((w) => w.totals[ty] > 0))
+                  .map((ty) => {
+                    const sum = g.weeks.reduce((s, w) => s + w.totals[ty], 0);
+                    return formatProductAmount(ty, sum, f, t) + (typeCount > 1 && ty !== "eggs" ? ` ${t(`livestock.products.${ty}`)}` : "");
+                  })
+                  .join(" · ")}
+              </span>
+            </span>
+          }
+        >
           {g.weeks.map((w) => {
             const open = openWeeks.has(w.key);
             const present = PRODUCT_TYPES.filter((ty) => w.totals[ty] > 0);

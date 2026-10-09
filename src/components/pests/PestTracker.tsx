@@ -206,7 +206,7 @@ export function PestTracker() {
                       </>
                     }
                     // The kind is the first meta part: one badge (severity) per row leaves the text its width.
-                    meta={[t(`pests.types.${pest.type}`), plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")]}
+                    meta={[t(`pests.types.${pest.type}`), plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "short")]}
                     // One running text (ListRow clamps it to 2 lines); "bio" is part of the
                     // treatment label instead of a badge that wraps onto its own line.
                     description={

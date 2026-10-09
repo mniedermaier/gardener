@@ -1503,7 +1503,8 @@
     "byCaloriesHint": "incl. productos animales",
     "rowMissing": "faltan {{kg}}",
     "rowExtraArea": "+{{area}}",
-    "rowCovered": "Objetivo alcanzado según la previsión"
+    "rowCovered": "Objetivo alcanzado según la previsión",
+    "rowNothingLogged": "nada registrado aún"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1552,7 +1553,6 @@
     "monthlyDesc_one": "Parte de las calorías que necesita {{count}} persona: fresco según la previsión y de reserva.",
     "monthlyDesc_other": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
     "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas: fresco según la previsión y de reserva.",
-    "monthlyCaption": "Cobertura calórica por mes según la previsión anual",
     "monthlyKgTitle": "Alimentos disponibles por mes",
     "noWinterGap": "De {{from}} a {{to}} tus reservas previstas cubren al menos una cuarta parte de la necesidad.",
     "noMonthCovered": "Tu huerto aún no cubre el {{percent}} de la necesidad en ningún mes. Las palancas de abajo muestran dónde más superficie aporta más.",
@@ -1581,12 +1581,15 @@
     "monthlyDescFresh_many": "Parte de las calorías que necesitan {{count}} personas (previsión). Aún no hay nada en reserva.",
     "harvested": "Cosechado",
     "freshForecast": "Previsión fresco",
-    "monthlyKgCaptionSplit": "Hasta {{month}} la cosecha registrada; desde {{month}} la previsión según los bancales, más despensa y productos animales.",
     "emptyNeed_one": "Una persona necesita unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
     "emptyNeed_other": "{{count}} personas necesitan unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
     "emptyNeed_many": "{{count}} personas necesitan unos {{kg}} de verdura y fruta al año, unos {{area}} de bancales.",
     "emptyMissing": "Faltan bancales o animales para mostrar cuánto cubres tú.",
-    "emptyFoodplanLink": "Ver la necesidad en el plan"
+    "emptyFoodplanLink": "Ver la necesidad en el plan",
+    "monthlyKgCaptionLogged": "Registrado hasta hoy, después previsión (rayado): cosecha según los bancales, despensa y productos animales.",
+    "monthlyCaptionTypical": "Año típico (previsión): cobertura calórica por mes",
+    "animalLogged": "Productos animales registrados",
+    "animalForecast": "Productos animales previstos"
   },
   "pests": {
     "title": "Plagas",
@@ -1868,7 +1871,7 @@
     "entriesHint_one": "{{count}} registro",
     "entriesHint_other": "{{count}} registros",
     "entriesHint_many": "{{count}} registros",
-    "costSplit": "Pienso {{feed}} · veterinario {{vet}}",
+    "costSplit": "Pienso {{feed}} · veterinario {{vet}}",
     "balance": "Balance",
     "howValue": "Valor = productos registrados × precio por unidad (por defecto: huevo 0,35 €, miel 12 €/kg, leche 1,40 €/l, carne 14 €/kg). Costes = pienso + veterinario de este animal.",
     "costPer": {
@@ -1890,7 +1893,7 @@
     "weekShort": "Sem. {{week}}",
     "showEntries": "mostrar entradas",
     "hideEntries": "ocultar entradas",
-    "ofExpectedToDate": "esperados ~{{amount}} (hasta hoy)",
+    "ofExpectedToDate": "esperados ~{{amount}} (hasta hoy)",
     "productThisYear": "{{product}} este año",
     "eggWeeksLabel": "Huevos cada 7 días en las últimas 8 semanas, media {{avg}}",
     "eggWeeksAvg": "Media {{avg}}/semana · 8 semanas",
@@ -1918,7 +1921,8 @@
     "singleEntriesRange_many": "últimos {{count}} meses",
     "eggTrend": "{{value}} frente a la semana media",
     "chooseAnimal": "Elegir animal…",
-    "expectedBasis": "desde el primer registro el {{date}}"
+    "expectedBasis": "desde el primer registro el {{date}}",
+    "valueHint": "{{amount}} × {{price}}"
   },
   "seeds": {
     "title": "Semillas",
@@ -2283,15 +2287,15 @@
     "howAnimals": "Animales {{total}}: {{expenses}} registrados como gastos, {{log}} del registro de pienso y de salud. Una factura anotada en ambos sitios (mismo importe, como mucho 3 días de diferencia) cuenta una vez.",
     "duplicatesSkipped_one": "{{count}} entrada duplicada no se ha contado.",
     "duplicatesSkipped_other": "{{count}} entradas duplicadas no se han contado.",
-    "fromFeedLog": "incl. {{amount}} del registro de pienso",
-    "fromHealthLog": "incl. {{amount}} del registro de salud",
+    "fromFeedLog": "{{amount}} registrados en el libro de alimentación",
+    "fromHealthLog": "{{amount}} registrados en salud",
     "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado.",
-    "fromFeedBook": "Registro de pienso",
-    "fromHealthBook": "Salud",
+    "fromFeedBook": "del libro de alimentación",
+    "fromHealthBook": "de salud",
     "openFeedBook": "Abrir en el registro de alimento",
     "openHealthBook": "Abrir en salud",
     "notesPlaceholder": "p. ej. tienda, número de factura…",
-    "alsoInFeedBook": "también en el registro de pienso",
+    "alsoInFeedBook": "también en el libro de alimentación",
     "alsoInHealthBook": "también en salud"
   },
   "succession": {

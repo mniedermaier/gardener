@@ -63,19 +63,20 @@ export function AnimalDetail() {
   const [dialog, setDialog] = useState<Dialog>({ kind: "none" });
   const close = () => setDialog({ kind: "none" });
 
+  const prices = useMemo(() => resolveProductPrices(productPrices), [productPrices]);
   const analytics = useMemo(() => {
     const feedCost = feeds.reduce((s, e) => s + (e.cost ?? 0), 0);
     const vetCost = health.reduce((s, h) => s + (h.cost ?? 0), 0);
     const cost = feedCost + vetCost;
     const totals = getActualProducts(products, null);
-    const value = animalProductValue(totals, resolveProductPrices(productPrices));
+    const value = animalProductValue(totals, prices);
     // Main product: the first one this animal type yields that has entries (eggs for hens, honey for bees).
     const main = (animal ? PRODUCT_TYPES_BY_ANIMAL[animal.type] : PRODUCT_TYPES).find((ty) => totals[ty] > 0) ?? PRODUCT_TYPES.find((ty) => totals[ty] > 0);
     const others = PRODUCT_TYPES.filter((ty) => ty !== main && totals[ty] > 0);
     // All costs are attributed to the main product — splitting them across honey and wax would count them twice.
     const perUnit = main && main !== "wax" && main !== "wool" ? { type: main, cost: cost / totals[main] } : null;
     return { feedCost, vetCost, cost, value, net: value - cost, perUnit, totals, main, others };
-  }, [feeds, health, products, productPrices, animal]);
+  }, [feeds, health, products, prices, animal]);
 
   if (!animal) {
     return (
@@ -187,16 +188,27 @@ export function AnimalDetail() {
               t("livestock.entriesHint", { count: products.length }),
             ].join(" · "),
           },
+          // The bars carry no figures (DESIGN_SYSTEM §7: numbers stay in text).
+          {
+            label: t("livestock.productionValue"),
+            value: f.formatCurrency(analytics.value),
+            hint: analytics.main && analytics.main !== "wax" && analytics.main !== "wool"
+              ? t("livestock.valueHint", { amount: formatProductAmount(analytics.main, analytics.totals[analytics.main], f, t), price: f.formatCurrency(prices[analytics.main]) })
+              : undefined,
+          },
           {
             label: t("livestock.totalCosts"),
             value: f.formatCurrency(analytics.cost),
-            // The cost per egg / kg is a derived figure: meta size, under the costs it comes from.
-            hint: [
-              t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) }),
-              analytics.cost > 0 && analytics.perUnit ? t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) }) : null,
-            ].filter(Boolean).join(" · "),
+            // The cost per egg / kg is a derived figure: meta size, on its own line under the split.
+            hint: (
+              <>
+                {t("livestock.costSplit", { feed: f.formatCurrency(analytics.feedCost), vet: f.formatCurrency(analytics.vetCost) })}
+                {analytics.cost > 0 && analytics.perUnit && (
+                  <span className="block">{t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) })}</span>
+                )}
+              </>
+            ),
           },
-          // The production value already stands in the balance bars above.
         ]}
       />
       <div className="mb-6">

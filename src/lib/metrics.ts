@@ -227,6 +227,23 @@ export function getActualProductKg(products: AnimalProduct[], animals: Animal[],
   return kg;
 }
 
+/**
+ * Recorded food products (eggs, honey, meat, milk — not wax or wool) as edible
+ * kg per month of `year`: the logged counterpart of the monthly forecast.
+ */
+export function getActualProductKgByMonth(products: AnimalProduct[], animals: Animal[], year: number): number[] {
+  const byId = new Map(animals.map((a) => [a.id, a]));
+  const out = Array.from({ length: 12 }, () => 0);
+  for (const p of products) {
+    if (!inPeriod(p.date, year) || PRODUCT_NUTRITION[p.type].caloriesPer100g <= 0) continue;
+    const m = Number(p.date.slice(5, 7)) - 1;
+    if (m < 0 || m > 11) continue;
+    const q = p.unit === "g" ? p.quantity / 1000 : p.quantity;
+    out[m] += p.type === "eggs" ? q * eggWeight(byId.get(p.animalId)) : q;
+  }
+  return out;
+}
+
 /** Expected annual products of the herd as edible kg. */
 export function getForecastProductKg(animals: Animal[]): ProductKg {
   const kg = emptyTotals();

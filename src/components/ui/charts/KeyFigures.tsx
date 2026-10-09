@@ -33,6 +33,8 @@ export interface KeyFiguresProps {
    * "stack" (side column): hero on top, secondaries as label/value rows.
    */
   layout?: "row" | "stack";
+  /** Stack layout only: a card title inside the surface, like CardHeader. */
+  title?: ReactNode;
   className?: string;
 }
 
@@ -52,7 +54,7 @@ function Wrap({ to, label, className, children }: { to?: string; label?: string;
  * a row of four equal StatCards when one number matters most and the others
  * only qualify it. See DESIGN_SYSTEM.md §7 "Key figures".
  */
-export const KeyFigures = memo(function KeyFigures({ hero, items = [], layout = "row", className = "" }: KeyFiguresProps) {
+export const KeyFigures = memo(function KeyFigures({ hero, items = [], layout = "row", title, className = "" }: KeyFiguresProps) {
   const Icon = hero.icon;
   const heroBody = (
     <>
@@ -78,7 +80,8 @@ export const KeyFigures = memo(function KeyFigures({ hero, items = [], layout = 
   if (layout === "stack") {
     return (
       <div className={`${CARD} ${className}`}>
-        <Wrap to={hero.to} label={hero.linkLabel} className="p-4">{heroBody}</Wrap>
+        {title && <h2 className="px-4 pt-4 text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h2>}
+        <Wrap to={hero.to} label={hero.linkLabel} className={title ? "p-4 pt-3" : "p-4"}>{heroBody}</Wrap>
         {items.length > 0 && (
           <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
             {items.map((it, i) => (

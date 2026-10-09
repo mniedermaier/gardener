@@ -1503,7 +1503,8 @@
     "byCaloriesHint": "produits animaux inclus",
     "rowMissing": "{{kg}} manquants",
     "rowExtraArea": "+{{area}}",
-    "rowCovered": "Objectif atteint selon la prévision"
+    "rowCovered": "Objectif atteint selon la prévision",
+    "rowNothingLogged": "rien de saisi"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -1552,7 +1553,6 @@
     "monthlyDesc_one": "Part des besoins caloriques de {{count}} personne : en frais selon la prévision et en réserve.",
     "monthlyDesc_other": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
-    "monthlyCaption": "Couverture calorique par mois selon la prévision annuelle",
     "monthlyKgTitle": "Quantité disponible par mois",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
     "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
@@ -1581,12 +1581,15 @@
     "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
     "harvested": "Récolté",
     "freshForecast": "Prévision frais",
-    "monthlyKgCaptionSplit": "Jusqu’en {{month}} la récolte saisie ; à partir de {{month}} la prévision selon les planches, plus réserve et produits animaux.",
     "emptyNeed_one": "Une personne a besoin d’environ {{kg}} de légumes et fruits par an, soit environ {{area}} de planches.",
     "emptyNeed_other": "{{count}} personnes ont besoin d’environ {{kg}} de légumes et fruits par an, soit environ {{area}} de planches.",
     "emptyNeed_many": "{{count}} personnes ont besoin d’environ {{kg}} de légumes et fruits par an, soit environ {{area}} de planches.",
     "emptyMissing": "Il manque des planches ou des animaux pour montrer ce que tu couvres toi-même.",
-    "emptyFoodplanLink": "Voir le besoin dans le plan"
+    "emptyFoodplanLink": "Voir le besoin dans le plan",
+    "monthlyKgCaptionLogged": "Saisi jusqu’à aujourd’hui, prévision ensuite (hachuré) : récolte selon les planches, réserve et produits animaux.",
+    "monthlyCaptionTypical": "Année type (prévision) : couverture calorique par mois",
+    "animalLogged": "Produits animaux saisis",
+    "animalForecast": "Produits animaux prévus"
   },
   "pests": {
     "title": "Ravageurs",
@@ -1868,7 +1871,7 @@
     "entriesHint_one": "{{count}} entrée",
     "entriesHint_other": "{{count}} entrées",
     "entriesHint_many": "{{count}} entrées",
-    "costSplit": "Alimentation {{feed}} · vétérinaire {{vet}}",
+    "costSplit": "Alimentation {{feed}} · vétérinaire {{vet}}",
     "balance": "Bilan",
     "howValue": "Valeur = produits enregistrés × prix unitaire (par défaut : œuf 0,35 €, miel 12 €/kg, lait 1,40 €/l, viande 14 €/kg). Coûts = alimentation + vétérinaire de cet animal.",
     "costPer": {
@@ -1890,7 +1893,7 @@
     "weekShort": "Sem. {{week}}",
     "showEntries": "afficher les entrées",
     "hideEntries": "masquer les entrées",
-    "ofExpectedToDate": "attendus ~{{amount}} (à ce jour)",
+    "ofExpectedToDate": "attendus ~{{amount}} (à ce jour)",
     "productThisYear": "{{product}} cette année",
     "eggWeeksLabel": "Œufs par 7 jours sur les 8 dernières semaines, moy. {{avg}}",
     "eggWeeksAvg": "Moy. {{avg}}/semaine · 8 semaines",
@@ -1918,7 +1921,8 @@
     "singleEntriesRange_many": "{{count}} derniers mois",
     "eggTrend": "{{value}} par rapport à la semaine moyenne",
     "chooseAnimal": "Choisir un animal…",
-    "expectedBasis": "depuis la première saisie le {{date}}"
+    "expectedBasis": "depuis la première saisie le {{date}}",
+    "valueHint": "{{amount}} × {{price}}"
   },
   "seeds": {
     "title": "Semences",
@@ -2283,16 +2287,16 @@
     "howAnimals": "Animaux {{total}} : {{expenses}} saisis en dépenses, {{log}} issus du carnet d’alimentation et du suivi santé. Une facture saisie aux deux endroits (même montant, au plus 3 jours d’écart) compte une fois.",
     "duplicatesSkipped_one": "{{count}} doublon n’a pas été compté.",
     "duplicatesSkipped_other": "{{count}} doublons n’ont pas été comptés.",
-    "fromFeedLog": "dont {{amount}} du carnet d’alimentation",
-    "fromHealthLog": "dont {{amount}} du suivi santé",
+    "fromFeedLog": "{{amount}} saisis dans le carnet d’alimentation",
+    "fromHealthLog": "{{amount}} saisis sous santé",
     "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés.",
-    "fromFeedBook": "Carnet d’alimentation",
-    "fromHealthBook": "Santé",
+    "fromFeedBook": "du carnet d’alimentation",
+    "fromHealthBook": "de santé",
     "openFeedBook": "Ouvrir dans le carnet d’alimentation",
     "openHealthBook": "Ouvrir dans la santé",
     "notesPlaceholder": "p. ex. magasin, numéro de facture…",
     "alsoInFeedBook": "aussi dans le carnet d’alimentation",
-    "alsoInHealthBook": "aussi dans santé"
+    "alsoInHealthBook": "aussi sous santé"
   },
   "succession": {
     "pick": "Choisir une culture",

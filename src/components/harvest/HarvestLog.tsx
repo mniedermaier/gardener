@@ -287,7 +287,8 @@ export function HarvestLog() {
 
           {/* Equal heights side by side; the chart centres in its card instead of
               leaving a band under it, and the crop list keeps its own height. */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          {/* Cards keep their own height: the chart card does not stretch into an empty band. */}
+          <div className="grid items-start gap-6 lg:grid-cols-2">
             <Card className="flex min-w-0 flex-col">
               {/* The subtitle names the range actually drawn (from the first harvest month, 3–12 months). */}
               <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint", { month: formatDate(stats.months[0].date, "monthYear") })} />

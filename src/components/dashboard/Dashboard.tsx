@@ -14,9 +14,9 @@ import { useSowingAgenda } from "@/hooks/useSowingAgenda";
 import { useVisibleAgendaRows } from "@/components/calendar/PlantableNowList";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
-import { Card } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { List, ListRow } from "@/components/ui/List";
+import { ListRow } from "@/components/ui/List";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
 import { HowCalculated, KeyFigures, Meter } from "@/components/ui/charts";
@@ -161,8 +161,9 @@ export function Dashboard() {
 
           {hasSeason && (
             <section>
-              <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.seasonTitle")}</h2>
+              {/* Title inside the surface, like the weather card above. */}
               <KeyFigures
+                title={t("dashboard.seasonTitle")}
                 layout="stack"
                 hero={{
                   label: t("metrics.yieldActual"),
@@ -214,14 +215,17 @@ export function Dashboard() {
           )}
 
           {recentHarvests.length > 0 && (
-            <section>
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.recentHarvests")}</h2>
-                <Link to="/harvest" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
-                  {t("dashboard.viewAll")} <ArrowRight size={14} aria-hidden="true" />
-                </Link>
-              </div>
-              <List label={t("dashboard.recentHarvests")}>
+            <Card padding="none">
+              <CardHeader
+                className="mb-0 px-4 pt-4 pb-2"
+                title={t("dashboard.recentHarvests")}
+                actions={
+                  <Link to="/harvest" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
+                    {t("dashboard.viewAll")} <ArrowRight size={14} aria-hidden="true" />
+                  </Link>
+                }
+              />
+              <ul className="divide-y divide-gray-100 dark:divide-white/5" aria-label={t("dashboard.recentHarvests")}>
                 {recentHarvests.map((h) => {
                   const plant = plantMap.get(h.plantId);
                   return (
@@ -242,8 +246,8 @@ export function Dashboard() {
                     />
                   );
                 })}
-              </List>
-            </section>
+              </ul>
+            </Card>
           )}
 
           <BackupHint now={now} />

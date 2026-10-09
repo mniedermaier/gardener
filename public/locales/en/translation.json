@@ -1438,7 +1438,8 @@
     "byCaloriesHint": "incl. animal products",
     "rowMissing": "{{kg}} short",
     "rowExtraArea": "+{{area}}",
-    "rowCovered": "Target reached by the forecast"
+    "rowCovered": "Target reached by the forecast",
+    "rowNothingLogged": "nothing logged yet"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1484,7 +1485,6 @@
     "coverageDesc_other": "Forecast for one year, needs of {{count}} people.",
     "monthlyDesc_one": "Share of the calorie needs of {{count}} person: fresh from the forecast and from storage.",
     "monthlyDesc_other": "Share of the calorie needs of {{count}} people: fresh from the forecast and from storage.",
-    "monthlyCaption": "Calorie coverage per month, annual forecast",
     "monthlyKgTitle": "Food available per month",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
     "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
@@ -1511,11 +1511,14 @@
     "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). Nothing in storage yet.",
     "harvested": "Harvested",
     "freshForecast": "Fresh forecast",
-    "monthlyKgCaptionSplit": "Up to {{month}} the logged harvest; from {{month}} the forecast from the current beds, plus stored food and animal products.",
     "emptyNeed_one": "One person needs about {{kg}} of vegetables and fruit a year, which takes roughly {{area}} of beds.",
     "emptyNeed_other": "{{count}} people need about {{kg}} of vegetables and fruit a year, which takes roughly {{area}} of beds.",
     "emptyMissing": "Add beds or animals to see how much of it you cover yourself.",
-    "emptyFoodplanLink": "See the need in the food plan"
+    "emptyFoodplanLink": "See the need in the food plan",
+    "monthlyKgCaptionLogged": "Logged up to today, forecast after (hatched): harvest from the current beds, stored food and animal products.",
+    "monthlyCaptionTypical": "Typical year (forecast): calorie coverage per month",
+    "animalLogged": "Animal products logged",
+    "animalForecast": "Animal products forecast"
   },
   "pests": {
     "title": "Pests",
@@ -1780,7 +1783,7 @@
     "openAnimal": "Open animal",
     "entriesHint_one": "{{count}} entry",
     "entriesHint_other": "{{count}} entries",
-    "costSplit": "Feed {{feed}} · vet {{vet}}",
+    "costSplit": "Feed {{feed}} · vet {{vet}}",
     "balance": "Balance",
     "howValue": "Value = recorded products × price per unit (default: egg €0.35, honey €12/kg, milk €1.40/l, meat €14/kg). Costs = feed + vet for this animal.",
     "costPer": {
@@ -1802,7 +1805,7 @@
     "weekShort": "Week {{week}}",
     "showEntries": "show entries",
     "hideEntries": "hide entries",
-    "ofExpectedToDate": "expected ~{{amount}} (to date)",
+    "ofExpectedToDate": "expected ~{{amount}} (to date)",
     "productThisYear": "{{product}} this year",
     "eggWeeksLabel": "Eggs per 7 days over the last 8 weeks, avg. {{avg}}",
     "eggWeeksAvg": "Avg. {{avg}}/week · 8 weeks",
@@ -1829,7 +1832,8 @@
     "singleEntriesRange_other": "last {{count}} months",
     "eggTrend": "{{value}} vs. average week",
     "chooseAnimal": "Choose animal…",
-    "expectedBasis": "since the first entry on {{date}}"
+    "expectedBasis": "since the first entry on {{date}}",
+    "valueHint": "{{amount}} × {{price}}"
   },
   "seeds": {
     "title": "Seeds",
@@ -2180,15 +2184,15 @@
     "howAnimals": "Animals {{total}}: {{expenses}} recorded as expenses, {{log}} from the feed log and health records. A bill recorded in both places (same amount, at most 3 days apart) counts once.",
     "duplicatesSkipped_one": "{{count}} duplicate entry was not counted.",
     "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
-    "fromFeedLog": "incl. {{amount}} from the feed log",
-    "fromHealthLog": "incl. {{amount}} from health records",
-    "fromFeedBook": "Feed log",
-    "fromHealthBook": "Health",
+    "fromFeedLog": "{{amount}} logged in the feed book",
+    "fromHealthLog": "{{amount}} logged under health",
+    "fromFeedBook": "from the feed book",
+    "fromHealthBook": "from health",
     "openFeedBook": "Open in feed log",
     "openHealthBook": "Open in health log",
     "notesPlaceholder": "e.g. shop, invoice number…",
-    "alsoInFeedBook": "also in feed log",
-    "alsoInHealthBook": "also in health"
+    "alsoInFeedBook": "also in the feed book",
+    "alsoInHealthBook": "also under health"
   },
   "succession": {
     "pick": "Pick a crop",

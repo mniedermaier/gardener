@@ -106,7 +106,8 @@ export function ProductionPage() {
         hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} />,
       }]
     : [];
-  const yearFigures = [...weekFigure, ...herdTypes.slice(1).map(yearFigure)];
+  // Wax and wool are listed as single entries under the chart: no second figure for them.
+  const yearFigures = [...weekFigure, ...herdTypes.slice(1).filter((ty) => ty !== "wax" && ty !== "wool").map(yearFigure)];
 
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
 
