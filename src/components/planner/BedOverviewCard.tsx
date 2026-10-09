@@ -102,7 +102,8 @@ export const BedOverviewCard = memo(function BedOverviewCard({ bed, plantMap, gr
           <span className="text-xs text-gray-500 dark:text-gray-400">{t("planner.bedEmpty")}</span>
         )}
         {species.length > 0 && <span className="text-xs text-gray-500 dark:text-gray-400">{t("planner.speciesCount", { count: species.length })}</span>}
-        <span className="ml-auto flex flex-wrap gap-1.5">
+        {/* Phones: a wrapped badge row stays left-aligned; beside the counts from sm. */}
+        <span className="flex flex-wrap gap-1.5 sm:ml-auto">
           {frostWeeks > 0 && <Badge tone="info" icon={ShieldCheck}>{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge>}
           {conflicts.length > 0 && <Badge tone="warning" icon={TriangleAlert}>{t("bedStats.conflictPairs", { count: conflicts.length })}</Badge>}
         </span>

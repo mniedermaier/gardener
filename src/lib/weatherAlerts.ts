@@ -1,5 +1,8 @@
 import type { WeatherForecastItem } from "@/types/weather";
 import type { Bed, GreenhouseConfig } from "@/types/garden";
+import { getFrostProtectionWeeks } from "@/types/garden";
+import { addDays } from "date-fns";
+import { HARVEST_GRACE_DAYS, plantedHarvestWindow } from "@/lib/season";
 import type { Plant, WaterNeed } from "@/types/plant";
 import type { AlertConfig } from "@/store/settingsSlice";
 
@@ -123,7 +126,13 @@ export interface BedFrostRisk {
  * "Heute" all read it. A bed is at risk when the frost reaches it **and** it
  * holds at least one frost-tender crop — winter-hardy beds get no pin.
  */
-export function frostRiskByBed(beds: Bed[], plantMap: Map<string, Plant>, frost: Pick<FrostSummary, "coldest"> | null): BedFrostRisk[] {
+export function frostRiskByBed(
+  beds: Bed[],
+  plantMap: Map<string, Plant>,
+  frost: Pick<FrostSummary, "coldest"> | null,
+  /** With the season: crops whose harvest (plus the late grace) ended are gone, not at risk. */
+  season?: { now: Date; lastFrostDate: string },
+): BedFrostRisk[] {
   if (!frost) return [];
   const risks: BedFrostRisk[] = [];
   for (const bed of beds) {
@@ -131,7 +140,12 @@ export function frostRiskByBed(beds: Bed[], plantMap: Map<string, Plant>, frost:
     const ids: string[] = [];
     for (const c of bed.cells) {
       const plant = plantMap.get(c.plantId);
-      if (plant && !ids.includes(plant.id) && isFrostSensitive(plant)) ids.push(plant.id);
+      if (!plant || ids.includes(plant.id) || !isFrostSensitive(plant)) continue;
+      if (season && c.plantedDate) {
+        const w = plantedHarvestWindow(plant, [c.plantedDate], { ...season, protectionWeeks: getFrostProtectionWeeks(bed) });
+        if (w && addDays(w.end, HARVEST_GRACE_DAYS) < season.now) continue;
+      }
+      ids.push(plant.id);
     }
     if (ids.length > 0) risks.push({ bedId: bed.id, plantIds: ids });
   }

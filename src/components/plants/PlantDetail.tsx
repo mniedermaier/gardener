@@ -503,8 +503,11 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               // Weight and count as meta parts, the last date on its own line: three parts
               // wrapped in the narrow column and left a "·" hanging at the line end.
               meta={harvestStats.count > 0
-                ? [formatWeight(harvestStats.grams), t("plants.detail.harvestEntries", { count: harvestStats.count }), harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : null]
+                ? [formatWeight(harvestStats.grams), t("plants.detail.harvestEntries", { count: harvestStats.count })]
                 : t("plants.detail.noHarvests")}
+              description={harvestStats.count > 0 && harvestStats.last
+                ? <span className="text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") })}</span>
+                : undefined}
               // Nothing to harvest from while the crop stands in no bed (and none was harvested yet).
               actions={locations.length > 0 || harvestStats.count > 0 ? <IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} /> : undefined}
             />

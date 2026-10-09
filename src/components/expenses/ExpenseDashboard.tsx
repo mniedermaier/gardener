@@ -165,7 +165,7 @@ export function ExpenseDashboard() {
 
       {!hasAnything ? (
         <Card>
-          <EmptyState icon={ReceiptText} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest")}>{t("expenses.toHarvest")}</Button>} />
+          <EmptyState icon={ReceiptText} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest", { state: { openAdd: true } })}>{t("expenses.toHarvest")}</Button>} />
         </Card>
       ) : (
         <div className="space-y-6">

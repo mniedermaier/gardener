@@ -285,6 +285,17 @@ describe("frost risk per bed (map pins, warning and weather page share it)", () 
     expect(frostRiskByBed(heated, plantMap, frost(-10))).toHaveLength(0);
   });
 
+  it("leaves out crops whose harvest (plus the late grace) is over", () => {
+    // Beans sown 8 May are long harvested by October; pumpkin keeps cropping until the frost.
+    const dated = [bed("acker", "outdoor_bed", ["pumpkin", "bean"], {
+      cells: [{ cellX: 0, cellY: 0, plantId: "pumpkin", plantedDate: "2026-05-08" }, { cellX: 1, cellY: 0, plantId: "bean", plantedDate: "2026-05-08" }],
+    })];
+    const season = { now: new Date(2026, 9, 9), lastFrostDate: "2026-05-15" };
+    expect(frostRiskByBed(dated, plantMap, frost(-1), season)[0]?.plantIds).toEqual(["pumpkin"]);
+    // Without the season (no dates known), every tender crop counts.
+    expect(frostRiskByBed(dated, plantMap, frost(-1))[0]?.plantIds).toEqual(["pumpkin", "bean"]);
+  });
+
   it("no frost, no risk", () => {
     expect(frostRiskByBed(beds, plantMap, null)).toHaveLength(0);
   });

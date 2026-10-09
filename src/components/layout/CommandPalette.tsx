@@ -366,7 +366,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     {c.leading ?? <Icon size={16} />}
                   </span>
                   <span className="min-w-0 flex-1 truncate font-medium">{c.label}</span>
-                  {c.hint && <span className="shrink-0 truncate text-xs text-gray-500 dark:text-gray-400">{c.hint}</span>}
+                  {c.hint && <span className="min-w-0 max-w-[45%] truncate text-xs text-gray-500 dark:text-gray-400">{c.hint}</span>}
                   {selected && <CornerDownLeft size={14} aria-hidden="true" className="hidden shrink-0 text-gray-500 sm:block" />}
                 </div>
               </div>

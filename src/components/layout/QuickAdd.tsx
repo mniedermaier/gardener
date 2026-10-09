@@ -50,7 +50,7 @@ export function QuickAdd({ hidden = false }: QuickAddProps) {
         </button>
       )}
       <Modal open={open} onClose={() => setOpen(false)} title={t("quickAdd.title")}>
-        <ul className="-mx-1 grid gap-1">
+        <ul className="-mx-1 -mt-3 grid gap-1">
           {QUICK_ACTIONS.map(({ to, icon: Icon, labelKey, hintKey, tone }) => (
             <li key={to}>
               <button

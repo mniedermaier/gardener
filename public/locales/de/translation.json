@@ -834,7 +834,7 @@
       "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein:",
       "yieldPerPlant": "≈ {{value}} pro Pflanze",
       "frostHarvest": "Frost ab {{date}} – jetzt abernten",
-      "stockEmpty": "{{plant}} steht noch in keinem Beet, Ernten und Saatgut fehlen noch.",
+      "stockEmpty": "Noch nicht im Beet, ohne erfasste Ernte und ohne Saatgut.",
       "sameBedConflict": "Im selben Beet · {{plants}}"
     },
     "sowNowFilter": "Jetzt säen & pflanzen",

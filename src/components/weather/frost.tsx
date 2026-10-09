@@ -82,12 +82,14 @@ export function useFrostSummary(forecast: { date: string; tempMin: number }[] | 
  * "Betroffen sind …" on the weather page.
  */
 export function useFrostRisk(summary: FrostSummary | null | undefined): { byBed: Map<string, BedFrostRisk>; plantIds: string[] } {
-  const gardens = useStore((s) => s.gardens);
+  const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plantMap = usePlantMap();
+  const today = useToday();
   return useMemo(() => {
-    const risks = frostRiskByBed(gardens.flatMap((g) => g.beds), plantMap, summary ?? null);
+    // Harvested-out crops (window + late grace over) are not "affected" — the same rule as the calendar.
+    const risks = frostRiskByBed(gardens.flatMap((g) => g.beds), plantMap, summary ?? null, { now: today, lastFrostDate });
     return { byBed: new Map(risks.map((r) => [r.bedId, r])), plantIds: frostAffectedPlants(risks) };
-  }, [gardens, plantMap, summary]);
+  }, [gardens, plantMap, summary, today, lastFrostDate]);
 }
 
 /**

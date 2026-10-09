@@ -251,10 +251,11 @@ export function GardenJournal() {
     return a ? a.name || t(`livestock.types.${a.type}`) : undefined;
   };
 
+  // Filter chips: rounded-md and a dark selected fill, so they never look like the section tabs above.
   const chip = (active: boolean) =>
-    `inline-flex min-h-11 items-center rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-8 ${
+    `inline-flex min-h-11 items-center rounded-md border px-3 text-sm font-medium transition-colors sm:min-h-8 ${
       active
-        ? "border-garden-600/40 bg-garden-50 text-garden-800 dark:border-garden-400/40 dark:bg-garden-500/15 dark:text-garden-200"
+        ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
         : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
     }`;
 
