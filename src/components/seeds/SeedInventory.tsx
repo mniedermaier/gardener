@@ -110,6 +110,9 @@ export function SeedInventory() {
     [seeds, plantMap, getPlantName],
   );
   const testCount = rows.filter((r) => r.viability.status === "testRecommended").length;
+  // "6 Posten · 6 Kulturen" repeats itself: name the crops only when they differ.
+  const cropCount = new Set(seeds.map((x) => x.plantId)).size;
+  const itemsHint = cropCount !== seeds.length ? t("seeds.itemsCrops", { count: cropCount }) : undefined;
   const shown = filter === "test" ? rows.filter((r) => r.viability.status === "testRecommended") : rows;
   const totalCost = seeds.reduce((s, seed) => s + (seed.cost ?? 0), 0);
 
@@ -194,10 +197,10 @@ export function SeedInventory() {
           // The shopping gap is what the page is about; with nothing missing
           // the stock itself leads. Zero counts are left out.
           hero={missing.length > 0
-            ? { label: t("seeds.missingStat"), value: formatNumber(missing.length), hint: t("seeds.missingStatHint"), icon: ShoppingCart, tone: "info" }
-            : { label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand", hint: t("seeds.itemsCrops", { count: new Set(seeds.map((x) => x.plantId)).size }) }}
+            ? { label: t("seeds.missingStat"), value: formatNumber(missing.length), hint: t("seeds.missingStatHint"), icon: ShoppingCart, tone: "neutral" }
+            : { label: t("seeds.items"), value: formatNumber(seeds.length), icon: Package, tone: "brand", hint: itemsHint }}
           items={[
-            ...(missing.length > 0 ? [{ label: t("seeds.items"), value: formatNumber(seeds.length), hint: t("seeds.itemsCrops", { count: new Set(seeds.map((x) => x.plantId)).size }) }] : []),
+            ...(missing.length > 0 ? [{ label: t("seeds.items"), value: formatNumber(seeds.length), hint: itemsHint }] : []),
             ...(testCount > 0 ? [{ label: t("seeds.testRecommended"), value: formatNumber(testCount), hint: t("seeds.testHintShort") }] : []),
             ...(totalCost > 0 ? [{ label: t("seeds.totalCost"), value: formatCurrency(totalCost) }] : []),
           ]}

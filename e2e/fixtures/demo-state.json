@@ -56,26 +56,26 @@
       {
        "cellX": 2,
        "cellY": 0,
-       "plantId": "radish",
-       "plantedDate": "2026-05-08"
+       "plantId": "lambs_lettuce",
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 2,
        "cellY": 1,
-       "plantId": "radish",
-       "plantedDate": "2026-05-08"
+       "plantId": "lambs_lettuce",
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 3,
        "cellY": 0,
-       "plantId": "radish",
-       "plantedDate": "2026-05-08"
+       "plantId": "lambs_lettuce",
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 3,
        "cellY": 1,
-       "plantId": "radish",
-       "plantedDate": "2026-05-08"
+       "plantId": "lambs_lettuce",
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 0,
@@ -388,114 +388,114 @@
       {
        "cellX": 0,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 0,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 1,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 1,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 2,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 2,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 3,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 3,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 4,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 4,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 5,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 5,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 6,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 6,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 7,
        "cellY": 0,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 7,
        "cellY": 1,
-       "plantId": "potato",
+       "plantId": "garlic",
        "variety": "Linda",
-       "plantedDate": "2026-05-08"
+       "plantedDate": "2026-10-02"
       },
       {
        "cellX": 0,
@@ -714,7 +714,8 @@
    "type": "transplant",
    "title": "Knoblauch stecken",
    "plantId": "garlic",
-   "dueDate": "2026-10-12"
+   "dueDate": "2026-10-12",
+   "completedDate": "2026-10-02"
   },
   {
    "id": "t6",
@@ -1275,11 +1276,11 @@
   },
   {
    "id": "p3",
-   "plantId": "radish",
+   "plantId": "lambs_lettuce",
    "bedId": "b-hochbeet",
-   "date": "2026-09-15",
+   "date": "2026-10-05",
    "type": "pest",
-   "name": "Erdflöhe",
+   "name": "Schnecken",
    "severity": 2,
    "organic": true,
    "resolved": false

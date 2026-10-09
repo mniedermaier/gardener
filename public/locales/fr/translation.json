@@ -1036,7 +1036,8 @@
     "afterFrostWindow": "après les nuits de gel : {{range}}",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
     "untilByBed": "jusqu’au {{date}} dans « {{bed}} »",
-    "fromByBed": "à partir du {{date}} dans « {{bed}} »"
+    "fromByBed": "à partir du {{date}} dans « {{bed}} »",
+    "afterFrostByBed": "{{range}} dans « {{bed}} »"
   },
   "settings": {
     "title": "Paramètres",
@@ -1552,7 +1553,7 @@
     "monthlyDesc_one": "Part des besoins caloriques de {{count}} personne : en frais selon la prévision et en réserve.",
     "monthlyDesc_other": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
     "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes : en frais selon la prévision et en réserve.",
-    "monthlyCaption": "Couverture calorique par mois",
+    "monthlyCaption": "Couverture calorique par mois selon la prévision annuelle",
     "monthlyKgTitle": "Quantité disponible par mois",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
     "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
@@ -1584,7 +1585,7 @@
     "monthlyDescFresh_many": "Part des besoins caloriques de {{count}} personnes (prévision). Rien en réserve pour l’instant.",
     "harvested": "Récolté",
     "freshForecast": "Prévision frais",
-    "monthlyKgCaptionSplit": "Jusqu’en {{month}} la récolte saisie, ensuite la prévision selon les planches actuelles ; plus réserve et produits animaux."
+    "monthlyKgCaptionSplit": "Jusqu’en {{month}} la récolte saisie ; à partir de {{month}} la prévision selon les planches, plus réserve et produits animaux."
   },
   "pests": {
     "title": "Ravageurs",
@@ -1694,7 +1695,7 @@
       "emptyTitle": "Œufs et miel en un coup d’œil",
       "entries": "Saisies",
       "notesPlaceholder": "p. ex. météo, pause de ponte…",
-      "yearHintSince": "attendus ~{{amount}} (depuis le {{date}})"
+      "yearHintSince": "~{{amount}} attendus depuis la première saisie le {{date}}"
     },
     "feed": {
       "title": "Alimentation",
@@ -1712,7 +1713,7 @@
     "health": {
       "title": "Santé",
       "totalEvents": "Total entrées",
-      "totalCost": "Frais vétérinaires",
+      "totalCost": "Frais de santé, toutes les saisies",
       "losses": "Pertes",
       "overdueWarning": "Vaccination possiblement en retard",
       "daysSince": "il y a {{days}} jours",
@@ -1909,14 +1910,14 @@
       "death": "p. ex. renard, vieillesse…",
       "other": "p. ex. parage des onglons"
     },
-    "ofExpectedSince": "attendus ~{{amount}} (depuis le {{date}})",
     "quantityIn": "Quantité ({{unit}})",
     "singleEntries": "Saisies individuelles",
     "singleEntriesRange_one": "dernier mois",
     "singleEntriesRange_other": "{{count}} derniers mois",
     "singleEntriesRange_many": "{{count}} derniers mois",
     "eggTrend": "{{value}} par rapport à la semaine moyenne",
-    "chooseAnimal": "Choisir un animal…"
+    "chooseAnimal": "Choisir un animal…",
+    "expectedBasis": "depuis la première saisie le {{date}}"
   },
   "seeds": {
     "title": "Semences",
@@ -2284,13 +2285,13 @@
     "fromFeedLog": "dont {{amount}} du carnet d’alimentation",
     "fromHealthLog": "dont {{amount}} du suivi santé",
     "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés.",
-    "fromFeedBook": "du carnet d’alimentation",
-    "fromHealthBook": "du carnet de santé",
+    "fromFeedBook": "Carnet d’alimentation",
+    "fromHealthBook": "Santé",
     "openFeedBook": "Ouvrir dans le carnet d’alimentation",
     "openHealthBook": "Ouvrir dans la santé",
     "notesPlaceholder": "p. ex. magasin, numéro de facture…",
     "alsoInFeedBook": "aussi dans le carnet d’alimentation",
-    "alsoInHealthBook": "aussi dans le carnet de santé"
+    "alsoInHealthBook": "aussi dans santé"
   },
   "succession": {
     "pick": "Choisir une culture",

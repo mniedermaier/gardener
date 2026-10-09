@@ -486,16 +486,21 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               (each with its own button repeating the header actions) read as noise. */}
           {locations.length === 0 && harvestStats.count === 0 && ownSeeds.length === 0 ? (
             // Nothing yet: one muted line instead of three empty rows.
-            <Card padding="sm">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("plants.detail.yourStock")}</p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("plants.detail.stockEmpty", { plant: getPlantName(plant.id) })}</p>
-              <Button variant="ghost" size="sm" className="-ml-2 mt-1" onClick={goSeeds}>
+            <Card>
+              <CardHeader title={t("plants.detail.yourStock")} description={t("plants.detail.stockEmpty", { plant: getPlantName(plant.id) })} />
+              <Button variant="ghost" size="sm" className="-ml-2 -mt-2" onClick={goSeeds}>
                 <Plus size={16} aria-hidden="true" />
                 {t("plants.addSeeds")}
               </Button>
             </Card>
           ) : (
-          <List header={t("plants.detail.yourStock")}>
+          // Same card title style as "Haltbarmachen & Saatgut" next to it.
+          <Card padding="none">
+          <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+            <CardHeader title={t("plants.detail.yourStock")} className="mb-2" />
+          </div>
+          <List label={t("plants.detail.yourStock")} className="rounded-none rounded-b-xl border-x-0 border-b-0 shadow-none">
+
             {locations.length > 0 ? locations.map((loc) => (
               <ListRow
                 key={loc.key}
@@ -545,6 +550,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               />
             )}
           </List>
+          </Card>
           )}
 
           {hasStorageInfo && (

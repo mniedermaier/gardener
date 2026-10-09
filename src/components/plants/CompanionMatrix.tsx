@@ -186,7 +186,10 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
       {hiddenBottom && (
         <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-40 h-12 bg-gradient-to-t from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
       )}
-      <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
+      {/* Phones: an inner scroll box keeps the header row in view. Desktop: the
+          table grows with the page, so no rows hide behind a fade. */}
+      <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable] lg:max-h-none lg:min-h-0">
+
         <table className="border-separate border-spacing-0">
           <caption className="sr-only">{t("companions.title")}</caption>
           <thead>

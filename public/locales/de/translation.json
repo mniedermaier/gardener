@@ -1004,7 +1004,8 @@
     "afterFrostWindow": "nach den Frostnächten: {{range}}",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
     "untilByBed": "bis {{date}} im Beet „{{bed}}“",
-    "fromByBed": "ab {{date}} im Beet „{{bed}}“"
+    "fromByBed": "ab {{date}} im Beet „{{bed}}“",
+    "afterFrostByBed": "{{range}} im Beet „{{bed}}“"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1484,7 +1485,7 @@
     "coverageDesc_other": "Prognose für ein Jahr, Bedarf von {{count}} Personen.",
     "monthlyDesc_one": "Anteil des Kalorienbedarfs von {{count}} Person: frisch laut Prognose und aus dem Vorrat.",
     "monthlyDesc_other": "Anteil des Kalorienbedarfs von {{count}} Personen: frisch laut Prognose und aus dem Vorrat.",
-    "monthlyCaption": "Kalorienabdeckung pro Monat",
+    "monthlyCaption": "Kalorienabdeckung pro Monat laut Jahresprognose",
     "monthlyKgTitle": "Verfügbare Menge pro Monat",
     "noWinterGap": "Von {{from}} bis {{to}} reicht dein geplanter Vorrat für mindestens ein Viertel des Bedarfs.",
     "noMonthCovered": "Dein Garten deckt bisher in keinem Monat {{percent}} des Bedarfs. Die Hebel unten zeigen, wo mehr Fläche am meisten bringt.",
@@ -1513,7 +1514,7 @@
     "monthlyDescFresh_other": "Anteil des Kalorienbedarfs von {{count}} Personen laut Prognose. Im Vorrat liegt noch nichts.",
     "harvested": "Geerntet",
     "freshForecast": "Prognose frisch",
-    "monthlyKgCaptionSplit": "Bis {{month}} die erfasste Ernte, danach die Prognose aus der aktuellen Beetbelegung; dazu Vorrat und Tierprodukte."
+    "monthlyKgCaptionSplit": "Bis {{month}} die erfasste Ernte; ab {{month}} die Prognose aus der Beetbelegung, dazu Vorrat und Tierprodukte."
   },
   "pests": {
     "title": "Schädlinge",
@@ -1621,7 +1622,7 @@
       "emptyTitle": "Eier und Honig im Blick",
       "entries": "Einträge",
       "notesPlaceholder": "z. B. Wetter, Legepause …",
-      "yearHintSince": "erwartet ~{{amount}} (seit {{date}})"
+      "yearHintSince": "erwartet ~{{amount}} ab erstem Eintrag am {{date}}"
     },
     "feed": {
       "title": "Futter",
@@ -1639,7 +1640,7 @@
     "health": {
       "title": "Gesundheit",
       "totalEvents": "Einträge gesamt",
-      "totalCost": "Tierarztkosten",
+      "totalCost": "Gesundheitskosten, alle Einträge",
       "losses": "Verluste",
       "overdueWarning": "Impfung möglicherweise fällig",
       "daysSince": "vor {{days}} Tagen",
@@ -1821,13 +1822,13 @@
       "death": "z. B. Fuchs, Alter …",
       "other": "z. B. Klauenpflege"
     },
-    "ofExpectedSince": "erwartet ~{{amount}} (seit {{date}})",
     "quantityIn": "Menge ({{unit}})",
     "singleEntries": "Einzeleinträge",
     "singleEntriesRange_one": "letzter Monat",
     "singleEntriesRange_other": "letzte {{count}} Monate",
     "eggTrend": "{{value}} zur Ø-Woche",
-    "chooseAnimal": "Tier wählen …"
+    "chooseAnimal": "Tier wählen …",
+    "expectedBasis": "ab erstem Eintrag am {{date}}"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2180,13 +2181,13 @@
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
     "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
     "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte",
-    "fromFeedBook": "aus dem Futterbuch",
-    "fromHealthBook": "aus der Gesundheitsakte",
+    "fromFeedBook": "Futterbuch",
+    "fromHealthBook": "Gesundheit",
     "openFeedBook": "Im Futterbuch öffnen",
     "openHealthBook": "In Gesundheit öffnen",
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
     "alsoInFeedBook": "auch im Futterbuch",
-    "alsoInHealthBook": "auch in der Gesundheitsakte"
+    "alsoInHealthBook": "auch in Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",

@@ -201,9 +201,11 @@ export function SufficiencyDashboard() {
                   values: [
                     m.month <= currentMonth ? logged[m.month] : 0,
                     ...(hasForecast ? [m.month > currentMonth ? m.freshKg : 0] : []),
-                    // Series order brand → earth → sky (DESIGN_SYSTEM charts).
-                    ...(hasAnimals ? [m.animalKg] : []),
-                    ...(hasStored ? [m.storedKg] : []),
+                    // Series order brand → earth → sky (DESIGN_SYSTEM charts). Stored food
+                    // and animal products are forecasts: drawn from this month on only, so
+                    // past months show exactly what was logged.
+                    ...(hasAnimals ? [m.month >= currentMonth ? m.animalKg : 0] : []),
+                    ...(hasStored ? [m.month >= currentMonth ? m.storedKg : 0] : []),
                   ],
                 }))}
                 series={[

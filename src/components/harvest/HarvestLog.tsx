@@ -291,7 +291,7 @@ export function HarvestLog() {
             <Card className="flex min-w-0 flex-col">
               {/* The subtitle names the range actually drawn (from the first harvest month, 3–12 months). */}
               <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint", { month: formatDate(stats.months[0].date, "monthYear") })} />
-              <div className="flex flex-1 flex-col justify-center">
+              <div className="flex flex-1 flex-col">
               <BarChart
                 caption={t("harvest.perMonth")}
                 categoryLabel={t("harvest.month")}

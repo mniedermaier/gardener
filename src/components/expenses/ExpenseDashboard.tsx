@@ -294,7 +294,16 @@ export function ExpenseDashboard() {
                 <EmptyState compact icon={ReceiptText} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
               </Card>
             ) : groups.map((g) => (
-              <List key={g.key} header={`${f.formatDate(`${g.key}-01`, "monthYear")} · ${f.formatCurrency(g.sum)}`}>
+              <List
+                key={g.key}
+                // Month total right-aligned like Ernte and Bewässerung: it reads as a column.
+                header={
+                  <span className="flex items-center justify-between gap-2">
+                    <span>{f.formatDate(`${g.key}-01`, "monthYear")}</span>
+                    <span className="font-medium tabular-nums">{f.formatCurrency(g.sum)}</span>
+                  </span>
+                }
+              >
                 {g.items.map((r) => {
                   if (r.kind === "log") {
                     const { entry } = r;
@@ -303,7 +312,8 @@ export function ExpenseDashboard() {
                         key={`${entry.source}-${entry.id}`}
                         leading={<CategoryTile category={entry.source === "feed" ? "animal_feed" : "veterinary"} />}
                         title={entry.label}
-                        meta={[t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook"), f.formatDate(entry.date, "relative")]}
+                        // Category first like every other row, the origin as a short tag.
+                        meta={[t(`expenses.categories.${entry.source === "feed" ? "animal_feed" : "veterinary"}`), t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook"), f.formatDate(entry.date, "relative")]}
                         trailing={f.formatCurrency(entry.cost)}
                         onClick={() => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health")}
                         clickLabel={`${entry.label} · ${t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook")}`}

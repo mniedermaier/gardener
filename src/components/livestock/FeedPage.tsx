@@ -127,7 +127,16 @@ export function FeedPage() {
             {groups.length === 0 ? (
               <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("livestock.emptyFilter")}</p></Card>
             ) : groups.map((g) => (
-              <List key={g.key} header={`${f.formatDate(g.date, "monthYear")} · ${f.formatCurrency(g.items.reduce((s, e) => s + (e.cost ?? 0), 0))}`}>
+              <List
+                key={g.key}
+                // Month total right-aligned, the same pattern as Ernte, Bewässerung and Kosten.
+                header={
+                  <span className="flex items-center justify-between gap-2">
+                    <span>{f.formatDate(g.date, "monthYear")}</span>
+                    <span className="font-medium tabular-nums">{f.formatCurrency(g.items.reduce((s, e) => s + (e.cost ?? 0), 0))}</span>
+                  </span>
+                }
+              >
                 {g.items.map((e) => {
                   const animal = animalMap.get(e.animalId);
                   return (

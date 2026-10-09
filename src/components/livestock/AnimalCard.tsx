@@ -77,9 +77,9 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedF
               <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
                 <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
-                  {basis
-                    ? t("livestock.ofExpectedSince", { amount: expected, date: f.formatDate(basis, "short") })
-                    : t("livestock.ofExpectedToDate", { amount: expected })}
+                  {t("livestock.ofExpectedToDate", { amount: expected })}
+                  {/* The basis on its own line, kept whole: it is not the herd's start date. */}
+                  {basis && <span className="block whitespace-nowrap">{t("livestock.expectedBasis", { date: f.formatDate(basis, "short") })}</span>}
                 </span>
               </dd>
             </div>

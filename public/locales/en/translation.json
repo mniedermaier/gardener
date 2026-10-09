@@ -1004,7 +1004,8 @@
     "afterFrostWindow": "after the frost nights: {{range}}",
     "timelineEmptyLine": "Your season plan needs a bed.",
     "untilByBed": "until {{date}} in “{{bed}}”",
-    "fromByBed": "from {{date}} in “{{bed}}”"
+    "fromByBed": "from {{date}} in “{{bed}}”",
+    "afterFrostByBed": "{{range}} in “{{bed}}”"
   },
   "settings": {
     "title": "Settings",
@@ -1484,7 +1485,7 @@
     "coverageDesc_other": "Forecast for one year, needs of {{count}} people.",
     "monthlyDesc_one": "Share of the calorie needs of {{count}} person: fresh from the forecast and from storage.",
     "monthlyDesc_other": "Share of the calorie needs of {{count}} people: fresh from the forecast and from storage.",
-    "monthlyCaption": "Calorie coverage per month",
+    "monthlyCaption": "Calorie coverage per month, annual forecast",
     "monthlyKgTitle": "Food available per month",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
     "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
@@ -1513,7 +1514,7 @@
     "monthlyDescFresh_other": "Share of the calorie needs of {{count}} people (forecast). Nothing in storage yet.",
     "harvested": "Harvested",
     "freshForecast": "Fresh forecast",
-    "monthlyKgCaptionSplit": "Up to {{month}} the logged harvest, after that the forecast from the current beds; plus stored food and animal products."
+    "monthlyKgCaptionSplit": "Up to {{month}} the logged harvest; from {{month}} the forecast from the current beds, plus stored food and animal products."
   },
   "pests": {
     "title": "Pests",
@@ -1621,7 +1622,7 @@
       "emptyTitle": "Keep track of eggs and honey",
       "entries": "Entries",
       "notesPlaceholder": "e.g. weather, laying break…",
-      "yearHintSince": "expected ~{{amount}} (since {{date}})"
+      "yearHintSince": "~{{amount}} expected since the first entry on {{date}}"
     },
     "feed": {
       "title": "Feed",
@@ -1639,7 +1640,7 @@
     "health": {
       "title": "Health",
       "totalEvents": "Total entries",
-      "totalCost": "Veterinary costs",
+      "totalCost": "Health costs, all entries",
       "losses": "Losses",
       "overdueWarning": "Vaccination possibly overdue",
       "daysSince": "{{days}} days ago",
@@ -1821,13 +1822,13 @@
       "death": "e.g. fox, old age…",
       "other": "e.g. hoof trimming"
     },
-    "ofExpectedSince": "expected ~{{amount}} (since {{date}})",
     "quantityIn": "Quantity ({{unit}})",
     "singleEntries": "Individual entries",
     "singleEntriesRange_one": "last month",
     "singleEntriesRange_other": "last {{count}} months",
     "eggTrend": "{{value}} vs. average week",
-    "chooseAnimal": "Choose animal…"
+    "chooseAnimal": "Choose animal…",
+    "expectedBasis": "since the first entry on {{date}}"
   },
   "seeds": {
     "title": "Seeds",
@@ -2180,13 +2181,13 @@
     "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
     "fromFeedLog": "incl. {{amount}} from the feed log",
     "fromHealthLog": "incl. {{amount}} from health records",
-    "fromFeedBook": "from the feed log",
-    "fromHealthBook": "from the health record",
+    "fromFeedBook": "Feed log",
+    "fromHealthBook": "Health",
     "openFeedBook": "Open in feed log",
     "openHealthBook": "Open in health log",
     "notesPlaceholder": "e.g. shop, invoice number…",
-    "alsoInFeedBook": "also in the feed log",
-    "alsoInHealthBook": "also in the health log"
+    "alsoInFeedBook": "also in feed log",
+    "alsoInHealthBook": "also in health"
   },
   "succession": {
     "pick": "Pick a crop",

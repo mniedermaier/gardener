@@ -71,7 +71,12 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     let when: string;
     if (afterFrost && lastFrostNight) {
       // Only the days between the last frost night and the window's end count.
-      when = t("calendar.afterFrostWindow", { range: formatDateRange(addDays(lastFrostNight, 1), windowEnd(item)) });
+      // Beds can close on different days: name the one that sets the end (like
+      // untilByBed), so the calendar agrees with the planner palette per bed.
+      const end = windowEnd(item);
+      const range = t("calendar.afterFrostWindow", { range: formatDateRange(addDays(lastFrostNight, 1), end) });
+      const setter = groups.length > 1 ? groups.find((g) => g.date.getTime() === end.getTime())?.beds[0]?.name : undefined;
+      when = setter ? t("calendar.afterFrostByBed", { range, bed: setter }) : range;
     } else if (groups.length === 1) {
       when = t(`calendar.${key}`, { date: formatDate(groups[0].date, "short") });
     } else {
