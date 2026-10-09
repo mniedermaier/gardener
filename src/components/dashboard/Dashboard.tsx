@@ -52,6 +52,9 @@ export function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { formatWeight, formatCurrency, formatNumber, formatPercent, formatDate, locale } = useFormat();
+  // Self-sufficiency shares as on the analysis page: a decimal below 10 %, so
+  // "2,5 % · Soll 3,5 %" does not round to "2 % · 4 %" here.
+  const share = (r: number) => formatPercent(r, r < 0.1 ? 1 : 0);
   const { gardens, activeGardenId, harvests, expenses, animals } = useStore(
     useShallow((s) => ({ gardens: s.gardens, activeGardenId: s.activeGardenId, harvests: s.harvests, expenses: s.expenses, animals: s.animals })),
   );
@@ -184,10 +187,10 @@ export function Dashboard() {
                 items={[
                   {
                     label: t("metrics.selfSufficiencyForecast"),
-                    value: formatPercent(m.selfSufficiency.forecastRatio),
+                    value: share(m.selfSufficiency.forecastRatio),
                     hint: m.selfSufficiency.forecastToDateRatio !== null
-                      ? t("metrics.actualVsToDateShort", { actual: formatPercent(m.selfSufficiency.actualRatio), expected: formatPercent(m.selfSufficiency.forecastToDateRatio) })
-                      : t("metrics.actualShort", { value: formatPercent(m.selfSufficiency.actualRatio) }),
+                      ? t("metrics.actualVsToDateShort", { actual: share(m.selfSufficiency.actualRatio), expected: share(m.selfSufficiency.forecastToDateRatio) })
+                      : t("metrics.actualShort", { value: share(m.selfSufficiency.actualRatio) }),
                     to: "/sufficiency",
                   },
                   {

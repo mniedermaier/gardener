@@ -191,6 +191,26 @@ export function formatTemperature(celsius: number, opts: FormatOptions = {}): st
 }
 
 /**
+ * Rounds ratios that make up one whole (garden + animals = total) to `digits`
+ * percent decimals so the rounded parts add up to the rounded sum (largest
+ * remainder): "0,8 % + 3,5 %" never stands next to a total of "4,2 %".
+ */
+export function roundShares(ratios: number[], digits = 0): number[] {
+  const unit = 100 * 10 ** digits;
+  const scaled = ratios.map((r) => r * unit);
+  const target = Math.round(scaled.reduce((a, b) => a + b, 0));
+  const parts = scaled.map((v) => Math.floor(v + 1e-9));
+  let rest = target - parts.reduce((a, b) => a + b, 0);
+  const order = scaled.map((v, i) => ({ i, frac: v - parts[i] })).sort((a, b) => b.frac - a.frac);
+  for (const { i } of order) {
+    if (rest <= 0) break;
+    parts[i]++;
+    rest--;
+  }
+  return parts.map((v) => v / unit);
+}
+
+/**
  * Takes a **ratio** (0.25 → "25 %" in de, "25%" in en). For values that are
  * already percentages, divide by 100 first.
  */

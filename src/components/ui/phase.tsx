@@ -33,13 +33,12 @@ export const PhaseSwatch = memo(function PhaseSwatch({ phase, className = "h-2.5
   return <span aria-hidden="true" className={`inline-block shrink-0 rounded-sm ${fill.className} ${className}`} style={fill.style} />;
 });
 
-/** Phase as a neutral badge with its icon and swatch (text carries the meaning). */
+/** Phase as a neutral badge with its icon (text carries the meaning; one cue, no extra swatch). */
 export const PhaseBadge = memo(function PhaseBadge({ phase, label }: { phase: Phase; label?: string }) {
   const { t } = useTranslation();
   const Icon = PHASE_META[phase].icon;
   return (
     <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-gray-700 dark:bg-white/10 dark:text-gray-300">
-      <PhaseSwatch phase={phase} className="h-2 w-2.5" />
       <Icon size={12} aria-hidden="true" className={`shrink-0 ${PHASE_META[phase].text}`} />
       <span className="truncate">{label ?? t(`plants.details.${phase}`)}</span>
     </span>

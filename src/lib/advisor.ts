@@ -272,7 +272,7 @@ export function agendaRowsByPlant(kind: AgendaPlantRow["kind"], rows: Array<Plan
 /**
  * The beds of an agenda row grouped by their own date, earliest first, so the
  * meta line never promises a date that is wrong for a bed it names:
- * "bis 10. Okt. · 2 Beete · Hochbeet Süd bis 17. Okt. · Gewächshaus bis 31. Okt."
+ * "Kartoffelacker, Kräuterkübel bis 10. Okt. · Hochbeet Süd bis 17. Okt. · Gewächshaus bis 31. Okt."
  * (soon: "ab …"). Without beds (sowing indoors) or with one date for all: one group.
  */
 export function groupAgendaBedsByDate(row: Pick<AgendaPlantRow, "date" | "beds">): Array<{ date: Date; beds: AgendaBed[] }> {

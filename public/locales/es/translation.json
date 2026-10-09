@@ -213,7 +213,8 @@
       "old_many": "Última copia hace {{count}} días",
       "why": "Tus datos solo están en este navegador. Una copia los protege y ayuda al cambiar de dispositivo.",
       "action": "Descargar copia",
-      "later": "Más tarde"
+      "later": "Más tarde",
+      "whyApp": "Tus datos solo están en esta app, en este dispositivo. Una copia los protege y ayuda al cambiar de dispositivo."
     },
     "forecastValue": "Previsión {{value}}",
     "roiValue": "Rentabilidad {{value}}",
@@ -939,7 +940,6 @@
     "nowDue": "Ahora",
     "next4Weeks": "Próximas 4 semanas",
     "nothingNow": "Ahora no hay ninguna ventana de siembra, trasplante o cosecha abierta.",
-    "nothingNext": "No empieza nada nuevo en las próximas 4 semanas.",
     "until": "hasta {{date}}",
     "from": "desde {{date}}",
     "bedsUntil": "{{beds}} hasta {{date}}",
@@ -978,10 +978,8 @@
       "soil_test": "Análisis de suelo",
       "custom": "Personalizada"
     },
-    "nothingNextPlanted_one": "No empieza nada nuevo para tus cultivos plantados. Ahora puedes sembrar o plantar {{count}} cultivo (ver abajo).",
-    "nothingNextPlanted_many": "No empieza nada nuevo para tus cultivos plantados. Ahora puedes sembrar o plantar {{count}} cultivos (ver abajo).",
-    "nothingNextPlanted_other": "No empieza nada nuevo para tus cultivos plantados. Ahora puedes sembrar o plantar {{count}} cultivos (ver abajo).",
-    "reopenNamed": "Reabrir «{{title}}»"
+    "reopenNamed": "Reabrir «{{title}}»",
+    "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales."
   },
   "settings": {
     "title": "Ajustes",
@@ -1137,9 +1135,12 @@
     "fleeceTaskAdded": "Tarea «Cubrir con manta térmica» añadida para {{day}}",
     "fleeceTaskPlanned": "Tarea de manta térmica para {{day}}",
     "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
-    "frostGroupTitleMixed_one": "Riesgo de helada en {{count}} noche, {{hard}} con helada, hasta {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "Riesgo de helada en {{count}} noches, {{hard}} con helada, hasta {{temp}} ({{day}})",
-    "frostGroupTitleMixed_many": "Riesgo de helada en {{count}} noches, {{hard}} con helada, hasta {{temp}} ({{day}})"
+    "frostGroupTitleMixed_one": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
+    "frostGroupTitleMixed_many": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
+    "frostHardNights_one": "Helada en {{count}} noche",
+    "frostHardNights_other": "Helada en {{count}} noches",
+    "frostHardNights_many": "Helada en {{count}} noches"
   },
   "harvest": {
     "title": "Cosecha",
@@ -1395,15 +1396,11 @@
     "extraArea": "+{{area}} de superficie",
     "target": "Objetivo anual",
     "covered": "Cubierto",
-    "notPlanted": "Sin plantar",
-    "rowMeta": "Registrado {{actual}} · previsión {{forecast}} · objetivo {{target}} · {{area}} de {{needed}}",
     "meterLabel": "{{plant}}: registrado {{actual}}, previsión {{forecast}}, objetivo {{target}}",
     "emptyTitle": "Planifica tu necesidad anual",
     "emptyText": "Tu hogar necesita unos {{kg}} de verdura y fruta al año. Planta bancales y el plan te mostrará lo que falta.",
     "howTargets": "Objetivo anual: consumo medio por persona en Europa central (p. ej. 30 kg de patatas, 15 kg de tomates) × tamaño del hogar.",
     "howCoverage": "Objetivo de cantidad: suma por cultivo de mín(cantidad, objetivo) dividida por la suma de objetivos. Un excedente de patatas no compensa tomates que faltan.",
-    "pctActual": "{{percent}} registrado",
-    "pctForecast": "{{percent}} previsto",
     "howVsCalories": "No es un valor calórico: la autosuficiencia de la página «Autosuficiencia» cuenta calorías e incluye productos animales. Por eso ambas cifras difieren.",
     "animalIntro_one": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} persona.",
     "animalIntro_other": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas.",
@@ -1411,10 +1408,15 @@
     "animalSurplus": "excedente {{amount}}",
     "surplusBadge": "Excedente",
     "animalIntro_many": "Rendimiento anual típico de tus animales y consumo habitual de {{count}} personas.",
-    "biggestGap": "Mayor déficit",
-    "biggestGapHint_one": "faltan {{kg}} · {{count}} cultivo bajo el objetivo",
-    "biggestGapHint_other": "faltan {{kg}} · {{count}} cultivos bajo el objetivo",
-    "biggestGapHint_many": "faltan {{kg}} · {{count}} cultivos bajo el objetivo"
+    "rowActualOfTarget": "{{actual}} de {{target}} registrados",
+    "rowForecast": "Previsión {{forecast}}",
+    "unplanted": "Aún sin plantar",
+    "unplantedTitle_one": "{{count}} cultivo aún sin plantar",
+    "unplantedTitle_other": "{{count}} cultivos aún sin plantar",
+    "unplantedTitle_many": "{{count}} cultivos aún sin plantar",
+    "unplantedDesc": "Sus objetivos necesitarían {{area}} en total.",
+    "targetShort": "Objetivo {{target}}",
+    "neededShort": "{{area}} necesarios"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -2132,7 +2134,7 @@
     "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado."
   },
   "succession": {
-    "pick": "Añadir cultivo",
+    "pick": "Elegir cultivo",
     "taskTitle": "Siembra {{n}}: {{plant}}",
     "added_one": "{{count}} fecha de siembra añadida a las tareas",
     "added_many": "{{count}} fechas de siembra añadidas a las tareas",
@@ -2149,7 +2151,7 @@
     "generateCount_many": "Añadir {{count}} fechas a tareas",
     "generateCount_other": "Añadir {{count}} fechas a tareas",
     "title": "Siembra escalonada",
-    "desc": "Escalona tus siembras para una cosecha continua durante toda la temporada.",
+    "desc": "Siembra varias veces con unas semanas de diferencia para que la cosecha no llegue de golpe. Elige un cultivo: el intervalo y el número se proponen y se convierten en tareas de siembra.",
     "interval": "Cada",
     "weeks": "semanas",
     "sowings": "Siembras",

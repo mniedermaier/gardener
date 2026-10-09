@@ -204,7 +204,8 @@
       "old_other": "Letztes Backup vor {{count}} Tagen",
       "why": "Deine Daten liegen nur in diesem Browser. Eine Sicherung schützt vor Verlust und hilft beim Gerätewechsel.",
       "action": "Backup herunterladen",
-      "later": "Später"
+      "later": "Später",
+      "whyApp": "Deine Daten liegen nur in dieser App auf diesem Gerät. Eine Sicherung schützt vor Verlust und hilft beim Gerätewechsel."
     },
     "forecastValue": "Prognose {{value}}",
     "roiValue": "Rendite {{value}}",
@@ -914,7 +915,6 @@
     "nowDue": "Jetzt dran",
     "next4Weeks": "Nächste 4 Wochen",
     "nothingNow": "Gerade läuft kein Aussaat-, Pflanz- oder Erntefenster.",
-    "nothingNext": "In den nächsten 4 Wochen beginnt nichts Neues.",
     "until": "bis {{date}}",
     "from": "ab {{date}}",
     "bedsUntil": "{{beds}} bis {{date}}",
@@ -950,9 +950,8 @@
       "soil_test": "Bodentest",
       "custom": "Eigene"
     },
-    "nothingNextPlanted_one": "Für deine bepflanzten Kulturen beginnt nichts Neues. {{count}} Kultur kannst du jetzt säen oder pflanzen (siehe unten).",
-    "nothingNextPlanted_other": "Für deine bepflanzten Kulturen beginnt nichts Neues. {{count}} Kulturen kannst du jetzt säen oder pflanzen (siehe unten).",
-    "reopenNamed": "„{{title}}“ wieder öffnen"
+    "reopenNamed": "„{{title}}“ wieder öffnen",
+    "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete."
   },
   "settings": {
     "title": "Einstellungen",
@@ -1100,8 +1099,10 @@
     "fleeceTaskAdded": "Aufgabe „Vlies auflegen“ für {{day}} angelegt",
     "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant",
     "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
-    "frostGroupTitleMixed_one": "Frostgefahr in {{count}} Nacht, {{hard}} davon mit Frost, bis {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "Frostgefahr in {{count}} Nächten, {{hard}} davon mit Frost, bis {{temp}} ({{day}})"
+    "frostGroupTitleMixed_one": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
+    "frostHardNights_one": "Frost in {{count}} Nacht",
+    "frostHardNights_other": "Frost in {{count}} Nächten"
   },
   "harvest": {
     "title": "Ernte",
@@ -1339,24 +1340,25 @@
     "extraArea": "+{{area}} Fläche",
     "target": "Jahresziel",
     "covered": "Gedeckt",
-    "notPlanted": "Nicht gepflanzt",
-    "rowMeta": "Erfasst {{actual}} · Prognose {{forecast}} · Ziel {{target}} · {{area}} von {{needed}}",
     "meterLabel": "{{plant}}: erfasst {{actual}}, Prognose {{forecast}}, Ziel {{target}}",
     "emptyTitle": "Plane deinen Jahresbedarf",
     "emptyText": "Dein Haushalt braucht rund {{kg}} Gemüse und Obst im Jahr. Bepflanze Beete, dann zeigt der Plan, was noch fehlt.",
     "howTargets": "Jahresziel: durchschnittlicher Verbrauch pro Person in Mitteleuropa (z. B. 30 kg Kartoffeln, 15 kg Tomaten) × Haushaltsgröße.",
     "howCoverage": "Mengenziel: Summe je Kultur von min(Menge, Ziel) geteilt durch die Summe aller Ziele. Ein Überschuss bei Kartoffeln gleicht also keine fehlenden Tomaten aus.",
-    "pctActual": "{{percent}} erfasst",
-    "pctForecast": "{{percent}} Prognose",
     "howVsCalories": "Das ist kein Kalorienwert: Die Selbstversorgung auf der Seite „Selbstversorgung“ rechnet in Kalorien und schließt Tierprodukte ein. Beide Zahlen weichen deshalb voneinander ab.",
     "animalIntro_one": "Typischer Jahresertrag deiner Tiere und der übliche Verbrauch von {{count}} Person.",
     "animalIntro_other": "Typischer Jahresertrag deiner Tiere und der übliche Verbrauch von {{count}} Personen.",
     "animalNeed": "Verbrauch {{amount}}",
     "animalSurplus": "Überschuss {{amount}}",
     "surplusBadge": "Überschuss",
-    "biggestGap": "Größte Lücke",
-    "biggestGapHint_one": "{{kg}} fehlen · {{count}} Kultur unter Ziel",
-    "biggestGapHint_other": "{{kg}} fehlen · {{count}} Kulturen unter Ziel"
+    "rowActualOfTarget": "{{actual}} von {{target}} erfasst",
+    "rowForecast": "Prognose {{forecast}}",
+    "unplanted": "Noch nicht angebaut",
+    "unplantedTitle_one": "{{count}} Kultur noch nicht angebaut",
+    "unplantedTitle_other": "{{count}} Kulturen noch nicht angebaut",
+    "unplantedDesc": "Für ihre Ziele wären zusammen {{area}} nötig.",
+    "targetShort": "Ziel {{target}}",
+    "neededShort": "{{area}} nötig"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -2042,7 +2044,7 @@
     "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte"
   },
   "succession": {
-    "pick": "Kultur hinzufügen",
+    "pick": "Kultur wählen",
     "taskTitle": "{{n}}. Aussaat: {{plant}}",
     "added_one": "{{count}} Aussaattermin zu den Aufgaben hinzugefügt",
     "added_other": "{{count}} Aussaattermine zu den Aufgaben hinzugefügt",
@@ -2055,7 +2057,7 @@
     "generateCount_one": "{{count}} Termin zu den Aufgaben",
     "generateCount_other": "{{count}} Termine zu den Aufgaben",
     "title": "Staffelaussaat",
-    "desc": "Versetzte Aussaaten für durchgehende Ernte während der Saison.",
+    "desc": "Mehrmals im Abstand säen, damit die Ernte nicht auf einmal kommt. Wähle eine Kultur: Abstand und Anzahl sind vorgeschlagen, daraus entstehen Aussaat-Aufgaben.",
     "interval": "Alle",
     "weeks": "Wochen",
     "sowings": "Aussaaten",

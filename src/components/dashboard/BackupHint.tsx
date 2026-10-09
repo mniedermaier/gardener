@@ -4,6 +4,7 @@ import { HardDriveDownload } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { exportAllData } from "@/lib/dataExport";
+import { isNativeApp } from "@/lib/nativeStorage";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 
@@ -20,19 +21,24 @@ function readSnooze(): number {
 
 /**
  * Quiet system note, not an alarm: only once there is something worth
- * losing (a week of use or 20 entries) and the last backup is two weeks old.
+ * losing (beds or records, plus a week of use or 20 entries) and the last
+ * backup is two weeks old. An empty garden never asks for a backup.
  */
 export const BackupHint = memo(function BackupHint({ now }: { now: Date }) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { lastBackupDate, gardens, harvests, journalEntries, tasks } = useStore(
-    useShallow((s) => ({ lastBackupDate: s.lastBackupDate, gardens: s.gardens, harvests: s.harvests, journalEntries: s.journalEntries, tasks: s.tasks })),
+  const { lastBackupDate, gardens, harvests, journalEntries, tasks, animalCount, expenseCount } = useStore(
+    useShallow((s) => ({
+      lastBackupDate: s.lastBackupDate, gardens: s.gardens, harvests: s.harvests, journalEntries: s.journalEntries, tasks: s.tasks,
+      animalCount: s.animals.length, expenseCount: s.expenses.length,
+    })),
   );
   const [snoozedUntil, setSnoozedUntil] = useState(readSnooze);
 
   const firstUse = Math.min(...gardens.map((g) => new Date(g.createdAt).getTime()).filter(Number.isFinite), now.getTime());
   const entries = harvests.length + journalEntries.length + tasks.filter((x) => x.completedDate).length;
-  const worthKeeping = now.getTime() - firstUse >= 7 * DAY || entries >= 20;
+  const hasContent = gardens.some((g) => g.beds.length > 0) || entries + animalCount + expenseCount > 0;
+  const worthKeeping = hasContent && (now.getTime() - firstUse >= 7 * DAY || entries >= 20);
   const daysSince = lastBackupDate ? Math.floor((now.getTime() - new Date(lastBackupDate).getTime()) / DAY) : null;
   const stale = daysSince === null || daysSince >= 14;
 
@@ -62,7 +68,7 @@ export const BackupHint = memo(function BackupHint({ now }: { now: Date }) {
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
           {daysSince === null ? t("dashboard.backup.never") : t("dashboard.backup.old", { count: daysSince })}
         </p>
-        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t("dashboard.backup.why")}</p>
+        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{t(isNativeApp() ? "dashboard.backup.whyApp" : "dashboard.backup.why")}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" onClick={backup}>{t("dashboard.backup.action")}</Button>
           <Button size="sm" variant="ghost" onClick={snooze}>{t("dashboard.backup.later")}</Button>

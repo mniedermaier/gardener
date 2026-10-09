@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { LayoutGrid, Target } from "lucide-react";
+import { ChevronDown, LayoutGrid, Target } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -41,6 +41,12 @@ export function FoodPlan() {
   );
   const animalForecast = useMemo(() => getForecastProducts(animals), [animals]);
   const deficits = plan.rows.filter((r) => r.deficitKg > 0.05);
+  // Crops with neither area nor harvest: collapsed into one group instead of
+  // a dozen "0 kg · 0 %" rows.
+  const isUnplanted = (r: (typeof plan.rows)[number]) => r.areaM2 === 0 && r.actualKg === 0;
+  const grown = plan.rows.filter((r) => !isUnplanted(r));
+  const unplanted = plan.rows.filter(isUnplanted);
+  const unplantedArea = unplanted.reduce((sum, r) => sum + r.neededAreaM2, 0);
   const hasPlantings = gardens.some((g) => g.beds.some((b) => b.cells.length > 0));
   const kg = (v: number) => f.formatWeight(v * 1000, "kg");
 
@@ -59,37 +65,42 @@ export function FoodPlan() {
         </Card>
       ) : (
         <div className="space-y-6">
-          <KeyFigures
-            hero={{
-              label: t("foodplan.coverageForecast"),
-              value: f.formatPercent(plan.forecastCoverage),
-              icon: Target,
-              tone: "brand",
-              visual: (
-                <Meter
-                  actual={Math.min(1, plan.actualCoverage)}
-                  forecast={Math.min(1, plan.forecastCoverage)}
-                  max={1}
-                  label={t("metrics.actualVsForecast", { actual: f.formatPercent(plan.actualCoverage), forecast: f.formatPercent(plan.forecastCoverage) })}
-                />
-              ),
-              hint: t("foodplan.ofTarget", { kg: kg(plan.targetKg) }),
-            }}
-            items={[
-              { label: t("foodplan.coverageActual"), value: f.formatPercent(plan.actualCoverage), hint: t("foodplan.actualKg", { kg: kg(plan.actualKg) }) },
-              { label: t("foodplan.area"), value: f.formatArea(plan.areaM2), hint: t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) }) },
-              // "20 von 20 Kulturen mit Lücke" says nothing; the largest gap does (rows are sorted by deficit).
-              deficits.length > 0
-                ? { label: t("foodplan.biggestGap"), value: plantName(deficits[0].plantId), hint: t("foodplan.biggestGapHint", { kg: kg(deficits[0].deficitKg), count: deficits.length }) }
-                : { label: t("foodplan.deficits"), value: f.formatNumber(0, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) },
-            ]}
-          />
-          <HowCalculated>
-            <p>{t("foodplan.howTargets")}</p>
-            <p>{t("foodplan.howCoverage")}</p>
-            <p>{t("metrics.howActual")}</p>
-            <p>{t("foodplan.howVsCalories")}</p>
-          </HowCalculated>
+          {/* The disclosure explains the figures: attached below them, not a section of its own. */}
+          <div>
+            <KeyFigures
+              hero={{
+                label: t("foodplan.coverageForecast"),
+                value: f.formatPercent(plan.forecastCoverage),
+                icon: Target,
+                tone: "brand",
+                visual: (
+                  <Meter
+                    actual={Math.min(1, plan.actualCoverage)}
+                    forecast={Math.min(1, plan.forecastCoverage)}
+                    max={1}
+                    label={t("metrics.actualVsForecast", { actual: f.formatPercent(plan.actualCoverage), forecast: f.formatPercent(plan.forecastCoverage) })}
+                  />
+                ),
+                hint: t("foodplan.ofTarget", { kg: kg(plan.targetKg) }),
+              }}
+              items={[
+                { label: t("foodplan.coverageActual"), value: f.formatPercent(plan.actualCoverage), hint: t("foodplan.actualKg", { kg: kg(plan.actualKg) }) },
+                { label: t("foodplan.area"), value: f.formatArea(plan.areaM2), hint: t("foodplan.areaNeeded", { area: f.formatArea(plan.neededAreaM2) }) },
+                // "20 von 20 Kulturen mit Lücke" says nothing and the largest gap is the
+                // first row of "Hier fehlt am meisten": the crops not grown at all are
+                // the figure the plan below acts on.
+                unplanted.length > 0
+                  ? { label: t("foodplan.unplanted"), value: f.formatNumber(unplanted.length, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) }
+                  : { label: t("foodplan.deficits"), value: f.formatNumber(deficits.length, { maximumFractionDigits: 0 }), hint: t("foodplan.ofCrops", { count: plan.rows.length }) },
+              ]}
+            />
+            <HowCalculated className="mt-1">
+              <p>{t("foodplan.howTargets")}</p>
+              <p>{t("foodplan.howCoverage")}</p>
+              <p>{t("metrics.howActual")}</p>
+              <p>{t("foodplan.howVsCalories")}</p>
+            </HowCalculated>
+          </div>
 
           {deficits.length > 0 && (
             <Card padding="none">
@@ -123,39 +134,64 @@ export function FoodPlan() {
                 ]}
               />
             </div>
-            <List label={t("foodplan.cropPlan")}>
-              {plan.rows.map((r) => {
-                const p = plantMap.get(r.plantId)!;
-                const ratio = r.targetKg > 0 ? Math.min(1, r.forecastKg / r.targetKg) : 0;
-                const actualRatio = r.targetKg > 0 ? Math.min(1, r.actualKg / r.targetKg) : 0;
-                return (
-                  <ListRow
-                    key={r.plantId}
-                    leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
-                    title={plantName(p.id)}
-                    badges={Math.max(ratio, actualRatio) >= 1 ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : r.areaM2 === 0 ? <Badge variant="outline">{t("foodplan.notPlanted")}</Badge> : undefined}
-                    meta={t("foodplan.rowMeta", { actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg), area: f.formatArea(r.areaM2), needed: f.formatArea(r.neededAreaM2) })}
-                    description={
-                      <Meter
-                        className="mt-1.5"
-                        size={6}
-                        actual={r.actualKg}
-                        forecast={r.forecastKg}
-                        max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}
-                        target={r.targetKg}
-                        label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
+            {grown.length > 0 && (
+              <List label={t("foodplan.cropPlan")}>
+                {grown.map((r) => {
+                  const p = plantMap.get(r.plantId)!;
+                  const covered = r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg;
+                  return (
+                    <ListRow
+                      key={r.plantId}
+                      leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
+                      title={plantName(p.id)}
+                      badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : undefined}
+                      meta={[t("foodplan.rowActualOfTarget", { actual: kg(r.actualKg), target: kg(r.targetKg) }), t("foodplan.rowForecast", { forecast: kg(r.forecastKg) })]}
+                      description={
+                        <Meter
+                          className="mt-1.5"
+                          size={6}
+                          actual={r.actualKg}
+                          forecast={r.forecastKg}
+                          max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}
+                          target={r.targetKg}
+                          label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
+                        />
+                      }
+                    />
+                  );
+                })}
+              </List>
+            )}
+            {unplanted.length > 0 && (
+              <details className="group rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
+                <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 [&::-webkit-details-marker]:hidden">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.unplantedTitle", { count: unplanted.length })}</span>
+                    <span className="block text-xs text-gray-500 dark:text-gray-400">{t("foodplan.unplantedDesc", { area: f.formatArea(unplantedArea) })}</span>
+                  </span>
+                  <ChevronDown size={18} aria-hidden="true" className="shrink-0 text-gray-500 transition-transform group-open:rotate-180 dark:text-gray-400" />
+                </summary>
+                <ul className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/5 dark:border-white/5">
+                  {unplanted.map((r) => {
+                    const p = plantMap.get(r.plantId)!;
+                    return (
+                      <ListRow
+                        key={r.plantId}
+                        leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={28} />}
+                        title={plantName(p.id)}
+                        meta={[t("foodplan.targetShort", { target: kg(r.targetKg) }), t("foodplan.neededShort", { area: f.formatArea(r.neededAreaM2) })]}
                       />
-                    }
-                    trailing={
-                      <span className="block text-right text-xs leading-5 text-gray-500 dark:text-gray-400">
-                        <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">{t("foodplan.pctActual", { percent: f.formatPercent(actualRatio) })}</span>
-                        {t("foodplan.pctForecast", { percent: f.formatPercent(ratio) })}
-                      </span>
-                    }
-                  />
-                );
-              })}
-            </List>
+                    );
+                  })}
+                </ul>
+                <div className="border-t border-gray-100 px-4 py-3 dark:border-white/5">
+                  <Button variant="secondary" size="sm" onClick={() => navigate("/planner")}>
+                    <LayoutGrid size={16} aria-hidden="true" />
+                    {t("plants.placeInPlanner")}
+                  </Button>
+                </div>
+              </details>
+            )}
           </section>
 
           {animals.length > 0 && (
