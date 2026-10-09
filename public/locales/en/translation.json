@@ -396,7 +396,7 @@
     "gardenDeleted": "“{{name}}” deleted",
     "gardenDuplicated": "Garden duplicated",
     "exportFile": "Export to file",
-    "importFile": "Import from file",
+    "importFile": "Load garden plan from file",
     "importDone_one": "{{count}} garden imported",
     "importDone_other": "{{count}} gardens imported",
     "importFileError": "The file could not be read. Choose a JSON file from a garden export.",
@@ -773,7 +773,20 @@
       "harvestMax": "Harvest until (days)",
       "harvestError": "Must not be less than the earliest value.",
       "namePlaceholder": "e.g. Ginger",
-      "daysAfterSowing": "Both counted from sowing."
+      "daysAfterSowing": "Both counted from sowing.",
+      "family": "Plant family",
+      "familyUnknown": "Not sure",
+      "sowMode": "Sowing",
+      "sowDirect": "Direct in the bed",
+      "sowIndoors": "Start indoors",
+      "sowWhen": "Sow",
+      "indoorsWhen": "Start indoors",
+      "transplantWhen": "Plant out",
+      "atFrost": "At the last frost",
+      "weeksBefore_one": "{{count}} week before the last frost",
+      "weeksBefore_other": "{{count}} weeks before the last frost",
+      "weeksAfter_one": "{{count}} week after the last frost",
+      "weeksAfter_other": "{{count}} weeks after the last frost"
     },
     "detail": {
       "today": "Today",
@@ -814,9 +827,8 @@
       "sowNow": "Sow now, until {{date}}",
       "nextSowing": "Next sowing from {{date}}",
       "hatchLegend": "Hatched: started indoors",
-      "bedFirstHint": "Add a bed, then you can place {{plant}} right away.",
-      "sowNoteBedFirst": "{{note}} – add a bed before then",
-      "yieldPerPlant": "≈ {{value}} per plant at full spacing",
+      "bedFirstHint": "Add a bed to plan {{plant}} right away:",
+      "yieldPerPlant": "≈ {{value}} per plant",
       "frostHarvest": "Frost from {{date}} – harvest now",
       "stockEmpty": "{{plant}} isn't in a bed yet, and there are no harvests or seeds."
     },
@@ -1107,7 +1119,8 @@
       "expenses_one": "{{count}} expense",
       "expenses_other": "{{count}} expenses"
     },
-    "backupStale": "Older than two weeks – a fresh backup is worth it."
+    "backupStale": "Older than two weeks – a fresh backup is worth it.",
+    "nothingYet": "Nothing to back up yet. Once you add beds or records, a backup is worth it."
   },
   "alerts": {
     "frostTitle": "Frost warning: {{temp}}",
@@ -1153,7 +1166,7 @@
     "frostHardNights_other": "{{count}} frost nights",
     "frostAdviceNoPlants": "Hold off on planting out until the frost nights are over.",
     "frostAdviceAutumn": "Bring in the last harvests and move tender pots indoors.",
-    "frostAdviceAutumnNoPlants": "Move pots and garden tools somewhere frost-free.",
+    "frostAdviceAutumnNoPlants": "Bring potted plants in, drain water pipes and rain barrels.",
     "frostGroupTitleHard": "{{hard}} – down to {{temp}} ({{day}})"
   },
   "harvest": {
@@ -1537,7 +1550,7 @@
     "treatmentHint": "Saved with today's date.",
     "date": "Noticed on",
     "treatmentOrganic": "Treatment (organic)",
-    "descriptionPlaceholder": "e.g. leaves curling, sticky undersides…",
+    "descriptionPlaceholder": "e.g. leaves curling…",
     "treatmentPlaceholder": "e.g. hosed off, nettle tea…",
     "kindLabel": "Type",
     "namePlaceholders": {
@@ -1546,7 +1559,9 @@
     },
     "summary_one": "{{count}} active",
     "summary_other": "{{count}} active",
-    "summarySevere": "{{active}} active · {{severe}} severe"
+    "summarySevere": "{{active}} active · {{severe}} severe",
+    "scaleLow": "Mild",
+    "scaleHigh": "Severe"
   },
   "livestock": {
     "title": "Animals",
@@ -1944,7 +1959,7 @@
       "high": "high"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nutrients in ppm (mg/kg), as test kits and labs report them.",
+    "ppmHint": "N, P and K are optional – in mg/kg, as test kits and labs report them.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
@@ -2163,7 +2178,8 @@
     "fromFeedBook": "from the feed log",
     "fromHealthBook": "from the health record",
     "openFeedBook": "Open in feed log",
-    "openHealthBook": "Open in health log"
+    "openHealthBook": "Open in health log",
+    "notesPlaceholder": "e.g. shop, invoice number…"
   },
   "succession": {
     "pick": "Pick a crop",

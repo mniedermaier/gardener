@@ -312,8 +312,8 @@ export function PestTracker() {
               options={SEVERITIES.map((s) => ({ value: String(s), label: String(s) }))}
             />
             <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
-              <span>{t("pests.severityLevel.1")}</span>
-              <span>{t("pests.severityLevel.5")}</span>
+              <span>{t("pests.scaleLow")}</span>
+              <span>{t("pests.scaleHigh")}</span>
             </div>
           </div>
           {/* Rule 9: details, then the date, then the free text. */}

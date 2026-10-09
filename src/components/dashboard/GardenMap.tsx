@@ -10,7 +10,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { taskGroup } from "@/lib/tasks";
 import type { FrostSummary } from "@/lib/weatherAlerts";
 import { useFrostRisk } from "@/components/weather/frost";
-import { familyColors, plantFamilyMap } from "@/data/plantFamilies";
+import { familyColors, familyOf } from "@/data/plantFamilies";
 import type { Bed, EnvironmentType, Garden } from "@/types/garden";
 import type { HarvestReadyItem } from "@/lib/season";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -230,7 +230,7 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
                           <span
                             key={`${c.cellX}-${c.cellY}`}
                             className="absolute rounded-full dark:opacity-90"
-                            style={{ left: left + u * 0.2, top: top + u * 0.2, width: u * 0.6, height: u * 0.6, backgroundColor: familyColors[plantFamilyMap[c.plantId] ?? "other"] }}
+                            style={{ left: left + u * 0.2, top: top + u * 0.2, width: u * 0.6, height: u * 0.6, backgroundColor: familyColors[familyOf(c.plantId, plantMap.get(c.plantId))] }}
                             aria-hidden="true"
                           />
                         );

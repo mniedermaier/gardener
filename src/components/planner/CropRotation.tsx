@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { Garden } from "@/types/garden";
-import { plantFamilyMap, familyColors, rotationGroups, type PlantFamily } from "@/data/plantFamilies";
+import { familyOf, familyColors, rotationGroups, type PlantFamily } from "@/data/plantFamilies";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { usePlantMap } from "@/hooks/usePlants";
 import { isPerennial } from "@/lib/season";
@@ -27,7 +27,7 @@ export const CropRotation = memo(function CropRotation({ garden }: { garden: Gar
         .map((bed) => {
           const families = new Map<PlantFamily, number>();
           for (const cell of bed.cells) {
-            const f = plantFamilyMap[cell.plantId] ?? "other";
+            const f = familyOf(cell.plantId, plantMap.get(cell.plantId));
             families.set(f, (families.get(f) ?? 0) + 1);
           }
           const sorted = [...families].sort((a, b) => b[1] - a[1]);

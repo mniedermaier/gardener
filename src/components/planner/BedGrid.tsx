@@ -7,13 +7,13 @@ import type { Plant } from "@/types/plant";
 import type { CellConflict, CellSide } from "@/lib/placementValidation";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { cn } from "@/lib/cn";
-import { familyColors, plantFamilyMap } from "@/data/plantFamilies";
+import { familyColors, familyOf } from "@/data/plantFamilies";
 
 /**
  * Cell tint = the crop's family (same colours as the crop-rotation legend):
  * Mangold, Spinat and Rote Bete share one, so a bed reads as rotation groups.
  */
-const familyTint = (plant: Plant | undefined) => (plant ? familyColors[plantFamilyMap[plant.id] ?? "other"] : "transparent");
+const familyTint = (plant: Plant | undefined) => (plant ? familyColors[familyOf(plant.id, plant)] : "transparent");
 
 export type GridMode = "inspect" | "place" | "path";
 

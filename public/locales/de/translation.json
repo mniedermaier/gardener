@@ -396,7 +396,7 @@
     "gardenDeleted": "„{{name}}“ gelöscht",
     "gardenDuplicated": "Garten dupliziert",
     "exportFile": "Als Datei exportieren",
-    "importFile": "Aus Datei importieren",
+    "importFile": "Gartenplan aus Datei laden",
     "importDone_one": "{{count}} Garten importiert",
     "importDone_other": "{{count}} Gärten importiert",
     "importFileError": "Die Datei konnte nicht gelesen werden. Wähle eine JSON-Datei aus einem Garten-Export.",
@@ -773,7 +773,20 @@
       "harvestMax": "Ernte bis (Tage)",
       "harvestError": "Darf nicht kleiner sein als der früheste Wert.",
       "namePlaceholder": "z. B. Ingwer",
-      "daysAfterSowing": "Beide gezählt ab der Aussaat."
+      "daysAfterSowing": "Beide gezählt ab der Aussaat.",
+      "family": "Pflanzenfamilie",
+      "familyUnknown": "Weiß ich nicht",
+      "sowMode": "Aussaat",
+      "sowDirect": "Direkt ins Beet",
+      "sowIndoors": "Vorziehen",
+      "sowWhen": "Säen",
+      "indoorsWhen": "Vorziehen ab",
+      "transplantWhen": "Auspflanzen",
+      "atFrost": "Am letzten Frost",
+      "weeksBefore_one": "{{count}} Woche vor dem letzten Frost",
+      "weeksBefore_other": "{{count}} Wochen vor dem letzten Frost",
+      "weeksAfter_one": "{{count}} Woche nach dem letzten Frost",
+      "weeksAfter_other": "{{count}} Wochen nach dem letzten Frost"
     },
     "detail": {
       "today": "Heute",
@@ -814,9 +827,8 @@
       "sowNow": "Jetzt säen, bis {{date}}",
       "nextSowing": "Nächste Aussaat ab {{date}}",
       "hatchLegend": "Schraffiert: Vorziehen im Haus",
-      "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein.",
-      "sowNoteBedFirst": "{{note}} – lege bis dahin ein Beet an",
-      "yieldPerPlant": "≈ {{value}} pro Pflanze mit vollem Abstand",
+      "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein:",
+      "yieldPerPlant": "≈ {{value}} pro Pflanze",
       "frostHarvest": "Frost ab {{date}} – jetzt abernten",
       "stockEmpty": "{{plant}} steht noch in keinem Beet, Ernten und Saatgut fehlen noch."
     },
@@ -1107,7 +1119,8 @@
       "expenses_one": "{{count}} Ausgabe",
       "expenses_other": "{{count}} Ausgaben"
     },
-    "backupStale": "Älter als zwei Wochen – ein neues Backup lohnt sich."
+    "backupStale": "Älter als zwei Wochen – ein neues Backup lohnt sich.",
+    "nothingYet": "Noch nichts zu sichern. Sobald du Beete oder Einträge anlegst, lohnt sich ein Backup."
   },
   "alerts": {
     "frostTitle": "Frostwarnung: {{temp}}",
@@ -1153,7 +1166,7 @@
     "frostHardNights_other": "{{count}} Frostnächte",
     "frostAdviceNoPlants": "Mit dem Auspflanzen warten, bis die Frostnächte vorbei sind.",
     "frostAdviceAutumn": "Letzte Ernten einholen und frostempfindliche Kübel ins Haus holen.",
-    "frostAdviceAutumnNoPlants": "Kübel und Gartengeräte frostsicher unterbringen.",
+    "frostAdviceAutumnNoPlants": "Kübelpflanzen reinholen, Wasserleitungen und Regentonnen entleeren.",
     "frostGroupTitleHard": "{{hard}} – bis {{temp}} ({{day}})"
   },
   "harvest": {
@@ -1271,7 +1284,7 @@
     "quantity": "Menge",
     "unitCount": "Gläser/Beutel",
     "label": "Name",
-    "labelPlaceholder": "z. B. Tomatensauce August 2026",
+    "labelPlaceholder": "z. B. Tomatensoße August 2026",
     "supplyCost": "Zubehörkosten (€)",
     "storedOn": "eingelagert",
     "expiresOn": "haltbar bis",
@@ -1537,7 +1550,7 @@
     "treatmentHint": "Wird mit dem heutigen Datum gespeichert.",
     "date": "Bemerkt am",
     "treatmentOrganic": "Behandlung (bio)",
-    "descriptionPlaceholder": "z. B. Blätter rollen sich ein, klebrige Unterseiten …",
+    "descriptionPlaceholder": "z. B. Blätter rollen sich ein …",
     "treatmentPlaceholder": "z. B. Mit Wasser abgespritzt, Brennnesseljauche …",
     "kindLabel": "Art",
     "namePlaceholders": {
@@ -1546,7 +1559,9 @@
     },
     "summary_one": "{{count}} aktiv",
     "summary_other": "{{count}} aktiv",
-    "summarySevere": "{{active}} aktiv · {{severe}} stark"
+    "summarySevere": "{{active}} aktiv · {{severe}} stark",
+    "scaleLow": "Gering",
+    "scaleHigh": "Stark"
   },
   "livestock": {
     "title": "Tiere",
@@ -1944,7 +1959,7 @@
       "high": "hoch"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nährstoffe in ppm (mg/kg), wie Testsets und Labore sie angeben.",
+    "ppmHint": "N, P und K sind optional – in mg/kg, wie Testsets und Labore sie angeben.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
@@ -2163,7 +2178,8 @@
     "fromFeedBook": "aus dem Futterbuch",
     "fromHealthBook": "aus der Gesundheitsakte",
     "openFeedBook": "Im Futterbuch öffnen",
-    "openHealthBook": "In Gesundheit öffnen"
+    "openHealthBook": "In Gesundheit öffnen",
+    "notesPlaceholder": "z. B. Händler, Rechnungsnummer …"
   },
   "succession": {
     "pick": "Kultur wählen",

@@ -409,7 +409,7 @@
     "gardenDeleted": "« {{name}} » supprimé",
     "gardenDuplicated": "Jardin dupliqué",
     "exportFile": "Exporter dans un fichier",
-    "importFile": "Importer depuis un fichier",
+    "importFile": "Charger un plan de jardin depuis un fichier",
     "importDone_one": "{{count}} jardin importé",
     "importDone_many": "{{count}} jardins importés",
     "importDone_other": "{{count}} jardins importés",
@@ -793,7 +793,22 @@
       "harvestMax": "Récolte jusqu’à (jours)",
       "harvestError": "Ne peut pas être inférieur à la valeur la plus précoce.",
       "namePlaceholder": "p. ex. gingembre",
-      "daysAfterSowing": "Les deux comptés à partir du semis."
+      "daysAfterSowing": "Les deux comptés à partir du semis.",
+      "family": "Famille botanique",
+      "familyUnknown": "Je ne sais pas",
+      "sowMode": "Semis",
+      "sowDirect": "Direct en pleine terre",
+      "sowIndoors": "À l’abri",
+      "sowWhen": "Semer",
+      "indoorsWhen": "Semis à l’abri dès",
+      "transplantWhen": "Repiquer",
+      "atFrost": "À la dernière gelée",
+      "weeksBefore_one": "{{count}} semaine avant la dernière gelée",
+      "weeksBefore_other": "{{count}} semaines avant la dernière gelée",
+      "weeksBefore_many": "{{count}} semaines avant la dernière gelée",
+      "weeksAfter_one": "{{count}} semaine après la dernière gelée",
+      "weeksAfter_other": "{{count}} semaines après la dernière gelée",
+      "weeksAfter_many": "{{count}} semaines après la dernière gelée"
     },
     "detail": {
       "today": "Aujourd’hui",
@@ -838,9 +853,8 @@
       "sowNow": "Semer maintenant, jusqu’au {{date}}",
       "nextSowing": "Prochain semis dès le {{date}}",
       "hatchLegend": "Hachuré : semis à l’abri",
-      "bedFirstHint": "Ajoute une planche, puis place {{plant}} directement.",
-      "sowNoteBedFirst": "{{note}} – ajoutez une planche d’ici là",
-      "yieldPerPlant": "≈ {{value}} par plante à espacement complet",
+      "bedFirstHint": "Ajoute une planche pour planifier {{plant}} :",
+      "yieldPerPlant": "≈ {{value}} par plante",
       "frostHarvest": "Gel dès le {{date}} – récolter maintenant",
       "stockEmpty": "{{plant}} n’est encore dans aucune planche, sans récolte ni semences."
     },
@@ -1142,7 +1156,8 @@
       "expenses_other": "{{count}} dépenses",
       "expenses_many": "{{count}} dépenses"
     },
-    "backupStale": "Plus de deux semaines – une nouvelle sauvegarde s’impose."
+    "backupStale": "Plus de deux semaines – une nouvelle sauvegarde s’impose.",
+    "nothingYet": "Rien à sauvegarder pour l’instant. Dès que tu ajoutes des planches ou des saisies, une sauvegarde vaut la peine."
   },
   "alerts": {
     "frostTitle": "Alerte gel : {{temp}}",
@@ -1193,7 +1208,7 @@
     "frostHardNights_many": "{{count}} nuits de gel",
     "frostAdviceNoPlants": "Attendez la fin des nuits de gel pour repiquer.",
     "frostAdviceAutumn": "Rentrez les dernières récoltes et mettez les pots sensibles à l’abri.",
-    "frostAdviceAutumnNoPlants": "Mets pots et outils de jardin à l’abri du gel.",
+    "frostAdviceAutumnNoPlants": "Rentre les plantes en pot, vidange tuyaux et récupérateurs d’eau.",
     "frostGroupTitleHard": "{{hard}} – jusqu’à {{temp}} ({{day}})"
   },
   "harvest": {
@@ -1606,7 +1621,7 @@
     "treatmentHint": "Enregistré avec la date du jour.",
     "date": "Constaté le",
     "treatmentOrganic": "Traitement (bio)",
-    "descriptionPlaceholder": "p. ex. feuilles enroulées, revers collant…",
+    "descriptionPlaceholder": "p. ex. feuilles enroulées…",
     "treatmentPlaceholder": "p. ex. rincé au jet, purin d’ortie…",
     "kindLabel": "Type",
     "namePlaceholders": {
@@ -1616,7 +1631,9 @@
     "summary_one": "{{count}} actif",
     "summary_other": "{{count}} actifs",
     "summary_many": "{{count}} actifs",
-    "summarySevere": "{{active}} actifs · {{severe}} graves"
+    "summarySevere": "{{active}} actifs · {{severe}} graves",
+    "scaleLow": "Faible",
+    "scaleHigh": "Fort"
   },
   "livestock": {
     "title": "Animaux",
@@ -2036,7 +2053,7 @@
       "high": "élevé"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "Nutriments en ppm (mg/kg), comme les indiquent kits et laboratoires.",
+    "ppmHint": "N, P et K sont facultatifs – en mg/kg, comme les indiquent kits et laboratoires.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
@@ -2264,7 +2281,8 @@
     "fromFeedBook": "du carnet d’alimentation",
     "fromHealthBook": "du carnet de santé",
     "openFeedBook": "Ouvrir dans le carnet d’alimentation",
-    "openHealthBook": "Ouvrir dans la santé"
+    "openHealthBook": "Ouvrir dans la santé",
+    "notesPlaceholder": "p. ex. magasin, numéro de facture…"
   },
   "succession": {
     "pick": "Choisir une culture",
