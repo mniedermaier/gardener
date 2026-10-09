@@ -45,20 +45,6 @@ import { AutoFillDialog, BedDialog, draftToBed, type BedDraft } from "./PlannerD
 
 type BedDialogState = { open: false } | { open: true; bedId?: string };
 
-/**
- * Initial zoom so a bed uses the width of its column (small beds grow, large
- * ones shrink to avoid horizontal scrolling) without getting taller than the
- * visible area below the header and mode bar.
- */
-function fitZoom(bed: Bed): number {
-  if (typeof window === "undefined") return 1;
-  const w = window.innerWidth;
-  const availableW = w >= 768 ? w - (w >= 1024 ? 256 : 0) - 340 - 96 : w - 48;
-  const availableH = window.innerHeight - (w >= 768 ? 300 : 320);
-  const zoom = Math.min(availableW / (bed.width * 52 + 12), availableH / (bed.height * 52 + 12));
-  return Math.max(0.6, Math.min(1.6, Math.floor(zoom * 10) / 10));
-}
-
 export function GardenPlanner() {
   const { t } = useTranslation();
   const pointerFine = usePointerFine();
@@ -111,7 +97,8 @@ export function GardenPlanner() {
   const [pendingPlant, setPendingPlant] = useState<Plant | null>(singleBed ? null : initialPlant);
   const [activeDragPlant, setActiveDragPlant] = useState<Plant | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [zoom, setZoom] = useState(() => (openBed ? fitZoom(openBed) : 1));
+  // 1 = the bed fits its column (BedGrid measures); zoom scales from there.
+  const [zoom, setZoom] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
   // Mobile sheet height: "peek" keeps the bed visible (actions only), "full" shows everything.
   const [sheetFull, setSheetFull] = useState(false);
@@ -135,14 +122,13 @@ export function GardenPlanner() {
     setPathMode(false);
     setSheetOpen(false);
     if (!bedParam || prevBedParam) setPlacingPlant(null);
-    if (openBed) setZoom(fitZoom(openBed));
+    setZoom(1);
   }
 
   const mode = pathMode ? "path" : placingPlant ? "place" : "inspect";
 
   const openBedById = useCallback((bedId: string) => {
-    const bed = activeGarden?.beds.find((b) => b.id === bedId);
-    if (bed) setZoom(fitZoom(bed));
+    setZoom(1);
     setInspectKey(null);
     setPathMode(false);
     setFeedback(null);
@@ -151,7 +137,7 @@ export function GardenPlanner() {
       setPendingPlant(null);
     }
     setSearchParams({ bed: bedId });
-  }, [activeGarden, pendingPlant, setSearchParams, setZoom, setInspectKey, setPathMode, setFeedback, setPlacingPlant, setPendingPlant]);
+  }, [pendingPlant, setSearchParams, setZoom, setInspectKey, setPathMode, setFeedback, setPlacingPlant, setPendingPlant]);
 
   const closeBed = useCallback(() => {
     setPlacingPlant(null);
@@ -596,9 +582,14 @@ export function GardenPlanner() {
     ? [
         gardens.length > 1 ? null : activeGarden.name,
         t("season.current", { year: activeGarden.season }),
-        t("season.beds", { count: activeGarden.beds.length }),
-        t("season.plants", { count: totalPlants }),
-      ].filter(Boolean).join(" · ")
+        // No "0 Beete · 0 Pflanzen": the empty state already says so.
+        activeGarden.beds.length > 0 ? t("season.beds", { count: activeGarden.beds.length }) : null,
+        totalPlants > 0 ? t("season.plants", { count: totalPlants }) : null,
+      ]
+        .filter((part): part is string => !!part)
+        // Each part wraps as a whole ("90 Pflanzen" never splits across lines).
+        .map((part) => part.replace(/ /g, " "))
+        .join(" · ")
     : t("planner.subtitle");
 
   const paletteOrInspector = (variant: "desktop" | "sheet") =>
@@ -647,7 +638,8 @@ export function GardenPlanner() {
             <>
               {canUndo && <IconButton icon={Undo2} label={t("planner.undo")} onClick={undo} />}
               {gardenMenu}
-              {activeGarden ? (
+              {/* Not while a bed is open (it would add a sibling, not edit this one) or while the empty state offers the same button. */}
+              {activeGarden && !openBed && activeGarden.beds.length > 0 ? (
                 <Button onClick={() => setBedDialog({ open: true })}>
                   <Plus size={16} aria-hidden="true" />
                   {t("planner.addBed")}
@@ -720,7 +712,8 @@ export function GardenPlanner() {
                 bottom nav (no strip of page content between them). Inspecting opens it as a
                 peek (actions only, ~30 % height) so the bed and the selected cell stay
                 visible; "Details" pulls it up. The spacer lets the last rows scroll above it. */}
-            <div className={sheetOpen && (sheetFull || !inspectedCell) ? "h-[72dvh] md:hidden" : "h-[40dvh] md:hidden"} aria-hidden="true" />
+            {/* Room for the sheet below the bed. Closed, it is only its handle row, which main's bottom padding already covers. */}
+            <div className={!sheetOpen ? "hidden" : sheetFull || !inspectedCell ? "h-[72dvh] md:hidden" : "h-[40dvh] md:hidden"} aria-hidden="true" />
             <section
               data-planner-sheet
               aria-label={inspectedCell ? t("planner.inspectorLabel", { name: inspectedPlant ? getPlantName(inspectedPlant.id) : "" }) : t("planner.paletteTitle")}

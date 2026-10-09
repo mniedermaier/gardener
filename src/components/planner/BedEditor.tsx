@@ -72,6 +72,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
   const getPlantName = usePlantName();
   const envType = bed.environmentType ?? "outdoor_bed";
   const frostWeeks = getFrostProtectionWeeks(bed);
+  const sideBySide = bed.height > bed.width;
   const size = `${formatNumber((bed.width * gridCellSizeCm) / 100)} × ${formatNumber((bed.height * gridCellSizeCm) / 100)} m`;
 
   // Group conflict pairs by plant combination: "Tomate ↔ Gurke · 2 Stellen".
@@ -97,8 +98,12 @@ export const BedEditor = memo(function BedEditor(props: Props) {
         {/* w-0: the title must not widen the card to its full text width. */}
         <div className="w-0 min-w-0 flex-1">
           <h2 className="truncate text-lg font-semibold text-gray-900 dark:text-gray-100">{bed.name}</h2>
-          <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-            {[size, t(`planner.environmentTypes.${envType}`), t("season.plants", { count: bed.cells.length })].join(" · ")}
+          {/* Wraps instead of truncating; each part stays whole ("1,2 × 2,4 m", "32 Pflanzen"). */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {[size, t(`planner.environmentTypes.${envType}`), bed.cells.length > 0 ? t("season.plants", { count: bed.cells.length }) : null]
+              .filter((part): part is string => !!part)
+              .map((part) => part.replace(/ /g, " "))
+              .join(" · ")}
           </p>
         </div>
         {frostWeeks > 0 && <span className="hidden sm:contents"><Badge tone="info" icon={ShieldCheck}>{t("planner.frostProtectionBadge", { count: frostWeeks })}</Badge></span>}
@@ -161,7 +166,9 @@ export const BedEditor = memo(function BedEditor(props: Props) {
         ) : (
           <>
             <MousePointerClick size={16} aria-hidden="true" className="shrink-0" />
-            <span className="min-w-0 flex-1 text-xs sm:text-sm">{fine ? t("planner.inspectHintClick") : t("planner.inspectHint")}</span>
+            {/* Phones: "how to place" is the sheet's job ("Antippen, dann Felder im Beet tippen"), so only the inspect half here. */}
+            <span className="min-w-0 flex-1 text-xs md:hidden">{fine ? t("planner.inspectHintShortClick") : t("planner.inspectHintShort")}</span>
+            <span className="min-w-0 flex-1 text-sm max-md:hidden">{fine ? t("planner.inspectHintClick") : t("planner.inspectHint")}</span>
           </>
         )}
       </div>
@@ -173,6 +180,9 @@ export const BedEditor = memo(function BedEditor(props: Props) {
         </p>
       )}
 
+      {/* Tall beds on a wide card: grid left, figures right, instead of a narrow grid above empty space. */}
+      <div className="@container">
+      <div className={sideBySide ? "@2xl:grid @2xl:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)] @2xl:items-start" : undefined}>
       <div className="px-3 py-4 sm:px-4">
         <EditableBedGrid
           bed={bed}
@@ -208,6 +218,7 @@ export const BedEditor = memo(function BedEditor(props: Props) {
         )}
       </div>
 
+      <div className={sideBySide ? "@2xl:self-stretch @2xl:border-l @2xl:border-gray-100 @2xl:[&>*:first-child]:border-t-0 @2xl:dark:border-white/5" : undefined}>
       {conflictGroups.length > 0 && (
         <section className="border-t border-gray-100 px-3 py-4 sm:px-4 dark:border-white/5" aria-labelledby={`conflicts-${bed.id}`}>
           <h3 id={`conflicts-${bed.id}`} className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -250,6 +261,9 @@ export const BedEditor = memo(function BedEditor(props: Props) {
           <GuildPicker gardenId={gardenId} bedId={bed.id} bedWidth={bed.width} bedHeight={bed.height} />
         </div>
       )}
+      </div>
+      </div>
+      </div>
     </div>
   );
 });
