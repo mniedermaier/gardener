@@ -394,8 +394,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                 <ArrowLeft size={16} aria-hidden="true" />
                 {t("common.back")}
               </Button>
-            ) : <span />}
-            <div className="flex items-center gap-2">
+            ) : <span className="hidden sm:block" />}
+            <div className={`flex items-center gap-2 ${index === 0 ? "flex-1 sm:flex-none" : ""}`}>
               <Button onClick={step === "start" ? finish : next} disabled={busy} variant={skipLocation ? "secondary" : "primary"} className={index === 0 ? "w-full sm:w-auto" : undefined}>
                 {busy && <Loader2 size={16} aria-hidden="true" className="animate-spin" />}
                 {primaryLabel}
