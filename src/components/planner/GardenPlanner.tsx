@@ -14,6 +14,7 @@ import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { useUndo } from "@/hooks/useUndo";
+import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Modal } from "@/components/ui/Modal";
@@ -104,6 +105,8 @@ export function GardenPlanner() {
   const [sheetFull, setSheetFull] = useState(false);
 
   const [bedDialog, setBedDialog] = useState<BedDialogState>({ open: false });
+  // "Beet hinzufügen" from other pages (useAddBed) lands here with the dialog open.
+  useOpenAddOnNavigate(useCallback(() => setBedDialog({ open: true }), []));
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
   const [newGardenOpen, setNewGardenOpen] = useState(false);
   const [gardenName, setGardenName] = useState("");
@@ -562,7 +565,8 @@ export function GardenPlanner() {
   const gardenMenu = activeGarden ? (
     <Menu
       label={t("planner.gardenMenu")}
-      trigger={<><span className="max-w-40 truncate">{t("planner.gardenMenuLabel")}</span><ChevronDown size={16} aria-hidden="true" /></>}
+      // One garden: a compact "…" (no dropdown that looks like a choice between gardens).
+      trigger={gardens.length > 1 ? <><span className="max-w-40 truncate">{t("planner.gardenMenuLabel")}</span><ChevronDown size={16} aria-hidden="true" /></> : undefined}
       items={[
         { label: t("planner.newGarden"), icon: Plus, onSelect: () => setNewGardenOpen(true) },
         { label: t("planner.duplicateGarden"), icon: Copy, onSelect: () => { duplicateGarden(activeGarden.id); closeBed(); toast(t("planner.gardenDuplicated"), "success"); } },

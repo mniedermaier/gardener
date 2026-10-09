@@ -812,9 +812,9 @@
       "seasonDescProtected_other": "Termine für {{place}}: {{count}} Wochen früher als im Freiland.",
       "sowNow": "Jetzt säen, bis {{date}}",
       "nextSowing": "Nächste Aussaat ab {{date}}",
-      "hatchLegend": "Schraffiert: unter Glas"
+      "hatchLegend": "Schraffiert: unter Glas",
+      "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein."
     },
-    "createBedFirst": "Erst ein Beet anlegen",
     "sowNowFilter": "Jetzt säen"
   },
   "weather": {
@@ -887,7 +887,6 @@
     "subtitle": "Was im Garten ansteht – nach Fälligkeit sortiert.",
     "pageSubtitle": "Saisonübersicht deiner Beete und Staffelaussaaten.",
     "toTasks": "Zu den Aufgaben",
-    "toPlanner": "Zum Planer",
     "generatedTitle": "{{action}}: {{plant}}",
     "generateHint": "Erstellt Aussaat- und Pflanztermine aus der Beetbelegung. Eigene und erledigte Aufgaben bleiben erhalten.",
     "exportIcal": "Als Kalenderdatei exportieren (iCal)",
@@ -935,8 +934,6 @@
     "overdueCount_other": "{{count}} überfällig",
     "timeline": "Saisonübersicht {{year}}",
     "timelineDesc": "Aussaat-, Pflanz- und Erntefenster je Beet, berechnet ab dem letzten Frost ({{date}}).",
-    "timelineEmptyTitle": "Noch nichts geplant",
-    "timelineEmptyText": "Sobald deine Beete bepflanzt sind, siehst du hier, wann gesät, gepflanzt und geerntet wird.",
     "bedFilter": "Beet",
     "allBeds": "Alle Beete",
     "today": "Heute",
@@ -982,7 +979,9 @@
     "untilRange": "Ende je nach Beet: {{range}}",
     "fromRange": "Start je nach Beet: {{range}}",
     "upNextFrom": "Als Nächstes · ab {{date}}",
-    "notesPlaceholder": "z. B. Werkzeug, Hinweise …"
+    "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
+    "afterFrostWindow": "nach dem Frost: {{range}}",
+    "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet."
   },
   "settings": {
     "title": "Einstellungen",
@@ -1129,8 +1128,8 @@
       "warning": "Achtung",
       "info": "Hinweis"
     },
-    "frostGroupTitle_one": "Frostgefahr in {{count}} Nacht, bis {{temp}} ({{day}})",
-    "frostGroupTitle_other": "Frostgefahr in {{count}} Nächten, bis {{temp}} ({{day}})",
+    "frostGroupTitle_one": "{{count}} Nacht mit Frostgefahr – bis {{temp}} ({{day}})",
+    "frostGroupTitle_other": "{{count}} Nächte mit Frostgefahr – bis {{temp}} ({{day}})",
     "frostAffected_one": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
     "frostAffected_other": "Betroffen sind {{count}} Kulturen ({{beds}}), z. B. {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
     "frostAdvice": "Empfindliche Pflanzen mit Vlies abdecken und mit dem Auspflanzen warten.",
@@ -1141,13 +1140,14 @@
     "fleeceTaskAdded": "Aufgabe „Vlies auflegen“ für {{day}} angelegt",
     "fleeceTaskPlanned": "Vlies-Aufgabe für {{day}} geplant",
     "frostAffectedAll": "Betroffen: {{plants}}. Mit Vlies abdecken oder ins Haus holen.",
-    "frostGroupTitleMixed_one": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "{{hard}}, Frostgefahr in {{count}} weiteren, bis {{temp}} ({{day}})",
-    "frostHardNights_one": "Frost in {{count}} Nacht",
-    "frostHardNights_other": "Frost in {{count}} Nächten",
+    "frostGroupTitleMixed_one": "{{hard}}, {{count}} weitere mit Frostgefahr – bis {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, {{count}} weitere mit Frostgefahr – bis {{temp}} ({{day}})",
+    "frostHardNights_one": "{{count}} Frostnacht",
+    "frostHardNights_other": "{{count}} Frostnächte",
     "frostAdviceNoPlants": "Mit dem Auspflanzen warten, bis die Frostnächte vorbei sind.",
     "frostAdviceAutumn": "Letzte Ernten einholen und frostempfindliche Kübel ins Haus holen.",
-    "frostAdviceAutumnNoPlants": "Kübel und Gartengeräte frostsicher unterbringen."
+    "frostAdviceAutumnNoPlants": "Kübel und Gartengeräte frostsicher unterbringen.",
+    "frostGroupTitleHard": "{{hard}} – bis {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Ernte",
@@ -1409,7 +1409,9 @@
     "rowGap": "fehlen {{kg}} (+{{area}})",
     "emptyCta": "Lege ein Beet an, dann zeigt der Plan, wie viel davon du schon anbaust.",
     "biggestGaps": "Größte Mengen: {{plants}}",
-    "byCalories": "Nach Kalorien: {{value}} – zur Selbstversorgung"
+    "byCalories": "Nach Kalorien: {{value}} – zur Selbstversorgung",
+    "planCropsTitle_one": "{{count}} Kultur im Plan",
+    "planCropsTitle_other": "{{count}} Kulturen im Plan"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1596,7 +1598,7 @@
       "perMonthSince": "seit {{date}}",
       "plusLiquid": "dazu {{volume}} Flüssigfutter",
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Futter und siehst, was es pro Monat kostet.",
-      "emptyTitle": "Futterkosten pro Monat",
+      "emptyTitle": "Futter und Kosten im Blick",
       "notesPlaceholder": "z. B. Futtermarke, wie gern gefressen …"
     },
     "health": {

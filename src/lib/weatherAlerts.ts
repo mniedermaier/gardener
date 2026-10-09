@@ -50,7 +50,7 @@ export interface FrostSummary {
 
 /**
  * Single source of the frost summary shown on "Heute" and on the weather page
- * ("Frostgefahr in 5 Nächten, bis −6 °C (Mi)"): same days (today onwards),
+ * ("3 Frostnächte, 2 weitere mit Frostgefahr – bis −6 °C (Mi)"): same days (today onwards),
  * same threshold, same coldest night. Returns null when no night qualifies.
  */
 export function summarizeFrost(

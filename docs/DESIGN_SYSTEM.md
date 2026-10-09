@@ -410,7 +410,7 @@ fällig").
 
 `summarizeFrost()` (`lib/weatherAlerts.ts`) + `useFrostSummary()`
 (`weather/frost.tsx`) produce the frost summary for **both** "Heute" and the
-weather page: "Frostgefahr in 5 Nächten, bis −6 °C (So)". `FrostTaskButton`
+weather page: "3 Frostnächte, 2 weitere mit Frostgefahr – bis −6 °C (So)". `FrostTaskButton`
 next to it turns the warning into a "Vlies auflegen" task on the first frost
 night (with undo; once planned it opens the task). `DayArc` shows today's sun
 path (sunrise → sunset, sun position now) in the current-weather card.

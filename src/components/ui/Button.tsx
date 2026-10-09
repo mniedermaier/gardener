@@ -3,7 +3,8 @@ import { type ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "danger" | "ghost" | "danger-ghost";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-garden-600 text-white shadow-xs hover:bg-garden-700 dark:hover:bg-garden-500",
+  // Disabled primary is neutral grey, not a washed-out green that still reads as the brand action.
+  primary: "bg-garden-600 text-white shadow-xs hover:bg-garden-700 dark:hover:bg-garden-500 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none disabled:opacity-100 disabled:hover:bg-gray-200 dark:disabled:bg-white/10 dark:disabled:text-gray-400 dark:disabled:hover:bg-white/10",
   secondary: "border border-gray-300 bg-white text-gray-800 shadow-xs hover:bg-gray-50 dark:border-white/15 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10",
   // Dark: a tinted button instead of a light salmon block, which would be the brightest thing on the page.
   danger: "bg-danger text-white hover:brightness-110 dark:bg-danger/15 dark:text-danger dark:ring-1 dark:ring-inset dark:ring-danger/40 dark:hover:bg-danger/25 dark:hover:brightness-100",

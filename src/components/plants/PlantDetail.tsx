@@ -10,6 +10,7 @@ import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { usePlants, usePlantMap } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { useAddBed } from "@/hooks/useAddBed";
 import { useFormat } from "@/hooks/useFormat";
 import { intlLocale } from "@/lib/format";
 import { getPhaseWindows, seasonFrost, type PhaseWindow } from "@/lib/season";
@@ -218,6 +219,7 @@ function StockTile({ icon: Icon }: { icon: LucideIcon }) {
 export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetailProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const addBed = useAddBed();
   const { formatNumber, formatWeight, formatDate } = useFormat();
   const allPlants = usePlants();
   const getPlantName = usePlantName();
@@ -296,7 +298,8 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
   const ownSeeds = useMemo(() => seeds.filter((s) => s.plantId === plant.id), [seeds, plant.id]);
 
   const description = t(`plants.catalog.${plant.id}.description`, { defaultValue: "" });
-  const goPlanner = () => navigate("/planner", { state: { placePlantId: plant.id } });
+  // No bed yet: the button adds one (planner opens with its dialog); with beds it places the crop.
+  const goPlanner = hasBeds ? () => navigate("/planner", { state: { placePlantId: plant.id } }) : addBed;
   const goSeeds = () => navigate("/seeds", { state: { openAdd: true, prefill: { plantId: plant.id } } satisfies OpenAddState });
   const goHarvest = () => navigate("/harvest", { state: { openAdd: true, prefill: { plantId: plant.id } } satisfies OpenAddState });
 
@@ -320,8 +323,8 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           // Phones: primary first, stacked at full width so no label breaks onto two lines.
           <>
             <Button variant={sowNote?.offSeason ? "secondary" : "primary"} className="w-full sm:w-auto" onClick={goPlanner}>
-              <LayoutGrid size={16} aria-hidden="true" />
-              {hasBeds ? t("plants.placeInPlanner") : t("plants.createBedFirst")}
+              {hasBeds ? <LayoutGrid size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
+              {hasBeds ? t("plants.placeInPlanner") : t("planner.addBed")}
             </Button>
             <Button variant="secondary" className="w-full sm:w-auto" onClick={goSeeds}>
               <Package size={16} aria-hidden="true" />
@@ -337,7 +340,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         }
       />
 
-      {(description || plant.caloriesPer100g || sowNote) && (
+      {(description || plant.caloriesPer100g || sowNote || !hasBeds) && (
         <div className="-mt-2 mb-6 max-w-3xl text-sm">
           {sowNote && (
             <p className="mb-2 inline-flex items-center gap-1.5 font-medium text-garden-700 dark:text-garden-300">
@@ -345,6 +348,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               {sowNote.text}
             </p>
           )}
+          {!hasBeds && <p className="mb-2 text-gray-600 dark:text-gray-400">{t("plants.detail.bedFirstHint", { plant: getPlantName(plant.id) })}</p>}
           {description && <p className="text-gray-700 dark:text-gray-300">{description}</p>}
           {plant.caloriesPer100g ? (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) })}</p>
@@ -462,12 +466,14 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                 onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
               />
             )) : (
-              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} />
+              // Every row of this list is tappable (chevron), so none looks disabled.
+              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} onClick={goPlanner} />
             )}
             <ListRow
               muted={harvestStats.count === 0}
               leading={<StockTile icon={Apple} />}
               title={t("plants.detail.yourHarvests")}
+              onClick={harvestStats.count > 0 ? () => navigate("/harvest") : goHarvest}
               // Weight, count and last date as meta parts of one size; only the "+" on the right, so the title keeps its width.
               meta={harvestStats.count > 0
                 ? [
@@ -488,7 +494,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                 onClick={() => navigate("/seeds")}
               />
             )) : (
-              <ListRow muted leading={<StockTile icon={Package} />} title={t("plants.detail.seedStock")} meta={t("plants.detail.noSeeds")} />
+              <ListRow muted leading={<StockTile icon={Package} />} title={t("plants.detail.seedStock")} meta={t("plants.detail.noSeeds")} onClick={goSeeds} />
             )}
           </List>
 

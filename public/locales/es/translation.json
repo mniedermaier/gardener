@@ -836,9 +836,9 @@
       "seasonDescProtected_many": "Fechas para {{place}}: {{count}} semanas antes que al aire libre.",
       "sowNow": "Siembra ahora, hasta el {{date}}",
       "nextSowing": "Próxima siembra desde el {{date}}",
-      "hatchLegend": "Rayado: bajo cubierta"
+      "hatchLegend": "Rayado: bajo cubierta",
+      "bedFirstHint": "Crea un bancal y podrás planificar {{plant}} enseguida."
     },
-    "createBedFirst": "Crea primero un bancal",
     "sowNowFilter": "Sembrar ahora"
   },
   "weather": {
@@ -912,7 +912,6 @@
     "subtitle": "Lo que toca en el huerto, ordenado por fecha.",
     "pageSubtitle": "Resumen de temporada de tus bancales y siembras escalonadas.",
     "toTasks": "Ir a tareas",
-    "toPlanner": "Abrir planificador",
     "generatedTitle": "{{action}}: {{plant}}",
     "generateHint": "Crea fechas de siembra y trasplante a partir de tus bancales. Las tareas propias y completadas se conservan.",
     "exportIcal": "Exportar como calendario (iCal)",
@@ -962,8 +961,6 @@
     "overdueCount_other": "{{count}} atrasadas",
     "timeline": "Resumen de temporada {{year}}",
     "timelineDesc": "Ventanas de siembra, trasplante y cosecha por bancal, desde la última helada ({{date}}).",
-    "timelineEmptyTitle": "Aún no hay nada planificado",
-    "timelineEmptyText": "Cuando tus bancales estén plantados verás aquí cuándo sembrar, trasplantar y cosechar.",
     "bedFilter": "Bancal",
     "allBeds": "Todos los bancales",
     "today": "Hoy",
@@ -1012,7 +1009,9 @@
     "untilRange": "Fin según el bancal: {{range}}",
     "fromRange": "Inicio según el bancal: {{range}}",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
-    "notesPlaceholder": "p. ej. herramientas, avisos…"
+    "notesPlaceholder": "p. ej. herramientas, avisos…",
+    "afterFrostWindow": "tras la helada: {{range}}",
+    "timelineEmptyLine": "Tu plan de temporada necesita un bancal."
   },
   "settings": {
     "title": "Ajustes",
@@ -1165,9 +1164,9 @@
       "warning": "Atención",
       "info": "Aviso"
     },
-    "frostGroupTitle_one": "Riesgo de helada en {{count}} noche, hasta {{temp}} ({{day}})",
-    "frostGroupTitle_other": "Riesgo de helada en {{count}} noches, hasta {{temp}} ({{day}})",
-    "frostGroupTitle_many": "Riesgo de helada en {{count}} noches, hasta {{temp}} ({{day}})",
+    "frostGroupTitle_one": "{{count}} noche con riesgo de helada – hasta {{temp}} ({{day}})",
+    "frostGroupTitle_other": "{{count}} noches con riesgo de helada – hasta {{temp}} ({{day}})",
+    "frostGroupTitle_many": "{{count}} noches con riesgo de helada – hasta {{temp}} ({{day}})",
     "frostAffected_one": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
     "frostAffected_other": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
     "frostAffected_many": "{{count}} cultivos afectados ({{beds}}), p. ej. {{plants}}. Cubre con manta térmica o ponlos a cubierto.",
@@ -1179,15 +1178,16 @@
     "fleeceTaskAdded": "Tarea «Cubrir con manta térmica» añadida para {{day}}",
     "fleeceTaskPlanned": "Tarea de manta térmica para {{day}}",
     "frostAffectedAll": "Afectado: {{plants}}. Cubre con manta térmica o ponlo a cubierto.",
-    "frostGroupTitleMixed_one": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
-    "frostGroupTitleMixed_many": "{{hard}}, riesgo de helada en {{count}} más, hasta {{temp}} ({{day}})",
-    "frostHardNights_one": "Helada en {{count}} noche",
-    "frostHardNights_other": "Helada en {{count}} noches",
-    "frostHardNights_many": "Helada en {{count}} noches",
+    "frostGroupTitleMixed_one": "{{hard}}, {{count}} más con riesgo de helada – hasta {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, {{count}} más con riesgo de helada – hasta {{temp}} ({{day}})",
+    "frostGroupTitleMixed_many": "{{hard}}, {{count}} más con riesgo de helada – hasta {{temp}} ({{day}})",
+    "frostHardNights_one": "{{count}} noche de helada",
+    "frostHardNights_other": "{{count}} noches de helada",
+    "frostHardNights_many": "{{count}} noches de helada",
     "frostAdviceNoPlants": "Espera a trasplantar hasta que pasen las noches de helada.",
     "frostAdviceAutumn": "Recoge las últimas cosechas y pon a cubierto las macetas sensibles.",
-    "frostAdviceAutumnNoPlants": "Guarda macetas y herramientas a salvo de la helada."
+    "frostAdviceAutumnNoPlants": "Guarda macetas y herramientas a salvo de la helada.",
+    "frostGroupTitleHard": "{{hard}} – hasta {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Cosecha",
@@ -1470,7 +1470,10 @@
     "rowGap": "faltan {{kg}} (+{{area}})",
     "emptyCta": "Crea un bancal y el plan mostrará cuánto de esto ya cultivas.",
     "biggestGaps": "Mayores cantidades: {{plants}}",
-    "byCalories": "Por calorías: {{value}} – ver autosuficiencia"
+    "byCalories": "Por calorías: {{value}} – ver autosuficiencia",
+    "planCropsTitle_one": "{{count}} cultivo en el plan",
+    "planCropsTitle_other": "{{count}} cultivos en el plan",
+    "planCropsTitle_many": "{{count}} cultivos en el plan"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1664,7 +1667,7 @@
       "perMonthSince": "desde el {{date}}",
       "plusLiquid": "más {{volume}} de alimento líquido",
       "emptyText": "Añade primero un animal. Después registras aquí el alimento y ves cuánto cuesta al mes.",
-      "emptyTitle": "Coste del alimento al mes",
+      "emptyTitle": "Alimento y coste bajo control",
       "notesPlaceholder": "p. ej. marca, aceptación…"
     },
     "health": {

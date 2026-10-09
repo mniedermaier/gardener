@@ -1,7 +1,8 @@
 import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { CalendarRange, LayoutGrid } from "lucide-react";
+import { CalendarRange, Plus } from "lucide-react";
+import { useAddBed } from "@/hooks/useAddBed";
 import { addWeeks, addYears, differenceInCalendarDays, endOfYear, startOfDay, startOfYear } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -43,6 +44,7 @@ export function SeasonTimeline() {
   const now = useToday();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const addBed = useAddBed();
   const { formatDate, formatDateRange } = useFormat();
   const { gardens, lastFrostDate } = useStore(useShallow((s) => ({ gardens: s.gardens, lastFrostDate: s.lastFrostDate })));
   const plantMap = usePlantMap();
@@ -140,19 +142,15 @@ export function SeasonTimeline() {
     // sowing list as context — every row there would lead to "first add a bed".
     return (
       <div className="space-y-4">
-        <Card padding="sm" className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300" aria-hidden="true">
-            <CalendarRange size={18} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("calendar.timelineEmptyTitle")}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t("calendar.timelineEmptyText")}</p>
-          </div>
-          <Button variant="secondary" className="self-start sm:self-center" onClick={() => navigate("/planner")}>
-            <LayoutGrid size={16} aria-hidden="true" />
-            {t("calendar.toPlanner")}
+        {/* One line, not a card: the sowing list below is the useful part. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300">
+          <CalendarRange size={16} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />
+          <span className="min-w-0 flex-1">{t("calendar.timelineEmptyLine")}</span>
+          <Button variant="ghost" size="sm" className="-mr-2" onClick={addBed}>
+            <Plus size={16} aria-hidden="true" />
+            {t("planner.addBed")}
           </Button>
-        </Card>
+        </div>
         {sowingList}
       </div>
     );

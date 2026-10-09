@@ -812,9 +812,9 @@
       "seasonDescProtected_other": "Dates for {{place}}: {{count}} weeks earlier than in the open field.",
       "sowNow": "Sow now, until {{date}}",
       "nextSowing": "Next sowing from {{date}}",
-      "hatchLegend": "Hatched: under glass"
+      "hatchLegend": "Hatched: under glass",
+      "bedFirstHint": "Add a bed, then you can place {{plant}} right away."
     },
-    "createBedFirst": "Create a bed first",
     "sowNowFilter": "Sow now"
   },
   "weather": {
@@ -887,7 +887,6 @@
     "subtitle": "What's coming up in the garden, sorted by due date.",
     "pageSubtitle": "Season overview of your beds and succession sowings.",
     "toTasks": "Go to tasks",
-    "toPlanner": "Open planner",
     "generatedTitle": "{{action}}: {{plant}}",
     "generateHint": "Creates sowing and planting dates from your bed plan. Custom and completed tasks are kept.",
     "exportIcal": "Export as calendar file (iCal)",
@@ -935,8 +934,6 @@
     "overdueCount_other": "{{count}} overdue",
     "timeline": "Season overview {{year}}",
     "timelineDesc": "Sowing, planting and harvest windows per bed, counted from the last frost ({{date}}).",
-    "timelineEmptyTitle": "Nothing planned yet",
-    "timelineEmptyText": "Once your beds are planted you'll see when to sow, plant out and harvest.",
     "bedFilter": "Bed",
     "allBeds": "All beds",
     "today": "Today",
@@ -982,7 +979,9 @@
     "untilRange": "Ends by bed: {{range}}",
     "fromRange": "Starts by bed: {{range}}",
     "upNextFrom": "Coming up next · from {{date}}",
-    "notesPlaceholder": "e.g. tools, reminders…"
+    "notesPlaceholder": "e.g. tools, reminders…",
+    "afterFrostWindow": "after the frost: {{range}}",
+    "timelineEmptyLine": "Your season plan needs a bed."
   },
   "settings": {
     "title": "Settings",
@@ -1129,8 +1128,8 @@
       "warning": "Caution",
       "info": "Note"
     },
-    "frostGroupTitle_one": "Frost risk on {{count}} night, down to {{temp}} ({{day}})",
-    "frostGroupTitle_other": "Frost risk on {{count}} nights, down to {{temp}} ({{day}})",
+    "frostGroupTitle_one": "{{count}} night at risk of frost – down to {{temp}} ({{day}})",
+    "frostGroupTitle_other": "{{count}} nights at risk of frost – down to {{temp}} ({{day}})",
     "frostAffected_one": "Affected: {{plants}}. Cover with fleece or bring indoors.",
     "frostAffected_other": "{{count}} crops affected ({{beds}}), e.g. {{plants}}. Cover with fleece or bring indoors.",
     "frostAdvice": "Cover tender plants with fleece and hold off on transplanting.",
@@ -1141,13 +1140,14 @@
     "fleeceTaskAdded": "Task “Cover with fleece” added for {{day}}",
     "fleeceTaskPlanned": "Fleece task planned for {{day}}",
     "frostAffectedAll": "Affected: {{plants}}. Cover with fleece or bring indoors.",
-    "frostGroupTitleMixed_one": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
-    "frostGroupTitleMixed_other": "{{hard}}, frost risk on {{count}} more, down to {{temp}} ({{day}})",
-    "frostHardNights_one": "Frost on {{count}} night",
-    "frostHardNights_other": "Frost on {{count}} nights",
+    "frostGroupTitleMixed_one": "{{hard}}, {{count}} more at risk of frost – down to {{temp}} ({{day}})",
+    "frostGroupTitleMixed_other": "{{hard}}, {{count}} more at risk of frost – down to {{temp}} ({{day}})",
+    "frostHardNights_one": "{{count}} frost night",
+    "frostHardNights_other": "{{count}} frost nights",
     "frostAdviceNoPlants": "Hold off on planting out until the frost nights are over.",
     "frostAdviceAutumn": "Bring in the last harvests and move tender pots indoors.",
-    "frostAdviceAutumnNoPlants": "Move pots and garden tools somewhere frost-free."
+    "frostAdviceAutumnNoPlants": "Move pots and garden tools somewhere frost-free.",
+    "frostGroupTitleHard": "{{hard}} – down to {{temp}} ({{day}})"
   },
   "harvest": {
     "title": "Harvest",
@@ -1409,7 +1409,9 @@
     "rowGap": "{{kg}} short (+{{area}})",
     "emptyCta": "Add a bed and the plan shows how much of this you already grow.",
     "biggestGaps": "Largest amounts: {{plants}}",
-    "byCalories": "By calories: {{value}} – see self-sufficiency"
+    "byCalories": "By calories: {{value}} – see self-sufficiency",
+    "planCropsTitle_one": "{{count}} crop in the plan",
+    "planCropsTitle_other": "{{count}} crops in the plan"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1596,7 +1598,7 @@
       "perMonthSince": "since {{date}}",
       "plusLiquid": "plus {{volume}} liquid feed",
       "emptyText": "Add an animal first. Then you log feed here and see what it costs per month.",
-      "emptyTitle": "Feed costs per month",
+      "emptyTitle": "Keep track of feed and its cost",
       "notesPlaceholder": "e.g. brand, how well it was eaten…"
     },
     "health": {

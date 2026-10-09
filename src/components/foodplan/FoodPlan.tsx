@@ -203,7 +203,7 @@ export function FoodPlan() {
               <details className="group rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
                 <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 [&::-webkit-details-marker]:hidden">
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t("foodplan.unplantedTitle", { count: unplanted.length })}</span>
+                    <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">{t(empty ? "foodplan.planCropsTitle" : "foodplan.unplantedTitle", { count: unplanted.length })}</span>
                     <span className="block text-xs text-gray-500 dark:text-gray-400">
                       {/* Without beds the area is already the hero's second figure: name the biggest gaps instead. */}
                       {empty

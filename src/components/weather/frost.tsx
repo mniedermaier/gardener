@@ -48,7 +48,7 @@ export function useDayLabel(): (iso: string, inline?: boolean) => string {
 
 /**
  * Frost nights of a forecast plus the one sentence used for them everywhere
- * ("Frostgefahr in 5 Nächten, bis −6 °C (Mi)"). Same threshold and days on
+ * ("3 Frostnächte, 2 weitere mit Frostgefahr – bis −6 °C (Mi)"). Same threshold and days on
  * "Heute" and on the weather page — see `summarizeFrost`.
  */
 export function useFrostSummary(forecast: { date: string; tempMin: number }[] | undefined): { summary: FrostSummary; title: string } | null {
@@ -60,12 +60,13 @@ export function useFrostSummary(forecast: { date: string; tempMin: number }[] | 
   return useMemo(() => {
     const summary = forecast ? summarizeFrost(forecast, threshold, toISODate(today)) : null;
     if (!summary) return null;
-    // Below the threshold but above 0 °C is only "Frostgefahr"; when both kinds
-    // occur, lead with the freezing nights: "Frost in 3 Nächten, Frostgefahr in
-    // 2 weiteren, bis −6 °C (So)".
+    // Below the threshold but above 0 °C is only "Frostgefahr"; freezing nights
+    // lead, counted as nights ("3 Frostnächte, 2 weitere mit Frostgefahr – bis
+    // −6 °C (So)"), never "in 3 Nächten", which reads as "three nights from now".
     const hard = summary.nights.filter((n) => n.tempMin <= 0).length;
     const mixed = hard > 0 && hard < summary.nights.length;
-    const title = t(mixed ? "alerts.frostGroupTitleMixed" : "alerts.frostGroupTitle", {
+    const key = mixed ? "alerts.frostGroupTitleMixed" : hard > 0 ? "alerts.frostGroupTitleHard" : "alerts.frostGroupTitle";
+    const title = t(key, {
       count: mixed ? summary.nights.length - hard : summary.nights.length,
       hard: t("alerts.frostHardNights", { count: hard }),
       temp: f.formatTemperature(summary.coldest.tempMin),
