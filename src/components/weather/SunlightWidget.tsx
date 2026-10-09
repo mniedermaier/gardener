@@ -67,7 +67,7 @@ export function SunlightWidget({ compact = false, className }: { compact?: boole
           fullLabel: f.formatDate(monthDate(d.month), "monthYear"),
           values: [d.daylightHours],
         }))}
-        series={[{ label: t("sunlight.daylight"), color: "earth" }]}
+        series={[{ label: t("sunlight.daylight"), color: "brand" }]}
         formatValue={hours}
         formatTick={(v) => t("sunlight.hoursShort", { hours: f.formatNumber(v, { maximumFractionDigits: 0 }) })}
         marker={{ index: now.getMonth(), label: t("charts.today") }}

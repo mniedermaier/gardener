@@ -7,6 +7,7 @@ import { toDate, toISODate } from "@/lib/format";
 import { PRODUCT_TYPES, type ProductTotals } from "@/lib/metrics";
 import type { AnimalProduct } from "@/types/animal";
 import { List, ListRow } from "@/components/ui/List";
+import { Button } from "@/components/ui/Button";
 import { PRODUCT_ICON } from "./icons";
 import { IconTile, formatProductAmount } from "./shared";
 
@@ -125,13 +126,8 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions, in
         </List>
       ))}
       {hiddenWeeks > 0 && (
-        <button
-          type="button"
-          onClick={() => setShowAll(true)}
-          className="flex min-h-11 items-center text-sm font-medium text-garden-700 hover:underline dark:text-garden-300"
-        >
-          {t("water.showOlder")}
-        </button>
+        // Same control as "Ältere Monate/Wochen anzeigen" on Ernte and Bewässerung.
+        <Button variant="secondary" onClick={() => setShowAll(true)}>{t("water.showOlder")}</Button>
       )}
     </div>
   );

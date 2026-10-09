@@ -306,6 +306,17 @@ export function ExpenseDashboard() {
                         trailing={f.formatCurrency(entry.cost)}
                         onClick={() => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health")}
                         clickLabel={`${entry.label} · ${t(entry.source === "feed" ? "expenses.fromFeedBook" : "expenses.fromHealthBook")}`}
+                        // Same menu slot as the expense rows, so every amount lines up.
+                        actions={
+                          <Menu
+                            label={t("common.moreActions")}
+                            items={[{
+                              label: t(entry.source === "feed" ? "expenses.openFeedBook" : "expenses.openHealthBook"),
+                              icon: ArrowUpRight,
+                              onSelect: () => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health"),
+                            }]}
+                          />
+                        }
                       />
                     );
                   }

@@ -30,6 +30,10 @@ import { Badge } from "@/components/ui/Badge";
 import { List, ListRow } from "@/components/ui/List";
 import { EnvironmentChip } from "@/components/planner/environment";
 import { useToday } from "@/hooks/useToday";
+import { useWeatherGlance } from "@/hooks/useWeatherGlance";
+import { useFrostSummary } from "@/components/weather/frost";
+import { isFrostSensitive } from "@/lib/weatherAlerts";
+import { toDate } from "@/lib/format";
 
 interface PlantDetailProps {
   plant: Plant;
@@ -264,6 +268,17 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
     return { offSeason: ahead.start.getFullYear() > today.getFullYear(), text: t("plants.detail.nextSowing", { date: formatDate(ahead.start) }) };
   }, [phases, today, plant, frost, context.protection, t, formatDate]);
 
+  // A tender crop still in its harvest window while the forecast brings a hard
+  // frost: say so on the year plan instead of showing harvest "until October".
+  const glance = useWeatherGlance();
+  const frostSummary = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
+  const frostHarvest = useMemo(() => {
+    const first = frostSummary?.summary.nights.find((n) => n.tempMin <= 0);
+    if (!first || context.protection > 0 || !isFrostSensitive(plant)) return null;
+    const inHarvest = phases.some((p) => p.key === "harvest" && p.start <= today && p.end >= today);
+    return inHarvest ? toDate(first.date) : null;
+  }, [frostSummary, context.protection, plant, phases, today]);
+
   // Relations are symmetric, like in the companion matrix.
   const { good, bad } = useMemo(() => {
     const g = new Set(plant.companions);
@@ -321,16 +336,11 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         title={getPlantName(plant.id)}
         description={t(`plants.category.${plant.category}`)}
         actions={
-          // Phones: primary first, stacked at full width so no label breaks onto two lines.
+          // One action in the header (seeds live in "Dein Bestand"); off-season it steps back to secondary.
           <>
-            {/* Off-season both actions are secondary and small; on phones both span the full width, so the edges line up. */}
             <Button variant={sowNote?.offSeason ? "secondary" : "primary"} size={sowNote?.offSeason ? "sm" : undefined} className="w-full sm:w-auto" onClick={goPlanner}>
               {hasBeds ? <LayoutGrid size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
               {hasBeds ? t("plants.placeInPlanner") : t("planner.addBed")}
-            </Button>
-            <Button variant="secondary" size={sowNote?.offSeason ? "sm" : undefined} className="w-full sm:w-auto" onClick={goSeeds}>
-              <Package size={16} aria-hidden="true" />
-              {t("plants.addSeeds")}
             </Button>
             {onEdit && (
               <Button variant="ghost" onClick={onEdit}>
@@ -342,7 +352,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         }
       />
 
-      {(description || plant.caloriesPer100g || sowNote || !hasBeds) && (
+      {(description || sowNote || !hasBeds) && (
         <div className="-mt-2 mb-6 max-w-3xl text-sm">
           {sowNote && (
             <p className="mb-2 inline-flex items-center gap-1.5 font-medium text-garden-700 dark:text-garden-300">
@@ -353,9 +363,6 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           )}
           {!hasBeds && !sowNote && <p className="mb-2 text-gray-600 dark:text-gray-400">{t("plants.detail.bedFirstHint", { plant: getPlantName(plant.id) })}</p>}
           {description && <p className="text-gray-700 dark:text-gray-300">{description}</p>}
-          {plant.caloriesPer100g ? (
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) })}</p>
-          ) : null}
         </div>
       )}
 
@@ -383,9 +390,10 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
           label={t("plants.detail.yield")}
           value={plant.expectedYieldKgPerM2 ? formatNumber(plant.expectedYieldKgPerM2) : "–"}
           unit={plant.expectedYieldKgPerM2 ? t("plants.detail.yieldUnit") : undefined}
-          hint={plant.expectedYieldKgPerM2
-            ? t("plants.detail.yieldPerPlant", { value: formatWeight(plantYieldKg(plant, gridCellSizeCm) * 1000) })
-            : undefined}
+          hint={[
+            plant.expectedYieldKgPerM2 ? t("plants.detail.yieldPerPlant", { value: formatWeight(plantYieldKg(plant, gridCellSizeCm) * 1000) }) : null,
+            plant.caloriesPer100g ? t("plants.detail.calories", { value: formatNumber(plant.caloriesPer100g) }) : null,
+          ].filter(Boolean).join(" · ") || undefined}
         />
         <StatCard
           icon={Sun}
@@ -414,6 +422,11 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
                 options={contexts.map((c) => ({ value: String(c.protection), label: contextLabel(c) }))}
               />
             )}
+            {frostHarvest && (
+              <p className="mb-3">
+                <Badge tone="warning" icon={TriangleAlert}>{t("plants.detail.frostHarvest", { date: formatDate(frostHarvest) })}</Badge>
+              </p>
+            )}
             {phases.length > 0 ? (
               <SeasonStrip phases={phases} frost={frost} />
             ) : (
@@ -421,82 +434,7 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
             )}
           </Card>
 
-        </div>
-
-        <div className="space-y-6">
-          {/* Beds, harvests and seeds of this crop in one list: three half-empty cards
-              (each with its own button repeating the header actions) read as noise. */}
-          <List header={t("plants.detail.yourStock")}>
-            {locations.length > 0 ? locations.map((loc) => (
-              <ListRow
-                key={loc.key}
-                leading={<EnvironmentChip type={loc.env} />}
-                title={loc.bedName}
-                meta={gardens.length > 1 ? loc.gardenName : undefined}
-                trailing={t("plants.detail.plantCount", { count: loc.count })}
-                onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
-              />
-            )) : (
-              // Every row of this list is tappable (chevron), so none looks disabled.
-              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} onClick={hasBeds ? goPlanner : undefined} />
-            )}
-            <ListRow
-              muted={harvestStats.count === 0}
-              leading={<StockTile icon={Apple} />}
-              title={t("plants.detail.yourHarvests")}
-              onClick={harvestStats.count > 0 ? () => navigate("/harvest") : goHarvest}
-              // Weight and count as meta parts, the last date on its own line: three parts
-              // wrapped in the narrow column and left a "·" hanging at the line end.
-              meta={harvestStats.count > 0
-                ? [formatWeight(harvestStats.grams), t("plants.detail.harvestEntries", { count: harvestStats.count })]
-                : t("plants.detail.noHarvests")}
-              description={harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : undefined}
-              // Nothing to harvest from while the crop stands in no bed (and none was harvested yet).
-              actions={locations.length > 0 || harvestStats.count > 0 ? <IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} /> : undefined}
-            />
-            {ownSeeds.length > 0 ? ownSeeds.map((s) => (
-              <ListRow
-                key={s.id}
-                leading={<StockTile icon={Package} />}
-                title={s.variety || t("plants.detail.seedStock")}
-                meta={[t(`seeds.unitCount.${s.unit}`, { count: s.quantity, n: formatNumber(s.quantity) }), String(s.yearAcquired)]}
-                onClick={() => navigate("/seeds")}
-              />
-            )) : (
-              <ListRow muted leading={<StockTile icon={Package} />} title={t("plants.detail.seedStock")} meta={t("plants.detail.noSeeds")} onClick={goSeeds} />
-            )}
-          </List>
-
-          {hasStorageInfo && (
-            <Card>
-              <CardHeader title={t("plants.detail.storage")} />
-              {plant.preservationMethods && plant.preservationMethods.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {plant.preservationMethods.map((m) => (
-                    <Badge key={m} variant="outline">{t(`preservation.methods.${m}`)}</Badge>
-                  ))}
-                </div>
-              )}
-              {plant.seedSaving && (
-                <div className={plant.preservationMethods?.length ? "mt-4 border-t border-gray-100 pt-4 dark:border-white/5" : ""}>
-                  <p className="flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-200">
-                    <Leaf size={16} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
-                    {t("preservation.seedSaving")}
-                    <Badge tone={plant.seedSaving.difficulty === "easy" ? "positive" : plant.seedSaving.difficulty === "moderate" ? "neutral" : "warning"}>
-                      {t(`preservation.difficulty.${plant.seedSaving.difficulty}`)}
-                    </Badge>
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {t("plants.detail.viability", { count: plant.seedSaving.seedViabilityYears })}
-                    {plant.seedSaving.isolationDistanceM !== undefined && plant.seedSaving.isolationDistanceM > 0 && (
-                      <> · {t("plants.detail.isolation", { distance: formatNumber(plant.seedSaving.isolationDistanceM) })}</>
-                    )}
-                  </p>
-                </div>
-              )}
-            </Card>
-          )}
-
+          {/* Partners under the year plan, so both columns end at about the same height on wide screens. */}
           <Card>
             <CardHeader
               title={t("plants.detail.partners")}
@@ -532,6 +470,101 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
               </div>
             )}
           </Card>
+        </div>
+
+        <div className="space-y-6">
+          {/* Beds, harvests and seeds of this crop in one list: three half-empty cards
+              (each with its own button repeating the header actions) read as noise. */}
+          {locations.length === 0 && harvestStats.count === 0 && ownSeeds.length === 0 ? (
+            // Nothing yet: one muted line instead of three empty rows.
+            <Card padding="sm">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("plants.detail.yourStock")}</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("plants.detail.stockEmpty", { plant: getPlantName(plant.id) })}</p>
+              <Button variant="ghost" size="sm" className="-ml-2 mt-1" onClick={goSeeds}>
+                <Plus size={16} aria-hidden="true" />
+                {t("plants.addSeeds")}
+              </Button>
+            </Card>
+          ) : (
+          <List header={t("plants.detail.yourStock")}>
+            {locations.length > 0 ? locations.map((loc) => (
+              <ListRow
+                key={loc.key}
+                leading={<EnvironmentChip type={loc.env} />}
+                title={loc.bedName}
+                meta={gardens.length > 1 ? loc.gardenName : undefined}
+                trailing={t("plants.detail.plantCount", { count: loc.count })}
+                onClick={() => navigate(`/planner?bed=${encodeURIComponent(loc.key)}`)}
+              />
+            )) : (
+              // Every row of this list is tappable (chevron), so none looks disabled.
+              <ListRow muted leading={<StockTile icon={LayoutGrid} />} title={t("plants.detail.notPlanted")} onClick={hasBeds ? goPlanner : undefined} />
+            )}
+            <ListRow
+              muted={harvestStats.count === 0}
+              leading={<StockTile icon={Apple} />}
+              title={t("plants.detail.yourHarvests")}
+              onClick={harvestStats.count > 0 ? () => navigate("/harvest") : goHarvest}
+              // Weight and count as meta parts, the last date on its own line: three parts
+              // wrapped in the narrow column and left a "·" hanging at the line end.
+              meta={harvestStats.count > 0
+                ? [formatWeight(harvestStats.grams), t("plants.detail.harvestEntries", { count: harvestStats.count }), harvestStats.last ? t("plants.detail.lastHarvest", { date: formatDate(harvestStats.last, "relativeInline") }) : null]
+                : t("plants.detail.noHarvests")}
+              // Nothing to harvest from while the crop stands in no bed (and none was harvested yet).
+              actions={locations.length > 0 || harvestStats.count > 0 ? <IconButton icon={Plus} label={t("plants.logHarvest")} onClick={goHarvest} /> : undefined}
+            />
+            {ownSeeds.length > 0 ? ownSeeds.map((s, i) => (
+              <ListRow
+                key={s.id}
+                // The add action sits on the first seed row (the header has no action slot).
+                actions={i === 0 ? <IconButton icon={Plus} label={t("plants.addSeeds")} onClick={goSeeds} /> : undefined}
+                leading={<StockTile icon={Package} />}
+                title={s.variety || t("plants.detail.seedStock")}
+                meta={[t(`seeds.unitCount.${s.unit}`, { count: s.quantity, n: formatNumber(s.quantity) }), String(s.yearAcquired)]}
+                onClick={() => navigate("/seeds")}
+              />
+            )) : (
+              <ListRow
+                muted
+                leading={<StockTile icon={Package} />}
+                title={t("plants.detail.seedStock")}
+                meta={t("plants.detail.noSeeds")}
+                actions={<IconButton icon={Plus} label={t("plants.addSeeds")} onClick={goSeeds} />}
+              />
+            )}
+          </List>
+          )}
+
+          {hasStorageInfo && (
+            <Card>
+              <CardHeader title={t("plants.detail.storage")} />
+              {plant.preservationMethods && plant.preservationMethods.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {plant.preservationMethods.map((m) => (
+                    <Badge key={m} variant="outline">{t(`preservation.methods.${m}`)}</Badge>
+                  ))}
+                </div>
+              )}
+              {plant.seedSaving && (
+                <div className={plant.preservationMethods?.length ? "mt-4 border-t border-gray-100 pt-4 dark:border-white/5" : ""}>
+                  <p className="flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-200">
+                    <Leaf size={16} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
+                    {t("preservation.seedSaving")}
+                    <Badge tone={plant.seedSaving.difficulty === "easy" ? "positive" : plant.seedSaving.difficulty === "moderate" ? "neutral" : "warning"}>
+                      {t(`preservation.difficulty.${plant.seedSaving.difficulty}`)}
+                    </Badge>
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    {t("plants.detail.viability", { count: plant.seedSaving.seedViabilityYears })}
+                    {plant.seedSaving.isolationDistanceM !== undefined && plant.seedSaving.isolationDistanceM > 0 && (
+                      <> · {t("plants.detail.isolation", { distance: formatNumber(plant.seedSaving.isolationDistanceM) })}</>
+                    )}
+                  </p>
+                </div>
+              )}
+            </Card>
+          )}
+
         </div>
       </div>
     </div>

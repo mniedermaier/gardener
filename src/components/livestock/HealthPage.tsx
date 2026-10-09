@@ -33,6 +33,21 @@ const VACC_GROUP: Partial<Record<AnimalType, "chicken" | "poultry" | "rabbit" | 
   chicken: "chicken", duck: "poultry", quail: "poultry", rabbit: "rabbit", goat: "ruminant", sheep: "ruminant",
 };
 
+/** First sentence of the vaccination note; the rest behind "Mehr". */
+function VaccNote({ text, moreLabel }: { text: string; moreLabel: string }) {
+  const cut = text.indexOf(". ");
+  if (cut < 0) return <p className="mt-1 max-w-2xl text-xs text-gray-600 dark:text-gray-300">{text}</p>;
+  return (
+    <details className="group mt-1 max-w-2xl text-xs text-gray-600 dark:text-gray-300">
+      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        {text.slice(0, cut + 1)}{" "}
+        <span className="font-medium text-garden-700 group-open:hidden dark:text-garden-300">{moreLabel}</span>
+      </summary>
+      <p className="mt-1">{text.slice(cut + 2)}</p>
+    </details>
+  );
+}
+
 export function HealthPage() {
   const now = useToday();
   const { t } = useTranslation();
@@ -134,10 +149,12 @@ export function HealthPage() {
                     ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") })
                     : t("livestock.health.vaccScopeHint"),
                 }] : []),
-                { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: stats.losses === 0 ? t("livestock.health.noLosses") : undefined },
+                { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: undefined },
               ]}
             />
           )}
+          {/* The vaccination rule, right under the figure it explains. */}
+          {stats.vaccinable > 0 && <HowCalculated>{t("livestock.health.dueHow", { days: VACCINATION_INTERVAL_DAYS })}</HowCalculated>}
 
           {stats.due.length > 0 && (
             <div className="space-y-2">
@@ -158,7 +175,7 @@ export function HealthPage() {
                           {lastDate ? t("livestock.health.lastVaccination", { date: f.formatDate(lastDate, "short") }) : t("livestock.health.neverVaccinated")}
                         </p>
                         {/* What is actually due for this species, so a hobby keeper can judge the hint. */}
-                        <p className="mt-1 max-w-2xl text-xs text-gray-600 dark:text-gray-300">{t(`livestock.health.vaccContext.${VACC_GROUP[animal.type] ?? "other"}`)}</p>
+                        <VaccNote text={t(`livestock.health.vaccContext.${VACC_GROUP[animal.type] ?? "other"}`)} moreLabel={t("common.more")} />
                       </div>
                       <Button size="sm" variant="secondary" className="shrink-0 self-start sm:self-auto" onClick={() => setDialog({ open: true, animalId, type: "vaccination" })}>
                         <Plus size={14} aria-hidden="true" />
@@ -169,8 +186,6 @@ export function HealthPage() {
                 })}
               </ul>
             </Card>
-            {/* The rule behind the hint, directly under the card it explains (not inside the warning). */}
-            <HowCalculated>{t("livestock.health.dueHow", { days: VACCINATION_INTERVAL_DAYS })}</HowCalculated>
             </div>
           )}
 

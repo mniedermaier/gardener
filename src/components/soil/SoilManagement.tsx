@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAddBed } from "@/hooks/useAddBed";
 import {
-  Beaker, LayoutGrid, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
-} from "lucide-react";
+  Beaker, LayoutGrid, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon, CalendarClock } from "lucide-react";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
 import { useFormat } from "@/hooks/useFormat";
@@ -246,8 +245,16 @@ export function SoilManagement() {
             />
           </Card>
         ) : (
-          // Row order (read across, like every other grid); items-start keeps short cards short.
-          <div className="grid items-start gap-4 md:grid-cols-2">
+          // One full-width card per bed (N/P/K side by side on wide screens): a two-column
+          // grid of cards with different heights left ragged gaps.
+          <div className="space-y-4">
+            {sortedTests.some((s) => staleTest(s.date)) && (
+              // Old tests are said once for the page, not as a badge on every card.
+              <p className="flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
+                <CalendarClock size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+                {t("soil.staleHint", { count: sortedTests.filter((s) => staleTest(s.date)).length })}
+              </p>
+            )}
             {sortedTests.map((s) => {
               const assessment = assessPh(s.ph, beds.byId.get(s.bedId)?.plantIds ?? []);
               const { advice, target } = assessment;
@@ -271,8 +278,6 @@ export function SoilManagement() {
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         <time dateTime={s.date}>{formatDate(s.date)}</time>
                       </p>
-                      {/* Values drift over a season: an old test says so, on its own line. */}
-                      {staleTest(s.date) && <Badge tone="warning" size="sm" className="mt-1">{t("soil.staleTest")}</Badge>}
                     </div>
                     <div className="relative z-10 -mt-1 -mr-2">
                       <Menu
@@ -311,7 +316,7 @@ export function SoilManagement() {
                     </span>
                   </p>
 
-                  <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3">
+                  <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-4">
                     {NUTRIENTS.map((n) => {
                       const value = n === "nitrogen" ? s.nitrogen : n === "phosphorus" ? s.phosphorus : n === "potassium" ? s.potassium : s.organicMatter;
                       // 0 ppm means "not measured" (the fields are optional).
@@ -322,8 +327,8 @@ export function SoilManagement() {
                         <div key={n}>
                           <dt className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>{t(`soil.nutrients.${n}`)}</span>
-                            {/* Same status language as the pH badge above. */}
-                            <Badge size="sm" dot tone={level === "optimal" ? "positive" : "warning"}>{t(`soil.levels.${level}`)}</Badge>
+                            {/* Same status language as the pH badge: too much is a warning, too little a cooler "info". */}
+                            <Badge size="sm" dot tone={level === "optimal" ? "positive" : level === "high" ? "warning" : "info"}>{t(`soil.levels.${level}`)}</Badge>
                           </dt>
                           <dd className="mt-0.5">
                             <span className="text-sm font-medium text-gray-900 tabular-nums dark:text-gray-100">{nutrientValue(n, value)}</span>

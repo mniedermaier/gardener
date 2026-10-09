@@ -327,10 +327,13 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
             <ChevronRight size={16} aria-hidden="true" />
           </Button>
         </div>
-        {/* Quick picks: square-cornered outline chips, so they never look like the section-tab pills. */}
-        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
-          {/* The active plant is already in the select: no second, highlighted copy of it here. */}
-          {QUICK_PICKS.filter((id) => names.has(id) && id !== selected.id).map((id) => (
+        {/* Quick picks: the crops in the beds (common crops without beds), captioned so they
+            are not read as companion results. The active plant is already in the select. */}
+        <p className="mt-3 mb-1.5 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          {t(bedsByPlant.size > 0 ? "companions.quickInGarden" : "companions.quickCommon")}
+        </p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
+          {(bedsByPlant.size > 0 ? [...bedsByPlant.keys()] : QUICK_PICKS).filter((id) => names.has(id) && id !== selected.id).slice(0, 8).map((id) => (
             <button
               key={id}
               type="button"

@@ -69,7 +69,7 @@ export const SERIES_TEXT: Record<SeriesColor, string> = {
   earth: "text-earth-300 dark:text-earth-400",
   sky: "text-water-400 dark:text-water-300",
   muted: "text-gray-300 dark:text-gray-600",
-  rain: "text-water-500 dark:text-water-300",
+  rain: "text-water-500 dark:text-water-200",
 };
 
 /** Rough width of an 11 px axis label in px (Inter, tabular figures). */

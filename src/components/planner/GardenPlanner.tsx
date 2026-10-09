@@ -791,11 +791,9 @@ export function GardenPlanner() {
                   title={t("planner.emptyBedsTitle")}
                   description={pointerFine ? t("planner.emptyBedsTextClick") : t("planner.emptyBedsText")}
                   action={<Button onClick={() => setBedDialog({ open: true })}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
+                  // A second garden right after creating the first only distracts; importing a shared bed plan stays.
                   secondaryAction={gardens.length > 1 ? undefined : (
-                    <span className="flex flex-wrap justify-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => setNewGardenOpen(true)}><Plus size={16} aria-hidden="true" />{t("planner.newGarden")}</Button>
-                      <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}><Upload size={16} aria-hidden="true" />{t("planner.importFile")}</Button>
-                    </span>
+                    <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}><Upload size={16} aria-hidden="true" />{t("planner.importFile")}</Button>
                   )}
                 />
               </Card>

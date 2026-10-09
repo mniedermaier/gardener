@@ -231,6 +231,8 @@ export function WaterTracker() {
                 values: [w.water, w.rain],
               }))}
               formatValue={formatVolume}
+              // The last bar is the current week, marked like every other time chart.
+              marker={data.chart.length > 0 ? { index: data.chart.length - 1, label: t("charts.today") } : undefined}
             />
           </Card>
 

@@ -242,7 +242,7 @@ export const GardenMap = memo(function GardenMap({ garden, now, harvestReady, fr
                         </span>
                       )}
                     </span>
-                    <span className="mt-1.5 line-clamp-2 hyphens-auto break-words text-center text-xs leading-tight font-medium text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-gray-50">
+                    <span title={bed.name} className="mt-1.5 block w-full truncate text-center text-xs leading-tight font-medium text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-gray-50">
                       {bed.name}
                     </span>
                   </Link>

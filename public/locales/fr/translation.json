@@ -837,10 +837,12 @@
       "seasonDescProtected_many": "Dates pour {{place}} : {{count}} semaines plus tôt qu’en plein champ.",
       "sowNow": "Semer maintenant, jusqu’au {{date}}",
       "nextSowing": "Prochain semis dès le {{date}}",
-      "hatchLegend": "Hachuré : sous abri",
+      "hatchLegend": "Hachuré : semis à l’abri",
       "bedFirstHint": "Ajoute une planche, puis place {{plant}} directement.",
       "sowNoteBedFirst": "{{note}} – ajoutez une planche d’ici là",
-      "yieldPerPlant": "≈ {{value}} par plante à espacement complet"
+      "yieldPerPlant": "≈ {{value}} par plante à espacement complet",
+      "frostHarvest": "Gel dès le {{date}} – récolter maintenant",
+      "stockEmpty": "{{plant}} n’est encore dans aucune planche, sans récolte ni semences."
     },
     "sowNowFilter": "À semer"
   },
@@ -1016,8 +1018,8 @@
     "notesPlaceholder": "p. ex. outils, rappels…",
     "afterFrostWindow": "après les nuits de gel : {{range}}",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
-    "untilByBed": "jusqu’au {{date}} (selon la planche)",
-    "fromByBed": "à partir du {{date}} (selon la planche)"
+    "untilByBed": "jusqu’au {{date}} ({{bed}})",
+    "fromByBed": "à partir du {{date}} ({{bed}})"
   },
   "settings": {
     "title": "Paramètres",
@@ -1365,7 +1367,6 @@
     "edit": "Modifier le stock",
     "emptyTitle": "Le garde-manger est vide",
     "emptyText": "Notez ce que vous mettez en conserve, congelez ou stockez. Vous verrez d’un coup d’œil ce qui arrive à échéance.",
-    "showGuides": "Voir les guides",
     "withinDays_one": "dans le prochain {{count}} jour",
     "withinDays_other": "dans les {{count}} prochains jours",
     "emptyFilter": "Aucun stock avec cette méthode.",
@@ -1483,7 +1484,8 @@
     "byCaloriesLabel": "En calories",
     "byCaloriesHint": "avec produits animaux · autonomie",
     "rowMissing": "{{kg}} manquants",
-    "rowExtraArea": "+{{area}}"
+    "rowExtraArea": "+{{area}}",
+    "rowCovered": "Objectif atteint selon la prévision"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -1656,7 +1658,7 @@
     "animalNotFound": "Animal non trouvé.",
     "days": "jours",
     "totalCosts": "Coûts totaux",
-    "productionValue": "Valeur de production",
+    "productionValue": "Valeur de la production",
     "perEgg": "œuf",
     "deleteAnimal": "Supprimer l'animal",
     "noJournal": "Relie des entrées du journal à cet animal et elles apparaîtront ici.",
@@ -1668,11 +1670,11 @@
       "allProducts": "Tous les produits",
       "subtitle": "Œufs, miel et autres productions de vos animaux.",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici œufs, miel ou lait, avec totaux hebdomadaires et évolution.",
-      "yearHint": "~{{amount}} attendus à ce jour",
+      "yearHint": "attendus ~{{amount}} (à ce jour)",
       "emptyTitle": "Œufs et miel en un coup d’œil",
       "entries": "Saisies",
       "notesPlaceholder": "p. ex. météo, pause de ponte…",
-      "yearHintSince": "~{{amount}} attendus depuis le {{date}}"
+      "yearHintSince": "attendus ~{{amount}} (depuis le {{date}})"
     },
     "feed": {
       "title": "Alimentation",
@@ -1704,7 +1706,6 @@
       "lastVaccination": "Dernier vaccin {{date}}",
       "logVaccination": "Saisir un vaccin",
       "lastEntry": "Dernière entrée : {{date}}",
-      "noLosses": "aucune perte enregistrée",
       "vaccContext": {
         "chicken": "Poules : en Allemagne, la vaccination contre la maladie de Newcastle (ND) est obligatoire. L’intervalle dépend du vaccin. Les poussins d’écloserie sont souvent déjà vaccinés contre Marek.",
         "poultry": "Canards et cailles : pas d’obligation, mais le vaccin ND est recommandé. L’intervalle dépend du vaccin.",
@@ -1868,7 +1869,7 @@
     "weekShort": "Sem. {{week}}",
     "showEntries": "afficher les entrées",
     "hideEntries": "masquer les entrées",
-    "ofExpectedToDate": "sur ~{{amount}} attendus à ce jour",
+    "ofExpectedToDate": "attendus ~{{amount}} (à ce jour)",
     "productThisYear": "{{product}} cette année",
     "eggWeeksLabel": "Œufs par 7 jours sur les 8 dernières semaines, moy. {{avg}}",
     "eggWeeksAvg": "Moy. {{avg}}/semaine · 8 semaines",
@@ -1889,7 +1890,7 @@
       "death": "p. ex. renard, vieillesse…",
       "other": "p. ex. parage des onglons"
     },
-    "ofExpectedSince": "sur ~{{amount}} attendus depuis le {{date}}",
+    "ofExpectedSince": "attendus ~{{amount}} (depuis le {{date}})",
     "quantityIn": "Quantité ({{unit}})",
     "singleEntries": "Saisies individuelles",
     "singleEntriesRange_one": "dernier mois",
@@ -2080,7 +2081,9 @@
     "moreMeasures_many": "{{count}} autres mesures",
     "notesPlaceholder": "p. ex. météo, incorporé…",
     "testNotesPlaceholder": "p. ex. prélèvement, laboratoire…",
-    "staleTest": "Plus de 5 mois – refaire l’analyse"
+    "staleHint_one": "{{count}} analyse date de plus de 5 mois – à refaire au printemps.",
+    "staleHint_other": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps.",
+    "staleHint_many": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps."
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -2259,7 +2262,9 @@
     "fromHealthLog": "dont {{amount}} du suivi santé",
     "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés.",
     "fromFeedBook": "du carnet d’alimentation",
-    "fromHealthBook": "du carnet de santé"
+    "fromHealthBook": "du carnet de santé",
+    "openFeedBook": "Ouvrir dans le carnet d’alimentation",
+    "openHealthBook": "Ouvrir dans la santé"
   },
   "succession": {
     "pick": "Choisir une culture",
@@ -2375,7 +2380,8 @@
     "examplePlaceholder": "p. ex. {{value}}",
     "optionalMark": "(facultatif)",
     "notesPlaceholder": "p. ex. observations, variété, météo…",
-    "costHint": "Compte dans le bilan sous Coûts."
+    "costHint": "Compte dans le bilan sous Coûts.",
+    "more": "Plus"
   },
   "companions": {
     "title": "Associations",
@@ -2412,7 +2418,9 @@
     "scopeAll": "Toutes",
     "scrollLeft": "Défiler vers la gauche",
     "scrollRight": "Défiler vers la droite",
-    "quickPick": "Cultures courantes"
+    "quickPick": "Cultures courantes",
+    "quickInGarden": "Au jardin",
+    "quickCommon": "Courantes"
   },
   "water": {
     "title": "Arrosage",

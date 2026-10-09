@@ -11,7 +11,7 @@ import { PhaseBadge, actionPhase } from "@/components/ui/phase";
 import { Badge } from "@/components/ui/Badge";
 import { useFrostHold } from "@/hooks/useFrostHold";
 import { isFrostSensitive } from "@/lib/weatherAlerts";
-import { addDays } from "date-fns";
+import { addDays, differenceInCalendarDays } from "date-fns";
 
 /**
  * Rows of the sowing agenda (`useSowingAgenda`): what can be sown or planted
@@ -56,13 +56,23 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     } else {
       const dates = groups.map((g) => g.date.getTime());
       const outer = key === "until" ? Math.max(...dates) : Math.min(...dates);
-      when = t(`calendar.${key}ByBed`, { date: formatDate(new Date(outer), "short") });
+      // Name the bed that sets the outer date ("bis 15. Nov. (Gewächshaus)").
+      const setter = groups.find((g) => g.date.getTime() === outer)?.beds[0]?.name ?? "";
+      when = t(`calendar.${key}ByBed`, { date: formatDate(new Date(outer), "short"), bed: setter });
     }
     return [when, beds].filter((x): x is string => !!x);
   };
 
-  const items = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);
-  const shown = expanded ? items : items.slice(0, limit);
+  const all = useMemo(() => [...agendaRowsByPlant("now", now), ...agendaRowsByPlant("soon", soon)], [now, soon]);
+  // A window that leaves three days or less after the forecast frost is no real
+  // chance to plant out (lettuce in mid-October): drop it instead of advising it.
+  const items = all.filter((item) => {
+    const plant = plantMap.get(item.plantId);
+    if (!plant || !lastFrostNight || !frostBlocks(item, plant)) return true;
+    return differenceInCalendarDays(windowEnd(item), addDays(lastFrostNight, 1)) >= 3;
+  });
+  // "1 weitere anzeigen" hides almost nothing: show everything then.
+  const shown = expanded || items.length <= limit + 1 ? items : items.slice(0, limit);
   const hidden = items.length - shown.length;
 
   return (

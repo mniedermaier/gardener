@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Apple, Beef, Citrus, LayoutGrid, Lightbulb, Sprout, Target, Wheat, Archive } from "lucide-react";
+import { Apple, Beef, Citrus, Lightbulb, Sprout, Target, Wheat, Archive, Plus } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -27,6 +27,7 @@ import { IconTile, formatProductAmount } from "@/components/livestock/shared";
 import { HouseholdSizeField } from "./HouseholdSizeField";
 import { PreservationGuide } from "./PreservationGuide";
 import { useToday } from "@/hooks/useToday";
+import { useAddBed } from "@/hooks/useAddBed";
 import { roundShares } from "@/lib/format";
 
 type View = "overview" | "crops" | "animals" | "preserve";
@@ -42,6 +43,7 @@ export function SufficiencyDashboard() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
+  const addBed = useAddBed();
   const { gardens, gridCellSizeCm, lastFrostDate, animals, pantryItems, harvests } = useStore(
     useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, lastFrostDate: s.lastFrostDate, animals: s.animals, pantryItems: s.pantryItems, harvests: s.harvests })),
   );
@@ -101,8 +103,9 @@ export function SufficiencyDashboard() {
             icon={Target}
             title={t("sufficiency.emptyTitle")}
             description={t("sufficiency.emptyText", { count: householdSize, kcal: f.formatNumber(DAILY_KCAL_PER_PERSON * householdSize, { maximumFractionDigits: 0 }) })}
-            action={<Button onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("sufficiency.toPlanner")}</Button>}
-            secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock")}>{t("sufficiency.toLivestock")}</Button>}
+            // Same first step as every page without beds: "Beet hinzufügen" opens the planner's dialog.
+            action={<Button onClick={addBed}><Plus size={16} aria-hidden="true" />{t("planner.addBed")}</Button>}
+            secondaryAction={<Button variant="ghost" onClick={() => navigate("/livestock", { state: { openAdd: true } })}>{t("livestock.addAnimal")}</Button>}
           />
         </Card>
       </div>

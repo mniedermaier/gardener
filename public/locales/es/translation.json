@@ -837,10 +837,12 @@
       "seasonDescProtected_many": "Fechas para {{place}}: {{count}} semanas antes que al aire libre.",
       "sowNow": "Siembra ahora, hasta el {{date}}",
       "nextSowing": "Próxima siembra desde el {{date}}",
-      "hatchLegend": "Rayado: bajo cubierta",
+      "hatchLegend": "Rayado: semillero en casa",
       "bedFirstHint": "Crea un bancal y podrás planificar {{plant}} enseguida.",
       "sowNoteBedFirst": "{{note}} – crea un bancal antes",
-      "yieldPerPlant": "≈ {{value}} por planta con marco completo"
+      "yieldPerPlant": "≈ {{value}} por planta con marco completo",
+      "frostHarvest": "Helada desde el {{date}}: cosecha ya",
+      "stockEmpty": "{{plant}} aún no está en ningún bancal y no hay cosechas ni semillas."
     },
     "sowNowFilter": "Sembrar ahora"
   },
@@ -1016,8 +1018,8 @@
     "notesPlaceholder": "p. ej. herramientas, avisos…",
     "afterFrostWindow": "tras las noches de helada: {{range}}",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
-    "untilByBed": "hasta el {{date}} (según el bancal)",
-    "fromByBed": "desde el {{date}} (según el bancal)"
+    "untilByBed": "hasta el {{date}} ({{bed}})",
+    "fromByBed": "desde el {{date}} ({{bed}})"
   },
   "settings": {
     "title": "Ajustes",
@@ -1365,7 +1367,6 @@
     "edit": "Editar existencia",
     "emptyTitle": "La despensa está vacía",
     "emptyText": "Registra lo que envasas, congelas o almacenas. Verás de un vistazo lo que está a punto de caducar.",
-    "showGuides": "Ver guías",
     "withinDays_one": "en el próximo {{count}} día",
     "withinDays_other": "en los próximos {{count}} días",
     "emptyFilter": "No hay existencias con este método.",
@@ -1483,7 +1484,8 @@
     "byCaloriesLabel": "Por calorías",
     "byCaloriesHint": "con productos animales · autosuficiencia",
     "rowMissing": "faltan {{kg}}",
-    "rowExtraArea": "+{{area}}"
+    "rowExtraArea": "+{{area}}",
+    "rowCovered": "Objetivo alcanzado según la previsión"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -1656,7 +1658,7 @@
     "animalNotFound": "Animal no encontrado.",
     "days": "días",
     "totalCosts": "Costos totales",
-    "productionValue": "Valor de producción",
+    "productionValue": "Valor de lo producido",
     "perEgg": "huevo",
     "deleteAnimal": "Eliminar animal",
     "noJournal": "Vincula entradas del diario a este animal y aparecerán aquí.",
@@ -1668,11 +1670,11 @@
       "allProducts": "Todos los productos",
       "subtitle": "Huevos, miel y otros rendimientos de tus animales.",
       "emptyText": "Añade primero un animal. Después registras aquí huevos, miel o leche y ves los totales semanales y la evolución.",
-      "yearHint": "~{{amount}} esperados hasta hoy",
+      "yearHint": "esperados ~{{amount}} (hasta hoy)",
       "emptyTitle": "Huevos y miel bajo control",
       "entries": "Registros",
       "notesPlaceholder": "p. ej. tiempo, pausa de puesta…",
-      "yearHintSince": "~{{amount}} esperados desde el {{date}}"
+      "yearHintSince": "esperados ~{{amount}} (desde el {{date}})"
     },
     "feed": {
       "title": "Alimento",
@@ -1704,7 +1706,6 @@
       "lastVaccination": "Última vacuna {{date}}",
       "logVaccination": "Registrar vacuna",
       "lastEntry": "Última entrada: {{date}}",
-      "noLosses": "sin bajas registradas",
       "vaccContext": {
         "chicken": "Gallinas: la vacuna contra la enfermedad de Newcastle (ND) es obligatoria en Alemania. El intervalo depende de la vacuna. Los pollitos de criadero suelen venir vacunados contra Marek.",
         "poultry": "Patos y codornices: no es obligatoria, pero se recomienda la vacuna ND. El intervalo depende de la vacuna.",
@@ -1868,7 +1869,7 @@
     "weekShort": "Sem. {{week}}",
     "showEntries": "mostrar entradas",
     "hideEntries": "ocultar entradas",
-    "ofExpectedToDate": "de ~{{amount}} esperados hasta hoy",
+    "ofExpectedToDate": "esperados ~{{amount}} (hasta hoy)",
     "productThisYear": "{{product}} este año",
     "eggWeeksLabel": "Huevos cada 7 días en las últimas 8 semanas, media {{avg}}",
     "eggWeeksAvg": "Media {{avg}}/semana · 8 semanas",
@@ -1889,7 +1890,7 @@
       "death": "p. ej. zorro, vejez…",
       "other": "p. ej. recorte de pezuñas"
     },
-    "ofExpectedSince": "de ~{{amount}} esperados desde el {{date}}",
+    "ofExpectedSince": "esperados ~{{amount}} (desde el {{date}})",
     "quantityIn": "Cantidad ({{unit}})",
     "singleEntries": "Registros individuales",
     "singleEntriesRange_one": "último mes",
@@ -2080,7 +2081,9 @@
     "moreMeasures_many": "{{count}} medidas más",
     "notesPlaceholder": "p. ej. tiempo, incorporado…",
     "testNotesPlaceholder": "p. ej. muestreo, laboratorio…",
-    "staleTest": "Más de 5 meses – volver a analizar"
+    "staleHint_one": "{{count}} análisis tiene más de 5 meses: repítelo en primavera.",
+    "staleHint_other": "{{count}} análisis tienen más de 5 meses: repítelos en primavera.",
+    "staleHint_many": "{{count}} análisis tienen más de 5 meses: repítelos en primavera."
   },
   "preservation": {
     "title": "Guía de conservación",
@@ -2259,7 +2262,9 @@
     "fromHealthLog": "incl. {{amount}} del registro de salud",
     "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado.",
     "fromFeedBook": "del registro de alimentación",
-    "fromHealthBook": "del registro de salud"
+    "fromHealthBook": "del registro de salud",
+    "openFeedBook": "Abrir en el registro de alimento",
+    "openHealthBook": "Abrir en salud"
   },
   "succession": {
     "pick": "Elegir cultivo",
@@ -2375,7 +2380,8 @@
     "examplePlaceholder": "p. ej. {{value}}",
     "optionalMark": "(opcional)",
     "notesPlaceholder": "p. ej. observaciones, variedad, tiempo…",
-    "costHint": "Cuenta en el balance de Costes."
+    "costHint": "Cuenta en el balance de Costes.",
+    "more": "Más"
   },
   "companions": {
     "title": "Asociaciones",
@@ -2412,7 +2418,9 @@
     "scopeAll": "Todos",
     "scrollLeft": "Desplazar a la izquierda",
     "scrollRight": "Desplazar a la derecha",
-    "quickPick": "Cultivos habituales"
+    "quickPick": "Cultivos habituales",
+    "quickInGarden": "En tu huerto",
+    "quickCommon": "Habituales"
   },
   "water": {
     "title": "Riego",

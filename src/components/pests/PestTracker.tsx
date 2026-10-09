@@ -199,11 +199,11 @@ export function PestTracker() {
                     badges={
                       <>
                         <Badge tone={SEVERITY_TONE[pest.severity]} dot>{t(`pests.severityLevel.${pest.severity}`)}</Badge>
-                        <Badge variant="outline" icon={pest.type === "pest" ? Bug : Microscope}>{t(`pests.types.${pest.type}`)}</Badge>
                         {pest.resolved && <Badge tone="positive" icon={Check}>{t("pests.resolvedLabel")}</Badge>}
                       </>
                     }
-                    meta={[plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")]}
+                    // The kind is the first meta part: one badge (severity) per row leaves the text its width.
+                    meta={[t(`pests.types.${pest.type}`), plant && getPlantName(pest.plantId), bedName, formatDate(pest.date, "relative")]}
                     // One running text (ListRow clamps it to 2 lines); "bio" is part of the
                     // treatment label instead of a badge that wraps onto its own line.
                     description={

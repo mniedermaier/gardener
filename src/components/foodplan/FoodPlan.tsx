@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
-import { ChevronDown, LayoutGrid, Target } from "lucide-react";
+import { useAddBed } from "@/hooks/useAddBed";
+import { ChevronDown, LayoutGrid, Target, Plus } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -28,6 +29,7 @@ export function FoodPlan() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
+  const addBed = useAddBed();
   const { gardens, gridCellSizeCm, harvests, animals } = useStore(
     useShallow((s) => ({ gardens: s.gardens, gridCellSizeCm: s.gridCellSizeCm, harvests: s.harvests, animals: s.animals })),
   );
@@ -79,8 +81,9 @@ export function FoodPlan() {
           />
           <div className="flex flex-col gap-3 rounded-xl border border-garden-200 bg-garden-50 p-4 sm:flex-row sm:items-center dark:border-garden-500/30 dark:bg-garden-500/10">
             <p className="min-w-0 flex-1 text-sm text-gray-700 dark:text-gray-300">{t("foodplan.emptyCta")}</p>
-            <Button onClick={() => navigate("/planner")} className="shrink-0">
-              <LayoutGrid size={16} aria-hidden="true" />
+            {/* Regular width (not stretched on phones): the hint is the content, the button its step. */}
+            <Button onClick={addBed} className="shrink-0 self-start sm:self-auto">
+              <Plus size={16} aria-hidden="true" />
               {t("planner.addBed")}
             </Button>
           </div>
@@ -157,7 +160,8 @@ export function FoodPlan() {
                       title={plantName(p.id)}
                       // No gap badge: the list is sorted by gap and the bar shows the forecast.
                       badges={covered ? <Badge tone="positive">{t("foodplan.covered")}</Badge> : undefined}
-                      meta={gap ? [t("foodplan.rowMissing", { kg: kg(r.deficitKg) }), t("foodplan.rowExtraArea", { area: f.formatArea(r.extraAreaM2) })] : undefined}
+                      // Covered rows keep a meta line too, so every row has the same height.
+                      meta={gap ? [t("foodplan.rowMissing", { kg: kg(r.deficitKg) }), t("foodplan.rowExtraArea", { area: f.formatArea(r.extraAreaM2) })] : covered ? t("foodplan.rowCovered") : undefined}
                       trailing={
                         // Fixed width: every bar in the list ends at the same x.
                         <span className="block w-24 text-right">

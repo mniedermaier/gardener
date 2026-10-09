@@ -293,7 +293,6 @@ export function PantryPage() {
               title={t("pantry.emptyTitle")}
               description={t("pantry.emptyText")}
               action={<Button onClick={openAddPlain}><Plus size={16} aria-hidden="true" />{t("pantry.add")}</Button>}
-              secondaryAction={<Button variant="ghost" onClick={() => setTab("guides")}>{t("pantry.showGuides")}</Button>}
             />
           </Card>
         ) : (

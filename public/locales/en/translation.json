@@ -813,10 +813,12 @@
       "seasonDescProtected_other": "Dates for {{place}}: {{count}} weeks earlier than in the open field.",
       "sowNow": "Sow now, until {{date}}",
       "nextSowing": "Next sowing from {{date}}",
-      "hatchLegend": "Hatched: under glass",
+      "hatchLegend": "Hatched: started indoors",
       "bedFirstHint": "Add a bed, then you can place {{plant}} right away.",
       "sowNoteBedFirst": "{{note}} – add a bed before then",
-      "yieldPerPlant": "≈ {{value}} per plant at full spacing"
+      "yieldPerPlant": "≈ {{value}} per plant at full spacing",
+      "frostHarvest": "Frost from {{date}} – harvest now",
+      "stockEmpty": "{{plant}} isn't in a bed yet, and there are no harvests or seeds."
     },
     "sowNowFilter": "Sow now"
   },
@@ -986,8 +988,8 @@
     "notesPlaceholder": "e.g. tools, reminders…",
     "afterFrostWindow": "after the frost nights: {{range}}",
     "timelineEmptyLine": "Your season plan needs a bed.",
-    "untilByBed": "until {{date}} (depending on bed)",
-    "fromByBed": "from {{date}} (depending on bed)"
+    "untilByBed": "until {{date}} ({{bed}})",
+    "fromByBed": "from {{date}} ({{bed}})"
   },
   "settings": {
     "title": "Settings",
@@ -1319,7 +1321,6 @@
     "edit": "Edit item",
     "emptyTitle": "The pantry is empty",
     "emptyText": "Log what you can, freeze or store. You will see at a glance what is about to expire.",
-    "showGuides": "View guides",
     "withinDays_one": "within the next {{count}} day",
     "withinDays_other": "within the next {{count}} days",
     "emptyFilter": "No items with this method.",
@@ -1420,7 +1421,8 @@
     "byCaloriesLabel": "By calories",
     "byCaloriesHint": "with animal products · self-sufficiency",
     "rowMissing": "{{kg}} short",
-    "rowExtraArea": "+{{area}}"
+    "rowExtraArea": "+{{area}}",
+    "rowCovered": "Target reached by the forecast"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -1585,7 +1587,7 @@
     "animalNotFound": "Animal not found.",
     "days": "days",
     "totalCosts": "Total costs",
-    "productionValue": "Production value",
+    "productionValue": "Value of yields",
     "perEgg": "egg",
     "deleteAnimal": "Delete animal",
     "noJournal": "Link journal entries to this animal and they'll show up here.",
@@ -1597,11 +1599,11 @@
       "allProducts": "All products",
       "subtitle": "Eggs, honey and other yields from your animals.",
       "emptyText": "Add an animal first. Then you log eggs, honey or milk here and see weekly totals and the trend.",
-      "yearHint": "~{{amount}} expected to date",
+      "yearHint": "expected ~{{amount}} (to date)",
       "emptyTitle": "Keep track of eggs and honey",
       "entries": "Entries",
       "notesPlaceholder": "e.g. weather, laying break…",
-      "yearHintSince": "~{{amount}} expected since {{date}}"
+      "yearHintSince": "expected ~{{amount}} (since {{date}})"
     },
     "feed": {
       "title": "Feed",
@@ -1632,7 +1634,6 @@
       "lastVaccination": "Last vaccination {{date}}",
       "logVaccination": "Log vaccination",
       "lastEntry": "Last entry: {{date}}",
-      "noLosses": "no losses recorded",
       "vaccContext": {
         "chicken": "Chickens: in Germany vaccination against Newcastle disease (ND) is mandatory. The interval depends on the vaccine. Hatchery chicks are often already vaccinated against Marek’s disease.",
         "poultry": "Ducks and quail: not mandatory, but ND vaccination is recommended. The interval depends on the vaccine.",
@@ -1782,7 +1783,7 @@
     "weekShort": "Week {{week}}",
     "showEntries": "show entries",
     "hideEntries": "hide entries",
-    "ofExpectedToDate": "of ~{{amount}} expected to date",
+    "ofExpectedToDate": "expected ~{{amount}} (to date)",
     "productThisYear": "{{product}} this year",
     "eggWeeksLabel": "Eggs per 7 days over the last 8 weeks, avg. {{avg}}",
     "eggWeeksAvg": "Avg. {{avg}}/week · 8 weeks",
@@ -1803,7 +1804,7 @@
       "death": "e.g. fox, old age…",
       "other": "e.g. hoof trimming"
     },
-    "ofExpectedSince": "of ~{{amount}} expected since {{date}}",
+    "ofExpectedSince": "expected ~{{amount}} (since {{date}})",
     "quantityIn": "Quantity ({{unit}})",
     "singleEntries": "Individual entries",
     "singleEntriesRange_one": "last month",
@@ -1987,7 +1988,8 @@
     "moreMeasures_other": "{{count}} more measures",
     "notesPlaceholder": "e.g. weather, worked in…",
     "testNotesPlaceholder": "e.g. sampling spot, lab…",
-    "staleTest": "Older than 5 months – test again"
+    "staleHint_one": "{{count}} soil test is older than 5 months – retest in spring.",
+    "staleHint_other": "{{count}} soil tests are older than 5 months – retest in spring."
   },
   "preservation": {
     "title": "Preservation guide",
@@ -2159,7 +2161,9 @@
     "fromFeedLog": "incl. {{amount}} from the feed log",
     "fromHealthLog": "incl. {{amount}} from health records",
     "fromFeedBook": "from the feed log",
-    "fromHealthBook": "from the health record"
+    "fromHealthBook": "from the health record",
+    "openFeedBook": "Open in feed log",
+    "openHealthBook": "Open in health log"
   },
   "succession": {
     "pick": "Pick a crop",
@@ -2271,7 +2275,8 @@
     "examplePlaceholder": "e.g. {{value}}",
     "optionalMark": "(optional)",
     "notesPlaceholder": "e.g. observations, variety, weather…",
-    "costHint": "Counts towards the balance under Costs."
+    "costHint": "Counts towards the balance under Costs.",
+    "more": "More"
   },
   "companions": {
     "title": "Companions",
@@ -2305,7 +2310,9 @@
     "scopeAll": "All",
     "scrollLeft": "Scroll left",
     "scrollRight": "Scroll right",
-    "quickPick": "Common crops"
+    "quickPick": "Common crops",
+    "quickInGarden": "In your garden",
+    "quickCommon": "Common"
   },
   "water": {
     "title": "Watering",

@@ -813,10 +813,12 @@
       "seasonDescProtected_other": "Termine für {{place}}: {{count}} Wochen früher als im Freiland.",
       "sowNow": "Jetzt säen, bis {{date}}",
       "nextSowing": "Nächste Aussaat ab {{date}}",
-      "hatchLegend": "Schraffiert: unter Glas",
+      "hatchLegend": "Schraffiert: Vorziehen im Haus",
       "bedFirstHint": "Lege ein Beet an, dann planst du {{plant}} direkt ein.",
       "sowNoteBedFirst": "{{note}} – lege bis dahin ein Beet an",
-      "yieldPerPlant": "≈ {{value}} pro Pflanze mit vollem Abstand"
+      "yieldPerPlant": "≈ {{value}} pro Pflanze mit vollem Abstand",
+      "frostHarvest": "Frost ab {{date}} – jetzt abernten",
+      "stockEmpty": "{{plant}} steht noch in keinem Beet, Ernten und Saatgut fehlen noch."
     },
     "sowNowFilter": "Jetzt säen"
   },
@@ -986,8 +988,8 @@
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
     "afterFrostWindow": "nach den Frostnächten: {{range}}",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
-    "untilByBed": "bis {{date}} (je nach Beet)",
-    "fromByBed": "ab {{date}} (je nach Beet)"
+    "untilByBed": "bis {{date}} ({{bed}})",
+    "fromByBed": "ab {{date}} ({{bed}})"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1319,7 +1321,6 @@
     "edit": "Vorrat bearbeiten",
     "emptyTitle": "Die Vorratskammer ist leer",
     "emptyText": "Trage ein, was du einkochst, einfrierst oder einlagerst. Ablaufende Vorräte siehst du dann auf einen Blick.",
-    "showGuides": "Anleitungen ansehen",
     "withinDays_one": "in den nächsten {{count}} Tag",
     "withinDays_other": "in den nächsten {{count}} Tagen",
     "emptyFilter": "Keine Vorräte mit dieser Methode.",
@@ -1420,7 +1421,8 @@
     "byCaloriesLabel": "Nach Kalorien",
     "byCaloriesHint": "mit Tierprodukten · Selbstversorgung",
     "rowMissing": "fehlen {{kg}}",
-    "rowExtraArea": "+{{area}}"
+    "rowExtraArea": "+{{area}}",
+    "rowCovered": "Ziel laut Prognose erreicht"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -1585,7 +1587,7 @@
     "animalNotFound": "Tier nicht gefunden.",
     "days": "Tage",
     "totalCosts": "Gesamtkosten",
-    "productionValue": "Produktionswert",
+    "productionValue": "Wert der Erträge",
     "perEgg": "Ei",
     "deleteAnimal": "Tier löschen",
     "noJournal": "Verknüpfe Tagebucheinträge mit diesem Tier, dann erscheinen sie hier.",
@@ -1597,11 +1599,11 @@
       "allProducts": "Alle Produkte",
       "subtitle": "Eier, Honig und andere Erträge deiner Tiere.",
       "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Eier, Honig oder Milch und siehst Wochensummen und Verlauf.",
-      "yearHint": "~{{amount}} bis heute erwartet",
+      "yearHint": "erwartet ~{{amount}} (bis heute)",
       "emptyTitle": "Eier und Honig im Blick",
       "entries": "Einträge",
       "notesPlaceholder": "z. B. Wetter, Legepause …",
-      "yearHintSince": "~{{amount}} seit {{date}} erwartet"
+      "yearHintSince": "erwartet ~{{amount}} (seit {{date}})"
     },
     "feed": {
       "title": "Futter",
@@ -1632,7 +1634,6 @@
       "lastVaccination": "Letzte Impfung {{date}}",
       "logVaccination": "Impfung erfassen",
       "lastEntry": "Letzter Eintrag: {{date}}",
-      "noLosses": "keine Verluste erfasst",
       "vaccContext": {
         "chicken": "Hühner: Die Impfung gegen die Newcastle-Krankheit (ND) ist in Deutschland Pflicht. Den Abstand gibt der Impfstoff vor. Küken aus der Brüterei sind oft schon gegen Marek geimpft.",
         "poultry": "Enten und Wachteln: keine Impfpflicht, ND-Impfung wird aber empfohlen. Den Abstand gibt der Impfstoff vor.",
@@ -1782,7 +1783,7 @@
     "weekShort": "KW {{week}}",
     "showEntries": "Einträge anzeigen",
     "hideEntries": "Einträge ausblenden",
-    "ofExpectedToDate": "von ~{{amount}} bis heute erwartet",
+    "ofExpectedToDate": "erwartet ~{{amount}} (bis heute)",
     "productThisYear": "{{product}} dieses Jahr",
     "eggWeeksLabel": "Eier je 7 Tage, letzte 8 Wochen, Ø {{avg}}",
     "eggWeeksAvg": "Ø {{avg}}/Woche · 8 Wochen",
@@ -1803,7 +1804,7 @@
       "death": "z. B. Fuchs, Alter …",
       "other": "z. B. Klauenpflege"
     },
-    "ofExpectedSince": "von ~{{amount}} seit {{date}} erwartet",
+    "ofExpectedSince": "erwartet ~{{amount}} (seit {{date}})",
     "quantityIn": "Menge ({{unit}})",
     "singleEntries": "Einzeleinträge",
     "singleEntriesRange_one": "letzter Monat",
@@ -1987,7 +1988,8 @@
     "moreMeasures_other": "{{count}} weitere Maßnahmen",
     "notesPlaceholder": "z. B. Wetter, eingearbeitet …",
     "testNotesPlaceholder": "z. B. Probenahme, Labor …",
-    "staleTest": "Älter als 5 Monate – neu beproben"
+    "staleHint_one": "{{count}} Bodentest ist älter als 5 Monate – im Frühjahr neu beproben.",
+    "staleHint_other": "{{count}} Bodentests sind älter als 5 Monate – im Frühjahr neu beproben."
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",
@@ -2159,7 +2161,9 @@
     "fromFeedLog": "davon {{amount}} aus dem Futterbuch",
     "fromHealthLog": "davon {{amount}} aus der Gesundheitsakte",
     "fromFeedBook": "aus dem Futterbuch",
-    "fromHealthBook": "aus der Gesundheitsakte"
+    "fromHealthBook": "aus der Gesundheitsakte",
+    "openFeedBook": "Im Futterbuch öffnen",
+    "openHealthBook": "In Gesundheit öffnen"
   },
   "succession": {
     "pick": "Kultur wählen",
@@ -2271,7 +2275,8 @@
     "examplePlaceholder": "z. B. {{value}}",
     "optionalMark": "(optional)",
     "notesPlaceholder": "z. B. Beobachtungen, Sorte, Wetter …",
-    "costHint": "Fließt in die Bilanz unter Kosten ein."
+    "costHint": "Fließt in die Bilanz unter Kosten ein.",
+    "more": "Mehr"
   },
   "companions": {
     "title": "Pflanzpartner",
@@ -2305,7 +2310,9 @@
     "scopeAll": "Alle",
     "scrollLeft": "Nach links scrollen",
     "scrollRight": "Nach rechts scrollen",
-    "quickPick": "Häufige Kulturen"
+    "quickPick": "Häufige Kulturen",
+    "quickInGarden": "Im Garten",
+    "quickCommon": "Häufig"
   },
   "water": {
     "title": "Bewässerung",
