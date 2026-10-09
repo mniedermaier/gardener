@@ -26,7 +26,7 @@ import { Tabs } from "@/components/ui/Tabs";
 import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Tone } from "@/components/ui/tone";
 import { DateField } from "@/components/ui/DateField";
-import { LABEL_CLASS } from "@/components/ui/Field";
+import { LABEL_CLASS, LabelText } from "@/components/ui/Field";
 import { useBeds } from "@/components/records/useBeds";
 
 const AMENDMENT_TYPES: AmendmentType[] = ["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"];
@@ -457,7 +457,7 @@ export function SoilManagement() {
           </div>
           {/* One caption carries unit and optional marker; the fields are just N, P, K (rule 9). */}
           <div>
-          <p className={LABEL_CLASS}>{t("soil.nutrientsPpm")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>
+          <p className={LABEL_CLASS}><LabelText label={t("soil.nutrientsPpm")} optional /></p>
           <div className="grid grid-cols-3 items-end gap-3">
             <Input aria-label={`${t("soil.nutrientsPpm")} N`} label="N" inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
             <Input aria-label={`${t("soil.nutrientsPpm")} P`} label="P" inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />

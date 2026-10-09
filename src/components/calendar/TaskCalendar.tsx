@@ -363,7 +363,7 @@ export function TaskCalendar() {
             autoFocus
           />
           {/* Rule 9 task exception: the due date follows the title — "when" is the
-              first thing a task answers. Heute / Morgen / +1 Woche. */}
+              first thing a task answers. Heute / Morgen / Datum …. */}
           <DateField mode="future" label={t("calendar.taskDate")} value={draft.dueDate} onChange={(dueDate) => patch({ dueDate })} />
           <Select
             label={t("calendar.taskType")}

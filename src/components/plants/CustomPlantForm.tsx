@@ -43,7 +43,7 @@ interface Draft {
   harvestMax: number;
 }
 
-const EMPTY: Draft = { name: "", category: "vegetable", family: "", sowing: DEFAULT_SOWING, icon: NEUTRAL_ICON, iconTouched: false, sun: "full", water: "medium", spacingCm: 30, harvestMin: 60, harvestMax: 90 };
+const EMPTY: Draft = { name: "", category: "vegetable", family: "", sowing: DEFAULT_SOWING, icon: NEUTRAL_ICON, iconTouched: false, sun: "full", water: "medium", spacingCm: 0, harvestMin: 0, harvestMax: 0 };
 
 const FAMILIES = (Object.keys(familyNameKeys) as PlantFamily[]).filter((f) => f !== "other");
 
@@ -74,7 +74,8 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
   const patchSowing = (p: Partial<SowingDraft>) => setDraft((d) => ({ ...d, sowing: { ...d.sowing, ...p } }));
 
   const name = draft.name.trim();
-  const harvestError = draft.harvestMax < draft.harvestMin ? t("plants.form.harvestError") : undefined;
+  // Only once both are filled: typing "ab" before "bis" is not an error yet.
+  const harvestError = draft.harvestMin > 0 && draft.harvestMax > 0 && draft.harvestMax < draft.harvestMin ? t("plants.form.harvestError") : undefined;
   const valid = name.length > 0 && !harvestError && draft.spacingCm > 0 && draft.harvestMin > 0;
 
   const handleSave = () => {
@@ -145,9 +146,9 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             {t("plants.customIcon")}
             {ICONS.includes(draft.icon) && <span className="font-normal text-gray-600 dark:text-gray-400">: {getPlantName(draft.icon)}</span>}
           </span>
-          {/* 16 icons: 6 per row on phones (3 short rows of 44 px targets — 8 per row would drop below 44 px at 390 px), 8 × 2 across the full field width on wider screens. An old emoji icon stays selectable as an extra tile. */}
-          <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">
-            {(ICONS.includes(draft.icon) ? ICONS : [...ICONS, draft.icon]).map((ic) => (
+          {/* 16 icons: 4 × 4 on phones, 8 × 2 on wider screens — no row ends with a lone tile. Only an old emoji icon of an edited plant is added as an extra tile; the neutral default is not a choice. */}
+          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8 sm:gap-2" role="group" aria-labelledby="custom-plant-icon-label">
+            {(ICONS.includes(draft.icon) || draft.icon === NEUTRAL_ICON ? ICONS : [...ICONS, draft.icon]).map((ic) => (
               <button
                 key={ic}
                 type="button"
@@ -167,7 +168,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Select
             label={t("plants.form.category")}
             value={draft.category}
@@ -211,12 +212,14 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             <Input
               label={t("plants.form.harvestMin")}
               inputMode="numeric"
+              placeholder={t("common.examplePlaceholder", { value: 60 })}
               value={String(draft.harvestMin || "")}
               onChange={(e) => patch({ harvestMin: Number(e.target.value.replace(/\D/g, "")) })}
             />
             <Input
               label={t("plants.form.harvestMax")}
               inputMode="numeric"
+              placeholder={t("common.examplePlaceholder", { value: 90 })}
               value={String(draft.harvestMax || "")}
               error={harvestError}
               onChange={(e) => patch({ harvestMax: Number(e.target.value.replace(/\D/g, "")) })}
@@ -228,6 +231,8 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
         <Input
           label={t("plants.form.spacingCm")}
           inputMode="numeric"
+          wrapperClassName="sm:w-1/2 sm:pr-2"
+          placeholder={t("common.examplePlaceholder", { value: 30 })}
           value={String(draft.spacingCm || "")}
           onChange={(e) => patch({ spacingCm: Number(e.target.value.replace(/\D/g, "")) })}
         />

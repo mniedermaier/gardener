@@ -60,9 +60,8 @@ covered here, copy the pattern from the reference page
    - **Measurements** (soil test): only the value the record needs is
      required (pH); every other reading is `optional`, with "z. B." examples.
    - **Dates:** `DateField` — Heute/Gestern/Datum … for records,
-     `mode="future"` (Heute/Morgen/+1 Woche/Datum …) for tasks; the last
-     segment is always "Datum …" with the calendar icon (icon only on phones in
-     the four-segment future mode, so nothing wraps). A native `DatePicker`
+     `mode="future"` (Heute/Morgen/Datum …) for tasks; always three segments,
+     the last one "Datum …" with the calendar icon and its text. A native `DatePicker`
      only for one-off dates such as "Im Bestand seit". The date field is
      labelled "Datum" when it is simply when the record happened; a specific
      "<Verb> am" only where a record has more than one date and the label
@@ -81,9 +80,10 @@ covered here, copy the pattern from the reference page
      wrap to two lines; keep labels short so they don't have to.
    - A required choice without an unambiguous default (e.g. the bed when
      watering) starts empty ("Beet wählen …"); prefill only from a deep link,
-     the last entry or a single option. A choice may start on its most likely
-     value when that value is the common case and harmless if kept (expense
-     category, task type "Sonstiges", health "Kontrolle"). A wrong value that
+     the last entry or a single option. **Preselected on purpose** (the common
+     case, harmless if kept) — and only these: expense category "Saatgut",
+     task type "Sonstiges", health "Kontrolle", pest kind "Schädling", bed
+     environment "Freilandbeet", pantry method once a plant is chosen. A wrong value that
      would be a silent data error never starts preselected (the species of a new
      animal, the plant symbol — new custom plants start on a neutral sprout).
      **Scales** (harvest quality, pest severity) start unset: a preset value
@@ -92,10 +92,11 @@ covered here, copy the pattern from the reference page
      until chosen. A choice that
      depends on an earlier field appears only once that field is set (pantry
      method after the plant).
-   - **Prefilled numbers** only where the default is a real, typical value the
-     user usually keeps (custom plant spacing 30 cm and days 60/90, seed packets
-     1 and this year, a new bed 1,2 × 2,4 m); every other numeric field starts
-     empty with a "z. B." placeholder (an animal count starts empty, "z. B. 6").
+   - **Prefilled numbers** only for dimensions and calendar facts the user
+     usually keeps: a new bed 1,2 × 2,4 m, the seed purchase year, a seed
+     packet count of 1. Everything that describes the plant or the record
+     starts empty with a "z. B." placeholder (custom plant days and spacing,
+     animal count "z. B. 6", amounts, costs).
    - Paired fields align on their inputs (`items-end`), so a label that wraps
      never pushes its field below its neighbour.
    - Placeholders that list examples end in a typographic ellipsis "…" (German
@@ -106,7 +107,10 @@ covered here, copy the pattern from the reference page
    - Save stays disabled until the required fields are valid.
    - **Choosing a type:** up to 3 options → `SegmentedControl`; up to 8 →
      icon tiles in a grid (animal species, health "Art", bed environment);
-     more than 8 → `Select` (task type, plant).
+     more than 8 → `Select` (task type, plant). A tile grid never ends with a
+     lone tile: pick the column count so rows fill (8 → 4 × 2, 7 → 4 + 3), or
+     let an odd last tile span the row on phones. Each tile's icon must be
+     distinct; if no fitting glyph exists, use the species' main product.
    - Scale endpoint captions are short single words ("Gering" … "Stark").
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation

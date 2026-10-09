@@ -395,7 +395,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
         {/* A small fixed set (8): icon tiles, like the animal species (DESIGN_SYSTEM rule 9). */}
         <div>
           <p id="health-type-label" className={LABEL_CLASS}>{t("livestock.healthType")}</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="radiogroup" aria-labelledby="health-type-label">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-labelledby="health-type-label">
             {HEALTH_EVENT_TYPES.map((ty) => {
               const Icon = HEALTH_ICON[ty];
               const selected = type === ty;
@@ -502,9 +502,10 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
         {!animal && (
           <fieldset>
             <legend className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.animalType")}</legend>
-            {/* Two columns on phones: "Bienenvölker" must not break mid-word. */}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {ANIMAL_TYPES.map((ty) => {
+            {/* Two columns on phones ("Bienenvölker" must not break mid-word), four on wider screens;
+                no row ends with a lone tile: on phones an odd last tile spans the row. */}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {ANIMAL_TYPES.map((ty, i) => {
                 const Icon = ANIMAL_ICON[ty];
                 const selected = type === ty;
                 return (
@@ -513,7 +514,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
                     type="button"
                     aria-pressed={selected}
                     onClick={() => setType(ty)}
-                    className={`flex min-h-11 min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2 text-left text-sm transition-colors sm:gap-2 sm:px-3 ${
+                    className={`flex min-h-11 min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2 text-left text-sm transition-colors sm:gap-2 sm:px-3 ${i === ANIMAL_TYPES.length - 1 && ANIMAL_TYPES.length % 2 === 1 ? "col-span-2 sm:col-span-1" : ""} ${
                       selected
                         ? "border-garden-600 bg-garden-50 font-medium text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
                         : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
