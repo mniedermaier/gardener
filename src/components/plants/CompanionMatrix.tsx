@@ -546,7 +546,7 @@ export function CompanionMatrix() {
           relation={relation}
           // Tomato, not the alphabetical first (Aubergine): the crop most people look up first.
           selectedId={focusId ?? (names.has(DEFAULT_PLANT) ? DEFAULT_PLANT : sorted[0]?.id ?? "")}
-          isExample={!focusId}
+          isExample={!focusId && !bedsByPlant.has(DEFAULT_PLANT)}
           onSelect={(id) => { setFocus(id); document.querySelector("main")?.scrollTo({ top: 0 }); }}
           bedsByPlant={bedsByPlant}
         />

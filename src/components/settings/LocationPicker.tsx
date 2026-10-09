@@ -175,7 +175,7 @@ export function LocationPicker({ value, onChange, prominent = false }: LocationP
           {t("location.useDevice")}
         </Button>
         {/* First run: coordinates are the expert path, so a quiet link under the main action. */}
-        <Button variant="ghost" size={prominent ? "sm" : undefined} className={prominent ? "-ml-2 min-h-11 text-garden-700 dark:text-garden-300" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
+        <Button variant="ghost" size={prominent ? "sm" : undefined} className={prominent ? "-ml-2 min-h-11 text-garden-700! dark:text-garden-300!" : undefined} onClick={() => setManual((m) => !m)} aria-expanded={manual}>
           {prominent && <Keyboard size={14} aria-hidden="true" />}
           {t("location.manual")}
         </Button>

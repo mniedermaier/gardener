@@ -58,6 +58,8 @@ export function WaterTracker() {
   const lastEntry = useMemo(() => [...waterEntries].sort((a, b) => b.date.localeCompare(a.date))[0], [waterEntries]);
 
   const openAdd = useCallback((params: AddParams = {}) => {
+    // No bed yet (quick add from anywhere): the first step is a bed, not a dialog that cannot be saved.
+    if (beds.beds.length === 0) { addBed(); return; }
     setEditingId(null);
     setSubmitted(false);
     // Prefill only an unambiguous bed (deep link, last used, or the only one);
@@ -67,7 +69,7 @@ export function WaterTracker() {
         : beds.beds.length === 1 ? beds.beds[0].id : "";
     setDraft({ bedId, liters: "", method: lastEntry && lastEntry.method !== "rain" ? lastEntry.method : "manual", duration: "", date: params.date ?? todayISO(), notes: "" });
     setDialogOpen(true);
-  }, [beds, lastEntry]);
+  }, [beds, lastEntry, addBed]);
   const openAddPlain = useCallback(() => openAdd(), [openAdd]);
   useOpenAddParamsOnNavigate(openAdd);
   useAddFromUrl(openAdd);

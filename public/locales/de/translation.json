@@ -2101,7 +2101,7 @@
     "reason": {
       "sow_outdoors": "Direktsaat bis {{date}}",
       "transplant": "Auspflanzen bis {{date}}",
-      "plant_autumn": "Pflanzzeit bis {{date}}",
+      "plant_autumn": "Auspflanzen bis {{date}}",
       "sow_autumn": "Herbstsaat bis {{date}}",
       "fitsBed": "Passt gut zu diesem Beet"
     }
@@ -2518,7 +2518,7 @@
     "fromGarden": "Garten",
     "fromAnimals": "Tierprodukte",
     "notCovered": "Nicht gedeckt",
-    "compositionHint": "Gemüse ist kalorienarm – Kartoffeln und Kürbis heben den Garten-Anteil am stärksten (siehe Größte Hebel).",
+    "compositionHint": "Gemüse ist kalorienarm – kalorienreiche Kulturen wie Kartoffeln heben den Garten-Anteil am stärksten (siehe Größte Hebel).",
     "surplusNote_one": "Über den Bedarf einer Person hinaus, nicht eingerechnet: {{items}}.",
     "surplusNote_other": "Über den Bedarf von {{count}} Personen hinaus, nicht eingerechnet: {{items}}."
   }

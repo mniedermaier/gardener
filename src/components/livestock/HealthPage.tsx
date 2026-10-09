@@ -59,7 +59,11 @@ export function HealthPage() {
   const [filterAnimalId, setFilterAnimalId] = useState("");
   const [filterType, setFilterType] = useState<"" | HealthEventType>("");
   const [dialog, setDialog] = useState<{ open: boolean; entry?: HealthEvent; animalId?: string; type?: HealthEventType }>({ open: false });
-  const openAdd = useCallback(() => setDialog({ open: true }), []);
+  // No animal yet (quick add from anywhere): add one first instead of an unsavable dialog.
+  const openAdd = useCallback(() => {
+    if (animals.length === 0) { navigate("/livestock", { state: { openAdd: true } }); return; }
+    setDialog({ open: true });
+  }, [animals.length, navigate]);
   useOpenAddOnNavigate(openAdd);
 
   const animalMap = useMemo(() => new Map(animals.map((a) => [a.id, a])), [animals]);
@@ -127,7 +131,8 @@ export function HealthPage() {
     label: t("livestock.health.vaccCoverageScoped"),
     value: t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable }),
     icon: Syringe,
-    tone: stats.due.length > 0 ? ("warning" as const) : ("positive" as const),
+    // Neutral tile: the warning is the "Impfung prüfen" card right below (colour once).
+
     hint: stats.due.length === 0 && stats.nextDue
       ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") })
       : t("livestock.health.vaccScopeHint", { count: stats.vaccinable }),

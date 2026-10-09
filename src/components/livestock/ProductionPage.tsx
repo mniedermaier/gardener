@@ -35,7 +35,11 @@ export function ProductionPage() {
   const [filterAnimalId, setFilterAnimalId] = useState("");
   const [filterType, setFilterType] = useState("");
   const [dialog, setDialog] = useState<{ open: boolean; entry?: AnimalProduct }>({ open: false });
-  const openAdd = useCallback(() => setDialog({ open: true }), []);
+  // No animal yet (quick add from anywhere): add one first instead of an unsavable dialog.
+  const openAdd = useCallback(() => {
+    if (animals.length === 0) { navigate("/livestock", { state: { openAdd: true } }); return; }
+    setDialog({ open: true });
+  }, [animals.length, navigate]);
   useOpenAddOnNavigate(openAdd);
 
   const animalMap = useMemo(() => new Map(animals.map((a) => [a.id, a])), [animals]);

@@ -74,12 +74,15 @@ export function SufficiencyDashboard() {
 
   const levers = useMemo(() => {
     const need = annualCalorieNeed(householdSize);
-    return LEVER_CROPS.map((id) => plantMap.get(id))
+    // A crop the food plan already counts as covered is no lever ("Gedeckt" there, "+5 m²" here would contradict).
+    const plan = getCropPlan({ gardens, plants: plantMap, gridCellSizeCm, harvests, householdSize, period: now.getFullYear() });
+    const covered = new Set(plan.rows.filter((r) => r.targetKg > 0 && Math.max(r.forecastKg, r.actualKg) >= r.targetKg).map((r) => r.plantId));
+    return LEVER_CROPS.filter((id) => !covered.has(id)).map((id) => plantMap.get(id))
       .filter((p): p is NonNullable<typeof p> => !!p && !!p.expectedYieldKgPerM2 && !!p.caloriesPer100g)
       .map((p) => ({ plantId: p.id, gain: (LEVER_AREA_M2 * p.expectedYieldKgPerM2! * 10 * p.caloriesPer100g!) / need }))
       .sort((a, b) => b.gain - a.gain)
       .slice(0, 3);
-  }, [plantMap, householdSize]);
+  }, [plantMap, householdSize, gardens, gridCellSizeCm, harvests, now]);
 
   const viewOptions: { value: View; label: string; count?: number }[] = [
     { value: "overview", label: t("sufficiency.tabs.overview") },
