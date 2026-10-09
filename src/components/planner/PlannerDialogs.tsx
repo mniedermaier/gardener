@@ -44,6 +44,12 @@ export function bedToDraft(bed: Bed | undefined, gridCellSizeCm: number): BedDra
   };
 }
 
+/** "1,8" or "1.8" → 1.8; anything unparsable or outside 0–50 m → 0 (the dialog then stays invalid). */
+export function parseMetres(text: string): number {
+  const n = Number(text.trim().replace(",", "."));
+  return text.trim() !== "" && Number.isFinite(n) && n > 0 && n <= 50 ? n : 0;
+}
+
 /** Bed fields from a draft: grid size from metres, only the config of the chosen type. */
 export function draftToBed(d: BedDraft, gridCellSizeCm: number) {
   const m = gridCellSizeCm / 100;
@@ -78,6 +84,9 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
   const { formatNumber } = useFormat();
   const [draft, setDraft] = useState<BedDraft>(() => bedToDraft(bed, gridCellSizeCm));
   const patch = (p: Partial<BedDraft>) => setDraft((d) => ({ ...d, ...p }));
+  // What the user typed ("1,8"); the draft holds the parsed metres.
+  const [widthText, setWidthText] = useState(() => formatNumber(draft.widthM));
+  const [heightText, setHeightText] = useState(() => formatNumber(draft.heightM));
 
   const cols = Math.max(1, Math.round(draft.widthM / (gridCellSizeCm / 100)));
   const rows = Math.max(1, Math.round(draft.heightM / (gridCellSizeCm / 100)));
@@ -106,7 +115,7 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
         <Input label={t("planner.bedName")} value={draft.name} onChange={(e) => patch({ name: e.target.value })} placeholder={t("planner.bedNamePlaceholder")} autoFocus />
         <fieldset>
           <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("planner.environment")}</legend>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-label={t("planner.environment")}>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="radiogroup" aria-label={t("planner.environment")}>
             {ALL_ENVIRONMENTS.map((env) => {
               const Icon = ENVIRONMENT_LUCIDE[env];
               const selected = draft.environmentType === env;
@@ -118,7 +127,8 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
                   aria-checked={selected}
                   onClick={() => patch({ environmentType: env })}
                   className={cn(
-                    "flex min-h-11 items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm transition-colors sm:flex-col sm:items-center sm:gap-1 sm:text-center sm:text-xs",
+                    // Icon left of the label on every width, like the other choice tiles.
+                    "flex min-h-11 items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm leading-tight transition-colors",
                     selected
                       ? "border-garden-600 bg-garden-50 font-medium text-garden-800 ring-1 ring-garden-600 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200 dark:ring-garden-400"
                       : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5",
@@ -131,9 +141,10 @@ export function BedDialog({ open, bed, gridCellSizeCm, onClose, onSave, onDelete
             })}
           </div>
         </fieldset>
+        {/* Text fields with a decimal keypad: a native number field shows spin arrows and the browser's separator ("1.8"), not the app's ("1,8"). */}
         <div className="grid grid-cols-2 gap-4">
-          <Input label={t("planner.widthM")} type="number" min={0.3} max={50} step={0.1} value={draft.widthM} onChange={(e) => patch({ widthM: Number(e.target.value) })} />
-          <Input label={t("planner.heightM")} type="number" min={0.3} max={50} step={0.1} value={draft.heightM} onChange={(e) => patch({ heightM: Number(e.target.value) })} />
+          <Input label={t("planner.widthM")} inputMode="decimal" value={widthText} onChange={(e) => { setWidthText(e.target.value); patch({ widthM: parseMetres(e.target.value) }); }} />
+          <Input label={t("planner.heightM")} inputMode="decimal" value={heightText} onChange={(e) => { setHeightText(e.target.value); patch({ heightM: parseMetres(e.target.value) }); }} />
         </div>
         <p className={cn("-mt-2 text-xs", shrinks ? "font-medium text-warning" : "text-gray-500 dark:text-gray-400")}>
           {shrinks

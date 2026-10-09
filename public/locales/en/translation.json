@@ -458,7 +458,7 @@
     "rotation": {
       "title": "Crop rotation",
       "description": "What each bed should grow next year so the soil is not depleted one-sidedly.",
-      "order": "Recommended order",
+      "order": "Recommended order, back to step 1 after step 4",
       "next": "{{year}}:",
       "groups": {
         "heavy": "Heavy feeders",
@@ -492,7 +492,9 @@
     "placingHintClick": "Click free cells. <good>good neighbour</good>, <bad>unfavourable neighbour</bad>.",
     "inspectHintClick": "Click a plant to inspect it. To plant, choose a plant first.",
     "dragPlantClick": "Click a plant, then click cells in the bed – or drag it into the bed.",
-    "emptyBedsTextClick": "Set its size and type (open ground, raised bed, greenhouse …). Then place plants by clicking or dragging."
+    "emptyBedsTextClick": "Set its size and type (open ground, raised bed, greenhouse …). Then place plants by clicking or dragging.",
+    "inspectHintShort": "Tap a plant to inspect it.",
+    "inspectHintShortClick": "Click a plant to inspect it."
   },
   "plants": {
     "title": "Plants",

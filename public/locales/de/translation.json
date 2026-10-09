@@ -458,7 +458,7 @@
     "rotation": {
       "title": "Fruchtfolge",
       "description": "Was nächstes Jahr in jedes Beet sollte, damit der Boden nicht einseitig ausgelaugt wird.",
-      "order": "Empfohlene Reihenfolge",
+      "order": "Empfohlene Reihenfolge, nach Schritt 4 wieder von vorn",
       "next": "{{year}}:",
       "groups": {
         "heavy": "Starkzehrer",
@@ -492,7 +492,9 @@
     "placingHintClick": "Klicke auf freie Felder. <good>guter Nachbar</good>, <bad>ungünstiger Nachbar</bad>.",
     "inspectHintClick": "Klicke auf eine Pflanze, um sie anzusehen. Zum Setzen erst eine Pflanze auswählen.",
     "dragPlantClick": "Anklicken und dann Felder im Beet anklicken – oder direkt ins Beet ziehen.",
-    "emptyBedsTextClick": "Gib Größe und Art an (Freiland, Hochbeet, Gewächshaus …). Danach setzt du Pflanzen per Klick oder Ziehen."
+    "emptyBedsTextClick": "Gib Größe und Art an (Freiland, Hochbeet, Gewächshaus …). Danach setzt du Pflanzen per Klick oder Ziehen.",
+    "inspectHintShort": "Tippe auf eine Pflanze, um sie anzusehen.",
+    "inspectHintShortClick": "Klicke auf eine Pflanze, um sie anzusehen."
   },
   "plants": {
     "title": "Pflanzen",

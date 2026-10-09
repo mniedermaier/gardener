@@ -476,7 +476,7 @@
     "rotation": {
       "title": "Rotation des cultures",
       "description": "Ce que chaque planche devrait accueillir l’an prochain pour ne pas épuiser le sol.",
-      "order": "Ordre recommandé",
+      "order": "Ordre recommandé, puis retour à l’étape 1 après la 4",
       "next": "{{year}} :",
       "groups": {
         "heavy": "Gourmandes",
@@ -510,7 +510,9 @@
     "placingHintClick": "Cliquez sur des cases libres. <good>bon voisin</good>, <bad>voisin défavorable</bad>.",
     "inspectHintClick": "Cliquez sur une plante pour l’examiner. Pour planter, choisissez d’abord une plante.",
     "dragPlantClick": "Cliquez sur une plante, puis sur des cases de la planche – ou glissez-la dans la planche.",
-    "emptyBedsTextClick": "Indiquez taille et type (pleine terre, carré surélevé, serre …). Placez ensuite les plantes en cliquant ou en glissant."
+    "emptyBedsTextClick": "Indiquez taille et type (pleine terre, carré surélevé, serre …). Placez ensuite les plantes en cliquant ou en glissant.",
+    "inspectHintShort": "Touchez une plante pour l’examiner.",
+    "inspectHintShortClick": "Cliquez sur une plante pour l’examiner."
   },
   "plants": {
     "title": "Plantes",

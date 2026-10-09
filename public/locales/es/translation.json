@@ -476,7 +476,7 @@
     "rotation": {
       "title": "Rotación de cultivos",
       "description": "Qué debería ir en cada bancal el próximo año para no agotar el suelo.",
-      "order": "Orden recomendado",
+      "order": "Orden recomendado; tras el paso 4, de nuevo desde el 1",
       "next": "{{year}}:",
       "groups": {
         "heavy": "Muy exigentes",
@@ -510,7 +510,9 @@
     "placingHintClick": "Haz clic en casillas libres. <good>buen vecino</good>, <bad>vecino desfavorable</bad>.",
     "inspectHintClick": "Haz clic en una planta para verla. Para plantar, elige primero una planta.",
     "dragPlantClick": "Haz clic en una planta y luego en casillas del bancal, o arrástrala al bancal.",
-    "emptyBedsTextClick": "Indica tamaño y tipo (al aire libre, bancal elevado, invernadero…). Después coloca plantas haciendo clic o arrastrando."
+    "emptyBedsTextClick": "Indica tamaño y tipo (al aire libre, bancal elevado, invernadero…). Después coloca plantas haciendo clic o arrastrando.",
+    "inspectHintShort": "Toca una planta para verla.",
+    "inspectHintShortClick": "Haz clic en una planta para verla."
   },
   "plants": {
     "title": "Plantas",

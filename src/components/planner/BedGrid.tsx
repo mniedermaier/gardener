@@ -1,4 +1,4 @@
-import { memo, useMemo, type CSSProperties } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { useDroppable } from "@dnd-kit/core";
 import { Check, TriangleAlert, NotebookText, Footprints } from "lucide-react";
@@ -82,10 +82,12 @@ const PlannerCell = memo(function PlannerCell({
         isPath && "bg-gray-200 dark:bg-white/10",
         empty && mode === "place" && hint === "bad" && "cursor-copy bg-warning/10 hover:bg-warning/20",
         empty && mode === "place" && hint === "good" && "cursor-copy bg-positive/15 hover:bg-positive/25",
-        empty && mode === "place" && !hint && "cursor-copy bg-white/80 hover:bg-garden-100 dark:bg-white/[0.07] dark:hover:bg-garden-500/20",
-        empty && mode === "path" && "cursor-pointer bg-white/60 hover:bg-gray-200 dark:bg-white/[0.05] dark:hover:bg-white/10",
-        empty && mode === "inspect" && "bg-white/60 dark:bg-white/[0.05]",
-        plant && "bg-(--tint)/15 dark:bg-(--tint)/[0.12]",
+        // Dark: empty cells sit below the planted ones (dashed, darker), never look raised.
+        empty && "dark:border dark:border-dashed dark:border-white/10",
+        empty && mode === "place" && !hint && "cursor-copy bg-white/80 hover:bg-garden-100 dark:bg-white/[0.03] dark:hover:bg-garden-500/20",
+        empty && mode === "path" && "cursor-pointer bg-white/60 hover:bg-gray-200 dark:bg-white/[0.03] dark:hover:bg-white/10",
+        empty && mode === "inspect" && "bg-white/60 dark:bg-white/[0.03]",
+        plant && "bg-(--tint)/15 dark:bg-(--tint)/[0.22]",
         plant && mode !== "path" && "cursor-pointer hover:brightness-95 dark:hover:brightness-125",
         plant && mode === "path" && "cursor-pointer",
         selected && "ring-2 ring-garden-600 ring-offset-1 ring-offset-gray-100 dark:ring-garden-300 dark:ring-offset-gray-900",
@@ -123,11 +125,40 @@ interface EditableGridProps {
   onActivate: (x: number, y: number) => void;
 }
 
+const GAP = 4;
+const PAD = 6;
+const MIN_CELL = 32;
+const MAX_CELL = 72;
+
+/**
+ * Cell size at zoom 1: the bed fills the width it gets, and stays short
+ * enough to be seen whole below the header and mode bar. Zoom multiplies it.
+ */
+function fitCell(width: number, maxHeight: number, cols: number, rows: number): number {
+  const byWidth = (width - 2 * PAD - (cols - 1) * GAP) / cols;
+  const byHeight = (maxHeight - 2 * PAD - (rows - 1) * GAP) / rows;
+  return Math.floor(Math.max(MIN_CELL, Math.min(MAX_CELL, byWidth, byHeight)));
+}
+
 /** The bed grid in the editor: every cell is a button and a drop target. */
 export const EditableBedGrid = memo(function EditableBedGrid({ bed, plantMap, getPlantName, mode, hints, conflicts, selectedKey, zoom, onActivate }: EditableGridProps) {
   const { t } = useTranslation();
-  const cellSize = Math.round(48 * zoom);
-  const iconSize = Math.round(24 * zoom);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  // Read once: a later viewport height change (address bar, keyboard) must not resize the bed under the finger.
+  const [maxHeight] = useState(() => (typeof window === "undefined" ? 600 : Math.max(260, window.innerHeight - (window.innerWidth >= 768 ? 300 : 320))));
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => setWidth(el.clientWidth);
+    measure();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, []);
+  const base = width > 0 ? fitCell(width, maxHeight, bed.width, bed.height) : 48;
+  const cellSize = Math.round(base * zoom);
+  const iconSize = Math.round(cellSize / 2);
 
   const byKey = useMemo(() => new Map(bed.cells.map((c) => [`${c.cellX}-${c.cellY}`, c])), [bed.cells]);
   const paths = useMemo(() => new Set(bed.paths ?? []), [bed.paths]);
@@ -176,11 +207,12 @@ export const EditableBedGrid = memo(function EditableBedGrid({ bed, plantMap, ge
   }
 
   return (
-    <div data-bed-grid className="scroll-mt-32 overflow-x-auto overscroll-x-contain pb-1" style={{ touchAction: "pan-x pan-y pinch-zoom" }}>
+    // flex + mx-auto: centred while it fits, scrolls from the left edge once zoomed wider.
+    <div ref={wrapRef} data-bed-grid className="flex scroll-mt-32 overflow-x-auto overscroll-x-contain pb-1" style={{ touchAction: "pan-x pan-y pinch-zoom" }}>
       <div
         role="group"
         aria-label={t("planner.gridLabel", { name: bed.name, cols: bed.width, rows: bed.height })}
-        className="inline-grid gap-1 rounded-xl bg-gray-100 p-1.5 dark:bg-white/[0.04]"
+        className="mx-auto inline-grid shrink-0 gap-1 rounded-xl bg-gray-100 p-1.5 dark:bg-white/[0.04]"
         style={{ gridTemplateColumns: `repeat(${bed.width}, ${cellSize}px)` }}
       >
         {cells}
@@ -219,7 +251,7 @@ export const MiniBedGrid = memo(function MiniBedGrid({ bed, plantMap, conflicts,
           key={key}
           className={cn(
             "relative flex items-center justify-center rounded-[3px]",
-            isPath ? "bg-gray-300/70 dark:bg-white/15" : plant ? "bg-(--tint)/15 dark:bg-(--tint)/[0.12]" : "bg-white/70 dark:bg-white/[0.06]",
+            isPath ? "bg-gray-300/70 dark:bg-white/15" : plant ? "bg-(--tint)/15 dark:bg-(--tint)/[0.22]" : "bg-white/70 dark:bg-white/[0.03]",
           )}
           style={{ width: cell, height: cell, ...(plant ? { "--tint": plant.color } : {}) } as CSSProperties}
         >
