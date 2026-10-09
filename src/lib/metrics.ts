@@ -730,7 +730,7 @@ export function getCropPlan(input: {
     forecastKg: sum((r) => r.forecastKg),
     areaM2: sum((r) => r.areaM2),
     neededAreaM2: sum((r) => r.neededAreaM2),
-    forecastCoverage: targetKg > 0 ? sum((r) => Math.min(r.forecastKg, r.targetKg)) / targetKg : 0,
+    forecastCoverage: targetKg > 0 ? sum((r) => Math.min(Math.max(r.forecastKg, r.actualKg), r.targetKg)) / targetKg : 0,
     actualCoverage: targetKg > 0 ? sum((r) => Math.min(r.actualKg, r.targetKg)) / targetKg : 0,
   };
 }

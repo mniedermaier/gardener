@@ -171,7 +171,7 @@ export function FoodPlan() {
                             className="min-w-0 flex-1"
                             size={8}
                             actual={r.actualKg}
-                            forecast={r.forecastKg}
+                            forecast={Math.max(r.forecastKg, r.actualKg)}
                             max={Math.max(r.targetKg, r.forecastKg, r.actualKg)}
                             target={r.targetKg}
                             label={t("foodplan.meterLabel", { plant: plantName(p.id), actual: kg(r.actualKg), forecast: kg(r.forecastKg), target: kg(r.targetKg) })}
