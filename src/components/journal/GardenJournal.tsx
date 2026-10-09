@@ -248,7 +248,7 @@ export function GardenJournal() {
   const chip = (active: boolean) =>
     `inline-flex min-h-11 items-center rounded-full border px-3 text-sm font-medium transition-colors sm:min-h-8 ${
       active
-        ? "border-garden-600 bg-garden-600 text-white dark:border-garden-500 dark:bg-garden-500/20 dark:text-garden-200"
+        ? "border-garden-600/40 bg-garden-50 text-garden-800 dark:border-garden-400/40 dark:bg-garden-500/15 dark:text-garden-200"
         : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
     }`;
 
@@ -261,12 +261,13 @@ export function GardenJournal() {
       <PageHeader
         title={t("journal.title")}
         description={t("journal.subtitle")}
-        actions={
+        // While the empty state shows, its button is the one way in.
+        actions={journalEntries.length > 0 ? (
           <Button onClick={openAddPlain}>
             <Plus size={16} aria-hidden="true" />
             {t("journal.add")}
           </Button>
-        }
+        ) : undefined}
       />
 
       {journalEntries.length === 0 ? (
@@ -279,9 +280,11 @@ export function GardenJournal() {
           />
         </Card>
       ) : (
-        <>
+        // Wide screens: entries left, tag filter as a sticky side column instead of empty space.
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-start lg:gap-8">
           {allTags.length > 0 && (
-            <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label={t("journal.filterByTag")}>
+            <div className="mb-5 flex flex-wrap gap-2 lg:sticky lg:top-0 lg:order-2 lg:mb-0 lg:rounded-xl lg:border lg:border-gray-200 lg:bg-white lg:p-4 lg:shadow-xs dark:lg:border-white/10 dark:lg:bg-gray-900" role="group" aria-label={t("journal.filterByTag")}>
+              <p className="hidden w-full text-xs font-semibold text-gray-600 lg:block dark:text-gray-400">{t("journal.filterByTag")}</p>
               <button type="button" aria-pressed={!filterTag} onClick={() => setFilterTag(null)} className={chip(!filterTag)}>
                 {t("journal.all")}
               </button>
@@ -293,13 +296,14 @@ export function GardenJournal() {
             </div>
           )}
 
-          <div className="max-w-3xl space-y-8">
+          <div className="min-w-0 space-y-6 lg:order-1">
+            {/* One surface per month with the same sticky header as the other record lists (ui/List). */}
             {groups.map(([month, entries]) => (
-              <section key={month} aria-label={formatDate(`${month}-01`, "monthYear")}>
-                <h2 className="mb-3 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              <section key={month} className="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-white/10 dark:bg-gray-900">
+                <h2 className="sticky top-0 z-20 rounded-t-xl border-b border-gray-200 bg-gray-50/95 px-4 py-2 text-xs font-semibold text-gray-600 backdrop-blur dark:border-white/10 dark:bg-gray-900/95 dark:text-gray-400">
                   {formatDate(`${month}-01`, "monthYear")}
                 </h2>
-                <div className="space-y-4">
+                <div className="divide-y divide-gray-100 dark:divide-white/5">
                   {entries.map((entry) => {
                     const plant = entry.plantId ? plantMap.get(entry.plantId) : undefined;
                     const bedLabel = beds.label(entry.bedId);
@@ -310,12 +314,12 @@ export function GardenJournal() {
                         key={entry.id}
                         id={`journal-entry-${entry.id}`}
                         tabIndex={-1}
-                        className={`relative rounded-xl border border-gray-200 bg-white shadow-xs transition-shadow dark:border-white/10 dark:bg-gray-900 ${
-                          highlightId === entry.id ? "ring-2 ring-garden-500 ring-offset-2 ring-offset-gray-50 dark:ring-garden-400 dark:ring-offset-gray-950" : ""
+                        className={`relative p-4 last:rounded-b-xl sm:p-5 ${
+                          highlightId === entry.id ? "ring-2 ring-inset ring-garden-500 dark:ring-garden-400" : ""
                         }`}
                       >
                         {photos.length > 0 && (
-                          <div className={`grid gap-0.5 overflow-hidden rounded-t-xl ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                          <div className={`mb-3 grid gap-0.5 overflow-hidden rounded-lg ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
                             {photos.map((photo, idx) => (
                               <button
                                 key={photo}
@@ -329,11 +333,11 @@ export function GardenJournal() {
                             ))}
                           </div>
                         )}
-                        <div className="p-4 sm:p-5">
+                        <div>
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                <time dateTime={entry.date}>{formatDate(entry.date, "relative")}</time>
+                                <time dateTime={entry.date}>{formatDate(entry.date, "weekdayDate")}</time>
                               </p>
                               <h3 className="mt-0.5 text-base font-semibold text-gray-900 dark:text-gray-100">
                                 <button
@@ -387,18 +391,17 @@ export function GardenJournal() {
                 </div>
               </section>
             ))}
+            {groups.length === 0 && (
+              <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("journal.emptyFilter")}</p></Card>
+            )}
           </div>
-          {groups.length === 0 && (
-            <Card><p className="text-center text-sm text-gray-500 dark:text-gray-400">{t("journal.emptyFilter")}</p></Card>
-          )}
-        </>
+        </div>
       )}
 
       <Modal
         open={dialogOpen}
         onClose={closeDialog}
         title={editingId ? t("journal.edit") : t("journal.add")}
-        size="lg"
         footer={
           <>
             {editing && (
@@ -444,8 +447,9 @@ export function GardenJournal() {
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("journal.photoHint", { max: MAX_PHOTOS })}</p>
           </div>
 
-          <fieldset className="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-white/10">
-            <legend className="px-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("journal.linkedTo")}</legend>
+          {/* A plain section, not a framed card inside the dialog card. */}
+          <fieldset className="space-y-4 border-t border-gray-100 pt-5 dark:border-white/10">
+            <legend className="float-left mb-1 w-full text-sm font-semibold text-gray-900 dark:text-gray-100">{t("journal.linkedTo")}</legend>
             <PlantCombobox
               label={t("harvest.plant")}
               plants={plants}

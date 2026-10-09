@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks } from "lucide-react";
+import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks, LayoutGrid } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
@@ -48,6 +49,7 @@ interface Draft {
 
 export function TaskCalendar() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { toast, confirm } = useToast();
   const confirmDelete = useConfirmDelete();
   const { tasks, gardens, lastFrostDate, addTask, updateTask, deleteTask, generateTasks } = useStore(
@@ -215,7 +217,8 @@ export function TaskCalendar() {
       <PageHeader
         title={t("nav.tasks")}
         description={description}
-        actions={
+        // While the empty state shows, it carries both actions; the header stays quiet.
+        actions={tasks.length === 0 ? undefined : (
           <>
             {hasPlantedBeds && (
               <span className="hidden sm:contents">
@@ -242,7 +245,7 @@ export function TaskCalendar() {
               />
             )}
           </>
-        }
+        )}
       />
 
       {tasks.length === 0 ? (
@@ -252,9 +255,12 @@ export function TaskCalendar() {
             title={t("calendar.emptyTitle")}
             description={t("calendar.emptyText")}
             action={<Button onClick={() => openAdd()}><Plus size={16} aria-hidden="true" />{t("calendar.addTask")}</Button>}
+            // The text promises dates from the bed plan: with planted beds generate them, else go plant some.
             secondaryAction={hasPlantedBeds ? (
               <Button variant="secondary" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
-            ) : undefined}
+            ) : (
+              <Button variant="secondary" onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>
+            )}
           />
         </Card>
       ) : (

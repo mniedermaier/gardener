@@ -1451,14 +1451,14 @@
       "pest": "Schädling",
       "disease": "Krankheit"
     },
-    "subtitle": "Probleme erfassen, behandeln und über die Saisons Muster erkennen.",
+    "subtitle": "Probleme melden, behandeln und über die Saisons Muster erkennen.",
     "updated": "Änderungen gespeichert",
     "deleted": "Eintrag gelöscht",
     "edit": "Problem bearbeiten",
     "reopen": "Wieder öffnen",
     "filterLabel": "Status-Filter",
-    "emptyTitle": "Keine Probleme erfasst",
-    "emptyText": "Erfasse Schädlinge und Krankheiten, sobald sie auftreten – so siehst du, was wirkt und was jedes Jahr wiederkommt.",
+    "emptyTitle": "Keine Probleme gemeldet",
+    "emptyText": "Melde Schädlinge und Krankheiten, sobald sie auftreten – so siehst du, was wirkt und was jedes Jahr wiederkommt.",
     "emptyFilter": "In dieser Ansicht gibt es keine Einträge.",
     "severityLevel": {
       "1": "Sehr gering",
@@ -1870,7 +1870,8 @@
       }
     },
     "openInPlanner": "Im Planer öffnen",
-    "yourNote": "Notiz:"
+    "yourNote": "Notiz:",
+    "emptyNoBeds": "Bodentests und Düngungen gehören zu einem Beet. Lege zuerst im Planer ein Beet an."
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",

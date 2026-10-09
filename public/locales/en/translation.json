@@ -1451,14 +1451,14 @@
       "pest": "Pest",
       "disease": "Disease"
     },
-    "subtitle": "Record problems, treat them and spot patterns across seasons.",
+    "subtitle": "Report problems, treat them and spot patterns across seasons.",
     "updated": "Changes saved",
     "deleted": "Entry deleted",
     "edit": "Edit problem",
     "reopen": "Reopen",
     "filterLabel": "Status filter",
-    "emptyTitle": "No problems recorded",
-    "emptyText": "Record pests and diseases as they appear, so you can see what works and what comes back every year.",
+    "emptyTitle": "No problems reported",
+    "emptyText": "Report pests and diseases as they appear, so you can see what works and what comes back every year.",
     "emptyFilter": "There are no entries in this view.",
     "severityLevel": {
       "1": "Very low",
@@ -1870,7 +1870,8 @@
       }
     },
     "openInPlanner": "Open in planner",
-    "yourNote": "Note:"
+    "yourNote": "Note:",
+    "emptyNoBeds": "Soil tests and amendments belong to a bed. Create a bed in the planner first."
   },
   "preservation": {
     "title": "Preservation guide",

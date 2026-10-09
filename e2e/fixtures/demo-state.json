@@ -711,7 +711,7 @@
   {
    "id": "t5",
    "gardenId": "g-hof",
-   "type": "custom",
+   "type": "transplant",
    "title": "Knoblauch stecken",
    "plantId": "garlic",
    "dueDate": "2026-10-12"
@@ -1028,7 +1028,7 @@
    "gardenId": "g-hof",
    "date": "2026-10-04",
    "title": "Erster Frost angekündigt",
-   "text": "Vlies über das Hochbeet gelegt, Kürbisse rein geholt. Die Tomaten im Gewächshaus tragen noch erstaunlich gut.",
+   "text": "Vlies über das Hochbeet gelegt. Die Tomaten im Gewächshaus tragen noch erstaunlich gut.",
    "tags": [
     "frost",
     "ernte"
@@ -1049,7 +1049,7 @@
   {
    "id": "j3",
    "gardenId": "g-hof",
-   "date": "2026-09-14",
+   "date": "2026-08-31",
    "title": "Kartoffeln geerntet",
    "text": "5,2 kg 'Linda' aus 16 Pflanzen. Kaum Drahtwurm, Schorf nur vereinzelt.",
    "tags": [
@@ -1063,12 +1063,13 @@
    "id": "j4",
    "gardenId": "g-hof",
    "date": "2026-08-22",
-   "title": "Braunfäule im Freiland",
-   "text": "Die zwei Freilandtomaten hat es erwischt — nächstes Jahr nur noch im Gewächshaus.",
+   "title": "Braunfäule im Gewächshaus",
+   "text": "Erste Flecken an den unteren Tomatenblättern. Befallene Blätter entfernt und mit Schachtelhalmbrühe gespritzt.",
    "tags": [
     "krankheit"
    ],
-   "plantId": "tomato"
+   "plantId": "tomato",
+   "bedId": "b-gh"
   }
  ],
  "expenses": [
