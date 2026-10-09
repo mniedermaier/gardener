@@ -1002,9 +1002,9 @@
     "nothingNextLine": "Next 4 weeks: nothing new for your beds.",
     "upNextFrom": "Coming up next · from {{date}}",
     "notesPlaceholder": "e.g. tools, reminders…",
-    "afterFrostWindow": "{{range}} (after frost)",
+    "afterFrostWindow": "{{range}} (after the frost nights)",
     "timelineEmptyLine": "Your season plan needs a bed.",
-    "bedPlus": "{{bed}} +{{more}}"
+    "bedPlus": "{{bed}} and {{more}} more beds"
   },
   "settings": {
     "title": "Settings",
@@ -1439,7 +1439,7 @@
     "rowMissing": "{{kg}} short",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Target reached by the forecast",
-    "rowNothingLogged": "nothing logged yet"
+    "rowNothingLogged": "0 kg logged"
   },
   "sufficiency": {
     "title": "Self-sufficiency",
@@ -2183,7 +2183,7 @@
     "howAnimals": "Animals {{total}}: {{expenses}} recorded as expenses, {{log}} from the feed log and health records. A bill recorded in both places (same amount, at most 3 days apart) counts once.",
     "duplicatesSkipped_one": "{{count}} duplicate entry was not counted.",
     "duplicatesSkipped_other": "{{count}} duplicate entries were not counted.",
-    "fromFeedLog": "{{amount}} logged in the feed book",
+    "fromFeedLog": "{{amount}} of it only in the feed log",
     "fromHealthLog": "{{amount}} logged under health",
     "fromFeedBook": "from the feed book",
     "fromHealthBook": "from health",

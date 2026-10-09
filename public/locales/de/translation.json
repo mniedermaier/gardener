@@ -1002,9 +1002,9 @@
     "nothingNextLine": "Nächste 4 Wochen: nichts Neues für deine Beete.",
     "upNextFrom": "Als Nächstes · ab {{date}}",
     "notesPlaceholder": "z. B. Werkzeug, Hinweise …",
-    "afterFrostWindow": "{{range}} (nach Frost)",
+    "afterFrostWindow": "{{range}} (nach den Frostnächten)",
     "timelineEmptyLine": "Für deinen Saisonplan brauchst du ein Beet.",
-    "bedPlus": "{{bed}} +{{more}}"
+    "bedPlus": "{{bed}} und {{more}} weitere Beete"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1439,7 +1439,7 @@
     "rowMissing": "fehlen {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Ziel laut Prognose erreicht",
-    "rowNothingLogged": "noch nichts erfasst"
+    "rowNothingLogged": "0 kg erfasst"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
@@ -2183,7 +2183,7 @@
     "howAnimals": "Tierhaltung {{total}}: {{expenses}} als Ausgaben erfasst, {{log}} aus Futterbuch und Gesundheitsakte. Steht dieselbe Rechnung an beiden Stellen (gleicher Betrag, höchstens 3 Tage auseinander), zählt sie einmal.",
     "duplicatesSkipped_one": "{{count}} doppelter Eintrag wurde nicht mitgezählt.",
     "duplicatesSkipped_other": "{{count}} doppelte Einträge wurden nicht mitgezählt.",
-    "fromFeedLog": "{{amount}} im Futterbuch erfasst",
+    "fromFeedLog": "davon {{amount}} nur im Futterbuch",
     "fromHealthLog": "{{amount}} unter Gesundheit erfasst",
     "fromFeedBook": "aus dem Futterbuch",
     "fromHealthBook": "aus Gesundheit",

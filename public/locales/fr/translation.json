@@ -1034,9 +1034,9 @@
     "nothingNextLine": "4 prochaines semaines : rien de nouveau pour vos planches.",
     "upNextFrom": "Ensuite · dès le {{date}}",
     "notesPlaceholder": "p. ex. outils, rappels…",
-    "afterFrostWindow": "{{range}} (après le gel)",
+    "afterFrostWindow": "{{range}} (après les nuits de gel)",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche.",
-    "bedPlus": "{{bed}} +{{more}}"
+    "bedPlus": "{{bed}} et {{more}} autres planches"
   },
   "settings": {
     "title": "Paramètres",
@@ -1504,7 +1504,7 @@
     "rowMissing": "{{kg}} manquants",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objectif atteint selon la prévision",
-    "rowNothingLogged": "rien de saisi"
+    "rowNothingLogged": "0 kg saisis"
   },
   "sufficiency": {
     "title": "Autosuffisance",
@@ -2286,7 +2286,7 @@
     "howAnimals": "Animaux {{total}} : {{expenses}} saisis en dépenses, {{log}} issus du carnet d’alimentation et du suivi santé. Une facture saisie aux deux endroits (même montant, au plus 3 jours d’écart) compte une fois.",
     "duplicatesSkipped_one": "{{count}} doublon n’a pas été compté.",
     "duplicatesSkipped_other": "{{count}} doublons n’ont pas été comptés.",
-    "fromFeedLog": "{{amount}} saisis dans le carnet d’alimentation",
+    "fromFeedLog": "dont {{amount}} seulement dans le carnet d’alimentation",
     "fromHealthLog": "{{amount}} saisis sous santé",
     "duplicatesSkipped_many": "{{count}} doublons n’ont pas été comptés.",
     "fromFeedBook": "du carnet d’alimentation",

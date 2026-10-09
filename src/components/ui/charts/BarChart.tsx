@@ -88,7 +88,8 @@ export function BarChart({
     e.preventDefault();
   };
 
-  const showLegend = legend ?? series.length > 1;
+  // The target line is named in the legend (a label on the line would sit on the bars).
+  const showLegend = legend ?? (series.length > 1 || !!target);
   const activeDatum = active !== null ? data[active] : null;
 
   return (
@@ -163,9 +164,6 @@ export function BarChart({
           {target && target.value <= top && (
             <g>
               <line x1={left} x2={left + plotW} y1={y(target.value)} y2={y(target.value)} strokeDasharray="4 3" className="stroke-gray-700 dark:stroke-gray-300" strokeWidth={1.5} />
-              <text x={left + plotW} y={y(target.value) - 4} textAnchor="end" className="fill-gray-700 text-[11px] font-medium dark:fill-gray-300">
-                {target.label}
-              </text>
             </g>
           )}
           {marker && marker.index >= 0 && marker.index < data.length && (

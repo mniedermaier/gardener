@@ -1034,9 +1034,9 @@
     "nothingNextLine": "Próximas 4 semanas: nada nuevo para tus bancales.",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
     "notesPlaceholder": "p. ej. herramientas, avisos…",
-    "afterFrostWindow": "{{range}} (tras la helada)",
+    "afterFrostWindow": "{{range}} (tras las noches de helada)",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal.",
-    "bedPlus": "{{bed}} +{{more}}"
+    "bedPlus": "{{bed}} y {{more}} bancales más"
   },
   "settings": {
     "title": "Ajustes",
@@ -1504,7 +1504,7 @@
     "rowMissing": "faltan {{kg}}",
     "rowExtraArea": "+{{area}}",
     "rowCovered": "Objetivo alcanzado según la previsión",
-    "rowNothingLogged": "nada registrado aún"
+    "rowNothingLogged": "0 kg registrados"
   },
   "sufficiency": {
     "title": "Autosuficiencia",
@@ -2286,7 +2286,7 @@
     "howAnimals": "Animales {{total}}: {{expenses}} registrados como gastos, {{log}} del registro de pienso y de salud. Una factura anotada en ambos sitios (mismo importe, como mucho 3 días de diferencia) cuenta una vez.",
     "duplicatesSkipped_one": "{{count}} entrada duplicada no se ha contado.",
     "duplicatesSkipped_other": "{{count}} entradas duplicadas no se han contado.",
-    "fromFeedLog": "{{amount}} registrados en el libro de alimentación",
+    "fromFeedLog": "{{amount}} solo en el registro de alimento",
     "fromHealthLog": "{{amount}} registrados en salud",
     "duplicatesSkipped_many": "{{count}} entradas duplicadas no se han contado.",
     "fromFeedBook": "del libro de alimentación",
