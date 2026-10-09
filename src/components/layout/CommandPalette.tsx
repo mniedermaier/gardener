@@ -10,6 +10,7 @@ import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
 import { applyTheme } from "@/lib/theme";
 import { exportAllData } from "@/lib/dataExport";
+import { todayISO } from "@/lib/format";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { useToast } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
@@ -235,10 +236,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         out.push({ id: `animal:${a.id}`, group: "animals", label: name, hint: t(`livestock.types.${a.type}`), icon: Bird, run: () => go(`/livestock/${a.id}`) });
       }
     }
+    // Same wording as the task list: "Vor 6 Tagen fällig", "Morgen fällig".
+    const today = todayISO();
+    const dueHint = (due: string) => t(due < today ? "calendar.overdueSince" : "calendar.dueRelative", { date: formatDate(due, "relative"), dateInline: formatDate(due, "relativeInline") });
     for (const task of tasks) {
       if (!cap("tasks")) break;
       if (!task.completedDate && normalize(task.title).includes(q)) {
-        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: formatDate(task.dueDate, "relative"), icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
+        out.push({ id: `task:${task.id}`, group: "tasks", label: task.title, hint: dueHint(task.dueDate), icon: ClipboardList, run: () => go(`/tasks?task=${encodeURIComponent(task.id)}`) });
       }
     }
     for (const j of journalEntries) {

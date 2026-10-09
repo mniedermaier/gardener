@@ -340,7 +340,7 @@ export function SeedInventory() {
           <Input label={t("planner.variety")} optional value={draft.variety} onChange={(e) => patch({ variety: e.target.value })} placeholder={varietyPlaceholder(t, draft.plantId)} />
           {/* Short pairs stay side by side on phones too. The unit is named once, by the
               select beside the field: its words are too long for an inline toggle (rule 9). */}
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-[3fr_2fr] items-end gap-4">
             <Input label={t("seeds.quantity")} inputMode="decimal" value={draft.quantity} onChange={(e) => patch({ quantity: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(draft.unit === "grams" ? 5 : draft.unit === "packets" ? 1 : 50) })} error={errors.quantity} />
             {/* A select, not a segmented toggle: three units do not fit a half-width column. */}
             <Select
@@ -350,8 +350,9 @@ export function SeedInventory() {
               options={UNITS.map((u) => ({ value: u, label: t(`seeds.units.${u}`) }))}
             />
           </div>
-          {/* Same columns as the row above, so both gutters line up. */}
-          <div className="grid grid-cols-2 items-end gap-4">
+          {/* Same columns as the row above, so both gutters line up; the wide one
+              keeps "Quelle wählen …" whole on phones. */}
+          <div className="grid grid-cols-[3fr_2fr] items-end gap-4">
             {/* Source first: the year means "bought" or "harvested" depending on it. */}
             <Select
               label={t("seeds.source")}

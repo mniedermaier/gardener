@@ -441,7 +441,7 @@
     "legendBad": "Ungünstiger Nachbar – Setzen möglich",
     "legendConflict": "Farbige Kante mit Warnzeichen = ungünstige Nachbarn",
     "paletteTitle": "Pflanze wählen",
-    "sheetPickHint": "Antippen, dann Felder im Beet tippen",
+    "sheetPickHint": "Dann Felder im Beet antippen",
     "sheetChangePlant": "Andere Pflanze wählen",
     "sheetInspectHint": "Sorte, Notizen, Ernte erfassen",
     "inspectorLabel": "Pflanzung: {{name}}",
@@ -1012,7 +1012,9 @@
     "bedFrom": "{{beds}} ab {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "nach den Frostnächten",
-    "pageSubtitleNoBeds": "Was du jetzt säen und pflanzen kannst – mit Beeten wird daraus dein Saisonplan."
+    "pageSubtitleNoBeds": "Was du jetzt säen und pflanzen kannst – mit Beeten wird daraus dein Saisonplan.",
+    "dueRelative": "{{date}} fällig",
+    "emptyTextNoBeds": "Lege Aufgaben an – oder ein Beet, dann erzeugt Gardener Aussaat- und Pflanztermine daraus."
   },
   "settings": {
     "title": "Einstellungen",
@@ -1843,8 +1845,8 @@
     "eggTrend": "{{value}} zur Ø-Woche",
     "chooseAnimal": "Tier wählen …",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "Erste Erfassung",
-    "ofExpectedSince": "erwartet ~{{amount}} seit {{date}}"
+    "ofExpectedSince": "erwartet ~{{amount}} seit {{date}}",
+    "recordedSince": "Erfasst seit {{date}}"
   },
   "seeds": {
     "title": "Saatgut",
@@ -2204,8 +2206,8 @@
     "notesPlaceholder": "z. B. Händler, Rechnungsnummer …",
     "sourceFeed": "Futter",
     "sourceHealth": "Gesundheit",
-    "alsoInFeedBook": "auch unter Futter",
-    "alsoInHealthBook": "auch unter Gesundheit"
+    "alsoInFeedBook": "auch Futter",
+    "alsoInHealthBook": "auch Gesundheit"
   },
   "succession": {
     "pick": "Kultur wählen",

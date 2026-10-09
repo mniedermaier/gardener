@@ -1012,7 +1012,9 @@
     "bedFrom": "{{beds}} from {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "after the frost nights",
-    "pageSubtitleNoBeds": "What you can sow and plant now – add beds and it becomes your season plan."
+    "pageSubtitleNoBeds": "What you can sow and plant now – add beds and it becomes your season plan.",
+    "dueRelative": "due {{dateInline}}",
+    "emptyTextNoBeds": "Add tasks – or a bed, and Gardener creates sowing and planting dates from it."
   },
   "settings": {
     "title": "Settings",
@@ -1843,8 +1845,8 @@
     "eggTrend": "{{value}} vs. average week",
     "chooseAnimal": "Choose animal…",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "First entry",
-    "ofExpectedSince": "expected ~{{amount}} since {{date}}"
+    "ofExpectedSince": "expected ~{{amount}} since {{date}}",
+    "recordedSince": "Recorded since {{date}}"
   },
   "seeds": {
     "title": "Seeds",

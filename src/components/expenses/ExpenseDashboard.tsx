@@ -396,10 +396,10 @@ export function ExpenseDashboard() {
   );
 }
 
-/** Where a cost also lives: one small outline badge, the same for log rows and linked expenses. */
 /**
  * Where a cost row comes from: "Futter" for entries made only in the feed
- * log, "auch unter Futter" (link icon) for a manual expense matched to one —
+ * log, "auch Futter" (link icon) for a manual expense matched to one — short,
+ * so the badge fits beside a phone row's amount and menu —
  * two meanings, two labels, so "davon x € aus Futter" adds up.
  */
 function SourceBadge({ source, linked = false }: { source: "feed" | "health"; linked?: boolean }) {

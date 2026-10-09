@@ -1044,7 +1044,9 @@
     "bedFrom": "{{beds}} à partir du {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "après les nuits de gel",
-    "pageSubtitleNoBeds": "Ce que vous pouvez semer et planter maintenant – avec des planches, cela devient votre plan de saison."
+    "pageSubtitleNoBeds": "Ce que vous pouvez semer et planter maintenant – avec des planches, cela devient votre plan de saison.",
+    "dueRelative": "prévue {{dateInline}}",
+    "emptyTextNoBeds": "Ajoutez des tâches – ou une planche, et Gardener en tirera les dates de semis et de plantation."
   },
   "settings": {
     "title": "Paramètres",
@@ -1933,8 +1935,8 @@
     "eggTrend": "{{value}} par rapport à la semaine moyenne",
     "chooseAnimal": "Choisir un animal…",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "Première saisie",
-    "ofExpectedSince": "attendus ~{{amount}} depuis le {{date}}"
+    "ofExpectedSince": "attendus ~{{amount}} depuis le {{date}}",
+    "recordedSince": "Enregistré depuis le {{date}}"
   },
   "seeds": {
     "title": "Semences",

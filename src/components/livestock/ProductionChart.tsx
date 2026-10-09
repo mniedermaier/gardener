@@ -180,34 +180,26 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
   const showSummary = values.filter((v) => v > 0).length > 1;
   return (
     <div className="space-y-4">
-      {(showSummary || firstEntry) && (
+      {showSummary && (
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:flex sm:gap-10">
-          {showSummary && (
-            <div>
-              <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.monthAvgLabel")}</dt>
-              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
-                {formatProductAmount(type, avg, f, t)}
-                {avgRange && <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{avgRange}</span>}
-              </dd>
-            </div>
-          )}
-          {showSummary && (
-            <div>
-              <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.bestMonth")}</dt>
-              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
-                {formatProductAmount(type, values[best], f, t)}
-                <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(summaryBuckets[best].date, "monthYear")}</span>
-              </dd>
-            </div>
-          )}
-          {firstEntry && (
-            <div>
-              <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.firstEntry")}</dt>
-              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">{f.formatDate(firstEntry, "date")}</dd>
-            </div>
-          )}
+          <div>
+            <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.monthAvgLabel")}</dt>
+            <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
+              {formatProductAmount(type, avg, f, t)}
+              {avgRange && <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{avgRange}</span>}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.bestMonth")}</dt>
+            <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
+              {formatProductAmount(type, values[best], f, t)}
+              <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(summaryBuckets[best].date, "monthYear")}</span>
+            </dd>
+          </div>
         </dl>
       )}
+      {/* A date is context, not a figure: one meta line instead of a stat. */}
+      {firstEntry && <p className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.recordedSince", { date: f.formatDate(firstEntry, "short") })}</p>}
       {charts}
     </div>
   );

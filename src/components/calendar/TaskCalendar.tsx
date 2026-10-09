@@ -257,7 +257,7 @@ export function TaskCalendar() {
           <EmptyState
             icon={ListChecks}
             title={t("calendar.emptyTitle")}
-            description={t("calendar.emptyText")}
+            description={t(gardens.every((g) => g.beds.length === 0) ? "calendar.emptyTextNoBeds" : "calendar.emptyText")}
             action={<Button onClick={() => openAdd()}><Plus size={16} aria-hidden="true" />{t("calendar.addTask")}</Button>}
             // The text promises dates from the bed plan: with planted beds generate them, else go plant some.
             secondaryAction={hasPlantedBeds ? (

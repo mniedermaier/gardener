@@ -1044,7 +1044,9 @@
     "bedFrom": "{{beds}} desde el {{date}}",
     "bedRange": "{{beds}} {{range}}",
     "afterFrostShort": "tras las noches de helada",
-    "pageSubtitleNoBeds": "Lo que puedes sembrar y plantar ahora: con bancales se convierte en tu plan de temporada."
+    "pageSubtitleNoBeds": "Lo que puedes sembrar y plantar ahora: con bancales se convierte en tu plan de temporada.",
+    "dueRelative": "vence {{dateInline}}",
+    "emptyTextNoBeds": "Añade tareas, o un bancal y Gardener creará a partir de él las fechas de siembra y plantación."
   },
   "settings": {
     "title": "Ajustes",
@@ -1933,8 +1935,8 @@
     "eggTrend": "{{value}} frente a la semana media",
     "chooseAnimal": "Elegir animal…",
     "valueHint": "{{amount}} × {{price}}",
-    "firstEntry": "Primer registro",
-    "ofExpectedSince": "esperados ~{{amount}} desde el {{date}}"
+    "ofExpectedSince": "esperados ~{{amount}} desde el {{date}}",
+    "recordedSince": "Registrado desde el {{date}}"
   },
   "seeds": {
     "title": "Semillas",

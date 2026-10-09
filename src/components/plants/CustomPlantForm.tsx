@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/Modal";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 import { usePlantName } from "@/hooks/usePlantName";
 import type { Plant, PlantCategory, SunRequirement, WaterNeed } from "@/types/plant";
 import { DEFAULT_SOWING, NEUTRAL_ICON, sowingDraftOf, sowingFields, type SowingDraft } from "@/lib/customPlant";
@@ -80,6 +81,8 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
     useShallow((s) => ({ addCustomPlant: s.addCustomPlant, updateCustomPlant: s.updateCustomPlant, deleteCustomPlant: s.deleteCustomPlant })),
   );
   const [draft, setDraft] = useState<Draft>(() => toDraft(plant));
+  // Edge fade on the phone's scrolling symbol row (same as tab rows), so the cut tile reads as "more".
+  const { ref: iconRowRef, fadeClass: iconFadeClass } = useScrollFade<HTMLDivElement>('[aria-checked="true"]', draft.icon);
   const patch = (p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p }));
 
   const relLabel = (w: number) => (w === 0 ? t("plants.form.atFrost") : w < 0 ? t("plants.form.weeksBefore", { count: -w }) : t("plants.form.weeksAfter", { count: w }));
@@ -162,7 +165,7 @@ export function CustomPlantForm({ open, onClose, plant, onDeleted }: Props) {
             <span className="font-normal text-gray-600 dark:text-gray-400">: {ICONS.includes(draft.icon) ? getPlantName(draft.icon) : t("plants.form.iconNeutral")}</span>
           </span>
           {/* Phones: one scrolling row, so the required fields stay above the fold; wider: 8 × 2. An old emoji icon of an edited plant replaces the sprout tile. */}
-          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-8 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0" role="radiogroup" aria-labelledby="custom-plant-icon-label">
+          <div ref={iconRowRef} className={`-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-8 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0 ${iconFadeClass}`} role="radiogroup" aria-labelledby="custom-plant-icon-label">
             {(ICON_TILES.includes(draft.icon) ? ICON_TILES : [draft.icon, ...ICONS]).map((ic) => (
               <button
                 key={ic}
