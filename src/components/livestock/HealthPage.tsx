@@ -97,7 +97,7 @@ export function HealthPage() {
   const addButton = (
     <Button onClick={openAdd}>
       <Plus size={16} aria-hidden="true" />
-      {t("livestock.addHealth")}
+      {t("livestock.health.addEntry")}
     </Button>
   );
 
@@ -124,8 +124,15 @@ export function HealthPage() {
                 ...(stats.vaccinable > 0 ? [{
                   // The scope is named: only animals with a vaccination schedule (bees have none).
                   label: t("livestock.health.vaccCoverageScoped"),
-                  value: t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable }),
-                  hint: stats.due.length === 0 && stats.nextDue ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") }) : undefined,
+                  value: (
+                    <span className="inline-flex flex-wrap items-center gap-2">
+                      {t("livestock.health.vaccCoverageValue", { covered: stats.vaccinable - stats.due.length, total: stats.vaccinable })}
+                      {stats.due.length > 0 && <Badge tone="warning" size="sm">{t("livestock.health.vaccDueBadge")}</Badge>}
+                    </span>
+                  ),
+                  hint: stats.due.length === 0 && stats.nextDue
+                    ? t("livestock.health.nextDue", { date: f.formatDate(stats.nextDue, "short") })
+                    : t("livestock.health.vaccScopeHint"),
                 }] : []),
                 { label: t("livestock.health.losses"), value: f.formatNumber(stats.losses, { maximumFractionDigits: 0 }), hint: stats.losses === 0 ? t("livestock.health.noLosses") : undefined },
               ]}
@@ -199,7 +206,8 @@ export function HealthPage() {
                         badges={typeBadge(h)}
                         meta={[animal ? animalLabel(animal, t) : null, f.formatDate(h.date, "relative")]}
                         description={h.notes}
-                        trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : undefined}
+                        // Rows without a cost keep the column, so the menus line up.
+                        trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">–</span>}
                         onClick={() => setDialog({ open: true, entry: h })}
                         actions={
                           <Menu

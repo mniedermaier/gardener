@@ -96,19 +96,22 @@ export function DataManagement() {
       {(harvests.length > 0 || expenses.length > 0) && (
         <div>
           <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">{t("dataManagement.csvTitle")}</p>
+          {/* Secondary buttons with a download icon: they read as actions, not as text. */}
           <div className="flex flex-wrap gap-2">
             {harvests.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={exportHarvestsCsv}>
+              <Button variant="secondary" size="sm" onClick={exportHarvestsCsv}>
                 <FileSpreadsheet size={14} aria-hidden="true" />
                 {t("dataManagement.exportHarvestsCsv")}
                 <span className="text-gray-500 tabular-nums dark:text-gray-400">{harvests.length}</span>
+                <Download size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
               </Button>
             )}
             {expenses.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={exportExpensesCsv}>
+              <Button variant="secondary" size="sm" onClick={exportExpensesCsv}>
                 <FileSpreadsheet size={14} aria-hidden="true" />
                 {t("dataManagement.exportExpensesCsv")}
                 <span className="text-gray-500 tabular-nums dark:text-gray-400">{expenses.length}</span>
+                <Download size={14} aria-hidden="true" className="text-gray-500 dark:text-gray-400" />
               </Button>
             )}
           </div>

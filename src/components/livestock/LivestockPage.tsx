@@ -161,6 +161,7 @@ export function LivestockPage() {
               ...herdTypes.filter((ty) => ty !== "eggs").map((ty) => ({
                 label: t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
                 value: formatProductAmount(ty, stats.year[ty], f, t),
+                hint: t("livestock.entriesHint", { count: animalProducts.filter((p) => p.type === ty && p.date.startsWith(String(year))).length }),
                 to: "/livestock/production",
               })),
               ...(eggAnimal ? [feedFigure] : []),

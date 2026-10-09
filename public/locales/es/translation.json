@@ -1013,7 +1013,7 @@
     "fromRange": "Inicio según el bancal: {{range}}",
     "upNextFrom": "Lo siguiente · desde el {{date}}",
     "notesPlaceholder": "p. ej. herramientas, avisos…",
-    "afterFrostWindow": "tras la helada: {{range}}",
+    "afterFrostWindow": "tras las noches de helada: {{range}}",
     "timelineEmptyLine": "Tu plan de temporada necesita un bancal."
   },
   "settings": {
@@ -1255,7 +1255,8 @@
     "harvestsCount_many": "{{count}} cosechas",
     "showAll_many": "Mostrar los {{count}}",
     "showOlder": "Mostrar meses anteriores",
-    "weightIn": "Peso ({{unit}})"
+    "weightIn": "Peso ({{unit}})",
+    "prev30": "30 días antes: {{weight}}"
   },
   "journal": {
     "title": "Diario",
@@ -1408,7 +1409,11 @@
       "piece_many": "unidades"
     },
     "totalItems": "Artículos en stock",
-    "notesPlaceholder": "p. ej. receta, lugar de almacenaje…"
+    "notesPlaceholder": "p. ej. receta, lugar de almacenaje…",
+    "methodsHint_one": "en {{count}} método de conservación",
+    "methodsHint_other": "en {{count}} métodos de conservación",
+    "methodsHint_many": "en {{count}} métodos de conservación",
+    "itemsHeading": "Artículos"
   },
   "season": {
     "current": "Temporada {{year}}",
@@ -1693,7 +1698,7 @@
       "lastEntry": "Última entrada: {{date}}",
       "noLosses": "sin bajas registradas",
       "vaccContext": {
-        "chicken": "Gallinas: la vacuna contra la enfermedad de Newcastle (ND) es obligatoria en Alemania. El intervalo depende de la vacuna; los pollitos de criadero suelen venir vacunados contra Marek.",
+        "chicken": "Gallinas: la vacuna contra la enfermedad de Newcastle (ND) es obligatoria en Alemania. El intervalo depende de la vacuna. Los pollitos de criadero suelen venir vacunados contra Marek.",
         "poultry": "Patos y codornices: no es obligatoria, pero se recomienda la vacuna ND. El intervalo depende de la vacuna.",
         "rabbit": "Conejos: RHD y mixomatosis, cada seis a doce meses según la vacuna.",
         "ruminant": "Cabras y ovejas: vacuna contra clostridios, normalmente refuerzo anual; consúltalo con tu veterinario.",
@@ -1706,7 +1711,10 @@
       "emptyText": "Añade primero un animal. Después registras aquí vacunas, desparasitaciones y visitas al veterinario y ves qué toca.",
       "emptyTitle": "Vacunas y tratamientos bajo control",
       "notesPlaceholder": "p. ej. veterinario, próxima cita…",
-      "vaccCoverageScoped": "Grupos con vacuna obligatoria, protegidos"
+      "vaccCoverageScoped": "Vacunación",
+      "vaccScopeHint": "Grupos con vacuna obligatoria",
+      "vaccDueBadge": "pendiente",
+      "addEntry": "Registrar entrada"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1791,7 +1799,7 @@
     "feedEntriesCount_one": "{{count}} registro de pienso",
     "feedEntriesCount_other": "{{count}} registros de pienso",
     "feedEntriesCount_many": "{{count}} registros de pienso",
-    "chartDesc12": "Huevos por mes; miel y cera en la lista de abajo.",
+    "chartDesc12": "Huevos por mes, miel y cera como registros individuales.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "unidades al mes",
@@ -1856,7 +1864,6 @@
     "productThisYear": "{{product}} este año",
     "eggWeeksLabel": "Huevos cada 7 días en las últimas 8 semanas, media {{avg}}",
     "eggWeeksAvg": "Media {{avg}}/semana · 8 semanas",
-    "singleHarvests": "Registros individuales (últimos {{months}} meses)",
     "tabYields": "Rendimientos",
     "tabFeedings": "Raciones",
     "tabTreatments": "Tratamientos",
@@ -1874,7 +1881,11 @@
       "death": "p. ej. zorro, vejez",
       "other": "p. ej. recorte de pezuñas"
     },
-    "ofExpectedSince": "de ~{{amount}} esperados desde el {{date}}"
+    "ofExpectedSince": "de ~{{amount}} esperados desde el {{date}}",
+    "singleEntries": "Registros individuales",
+    "singleEntriesRange_one": "último mes",
+    "singleEntriesRange_other": "últimos {{count}} meses",
+    "singleEntriesRange_many": "últimos {{count}} meses"
   },
   "seeds": {
     "title": "Semillas",
@@ -1997,7 +2008,7 @@
       "optimal": "Dentro del rango objetivo de los cultivos (pH {{range}}). No hace falta cal ni azufre: el pH no necesita nada.",
       "noLime": "Algo por encima del rango objetivo (pH {{range}}). No encales ni uses ceniza de madera. El mantillo de hojas, el compost de corteza y la pinocha bajan el pH poco a poco; el compost normal es neutro o algo alcalino, úsalo con moderación. No hace falta azufre.",
       "sulfur": "Bastante por encima del rango objetivo (pH {{range}}). Incorpora azufre elemental en pequeñas dosis; nada de cal ni ceniza de madera.",
-      "limeVeto": "No encales: el pH {{ph}} conviene a {{crops}} (objetivo {{range}}). {{reason}} Los demás cultivos del bancal lo toleran; encala después de la cosecha, para el cultivo siguiente.",
+      "limeVeto": "No encales: el pH {{ph}} conviene a {{crops}} (objetivo {{range}}). {{reason}} Los demás cultivos del bancal suelen tolerarlo; encala después de la cosecha, para el cultivo siguiente.",
       "averseHigh": "Algo alto para {{crops}} (objetivo {{range}}). {{reason}} No encales ni uses ceniza; el mantillo de hojas o el compost de corteza bajan el pH poco a poco.",
       "acidify": "Demasiado alto para {{crops}} (objetivo {{range}}). Rellena el bancal o el hoyo con sustrato ácido (tierra para plantas acidófilas, corteza compostada) o baja el pH poco a poco con azufre elemental. Riega con agua de lluvia; la del grifo suele ser calcárea."
     },
@@ -2057,7 +2068,8 @@
     "moreMeasures_other": "{{count}} medidas más",
     "moreMeasures_many": "{{count}} medidas más",
     "notesPlaceholder": "p. ej. tiempo, incorporado…",
-    "testNotesPlaceholder": "p. ej. muestreo, laboratorio…"
+    "testNotesPlaceholder": "p. ej. muestreo, laboratorio…",
+    "staleTest": "Más de 5 meses – volver a analizar"
   },
   "preservation": {
     "title": "Guía de conservación",
@@ -2501,7 +2513,10 @@
     "pastePlaceholder": "https://…#/import?t=…",
     "pasteInvalid": "No es un enlace válido.",
     "preview": "Vista previa",
-    "toPlanner": "Ir al planificador"
+    "toPlanner": "Ir al planificador",
+    "restoreBackupHint": "Para tu propia copia (.json): sustituye o combina todos los datos.",
+    "includes": "Se copian los bancales y las plantaciones.",
+    "excludes": "No se incluyen: cosechas, animales, notas ni gastos."
   },
   "charts": {
     "month": "Mes",

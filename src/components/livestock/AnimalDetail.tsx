@@ -97,7 +97,7 @@ export function AnimalDetail() {
     // "Ertrag" everywhere: tab "Erträge", this button, the production page and the dialog.
     production: t("livestock.addProduct"),
     feed: t("livestock.addFeed"),
-    health: t("livestock.addHealth"),
+    health: t("livestock.health.addEntry"),
   };
   const openAddForTab = () => setDialog(tab === "feed" ? { kind: "feed" } : tab === "health" ? { kind: "health" } : { kind: "product" });
 
@@ -193,7 +193,7 @@ export function AnimalDetail() {
               analytics.cost > 0 && analytics.perUnit ? t(`livestock.costPer.${analytics.perUnit.type}`, { cost: f.formatCurrency(analytics.perUnit.cost) }) : null,
             ].filter(Boolean).join(" · "),
           },
-          { label: t("livestock.productionValue"), value: f.formatCurrency(analytics.value) },
+          // The production value already stands in the balance bars above.
         ]}
       />
       <div className="mb-6">

@@ -983,7 +983,7 @@
     "fromRange": "Starts by bed: {{range}}",
     "upNextFrom": "Coming up next · from {{date}}",
     "notesPlaceholder": "e.g. tools, reminders…",
-    "afterFrostWindow": "after the frost: {{range}}",
+    "afterFrostWindow": "after the frost nights: {{range}}",
     "timelineEmptyLine": "Your season plan needs a bed."
   },
   "settings": {
@@ -1210,7 +1210,8 @@
     "showLess": "Show less",
     "log": "Log",
     "showOlder": "Show older months",
-    "weightIn": "Weight ({{unit}})"
+    "weightIn": "Weight ({{unit}})",
+    "prev30": "30 days before: {{weight}}"
   },
   "journal": {
     "title": "Journal",
@@ -1353,7 +1354,10 @@
       "piece_other": "pieces"
     },
     "totalItems": "Items in stock",
-    "notesPlaceholder": "e.g. recipe, storage spot…"
+    "notesPlaceholder": "e.g. recipe, storage spot…",
+    "methodsHint_one": "in {{count}} storage method",
+    "methodsHint_other": "in {{count}} storage methods",
+    "itemsHeading": "Items"
   },
   "season": {
     "current": "Season {{year}}",
@@ -1623,7 +1627,7 @@
       "lastEntry": "Last entry: {{date}}",
       "noLosses": "no losses recorded",
       "vaccContext": {
-        "chicken": "Chickens: in Germany vaccination against Newcastle disease (ND) is mandatory. The interval depends on the vaccine – hatchery chicks are often already vaccinated against Marek’s disease.",
+        "chicken": "Chickens: in Germany vaccination against Newcastle disease (ND) is mandatory. The interval depends on the vaccine. Hatchery chicks are often already vaccinated against Marek’s disease.",
         "poultry": "Ducks and quail: not mandatory, but ND vaccination is recommended. The interval depends on the vaccine.",
         "rabbit": "Rabbits: RHD and myxomatosis, every six to twelve months depending on the vaccine.",
         "ruminant": "Goats and sheep: clostridial vaccine, usually boosted yearly – check with your vet.",
@@ -1636,7 +1640,10 @@
       "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due.",
       "emptyTitle": "Keep track of vaccinations and treatments",
       "notesPlaceholder": "e.g. vet, next appointment…",
-      "vaccCoverageScoped": "Groups needing vaccination, covered"
+      "vaccCoverageScoped": "Vaccination",
+      "vaccScopeHint": "Animal groups that require vaccination",
+      "vaccDueBadge": "due",
+      "addEntry": "Log entry"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1708,7 +1715,7 @@
     "eggsThisYear": "Eggs this year",
     "feedEntriesCount_one": "{{count}} feed entry",
     "feedEntriesCount_other": "{{count}} feed entries",
-    "chartDesc12": "Eggs per month; honey and wax listed below.",
+    "chartDesc12": "Eggs per month, honey and wax as individual entries.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "pieces per month",
@@ -1772,7 +1779,6 @@
     "productThisYear": "{{product}} this year",
     "eggWeeksLabel": "Eggs per 7 days over the last 8 weeks, avg. {{avg}}",
     "eggWeeksAvg": "Avg. {{avg}}/week · 8 weeks",
-    "singleHarvests": "Individual entries (last {{months}} months)",
     "tabYields": "Yields",
     "tabFeedings": "Feedings",
     "tabTreatments": "Treatments",
@@ -1790,7 +1796,10 @@
       "death": "e.g. fox, old age",
       "other": "e.g. hoof trimming"
     },
-    "ofExpectedSince": "of ~{{amount}} expected since {{date}}"
+    "ofExpectedSince": "of ~{{amount}} expected since {{date}}",
+    "singleEntries": "Individual entries",
+    "singleEntriesRange_one": "last month",
+    "singleEntriesRange_other": "last {{count}} months"
   },
   "seeds": {
     "title": "Seeds",
@@ -1908,7 +1917,7 @@
       "optimal": "Within the crops' target range (pH {{range}}). No lime or sulphur needed – nothing to do for the pH.",
       "noLime": "Slightly above the target range (pH {{range}}). Do not lime and no wood ash. Leaf mould, bark compost and pine needles lower the pH slowly; ordinary garden compost is neutral to alkaline, so use it sparingly. Sulphur is not needed.",
       "sulfur": "Well above the target range (pH {{range}}). Work in elemental sulphur in small doses; no lime and no wood ash.",
-      "limeVeto": "Do not lime: pH {{ph}} suits {{crops}} (target {{range}}). {{reason}} The other crops in the bed cope with it; lime after the harvest, for the next crop.",
+      "limeVeto": "Do not lime: pH {{ph}} suits {{crops}} (target {{range}}). {{reason}} The other crops in the bed usually cope with it; lime after the harvest, for the next crop.",
       "averseHigh": "Slightly too high for {{crops}} (target {{range}}). {{reason}} Do not lime, no wood ash; leaf mould or bark compost lowers the pH slowly.",
       "acidify": "Far too high for {{crops}} (target {{range}}). Fill the bed or planting hole with acidic substrate (ericaceous compost, composted bark) or lower the pH slowly with elemental sulphur. Water with rainwater; tap water is often hard."
     },
@@ -1967,7 +1976,8 @@
     "moreMeasures_one": "{{count}} more measure",
     "moreMeasures_other": "{{count}} more measures",
     "notesPlaceholder": "e.g. weather, worked in…",
-    "testNotesPlaceholder": "e.g. sampling spot, lab…"
+    "testNotesPlaceholder": "e.g. sampling spot, lab…",
+    "staleTest": "Older than 5 months – test again"
   },
   "preservation": {
     "title": "Preservation guide",
@@ -2391,7 +2401,10 @@
     "pastePlaceholder": "https://…#/import?t=…",
     "pasteInvalid": "This is not a valid share link.",
     "preview": "Preview",
-    "toPlanner": "Go to planner"
+    "toPlanner": "Go to planner",
+    "restoreBackupHint": "For your own backup (.json) – replaces or merges all data.",
+    "includes": "Beds and plantings are copied.",
+    "excludes": "Not included: harvests, animals, notes and expenses."
   },
   "charts": {
     "month": "Month",

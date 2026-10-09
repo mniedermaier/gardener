@@ -5,6 +5,8 @@ import { useDraggable } from "@dnd-kit/core";
 import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
+import { useFrostHold } from "@/hooks/useFrostHold";
+import { addDays } from "date-fns";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -68,7 +70,8 @@ const PaletteItem = memo(function PaletteItem({ plant, name, reason, isSelected,
  */
 export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bedFitIds, className = "" }: Props) {
   const { t } = useTranslation();
-  const { formatDate } = useFormat();
+  const { formatDate, formatDateRange } = useFormat();
+  const { lastFrostNight, holds } = useFrostHold();
   const plants = usePlants();
   const getPlantName = usePlantName();
   const [query, setQuery] = useState("");
@@ -94,18 +97,27 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
   const recommended = useMemo(() => {
     if (plantableNow.length > 0) {
       return plantableNow
-        .map((r) => ({
-          plant: plantById.get(r.plantId),
+        .map((r) => {
+          const plant = plantById.get(r.plantId);
+          // Same frost rule as the calendar: during a forecast frost spell the
+          // window starts after the last frost night (or waits for it).
+          const held = !!plant && !!lastFrostNight && holds(plant, [r.action]);
+          const after = lastFrostNight ? addDays(lastFrostNight, 1) : null;
+          const when = held && after
+            ? after <= r.until
+              ? t("calendar.afterFrostWindow", { range: formatDateRange(after, r.until) })
+              : t("advisor.afterFrost", { date: formatDate(after, "short") })
+            : t(`palette.reason.${r.action}`, { date: formatDate(r.until, "short") });
           // Garden level: name the beds it suits ("Herbstsaat bis 17. Okt. · Hochbeet Süd").
-          reason: [t(`palette.reason.${r.action}`, { date: formatDate(r.until, "short") }), r.beds?.length ? r.beds.map((b) => b.name).join(", ") : null].filter(Boolean).join(" · "),
-        }))
+          return { plant, reason: [when, r.beds?.length ? r.beds.map((b) => b.name).join(", ") : null].filter(Boolean).join(" · ") };
+        })
         .filter((r): r is { plant: Plant; reason: string } => !!r.plant);
     }
     return bedFitIds
       .map((id) => plantById.get(id))
       .filter((p): p is Plant => !!p)
       .map((plant) => ({ plant, reason: t("palette.reason.fitsBed") }));
-  }, [plantableNow, bedFitIds, plantById, t, formatDate]);
+  }, [plantableNow, bedFitIds, plantById, t, formatDate, formatDateRange, lastFrostNight, holds]);
 
   const items = useMemo(() => {
     let list: Array<{ plant: Plant; reason?: string }>;

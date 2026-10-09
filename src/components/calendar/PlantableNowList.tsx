@@ -9,15 +9,9 @@ import { ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { PhaseBadge, actionPhase } from "@/components/ui/phase";
 import { Badge } from "@/components/ui/Badge";
-import { useWeatherGlance } from "@/hooks/useWeatherGlance";
-import { useToday } from "@/hooks/useToday";
-import { useFrostSummary } from "@/components/weather/frost";
+import { useFrostHold } from "@/hooks/useFrostHold";
 import { isFrostSensitive } from "@/lib/weatherAlerts";
-import { toDate, toISODate } from "@/lib/format";
 import { addDays } from "date-fns";
-
-/** Planted in autumn on purpose to overwinter: frost does not stop them. */
-const OVERWINTERING = new Set(["garlic", "onion", "currant", "gooseberry", "raspberry", "blueberry", "strawberry"]);
 
 /**
  * Rows of the sowing agenda (`useSowingAgenda`): what can be sown or planted
@@ -31,22 +25,11 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
   const plantMap = usePlantMap();
   const getPlantName = usePlantName();
   const [expanded, setExpanded] = useState(false);
-  const today = useToday();
-  const glance = useWeatherGlance();
-  const frost = useFrostSummary(glance.status === "ready" ? glance.data.days : undefined);
-  // The last forecast frost night (≤ 0 °C) when one comes in the next three
-  // nights: planting out before it would contradict the frost warning on
-  // "Heute" and "Wetter", so those rows show the window after it instead.
-  const lastFrostNight = useMemo(() => {
-    const until = toISODate(addDays(today, 3));
-    const hard = frost?.summary.nights.filter((n) => n.tempMin <= 0) ?? [];
-    if (!hard.some((n) => n.date <= until)) return null;
-    return toDate(hard.reduce((a, b) => (b.date > a.date ? b : a)).date);
-  }, [frost, today]);
+  // Planting out before a forecast frost night would contradict the frost
+  // warning on "Heute" and "Wetter": those rows show the window after it.
+  const { lastFrostNight, holds } = useFrostHold();
   const frostBlocks = (item: AgendaPlantRow, plant: Parameters<typeof isFrostSensitive>[0]) =>
-    !!lastFrostNight && item.kind === "now" && !OVERWINTERING.has(plant.id)
-    && item.actions.some((a) => a === "transplant" || a === "plant_autumn")
-    && (isFrostSensitive(plant) || item.actions.includes("plant_autumn"));
+    item.kind === "now" && holds(plant, item.actions);
   const windowEnd = (item: AgendaPlantRow) => new Date(Math.max(...groupAgendaBedsByDate(item).map((g) => g.date.getTime())));
   /** Some days of the window remain after the last frost night. */
   const windowAfterFrost = (item: AgendaPlantRow) => !!lastFrostNight && addDays(lastFrostNight, 1) <= windowEnd(item);

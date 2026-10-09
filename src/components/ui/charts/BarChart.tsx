@@ -19,6 +19,8 @@ export interface BarSeries {
   hatched?: boolean;
   /** Dotted fill: a second measured series of the same family (rain beside watering). */
   dotted?: boolean;
+  /** Drawn with less emphasis, so another series stays the hero (animal products beside the garden). */
+  muted?: boolean;
 }
 
 export interface BarChartProps {
@@ -130,7 +132,8 @@ export function BarChart({
                   const y0 = y(acc);
                   acc += v;
                   const y1 = y(acc);
-                  const h = Math.max(1, y0 - y1 - (k < lastIdx ? 2 : 0));
+                  // A value above zero stays visible as a segment (≥ 3 px), never a hairline.
+                  const h = Math.max(3, y0 - y1 - (k < lastIdx ? 2 : 0));
                   const s = series[k];
                   const patterned = s.hatched || s.dotted;
                   const fill = patterned ? `url(#${uid}-h${k})` : undefined;
@@ -139,7 +142,7 @@ export function BarChart({
                   const x0 = cx - barW / 2;
                   const top0 = y0 - h;
                   const path = `M${x0},${y0} V${top0 + r} Q${x0},${top0} ${x0 + r},${top0} H${x0 + barW - r} Q${x0 + barW},${top0} ${x0 + barW},${top0 + r} V${y0} Z`;
-                  return <path key={k} d={path} className={cls} fill={fill} />;
+                  return <path key={k} d={path} className={s.muted ? `${cls} opacity-60` : cls} fill={fill} />;
                 })}
                 {showLabel(i) && (
                   <text

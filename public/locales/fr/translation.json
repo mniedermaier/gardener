@@ -1013,7 +1013,7 @@
     "fromRange": "Début selon la planche : {{range}}",
     "upNextFrom": "Ensuite · dès le {{date}}",
     "notesPlaceholder": "p. ex. outils, rappels…",
-    "afterFrostWindow": "après le gel : {{range}}",
+    "afterFrostWindow": "après les nuits de gel : {{range}}",
     "timelineEmptyLine": "Ton plan de saison a besoin d’une planche."
   },
   "settings": {
@@ -1255,7 +1255,8 @@
     "harvestsCount_many": "{{count}} récoltes",
     "showAll_many": "Afficher les {{count}}",
     "showOlder": "Afficher les mois précédents",
-    "weightIn": "Poids ({{unit}})"
+    "weightIn": "Poids ({{unit}})",
+    "prev30": "30 jours avant : {{weight}}"
   },
   "journal": {
     "title": "Journal",
@@ -1408,7 +1409,11 @@
       "piece_many": "pièces"
     },
     "totalItems": "Articles en stock",
-    "notesPlaceholder": "p. ex. recette, lieu de stockage…"
+    "notesPlaceholder": "p. ex. recette, lieu de stockage…",
+    "methodsHint_one": "en {{count}} mode de conservation",
+    "methodsHint_other": "en {{count}} modes de conservation",
+    "methodsHint_many": "en {{count}} modes de conservation",
+    "itemsHeading": "Articles"
   },
   "season": {
     "current": "Saison {{year}}",
@@ -1693,7 +1698,7 @@
       "lastEntry": "Dernière entrée : {{date}}",
       "noLosses": "aucune perte enregistrée",
       "vaccContext": {
-        "chicken": "Poules : en Allemagne, la vaccination contre la maladie de Newcastle (ND) est obligatoire. L’intervalle dépend du vaccin ; les poussins d’écloserie sont souvent déjà vaccinés contre Marek.",
+        "chicken": "Poules : en Allemagne, la vaccination contre la maladie de Newcastle (ND) est obligatoire. L’intervalle dépend du vaccin. Les poussins d’écloserie sont souvent déjà vaccinés contre Marek.",
         "poultry": "Canards et cailles : pas d’obligation, mais le vaccin ND est recommandé. L’intervalle dépend du vaccin.",
         "rabbit": "Lapins : VHD et myxomatose, tous les six à douze mois selon le vaccin.",
         "ruminant": "Chèvres et moutons : vaccin contre les clostridies, rappel le plus souvent annuel – voyez avec votre vétérinaire.",
@@ -1706,7 +1711,10 @@
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire.",
       "emptyTitle": "Vaccins et soins en un coup d’œil",
       "notesPlaceholder": "p. ex. vétérinaire, prochain rendez-vous…",
-      "vaccCoverageScoped": "Groupes à vacciner, protégés"
+      "vaccCoverageScoped": "Vaccination",
+      "vaccScopeHint": "Groupes soumis à vaccination",
+      "vaccDueBadge": "à faire",
+      "addEntry": "Saisir une entrée"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1791,7 +1799,7 @@
     "feedEntriesCount_one": "{{count}} entrée d’alimentation",
     "feedEntriesCount_other": "{{count}} entrées d’alimentation",
     "feedEntriesCount_many": "{{count}} entrées d’alimentation",
-    "chartDesc12": "Œufs par mois ; miel et cire en liste ci-dessous.",
+    "chartDesc12": "Œufs par mois, miel et cire en saisies individuelles.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "pièces par mois",
@@ -1856,7 +1864,6 @@
     "productThisYear": "{{product}} cette année",
     "eggWeeksLabel": "Œufs par 7 jours sur les 8 dernières semaines, moy. {{avg}}",
     "eggWeeksAvg": "Moy. {{avg}}/semaine · 8 semaines",
-    "singleHarvests": "Saisies individuelles ({{months}} derniers mois)",
     "tabYields": "Rendements",
     "tabFeedings": "Rations",
     "tabTreatments": "Soins",
@@ -1874,7 +1881,11 @@
       "death": "p. ex. renard, vieillesse",
       "other": "p. ex. parage des onglons"
     },
-    "ofExpectedSince": "sur ~{{amount}} attendus depuis le {{date}}"
+    "ofExpectedSince": "sur ~{{amount}} attendus depuis le {{date}}",
+    "singleEntries": "Saisies individuelles",
+    "singleEntriesRange_one": "dernier mois",
+    "singleEntriesRange_other": "{{count}} derniers mois",
+    "singleEntriesRange_many": "{{count}} derniers mois"
   },
   "seeds": {
     "title": "Semences",
@@ -1997,7 +2008,7 @@
       "optimal": "Dans la plage cible des cultures (pH {{range}}). Ni chaux ni soufre nécessaires : rien à faire pour le pH.",
       "noLime": "Un peu au-dessus de la plage cible (pH {{range}}). Ne pas chauler, pas de cendre de bois. Le terreau de feuilles, le compost d’écorce et les aiguilles de pin abaissent lentement le pH ; le compost ordinaire est neutre à basique, à utiliser avec parcimonie. Le soufre est inutile.",
       "sulfur": "Nettement au-dessus de la plage cible (pH {{range}}). Incorporer du soufre élémentaire par petites doses ; ni chaux ni cendre de bois.",
-      "limeVeto": "Ne pas chauler : un pH de {{ph}} convient à {{crops}} (cible {{range}}). {{reason}} Les autres cultures de la planche s’en accommodent ; chauler après la récolte, pour la culture suivante.",
+      "limeVeto": "Ne pas chauler : un pH de {{ph}} convient à {{crops}} (cible {{range}}). {{reason}} Les autres cultures de la planche s’en accommodent en général ; chauler après la récolte, pour la culture suivante.",
       "averseHigh": "Un peu trop élevé pour {{crops}} (cible {{range}}). {{reason}} Ne pas chauler, pas de cendre ; le terreau de feuilles ou le compost d’écorce abaissent lentement le pH.",
       "acidify": "Bien trop élevé pour {{crops}} (cible {{range}}). Remplir la planche ou le trou de plantation de substrat acide (terre de bruyère, écorce compostée) ou abaisser lentement le pH avec du soufre élémentaire. Arroser à l’eau de pluie, l’eau du robinet est souvent calcaire."
     },
@@ -2057,7 +2068,8 @@
     "moreMeasures_other": "{{count}} autres mesures",
     "moreMeasures_many": "{{count}} autres mesures",
     "notesPlaceholder": "p. ex. météo, incorporé…",
-    "testNotesPlaceholder": "p. ex. prélèvement, laboratoire…"
+    "testNotesPlaceholder": "p. ex. prélèvement, laboratoire…",
+    "staleTest": "Plus de 5 mois – refaire l’analyse"
   },
   "preservation": {
     "title": "Guide de conservation",
@@ -2501,7 +2513,10 @@
     "pastePlaceholder": "https://…#/import?t=…",
     "pasteInvalid": "Ce n’est pas un lien de partage valide.",
     "preview": "Aperçu",
-    "toPlanner": "Aller au planificateur"
+    "toPlanner": "Aller au planificateur",
+    "restoreBackupHint": "Pour ta propre sauvegarde (.json) – remplace ou fusionne toutes les données.",
+    "includes": "Les planches et les plantations sont reprises.",
+    "excludes": "Non inclus : récoltes, animaux, notes et dépenses."
   },
   "charts": {
     "month": "Mois",

@@ -11,6 +11,12 @@ import { useToday } from "@/hooks/useToday";
 /** Fewest months a chart shows, even for a herd that is only weeks old. */
 const MIN_MONTHS = 3;
 
+/** Index of the first month with a value, keeping at least MIN_MONTHS bars. */
+function chartStart(values: number[]): number {
+  const first = values.findIndex((v) => v > 0);
+  return first < 0 ? 0 : Math.max(0, Math.min(first, values.length - MIN_MONTHS));
+}
+
 interface ProductionChartProps {
   animalProducts: AnimalProduct[];
   months?: number;
@@ -69,7 +75,11 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
   const charts = types.length > 0 && (
     <div className={`grid gap-6 ${types.length > 1 ? "lg:grid-cols-2" : ""}`}>
       {types.map((type) => {
-        const values = perType.get(type)!;
+        // Each chart starts at its own first month with a value: honey logged in
+        // July must not leave an empty July column in the egg chart.
+        const from = chartStart(perType.get(type)!);
+        const values = perType.get(type)!.slice(from);
+        const chartBuckets = buckets.slice(from);
         const Icon = PRODUCT_ICON[type];
         const total = values.reduce((s, v) => s + v, 0);
         const fmt = (v: number) => formatProductAmount(type, v, f, t);
@@ -83,7 +93,7 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
               <span className="font-normal text-gray-500 dark:text-gray-400">· {t("livestock.chartUnit", { unit: t(`livestock.unitPerMonth.${type}`) })}</span>
             </h3>
             <BarChart
-              data={buckets.map((b, i) => ({
+              data={chartBuckets.map((b, i) => ({
                 key: b.key,
                 label: f.formatDate(b.date, "month"),
                 fullLabel: f.formatDate(b.date, "monthYear"),
@@ -92,8 +102,8 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
               series={[{ label: name, color: "brand" }]}
               formatValue={fmt}
               formatTick={tick}
-              marker={{ index: buckets.length - 1, label: t("charts.today") }}
-              caption={t("livestock.chartCaption", { product: name, months: shown, total: fmt(total) })}
+              marker={{ index: chartBuckets.length - 1, label: t("charts.today") }}
+              caption={t("livestock.chartCaption", { product: name, months: chartBuckets.length, total: fmt(total) })}
               categoryLabel={t("charts.month")}
               height={150}
             />
@@ -103,26 +113,28 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
     </div>
   );
 
+  // Rare harvests (honey, wax) as rows: product, month as meta, amount right-aligned.
   const sparseList = sparse.length > 0 && (
     <div>
-      <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("livestock.singleHarvests", { months: shown })}</h3>
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t("livestock.singleEntries")}</h3>
+      <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{t("livestock.singleEntriesRange", { count: shown })}</p>
       <ul className="divide-y divide-gray-100 text-sm dark:divide-white/5">
-        {sparse.map((type) => {
+        {sparse.flatMap((type) => {
           const Icon = PRODUCT_ICON[type];
           const values = perType.get(type)!;
-          const entries = buckets
+          return buckets
             .map((b, i) => ({ b, v: values[i] }))
             .filter((x) => x.v > 0)
-            .map((x) => `${formatProductAmount(type, x.v, f, t)} (${f.formatDate(x.b.date, "monthYear")})`);
-          return (
-            <li key={type} className="flex items-start gap-2 py-2">
-              <Icon size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
-              <span className="min-w-0">
-                <span className="font-medium text-gray-900 dark:text-gray-100">{t(`livestock.products.${type}`)}</span>{" "}
-                <span className="text-gray-600 tabular-nums dark:text-gray-300">{entries.join(", ")}</span>
-              </span>
-            </li>
-          );
+            .map(({ b, v }) => (
+              <li key={`${type}-${b.key}`} className="flex items-center gap-3 py-2">
+                <Icon size={16} aria-hidden="true" className="shrink-0 text-gray-500 dark:text-gray-400" />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium text-gray-900 dark:text-gray-100">{t(`livestock.products.${type}`)}</span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">{f.formatDate(b.date, "monthYear")}</span>
+                </span>
+                <span className="shrink-0 font-medium text-gray-900 tabular-nums dark:text-gray-100">{formatProductAmount(type, v, f, t)}</span>
+              </li>
+            ));
         })}
       </ul>
     </div>
@@ -142,25 +154,35 @@ export function ProductionChart({ animalProducts, months = 6, rangeProducts }: P
     );
   }
   const type = types[0];
-  const values = perType.get(type)!;
-  const withData = values.filter((v) => v > 0);
-  const avg = withData.length > 0 ? withData.reduce((s, v) => s + v, 0) / withData.length : 0;
+  const from = chartStart(perType.get(type)!);
+  const values = perType.get(type)!.slice(from);
+  const summaryBuckets = buckets.slice(from);
+  // The current month is still running: the average uses full months only and names them.
+  const full = values.slice(0, -1).map((v, i) => ({ v, b: summaryBuckets[i] })).filter((x) => x.v > 0);
+  const withData = full.length > 0 ? full : values.map((v, i) => ({ v, b: summaryBuckets[i] })).filter((x) => x.v > 0);
+  const avg = withData.length > 0 ? withData.reduce((sum, x) => sum + x.v, 0) / withData.length : 0;
+  const avgRange = withData.length > 1
+    ? `${f.formatDate(withData[0].b.date, "month")}–${f.formatDate(withData[withData.length - 1].b.date, "month")}`
+    : withData.length === 1 ? f.formatDate(withData[0].b.date, "monthYear") : "";
   const best = values.reduce((bi, v, i, a) => (v > a[bi] ? i : bi), 0);
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,36rem)_1fr] lg:gap-8">
       {charts}
       {sparseList || (
-        withData.length > 1 && (
+        values.filter((v) => v > 0).length > 1 && (
           <dl className="grid grid-cols-2 content-start gap-x-6 gap-y-4 text-sm lg:grid-cols-1">
             <div>
               <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.monthAvgLabel")}</dt>
-              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">{formatProductAmount(type, avg, f, t)}</dd>
+              <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
+                {formatProductAmount(type, avg, f, t)}
+                {avgRange && <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{avgRange}</span>}
+              </dd>
             </div>
             <div>
               <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.bestMonth")}</dt>
               <dd className="text-xl font-semibold text-gray-900 tabular-nums dark:text-gray-100">
                 {formatProductAmount(type, values[best], f, t)}
-                <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(buckets[best].date, "monthYear")}</span>
+                <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">{f.formatDate(summaryBuckets[best].date, "monthYear")}</span>
               </dd>
             </div>
           </dl>
