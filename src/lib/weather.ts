@@ -76,39 +76,25 @@ export interface FetchWeatherOptions {
 /**
  * What the last request with an OpenWeatherMap key found out: "ok", "auth"
  * (key rejected, Open-Meteo used instead) or "unavailable" (OWM down, Open-Meteo
- * used). Kept per key for the session so Settings can name the provider that
- * actually delivers the weather.
+ * used). Kept per key in memory only, so Settings can name the provider that
+ * actually delivers the weather. Never written to storage: the key is a secret.
  */
 export type OwmKeyStatus = "ok" | "auth" | "unavailable";
 
-const OWM_STATUS_KEY = "gardener-owm-status";
+const owmStatus = new Map<string, OwmKeyStatus>();
 const owmListeners = new Set<() => void>();
-
-function readOwmStatus(): Record<string, OwmKeyStatus> {
-  try {
-    return JSON.parse(sessionStorage.getItem(OWM_STATUS_KEY) ?? "{}") as Record<string, OwmKeyStatus>;
-  } catch {
-    return {};
-  }
-}
 
 function setOwmKeyStatus(apiKey: string | null | undefined, status: OwmKeyStatus): void {
   const key = apiKey?.trim();
-  if (!key) return;
-  const all = readOwmStatus();
-  if (all[key] === status) return;
-  try {
-    sessionStorage.setItem(OWM_STATUS_KEY, JSON.stringify({ ...all, [key]: status }));
-  } catch {
-    // Session storage blocked: the status is just not remembered.
-  }
+  if (!key || owmStatus.get(key) === status) return;
+  owmStatus.set(key, status);
   owmListeners.forEach((l) => l());
 }
 
 /** Status of the given key, undefined while no request has used it yet. */
 export function getOwmKeyStatus(apiKey: string | null | undefined): OwmKeyStatus | undefined {
   const key = apiKey?.trim();
-  return key ? readOwmStatus()[key] : undefined;
+  return key ? owmStatus.get(key) : undefined;
 }
 
 /** For useSyncExternalStore: notifies when a key status changes. */
