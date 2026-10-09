@@ -1962,11 +1962,11 @@
       "high": "hoch"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "N, P und K sind optional – in mg/kg, wie Testsets und Labore sie angeben.",
+    "ppmHint": "ppm = mg/kg, wie Testsets und Labore sie angeben.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
-    "chooseBed": "Beet wählen",
+    "chooseBed": "Beet wählen …",
     "needBed": "Bitte ein Beet wählen",
     "needMaterial": "Bitte das Material angeben",
     "invalidPh": "pH zwischen 3 und 10 eingeben",
@@ -2007,7 +2007,8 @@
     "notesPlaceholder": "z. B. Wetter, eingearbeitet …",
     "testNotesPlaceholder": "z. B. Probenahme, Labor …",
     "staleHint_one": "{{count}} Bodentest ist älter als 5 Monate – im Frühjahr neu beproben.",
-    "staleHint_other": "{{count}} Bodentests sind älter als 5 Monate – im Frühjahr neu beproben."
+    "staleHint_other": "{{count}} Bodentests sind älter als 5 Monate – im Frühjahr neu beproben.",
+    "nutrientsPpm": "Nährstoffe (ppm)"
   },
   "preservation": {
     "title": "Konservierungs-Ratgeber",

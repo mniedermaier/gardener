@@ -26,6 +26,7 @@ import { Tabs } from "@/components/ui/Tabs";
 import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Tone } from "@/components/ui/tone";
 import { DateField } from "@/components/ui/DateField";
+import { LABEL_CLASS } from "@/components/ui/Field";
 import { useBeds } from "@/components/records/useBeds";
 
 const AMENDMENT_TYPES: AmendmentType[] = ["compost", "manure", "lime", "sulfur", "fertilizer", "mulch", "other"];
@@ -454,12 +455,16 @@ export function SoilManagement() {
             <Input label={t("soil.ph")} inputMode="decimal" value={test.ph} onChange={(e) => patchTest({ ph: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(6.5) })} error={testErrors.ph} />
             <Input label={`${t("soil.nutrients.organicMatter")} (%)`} optional inputMode="decimal" value={test.om} onChange={(e) => patchTest({ om: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(4.5) })} error={testErrors.om} />
           </div>
+          {/* One caption carries unit and optional marker; the fields are just N, P, K (rule 9). */}
+          <div>
+          <p className={LABEL_CLASS}>{t("soil.nutrientsPpm")} <span className="font-normal text-gray-500 dark:text-gray-400">{t("common.optionalMark")}</span></p>
           <div className="grid grid-cols-3 items-end gap-3">
-            <Input label={t("soil.nShort")} inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
-            <Input label={t("soil.pShort")} inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />
-            <Input label={t("soil.kShort")} inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(150) })} error={testErrors.k} />
+            <Input aria-label={`${t("soil.nutrientsPpm")} N`} label="N" inputMode="decimal" value={test.n} onChange={(e) => patchTest({ n: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(40) })} error={testErrors.n} />
+            <Input aria-label={`${t("soil.nutrientsPpm")} P`} label="P" inputMode="decimal" value={test.p} onChange={(e) => patchTest({ p: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(30) })} error={testErrors.p} />
+            <Input aria-label={`${t("soil.nutrientsPpm")} K`} label="K" inputMode="decimal" value={test.k} onChange={(e) => patchTest({ k: e.target.value })} placeholder={t("common.examplePlaceholder", { value: formatNumber(150) })} error={testErrors.k} />
           </div>
-          <p className="-mt-2 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("soil.ppmHint")}</p>
+          </div>
           <DateField label={t("harvest.date")} value={test.date} onChange={(date) => patchTest({ date })} />
           <Textarea label={t("harvest.notes")} optional placeholder={t("soil.testNotesPlaceholder")} rows={2} value={test.notes} onChange={(e) => patchTest({ notes: e.target.value })} />
         </div>

@@ -2057,11 +2057,11 @@
       "high": "élevé"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "N, P et K sont facultatifs – en mg/kg, comme les indiquent kits et laboratoires.",
+    "ppmHint": "ppm = mg/kg, comme les indiquent kits et laboratoires.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
-    "chooseBed": "Choisir une planche",
+    "chooseBed": "Choisir une planche…",
     "needBed": "Choisissez une planche",
     "needMaterial": "Indiquez le matériau",
     "invalidPh": "Saisissez un pH entre 3 et 10",
@@ -2104,7 +2104,8 @@
     "testNotesPlaceholder": "p. ex. prélèvement, laboratoire…",
     "staleHint_one": "{{count}} analyse date de plus de 5 mois – à refaire au printemps.",
     "staleHint_other": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps.",
-    "staleHint_many": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps."
+    "staleHint_many": "{{count}} analyses datent de plus de 5 mois – à refaire au printemps.",
+    "nutrientsPpm": "Nutriments (ppm)"
   },
   "preservation": {
     "title": "Guide de conservation",

@@ -1962,11 +1962,11 @@
       "high": "high"
     },
     "ppm": "{{value}} ppm",
-    "ppmHint": "N, P and K are optional – in mg/kg, as test kits and labs report them.",
+    "ppmHint": "ppm = mg/kg, as test kits and labs report them.",
     "nShort": "N (ppm)",
     "pShort": "P (ppm)",
     "kShort": "K (ppm)",
-    "chooseBed": "Choose a bed",
+    "chooseBed": "Choose a bed…",
     "needBed": "Choose a bed",
     "needMaterial": "Enter the material",
     "invalidPh": "Enter a pH between 3 and 10",
@@ -2007,7 +2007,8 @@
     "notesPlaceholder": "e.g. weather, worked in…",
     "testNotesPlaceholder": "e.g. sampling spot, lab…",
     "staleHint_one": "{{count}} soil test is older than 5 months – retest in spring.",
-    "staleHint_other": "{{count}} soil tests are older than 5 months – retest in spring."
+    "staleHint_other": "{{count}} soil tests are older than 5 months – retest in spring.",
+    "nutrientsPpm": "Nutrients (ppm)"
   },
   "preservation": {
     "title": "Preservation guide",
