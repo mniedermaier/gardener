@@ -199,6 +199,14 @@ describe("crop plan", () => {
     expect(plan.rows[0].plantId).toBe("tomato"); // largest deficit first
   });
 
+  it("counts a harvest above the forecast against the gap", () => {
+    const big = [...harvests, harvest("tomato", "2026-08-10", 8000)];
+    const plan = getCropPlan({ gardens: [garden], plants, gridCellSizeCm: 30, harvests: big, householdSize: 1, period: 2026, targets: { potato: 2, tomato: 10 } });
+    const tm = plan.rows.find((r) => r.plantId === "tomato")!;
+    expect(tm.actualKg).toBeGreaterThan(tm.forecastKg);
+    expect(tm.deficitKg).toBeCloseTo(10 - tm.actualKg);
+  });
+
   it("scales targets with household size", () => {
     const one = getCropPlan({ gardens: [], plants, gridCellSizeCm: 30, harvests: [], householdSize: 1, period: 2026 });
     const four = getCropPlan({ gardens: [], plants, gridCellSizeCm: 30, harvests: [], householdSize: 4, period: 2026 });

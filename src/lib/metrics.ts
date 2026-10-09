@@ -706,11 +706,13 @@ export function getCropPlan(input: {
     const targetKg = perPerson * input.householdSize;
     const areaM2 = area[plantId] ?? 0;
     const forecastKg = areaM2 * kgPerM2;
-    const deficitKg = Math.max(0, targetKg - forecastKg);
+    const actualKg = (actual[plantId] ?? 0) / 1000;
+    // What is already harvested counts even when it beats the (bed-capped) forecast.
+    const deficitKg = Math.max(0, targetKg - Math.max(forecastKg, actualKg));
     rows.push({
       plantId,
       targetKg,
-      actualKg: (actual[plantId] ?? 0) / 1000,
+      actualKg,
       forecastKg,
       areaM2,
       neededAreaM2: kgPerM2 > 0 ? targetKg / kgPerM2 : 0,
