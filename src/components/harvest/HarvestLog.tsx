@@ -283,7 +283,8 @@ export function HarvestLog() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card className="min-w-0">
-              <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint")} />
+              {/* The subtitle names the range actually drawn (from the first harvest month, 3–12 months). */}
+              <CardHeader title={t("harvest.perMonth")} description={t("harvest.perMonthHint", { month: formatDate(stats.months[0].date, "monthYear") })} />
               <BarChart
                 caption={t("harvest.perMonth")}
                 categoryLabel={t("harvest.month")}
@@ -292,6 +293,7 @@ export function HarvestLog() {
                 data={stats.months.map((m) => ({ key: m.key, label: formatDate(m.date, "month"), fullLabel: formatDate(m.date, "monthYear"), values: [m.kg] }))}
                 formatValue={(kg) => formatWeight(kg * 1000)}
                 formatTick={kgTick}
+                marker={{ index: stats.months.length - 1, label: t("charts.today") }}
               />
             </Card>
 

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Syringe, Trash2 } from "lucide-react";
+import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Stethoscope, Syringe, Trash2 } from "lucide-react";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -106,7 +106,7 @@ export function HealthPage() {
       <PageHeader title={t("livestock.health.title")} description={t("livestock.health.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
       {animals.length === 0 ? (
-        <NoAnimalsYet text={t("livestock.health.emptyText")} />
+        <NoAnimalsYet icon={Stethoscope} title={t("livestock.health.emptyTitle")} text={t("livestock.health.emptyText")} />
       ) : (
         <div className="space-y-6">
           {(healthEvents.length > 0 || stats.vaccinable > 0) && (

@@ -1170,7 +1170,7 @@
     "outOfFive": "of 5",
     "topCrop": "Top crop",
     "perMonth": "Harvest per month",
-    "perMonthHint": "Weight over the last 12 months",
+    "perMonthHint": "Weight per month since {{month}}",
     "month": "Month",
     "byPlant": "By crop",
     "byPlantHint": "Total weight and number of harvests",
@@ -1358,8 +1358,8 @@
     "target": "Annual target",
     "covered": "Covered",
     "meterLabel": "{{plant}}: recorded {{actual}}, forecast {{forecast}}, target {{target}}",
-    "emptyTitle": "Plan your annual needs",
-    "emptyText": "Your household needs about {{kg}} of vegetables and fruit per year. Plant some beds and the plan shows what's missing.",
+    "emptyTitle": "Nothing planted yet",
+    "emptyText": "Your household needs about {{kg}} of vegetables and fruit per year. Below is how much per crop – add beds and the plan shows what's missing.",
     "howTargets": "Annual target: average consumption per person in central Europe (e.g. 30 kg potatoes, 15 kg tomatoes) × household size.",
     "howCoverage": "Quantity target: the sum of min(amount, target) per crop divided by the sum of all targets. A potato surplus doesn't make up for missing tomatoes.",
     "howVsCalories": "This is not a calorie figure: self-sufficiency on the “Self-sufficiency” page counts calories and includes animal products. The two numbers therefore differ.",
@@ -1373,7 +1373,7 @@
     "unplanted": "Not planted yet",
     "unplantedTitle_one": "{{count}} crop not planted yet",
     "unplantedTitle_other": "{{count}} crops not planted yet",
-    "unplantedDesc": "Their targets would need {{area}} in total.",
+    "unplantedDesc": "Together they would need {{area}}.",
     "targetShort": "Target {{target}}",
     "neededShort": "{{area}} needed"
   },
@@ -1396,7 +1396,7 @@
     "yieldByPlant": "Yield by plant",
     "monthlyTitle": "Supply per month",
     "annualCoverage": "Annual coverage",
-    "fresh": "Fresh",
+    "fresh": "Garden, fresh",
     "stored": "From storage",
     "months": "months shelf life",
     "winterGap": "Winter storage gap",
@@ -1416,7 +1416,6 @@
       "preserve": "Preserving & seeds"
     },
     "emptyTitle": "Nothing to calculate yet",
-    "emptyText": "Once beds are planted or animals are added, you'll see here how much of your needs your garden covers.",
     "toPlanner": "Open planner",
     "toLivestock": "Add animals",
     "coverageDesc_one": "Forecast for one year, needs of {{count}} person.",
@@ -1425,7 +1424,7 @@
     "monthlyDesc_other": "Share of the calorie needs of {{count}} people, fresh and from storage (forecast).",
     "monthlyCaption": "Calorie coverage per month",
     "monthlyKgTitle": "Food available per month",
-    "monthlyKgCaption": "Food available per month in kg, fresh and stored",
+    "monthlyKgCaption": "Food available per month in kg: from the garden (fresh and stored) and from the animals",
     "noWinterGap": "From {{from}} to {{to}} your planned stores cover at least a quarter of your needs.",
     "noMonthCovered": "Your garden doesn't cover {{percent}} of your needs in any month yet. The levers below show where more space helps most.",
     "ofNeed": "{{produced}} of {{needed}}",
@@ -1446,7 +1445,9 @@
     "shelfLife_one": "keeps {{count}} month",
     "shelfLife_other": "keeps {{count}} months",
     "kcalCounted": "{{kcal}} kcal counted",
-    "surplus": "surplus {{amount}}"
+    "surplus": "surplus {{amount}}",
+    "emptyText_one": "One person needs about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover.",
+    "emptyText_other": "{{count}} people need about {{kcal}} kcal a day. Once beds are planted or animals are added, you'll see here how much of that your garden and animals cover."
   },
   "pests": {
     "title": "Pests",
@@ -1493,7 +1494,7 @@
     "addProduct": "Log production",
     "added": "{{name}} added",
     "totalAnimals": "Total animals",
-    "eggsThisWeek": "Eggs this week",
+    "eggsThisWeek": "Eggs, last 7 days",
     "animalsTab": "Animals",
     "noProducts": "Log eggs, honey or milk to see trends and value.",
     "animalName": "Name (optional)",
@@ -1540,7 +1541,8 @@
       "allProducts": "All products",
       "subtitle": "Eggs, honey and other yields from your animals.",
       "emptyText": "Add an animal first. Then you log eggs, honey or milk here and see weekly totals and the trend.",
-      "yearHint": "~{{amount}} expected to date"
+      "yearHint": "~{{amount}} expected to date",
+      "emptyTitle": "Keep track of eggs and honey"
     },
     "feed": {
       "title": "Feed",
@@ -1551,7 +1553,8 @@
       "perMonth": "Avg. per month",
       "perMonthSince": "since {{date}}",
       "plusLiquid": "plus {{volume}} liquid feed",
-      "emptyText": "Add an animal first. Then you log feed here and see what it costs per month."
+      "emptyText": "Add an animal first. Then you log feed here and see what it costs per month.",
+      "emptyTitle": "Feed costs per month"
     },
     "health": {
       "title": "Health",
@@ -1581,7 +1584,8 @@
       "vaccCoverageValue": "{{covered}} of {{total}}",
       "nextDue": "Next booster from {{date}}",
       "dueNames": "Check vaccination: {{names}}",
-      "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due."
+      "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due.",
+      "emptyTitle": "Keep track of vaccinations and treatments"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1715,8 +1719,8 @@
     "hideEntries": "hide entries",
     "ofExpectedToDate": "of ~{{amount}} expected to date",
     "productThisYear": "{{product}} this year",
-    "eggWeeksLabel": "Eggs per week over the last 8 weeks, avg. {{avg}}",
-    "eggWeeksAvg": "Avg. {{avg}} per week over the last 8 weeks",
+    "eggWeeksLabel": "Eggs per 7 days over the last 8 weeks, avg. {{avg}}",
+    "eggWeeksAvg": "Avg. {{avg}}/week · 8 weeks",
     "singleHarvests": "Individual entries (last {{months}} months)",
     "tabYields": "Yields",
     "tabFeedings": "Feedings",
@@ -2298,7 +2302,6 @@
   },
   "charts": {
     "month": "Month",
-    "now": "Now",
     "today": "Today"
   },
   "metrics": {

@@ -1209,7 +1209,7 @@
     "outOfFive": "de 5",
     "topCrop": "Cultivo más productivo",
     "perMonth": "Cosecha por mes",
-    "perMonthHint": "Peso de los últimos 12 meses",
+    "perMonthHint": "Peso por mes desde {{month}}",
     "month": "Mes",
     "byPlant": "Por cultivo",
     "byPlantHint": "Peso total y número de cosechas",
@@ -1414,8 +1414,8 @@
     "target": "Objetivo anual",
     "covered": "Cubierto",
     "meterLabel": "{{plant}}: registrado {{actual}}, previsión {{forecast}}, objetivo {{target}}",
-    "emptyTitle": "Planifica tu necesidad anual",
-    "emptyText": "Tu hogar necesita unos {{kg}} de verdura y fruta al año. Planta bancales y el plan te mostrará lo que falta.",
+    "emptyTitle": "Aún no hay nada plantado",
+    "emptyText": "Tu hogar necesita unos {{kg}} de verdura y fruta al año. Abajo ves cuánto por cultivo – añade bancales y el plan te mostrará lo que falta.",
     "howTargets": "Objetivo anual: consumo medio por persona en Europa central (p. ej. 30 kg de patatas, 15 kg de tomates) × tamaño del hogar.",
     "howCoverage": "Objetivo de cantidad: suma por cultivo de mín(cantidad, objetivo) dividida por la suma de objetivos. Un excedente de patatas no compensa tomates que faltan.",
     "howVsCalories": "No es un valor calórico: la autosuficiencia de la página «Autosuficiencia» cuenta calorías e incluye productos animales. Por eso ambas cifras difieren.",
@@ -1431,7 +1431,7 @@
     "unplantedTitle_one": "{{count}} cultivo aún sin plantar",
     "unplantedTitle_other": "{{count}} cultivos aún sin plantar",
     "unplantedTitle_many": "{{count}} cultivos aún sin plantar",
-    "unplantedDesc": "Sus objetivos necesitarían {{area}} en total.",
+    "unplantedDesc": "Juntos necesitarían {{area}}.",
     "targetShort": "Objetivo {{target}}",
     "neededShort": "{{area}} necesarios"
   },
@@ -1454,7 +1454,7 @@
     "yieldByPlant": "Rendimiento por planta",
     "monthlyTitle": "Abastecimiento por mes",
     "annualCoverage": "Cobertura anual",
-    "fresh": "Fresco",
+    "fresh": "Huerto, fresco",
     "stored": "De reserva",
     "months": "meses de vida útil",
     "winterGap": "Hueco de reservas en invierno",
@@ -1475,7 +1475,6 @@
       "preserve": "Conservas y semillas"
     },
     "emptyTitle": "Aún no hay nada que calcular",
-    "emptyText": "Cuando haya bancales plantados o animales, verás aquí cuánto de tu necesidad cubre el huerto.",
     "toPlanner": "Ir al planificador",
     "toLivestock": "Añadir animales",
     "coverageDesc_one": "Previsión para un año, necesidad de {{count}} persona.",
@@ -1486,7 +1485,7 @@
     "monthlyDesc_many": "Parte de las calorías que necesitan {{count}} personas, fresco y de reserva (previsión).",
     "monthlyCaption": "Cobertura calórica por mes",
     "monthlyKgTitle": "Alimentos disponibles por mes",
-    "monthlyKgCaption": "Alimentos disponibles por mes en kg, frescos y almacenados",
+    "monthlyKgCaption": "Alimentos disponibles por mes en kg: del huerto (frescos y de reserva) y de los animales",
     "noWinterGap": "De {{from}} a {{to}} tus reservas previstas cubren al menos una cuarta parte de la necesidad.",
     "noMonthCovered": "Tu huerto aún no cubre el {{percent}} de la necesidad en ningún mes. Las palancas de abajo muestran dónde más superficie aporta más.",
     "ofNeed": "{{produced}} de {{needed}}",
@@ -1508,7 +1507,10 @@
     "shelfLife_other": "se conserva {{count}} meses",
     "shelfLife_many": "se conserva {{count}} meses",
     "kcalCounted": "{{kcal}} kcal computadas",
-    "surplus": "excedente {{amount}}"
+    "surplus": "excedente {{amount}}",
+    "emptyText_one": "Una persona necesita unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
+    "emptyText_other": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales.",
+    "emptyText_many": "{{count}} personas necesitan unas {{kcal}} kcal al día. Cuando haya bancales plantados o animales, verás aquí cuánto cubren el huerto y los animales."
   },
   "pests": {
     "title": "Plagas",
@@ -1555,7 +1557,7 @@
     "addProduct": "Registrar producción",
     "added": "{{name}} añadido",
     "totalAnimals": "Total animales",
-    "eggsThisWeek": "Huevos esta semana",
+    "eggsThisWeek": "Huevos, últimos 7 días",
     "animalsTab": "Animales",
     "noProducts": "Registra huevos, miel o leche para ver evolución y valor.",
     "animalName": "Nombre (opcional)",
@@ -1603,7 +1605,8 @@
       "allProducts": "Todos los productos",
       "subtitle": "Huevos, miel y otros rendimientos de tus animales.",
       "emptyText": "Añade primero un animal. Después registras aquí huevos, miel o leche y ves los totales semanales y la evolución.",
-      "yearHint": "~{{amount}} esperados hasta hoy"
+      "yearHint": "~{{amount}} esperados hasta hoy",
+      "emptyTitle": "Huevos y miel bajo control"
     },
     "feed": {
       "title": "Alimento",
@@ -1614,7 +1617,8 @@
       "perMonth": "Media mensual",
       "perMonthSince": "desde el {{date}}",
       "plusLiquid": "más {{volume}} de alimento líquido",
-      "emptyText": "Añade primero un animal. Después registras aquí el alimento y ves cuánto cuesta al mes."
+      "emptyText": "Añade primero un animal. Después registras aquí el alimento y ves cuánto cuesta al mes.",
+      "emptyTitle": "Coste del alimento al mes"
     },
     "health": {
       "title": "Salud",
@@ -1645,7 +1649,8 @@
       "vaccCoverageValue": "{{covered}} de {{total}}",
       "nextDue": "Próximo refuerzo a partir del {{date}}",
       "dueNames": "Revisar vacunación: {{names}}",
-      "emptyText": "Añade primero un animal. Después registras aquí vacunas, desparasitaciones y visitas al veterinario y ves qué toca."
+      "emptyText": "Añade primero un animal. Después registras aquí vacunas, desparasitaciones y visitas al veterinario y ves qué toca.",
+      "emptyTitle": "Vacunas y tratamientos bajo control"
     },
     "healthTypes": {
       "vaccination": "Vacunación",
@@ -1793,8 +1798,8 @@
     "hideEntries": "ocultar entradas",
     "ofExpectedToDate": "de ~{{amount}} esperados hasta hoy",
     "productThisYear": "{{product}} este año",
-    "eggWeeksLabel": "Huevos por semana en las últimas 8 semanas, media {{avg}}",
-    "eggWeeksAvg": "Media de {{avg}} por semana en las últimas 8 semanas",
+    "eggWeeksLabel": "Huevos cada 7 días en las últimas 8 semanas, media {{avg}}",
+    "eggWeeksAvg": "Media {{avg}}/semana · 8 semanas",
     "singleHarvests": "Registros individuales (últimos {{months}} meses)",
     "tabYields": "Rendimientos",
     "tabFeedings": "Raciones",
@@ -2401,7 +2406,6 @@
   },
   "charts": {
     "month": "Mes",
-    "now": "Ahora",
     "today": "Hoy"
   },
   "metrics": {

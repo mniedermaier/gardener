@@ -1,4 +1,4 @@
-import { startOfWeek, subWeeks } from "date-fns";
+import { differenceInCalendarDays, subDays } from "date-fns";
 import { toDate } from "@/lib/format";
 import type { ProductTotals } from "@/lib/metrics";
 import { ANNUAL_YIELD, type Animal, type AnimalProduct, type ProductType } from "@/types/animal";
@@ -17,17 +17,20 @@ export function herdProductTypes(animals: Animal[], yearTotals: ProductTotals): 
   return ORDER.filter((ty) => types.has(ty));
 }
 
-/** Eggs per ISO week for the last `weeks` weeks, oldest first (this week last). */
+/**
+ * Eggs per rolling 7-day window for the last `weeks` windows, oldest first;
+ * the last one ends today. Rolling, not calendar weeks: on a Friday "this
+ * week" would only hold five days and read like a collapse in laying.
+ */
 export function weeklyEggs(products: AnimalProduct[], now: Date, weeks = 8): number[] {
-  const thisWeek = startOfWeek(now, { weekStartsOn: 1 });
-  const first = subWeeks(thisWeek, weeks - 1);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const first = subDays(today, 7 * weeks - 1);
   const out: number[] = Array.from({ length: weeks }, () => 0);
   for (const p of products) {
     if (p.type !== "eggs") continue;
     const d = toDate(p.date);
-    if (!d || d < first) continue;
-    const ws = startOfWeek(d, { weekStartsOn: 1 });
-    const i = Math.round((ws.getTime() - first.getTime()) / (7 * 864e5));
+    if (!d || d < first || d > today) continue;
+    const i = Math.floor(differenceInCalendarDays(d, first) / 7);
     if (i >= 0 && i < weeks) out[i] += p.quantity;
   }
   return out;

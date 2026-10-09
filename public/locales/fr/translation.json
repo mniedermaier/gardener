@@ -1209,7 +1209,7 @@
     "outOfFive": "sur 5",
     "topCrop": "Culture la plus productive",
     "perMonth": "Récolte par mois",
-    "perMonthHint": "Poids des 12 derniers mois",
+    "perMonthHint": "Poids par mois depuis {{month}}",
     "month": "Mois",
     "byPlant": "Par culture",
     "byPlantHint": "Poids total et nombre de récoltes",
@@ -1414,8 +1414,8 @@
     "target": "Objectif annuel",
     "covered": "Couvert",
     "meterLabel": "{{plant}} : enregistré {{actual}}, prévision {{forecast}}, objectif {{target}}",
-    "emptyTitle": "Planifiez vos besoins annuels",
-    "emptyText": "Votre foyer a besoin d’environ {{kg}} de légumes et de fruits par an. Plantez des planches et le plan vous montrera ce qui manque.",
+    "emptyTitle": "Rien de planté pour l’instant",
+    "emptyText": "Votre foyer a besoin d’environ {{kg}} de légumes et de fruits par an. Voici la quantité par culture – ajoutez des planches et le plan montrera ce qui manque.",
     "howTargets": "Objectif annuel : consommation moyenne par personne en Europe centrale (p. ex. 30 kg de pommes de terre, 15 kg de tomates) × taille du foyer.",
     "howCoverage": "Objectif de quantité : somme par culture de min(quantité, objectif) divisée par la somme des objectifs. Un surplus de pommes de terre ne remplace pas des tomates manquantes.",
     "howVsCalories": "Ce n’est pas une valeur calorique : l’autonomie de la page « Autonomie » compte les calories et inclut les produits animaux. Les deux chiffres diffèrent donc.",
@@ -1431,7 +1431,7 @@
     "unplantedTitle_one": "{{count}} culture pas encore plantée",
     "unplantedTitle_other": "{{count}} cultures pas encore plantées",
     "unplantedTitle_many": "{{count}} cultures pas encore plantées",
-    "unplantedDesc": "Leurs objectifs demanderaient {{area}} au total.",
+    "unplantedDesc": "Ensemble, elles demanderaient {{area}}.",
     "targetShort": "Objectif {{target}}",
     "neededShort": "{{area}} nécessaires"
   },
@@ -1454,7 +1454,7 @@
     "yieldByPlant": "Rendement par plante",
     "monthlyTitle": "Approvisionnement par mois",
     "annualCoverage": "Couverture annuelle",
-    "fresh": "Frais",
+    "fresh": "Jardin, frais",
     "stored": "En réserve",
     "months": "mois de conservation",
     "winterGap": "Manque de réserves en hiver",
@@ -1475,7 +1475,6 @@
       "preserve": "Conserves et semences"
     },
     "emptyTitle": "Rien à calculer pour l’instant",
-    "emptyText": "Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part de vos besoins votre jardin couvre.",
     "toPlanner": "Ouvrir le planificateur",
     "toLivestock": "Ajouter des animaux",
     "coverageDesc_one": "Prévision sur un an, besoins de {{count}} personne.",
@@ -1486,7 +1485,7 @@
     "monthlyDesc_many": "Part des besoins caloriques de {{count}} personnes, en frais et en réserve (prévision).",
     "monthlyCaption": "Couverture calorique par mois",
     "monthlyKgTitle": "Quantité disponible par mois",
-    "monthlyKgCaption": "Aliments disponibles par mois en kg, frais et stockés",
+    "monthlyKgCaption": "Aliments disponibles par mois en kg : du jardin (frais et en réserve) et des animaux",
     "noWinterGap": "De {{from}} à {{to}}, vos réserves prévues couvrent au moins un quart des besoins.",
     "noMonthCovered": "Votre jardin ne couvre encore {{percent}} des besoins dans aucun mois. Les leviers ci-dessous montrent où plus de surface rapporte le plus.",
     "ofNeed": "{{produced}} sur {{needed}}",
@@ -1508,7 +1507,10 @@
     "shelfLife_other": "se conserve {{count}} mois",
     "shelfLife_many": "se conserve {{count}} mois",
     "kcalCounted": "{{kcal}} kcal comptées",
-    "surplus": "surplus {{amount}}"
+    "surplus": "surplus {{amount}}",
+    "emptyText_one": "Une personne a besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
+    "emptyText_other": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent.",
+    "emptyText_many": "{{count}} personnes ont besoin d’environ {{kcal}} kcal par jour. Dès que des planches sont plantées ou des animaux ajoutés, vous verrez ici quelle part le jardin et les animaux en couvrent."
   },
   "pests": {
     "title": "Ravageurs",
@@ -1555,7 +1557,7 @@
     "addProduct": "Noter la production",
     "added": "{{name}} ajouté",
     "totalAnimals": "Total animaux",
-    "eggsThisWeek": "Œufs cette semaine",
+    "eggsThisWeek": "Œufs, 7 derniers jours",
     "animalsTab": "Animaux",
     "noProducts": "Notez œufs, miel ou lait pour voir l’évolution et la valeur.",
     "animalName": "Nom (optionnel)",
@@ -1603,7 +1605,8 @@
       "allProducts": "Tous les produits",
       "subtitle": "Œufs, miel et autres productions de vos animaux.",
       "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici œufs, miel ou lait, avec totaux hebdomadaires et évolution.",
-      "yearHint": "~{{amount}} attendus à ce jour"
+      "yearHint": "~{{amount}} attendus à ce jour",
+      "emptyTitle": "Œufs et miel en un coup d’œil"
     },
     "feed": {
       "title": "Alimentation",
@@ -1614,7 +1617,8 @@
       "perMonth": "Moyenne par mois",
       "perMonthSince": "depuis le {{date}}",
       "plusLiquid": "plus {{volume}} d’aliment liquide",
-      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici la nourriture et verrez ce qu’elle coûte par mois."
+      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici la nourriture et verrez ce qu’elle coûte par mois.",
+      "emptyTitle": "Coût de la nourriture par mois"
     },
     "health": {
       "title": "Santé",
@@ -1645,7 +1649,8 @@
       "vaccCoverageValue": "{{covered}} sur {{total}}",
       "nextDue": "Prochain rappel à partir du {{date}}",
       "dueNames": "Vérifier la vaccination : {{names}}",
-      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire."
+      "emptyText": "Ajoutez d’abord un animal. Vous noterez ensuite ici vaccins, vermifuges et visites vétérinaires et verrez ce qui est à faire.",
+      "emptyTitle": "Vaccins et soins en un coup d’œil"
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1793,8 +1798,8 @@
     "hideEntries": "masquer les entrées",
     "ofExpectedToDate": "sur ~{{amount}} attendus à ce jour",
     "productThisYear": "{{product}} cette année",
-    "eggWeeksLabel": "Œufs par semaine sur les 8 dernières semaines, moy. {{avg}}",
-    "eggWeeksAvg": "Moy. {{avg}} par semaine sur les 8 dernières semaines",
+    "eggWeeksLabel": "Œufs par 7 jours sur les 8 dernières semaines, moy. {{avg}}",
+    "eggWeeksAvg": "Moy. {{avg}}/semaine · 8 semaines",
     "singleHarvests": "Saisies individuelles ({{months}} derniers mois)",
     "tabYields": "Rendements",
     "tabFeedings": "Rations",
@@ -2401,7 +2406,6 @@
   },
   "charts": {
     "month": "Mois",
-    "now": "Maintenant",
     "today": "Aujourd’hui"
   },
   "metrics": {

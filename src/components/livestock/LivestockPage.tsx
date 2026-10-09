@@ -2,13 +2,12 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Bird, Egg, Plus, Coins } from "lucide-react";
-import { endOfWeek, startOfWeek } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { todayISO, toISODate } from "@/lib/format";
-import { getActualProducts, getFeedCostStats, type ProductTotals } from "@/lib/metrics";
+import { todayISO } from "@/lib/format";
+import { expectationStart, getActualProducts, getFeedCostStats, type ProductTotals } from "@/lib/metrics";
 import { EGG_LAYERS, type Animal } from "@/types/animal";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -46,15 +45,15 @@ export function LivestockPage() {
   const eggAnimal = animals.find((a) => EGG_LAYERS.includes(a.type));
 
   const stats = useMemo(() => {
-    const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
-    const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
     const eggs = animalProducts.filter((p) => p.type === "eggs");
+    const eggWeeks = weeklyEggs(animalProducts, now);
     return {
       eggsToday: eggs.filter((p) => p.date === today).reduce((s, p) => s + p.quantity, 0),
-      eggsWeek: eggs.filter((p) => p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
+      // Last 7 days (the newest rolling window), not the calendar week.
+      eggsWeek: eggWeeks[eggWeeks.length - 1],
       year: getActualProducts(animalProducts, year),
       feed: getFeedCostStats(feedEntries, now),
-      eggWeeks: weeklyEggs(animalProducts, now),
+      eggWeeks,
     };
   }, [now, animalProducts, feedEntries, today, year]);
 
@@ -178,6 +177,7 @@ export function LivestockPage() {
                     key={animal.id}
                     animal={animal}
                     recorded={d?.recorded ?? {}}
+                    expectedFrom={expectationStart(animal, animalProducts)}
                     feedCost={d?.feedCost ?? 0}
                     lastHealth={d?.lastHealth}
                     onOpen={() => navigate(`/livestock/${animal.id}`)}

@@ -15,6 +15,8 @@ interface AnimalCardProps {
   animal: Animal;
   /** Recorded this season, per product, in recording units. */
   recorded: Partial<Record<string, number>>;
+  /** Start of "expected so far": arrival or first recorded entry (`expectationStart`). */
+  expectedFrom: string;
   feedCost: number;
   lastHealth?: HealthEvent;
   onEdit: () => void;
@@ -23,7 +25,7 @@ interface AnimalCardProps {
 }
 
 /** One herd/colony. The whole card opens the detail page; actions sit in the menu. */
-export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost, lastHealth, onEdit, onDelete, onOpen }: AnimalCardProps) {
+export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedFrom, feedCost, lastHealth, onEdit, onDelete, onOpen }: AnimalCardProps) {
   const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
@@ -61,8 +63,8 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm dark:border-white/5">
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
-          // Same time basis as the recorded value: expected so far this year (since the animal arrived).
-          const expectedQty = y.quantity * animal.count * expectedShareToDate(y.product, now, animal.acquiredDate);
+          // Same time basis as the recorded value: expected so far this year (since arrival or the first entry).
+          const expectedQty = y.quantity * animal.count * expectedShareToDate(y.product, now, expectedFrom);
           // "225 Eier von ~1.019 bis heute erwartet": the unit is already in the value, count only.
           const expected = y.product === "eggs" ? f.formatNumber(expectedQty, { maximumFractionDigits: 0 }) : formatProductAmount(y.product, expectedQty, f, t);
           return (

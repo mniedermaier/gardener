@@ -63,7 +63,7 @@ export function FeedPage() {
       <PageHeader title={t("livestock.feed.title")} description={t("livestock.feed.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
       {animals.length === 0 ? (
-        <NoAnimalsYet text={t("livestock.feed.emptyText")} />
+        <NoAnimalsYet icon={Wheat} title={t("livestock.feed.emptyTitle")} text={t("livestock.feed.emptyText")} />
       ) : feedEntries.length === 0 ? (
         <Card>
           <EmptyState icon={Wheat} title={t("livestock.noFeedTitle")} description={t("livestock.noFeed")} action={addButton} />
