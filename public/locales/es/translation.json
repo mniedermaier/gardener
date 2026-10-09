@@ -1466,11 +1466,12 @@
     "areaNeededHint": "para todos los cultivos del plan",
     "cropPlanDesc": "Ordenado por el mayor déficit previsto.",
     "bigGap": "Gran déficit",
-    "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "faltan {{kg}} (+{{area}})",
     "emptyCta": "Crea un bancal y el plan mostrará cuánto de esto ya cultivas.",
     "biggestGaps": "Mayores cantidades: {{plants}}",
-    "byCalories": "Por calorías: {{value}} – ver autosuficiencia"
+    "byCalories": "Por calorías: {{value}} – ver autosuficiencia",
+    "rowLogged": "{{actual}} registrados",
+    "rowTargetOf": "de {{target}}"
   },
   "sufficiency": {
     "title": "Autosuficiencia",

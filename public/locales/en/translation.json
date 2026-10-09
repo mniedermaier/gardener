@@ -1405,11 +1405,12 @@
     "areaNeededHint": "for all crops in the plan",
     "cropPlanDesc": "Sorted by the largest forecast gap.",
     "bigGap": "Large gap",
-    "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "{{kg}} short (+{{area}})",
     "emptyCta": "Add a bed and the plan shows how much of this you already grow.",
     "biggestGaps": "Largest amounts: {{plants}}",
-    "byCalories": "By calories: {{value}} – see self-sufficiency"
+    "byCalories": "By calories: {{value}} – see self-sufficiency",
+    "rowLogged": "{{actual}} logged",
+    "rowTargetOf": "of {{target}}"
   },
   "sufficiency": {
     "title": "Self-sufficiency",

@@ -1466,11 +1466,12 @@
     "areaNeededHint": "pour toutes les cultures du plan",
     "cropPlanDesc": "Trié par le plus grand manque prévu.",
     "bigGap": "Gros manque",
-    "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "{{kg}} manquants (+{{area}})",
     "emptyCta": "Ajoute une planche et le plan montrera ce que tu cultives déjà.",
     "biggestGaps": "Plus grandes quantités : {{plants}}",
-    "byCalories": "En calories : {{value}} – voir l’autonomie"
+    "byCalories": "En calories : {{value}} – voir l’autonomie",
+    "rowLogged": "{{actual}} saisis",
+    "rowTargetOf": "sur {{target}}"
   },
   "sufficiency": {
     "title": "Autosuffisance",

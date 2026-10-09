@@ -1405,11 +1405,12 @@
     "areaNeededHint": "für alle Kulturen im Plan",
     "cropPlanDesc": "Sortiert nach der größten Lücke laut Prognose.",
     "bigGap": "Große Lücke",
-    "rowOfTarget": "{{actual}} / {{target}}",
     "rowGap": "fehlen {{kg}} (+{{area}})",
     "emptyCta": "Lege ein Beet an, dann zeigt der Plan, wie viel davon du schon anbaust.",
     "biggestGaps": "Größte Mengen: {{plants}}",
-    "byCalories": "Nach Kalorien: {{value}} – zur Selbstversorgung"
+    "byCalories": "Nach Kalorien: {{value}} – zur Selbstversorgung",
+    "rowLogged": "{{actual}} erfasst",
+    "rowTargetOf": "von {{target}}"
   },
   "sufficiency": {
     "title": "Selbstversorgung",
