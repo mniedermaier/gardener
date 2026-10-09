@@ -8,6 +8,9 @@ import { formatProductAmount } from "./shared";
 import { PRODUCT_ICON } from "./icons";
 import { useToday } from "@/hooks/useToday";
 
+/** Fewest months a chart shows, even for a herd that is only weeks old. */
+const MIN_MONTHS = 3;
+
 interface ProductionChartProps {
   animalProducts: AnimalProduct[];
   months?: number;
@@ -23,21 +26,31 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
   const f = useFormat();
 
   const { buckets, perType } = useMemo(() => {
-    const buckets = Array.from({ length: months }, (_, i) => {
+    const all = Array.from({ length: months }, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
       return { key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, date: d };
     });
-    const index = new Map(buckets.map((b, i) => [b.key, i]));
-    const perType = new Map<ProductType, number[]>();
+    const index = new Map(all.map((b, i) => [b.key, i]));
+    const full = new Map<ProductType, number[]>();
     for (const p of animalProducts) {
       const i = index.get(p.date.slice(0, 7));
       if (i === undefined) continue;
-      const arr = perType.get(p.type) ?? Array.from({ length: months }, () => 0);
+      const arr = full.get(p.type) ?? Array.from({ length: months }, () => 0);
       arr[i] += p.unit === "g" ? p.quantity / 1000 : p.quantity;
-      perType.set(p.type, arr);
+      full.set(p.type, arr);
     }
-    return { buckets, perType };
+    // Start at the first month with any entry (but show at least 3 months):
+    // a herd that arrived in August should not get nine empty bars.
+    let first = months - 1;
+    for (const arr of full.values()) {
+      const i = arr.findIndex((v) => v > 0);
+      if (i >= 0) first = Math.min(first, i);
+    }
+    const start = Math.max(0, Math.min(first, months - MIN_MONTHS));
+    const perType = new Map([...full].map(([ty, arr]) => [ty, arr.slice(start)] as const));
+    return { buckets: all.slice(start), perType };
   }, [now, animalProducts, months]);
+  const shown = buckets.length;
 
   const present = PRODUCT_TYPES.filter((ty) => perType.get(ty)?.some((v) => v > 0));
   if (present.length === 0) {
@@ -75,7 +88,7 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
               formatValue={fmt}
               formatTick={tick}
               marker={{ index: buckets.length - 1, label: t("charts.now") }}
-              caption={t("livestock.chartCaption", { product: name, months, total: fmt(total) })}
+              caption={t("livestock.chartCaption", { product: name, months: shown, total: fmt(total) })}
               categoryLabel={t("charts.month")}
               height={150}
             />
@@ -85,7 +98,7 @@ export function ProductionChart({ animalProducts, months = 6 }: ProductionChartP
     </div>}
     {sparse.length > 0 && (
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("livestock.singleHarvests", { months })}</h3>
+        <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{t("livestock.singleHarvests", { months: shown })}</h3>
         <ul className="divide-y divide-gray-100 text-sm dark:divide-white/5">
           {sparse.map((type) => {
             const Icon = PRODUCT_ICON[type];

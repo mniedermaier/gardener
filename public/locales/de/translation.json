@@ -1476,16 +1476,14 @@
     "totalAnimals": "Tiere gesamt",
     "eggsThisWeek": "Eier diese Woche",
     "animalsTab": "Bestand",
-    "productionTab": "Produktion",
     "noProducts": "Erfasse Eier, Honig oder Milch, um Verlauf und Wert zu sehen.",
     "animalName": "Name (optional)",
     "namePlaceholder": "z. B. Henriette, Bienenstock 1…",
     "count": "Anzahl",
-    "selectAnimal": "Tier auswählen",
+    "selectAnimal": "Tier",
     "quantity": "Menge",
     "pieces": "Stk.",
     "year": "Jahr",
-    "feedTab": "Futter",
     "addFeed": "Futter erfassen",
     "feedAdded": "Futter erfasst",
     "noFeed": "Mit Futtermengen und Kosten siehst du, was deine Tiere kosten.",
@@ -1497,13 +1495,12 @@
     "liters": "Liter",
     "productionEntries_one": "{{count}} Eintrag",
     "productionEntries_other": "{{count}} Einträge",
-    "healthTab": "Gesundheit",
     "addHealth": "Gesundheitseintrag erfassen",
     "healthAdded": "Gesundheitseintrag erfasst",
     "noHealth": "Halte Impfungen, Behandlungen und Kontrollen fest, damit nichts in Vergessenheit gerät.",
     "healthType": "Art",
     "healthDesc": "Beschreibung",
-    "healthDescPlaceholder": "z. B. Impfung gegen Newcastle, Entwurmung mit…",
+    "healthDescPlaceholder": "z. B. Newcastle-Impfung",
     "editAnimal": "Tier bearbeiten",
     "updated": "Tier aktualisiert",
     "since": "seit",
@@ -1522,7 +1519,9 @@
       "totalHoney": "Honig gesamt",
       "totalMilk": "Milch gesamt",
       "allProducts": "Alle Produkte",
-      "subtitle": "Eier, Honig und andere Erträge deiner Tiere."
+      "subtitle": "Eier, Honig und andere Erträge deiner Tiere.",
+      "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Eier, Honig oder Milch und siehst Wochensummen und Verlauf.",
+      "yearHint": "~{{amount}} bis heute erwartet"
     },
     "feed": {
       "title": "Futter",
@@ -1531,7 +1530,9 @@
       "perAnimal": "Kosten pro Tier",
       "subtitle": "Futtermengen und -kosten pro Tier.",
       "perMonth": "Ø pro Monat",
-      "perMonthSince": "seit {{date}}"
+      "perMonthSince": "seit {{date}}",
+      "plusLiquid": "dazu {{volume}} Flüssigfutter",
+      "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Futter und siehst, was es pro Monat kostet."
     },
     "health": {
       "title": "Gesundheit",
@@ -1560,7 +1561,8 @@
       "vaccCoverage": "Tiergruppen mit Impfschutz",
       "vaccCoverageValue": "{{covered}} von {{total}}",
       "nextDue": "Nächste Auffrischung ab {{date}}",
-      "dueNames": "Impfung prüfen: {{names}}"
+      "dueNames": "Impfung prüfen: {{names}}",
+      "emptyText": "Lege zuerst ein Tier an. Dann erfasst du hier Impfungen, Entwurmungen und Tierarztbesuche und siehst, was fällig ist."
     },
     "healthTypes": {
       "vaccination": "Impfung",
@@ -1594,7 +1596,6 @@
     "subtitle": "Bestand, Produktion, Futter und Gesundheit deiner Tiere.",
     "emptyTitle": "Noch keine Tiere",
     "emptyText": "Lege Hühner, Bienen oder andere Tiere an. Dann erfasst du hier Eier, Honig, Futter und Tierarztbesuche.",
-    "toHerd": "Zum Bestand",
     "backToHerd": "Zurück zum Bestand",
     "herd": "Bestand",
     "deleted": "{{name}} gelöscht",
@@ -1633,8 +1634,7 @@
     "eggsThisYear": "Eier dieses Jahr",
     "feedEntriesCount_one": "{{count}} Futtereintrag",
     "feedEntriesCount_other": "{{count}} Futtereinträge",
-    "chartDesc": "Letzte 6 Monate, ein Diagramm pro Produkt.",
-    "chartDesc12": "Letzte 12 Monate, ein Diagramm pro Produkt.",
+    "chartDesc12": "Pro Monat ab dem ersten Eintrag, höchstens 12 Monate. Seltene Ernten wie Honig stehen als Liste darunter.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "Stück pro Monat",
@@ -1694,11 +1694,15 @@
     "weekShort": "KW {{week}}",
     "showEntries": "Einträge anzeigen",
     "hideEntries": "Einträge ausblenden",
-    "ofExpectedToDate": "von ~{{amount}} erwartet",
+    "ofExpectedToDate": "von ~{{amount}} bis heute erwartet",
     "productThisYear": "{{product}} dieses Jahr",
     "eggWeeksLabel": "Eier pro Woche, letzte 8 Wochen, Ø {{avg}}",
     "eggWeeksAvg": "Ø {{avg}} pro Woche in den letzten 8 Wochen",
-    "singleHarvests": "Einzelne Einträge (letzte {{months}} Monate)"
+    "singleHarvests": "Einzelne Einträge (letzte {{months}} Monate)",
+    "tabYields": "Erträge",
+    "tabFeedings": "Fütterungen",
+    "tabTreatments": "Behandlungen",
+    "costPerUnit": "Kosten je Einheit"
   },
   "seeds": {
     "title": "Saatgut",

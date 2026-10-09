@@ -83,20 +83,23 @@ export function ProductWeekList({ products, entryMeta, onOpen, renderActions }: 
   return (
     <div className="space-y-3">
       {weeksByMonth(groupByWeek(products)).map((g) => (
-        <List key={g.key} header={`${f.formatDate(g.date, "monthYear")} · ${t("livestock.entriesHint", { count: g.count })}`}>
+        // The entry count lives on the week rows only, not again in the month header.
+        <List key={g.key} header={f.formatDate(g.date, "monthYear")}>
           {g.weeks.map((w) => {
             const open = openWeeks.has(w.key);
-            const sums = PRODUCT_TYPES.filter((ty) => w.totals[ty] > 0).map((ty) => formatProductAmount(ty, w.totals[ty], f, t) + (typeCount > 1 && ty !== "eggs" ? ` ${t(`livestock.products.${ty}`)}` : ""));
+            const present = PRODUCT_TYPES.filter((ty) => w.totals[ty] > 0);
+            const sums = present.map((ty) => formatProductAmount(ty, w.totals[ty], f, t) + (typeCount > 1 && ty !== "eggs" ? ` ${t(`livestock.products.${ty}`)}` : ""));
             const weekTitle = `${t("livestock.weekShort", { week: w.week })} · ${sums.join(" · ")}`;
+            const Chevron = open ? ChevronDown : ChevronRight;
             return (
               <Fragment key={w.key}>
                 <ListRow
-                  leading={<IconTile icon={open ? ChevronDown : ChevronRight} />}
+                  leading={<IconTile icon={PRODUCT_ICON[present[0] ?? "eggs"]} />}
                   title={weekTitle}
                   meta={[`${f.formatDate(w.from, "short")} – ${f.formatDate(w.to, "short")}`, t("livestock.entriesHint", { count: w.items.length })]}
                   clickLabel={`${weekTitle} – ${t(open ? "livestock.hideEntries" : "livestock.showEntries")}`}
                   onClick={() => toggle(w.key)}
-                  trailing={null}
+                  trailing={<Chevron size={18} aria-hidden="true" className="text-gray-400 dark:text-gray-500" />}
                 />
                 {open && w.items.map((p) => (
                   <ListRow

@@ -8,8 +8,8 @@ import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { toISODate } from "@/lib/format";
-import { getActualProducts } from "@/lib/metrics";
-import { EGG_LAYERS, type AnimalProduct, type ProductType } from "@/types/animal";
+import { expectedShareToDate, getActualProducts } from "@/lib/metrics";
+import { ANNUAL_YIELD, EGG_LAYERS, type AnimalProduct, type ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -19,7 +19,7 @@ import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductionChart } from "./ProductionChart";
 import { PRODUCT_ICON } from "./icons";
-import { ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
+import { NoAnimalsYet, ProductDialog, animalLabel, formatProductAmount, useRecordActions } from "./shared";
 import { ProductWeekList } from "./ProductWeekList";
 import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
@@ -66,16 +66,37 @@ export function ProductionPage() {
   });
   const eggWeeks = stats.eggWeeks;
   const eggAvg = eggWeeks.reduce((s, n) => s + n, 0) / eggWeeks.length;
-  const heroFigure = hasLayers
+  // Same basis as the herd cards on "Tiere": expected up to today since each animal arrived.
+  const expectedToDate = (ty: ProductType) => animals.reduce((sum, a) => {
+    const y = ANNUAL_YIELD[a.type]?.find((x) => x.product === ty);
+    return y ? sum + y.quantity * a.count * expectedShareToDate(ty, now, a.acquiredDate) : sum;
+  }, 0);
+  // "Tiere" leads with this week; this page is the record: the year so far
+  // against what the herd should have yielded by now, then the week.
+  const heroType = herdTypes[0];
+  const heroExpected = heroType ? expectedToDate(heroType) : 0;
+  const heroFigure = heroType
     ? {
-        label: t("livestock.eggsThisWeek"),
-        value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
-        icon: Egg,
-        visual: <Sparkline values={eggWeeks} color="earth" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
-        hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
+        ...yearFigure(heroType),
+        icon: PRODUCT_ICON[heroType],
+        hint: heroExpected > 0
+          ? t("livestock.production.yearHint", { amount: heroType === "eggs" ? f.formatNumber(heroExpected, { maximumFractionDigits: 0 }) : formatProductAmount(heroType, heroExpected, f, t) })
+          : undefined,
       }
-    : herdTypes[0] ? { ...yearFigure(herdTypes[0]), icon: PRODUCT_ICON[herdTypes[0]] } : null;
-  const yearFigures = (hasLayers ? herdTypes : herdTypes.slice(1)).map(yearFigure);
+    : null;
+  const weekFigure = hasLayers
+    ? [{
+        label: t("livestock.eggsThisWeek"),
+        value: (
+          <span className="inline-flex items-end gap-3">
+            {f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })}
+            <Sparkline values={eggWeeks} color="earth" width={72} height={22} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />
+          </span>
+        ),
+        hint: t("livestock.eggWeeksAvg", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) }),
+      }]
+    : [];
+  const yearFigures = [...weekFigure, ...herdTypes.slice(1).map(yearFigure)];
 
   const productTypes = [...new Set(animalProducts.map((p) => p.type))] as ProductType[];
 
@@ -91,9 +112,7 @@ export function ProductionPage() {
       <PageHeader title={t("livestock.production.title")} description={t("livestock.production.subtitle")} actions={animals.length > 0 ? addButton : undefined} />
 
       {animals.length === 0 ? (
-        <Card>
-          <EmptyState icon={Bird} title={t("livestock.emptyTitle")} description={t("livestock.emptyText")} action={<Button onClick={() => navigate("/livestock")}>{t("livestock.toHerd")}</Button>} />
-        </Card>
+        <NoAnimalsYet text={t("livestock.production.emptyText")} />
       ) : (
         <div className="space-y-6">
           {heroFigure && <KeyFigures hero={heroFigure} items={yearFigures.slice(0, 3)} />}
@@ -112,7 +131,7 @@ export function ProductionPage() {
           ) : (
             <section className="space-y-3">
               {(animals.length > 1 || productTypes.length > 1) && (
-                <div className="grid gap-3 sm:max-w-lg sm:grid-cols-2">
+                <div className={`grid gap-3 sm:max-w-lg ${animals.length > 1 && productTypes.length > 1 ? "grid-cols-2" : "sm:grid-cols-2"}`}>
                   {animals.length > 1 && (
                     <Select label={t("livestock.filterAnimal")} value={filterAnimalId} onChange={(e) => setFilterAnimalId(e.target.value)} placeholder={t("livestock.allAnimals")} options={animals.map((a) => ({ value: a.id, label: animalLabel(a, t) }))} />
                   )}

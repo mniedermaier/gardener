@@ -1476,16 +1476,14 @@
     "totalAnimals": "Total animals",
     "eggsThisWeek": "Eggs this week",
     "animalsTab": "Animals",
-    "productionTab": "Production",
     "noProducts": "Log eggs, honey or milk to see trends and value.",
     "animalName": "Name (optional)",
     "namePlaceholder": "e.g. Henriette, Hive 1…",
     "count": "Number of animals",
-    "selectAnimal": "Select animal",
+    "selectAnimal": "Animal",
     "quantity": "Quantity",
     "pieces": "pcs",
     "year": "year",
-    "feedTab": "Feed",
     "addFeed": "Log feed",
     "feedAdded": "Feed logged",
     "noFeed": "With feed amounts and costs you'll see what your animals cost.",
@@ -1497,13 +1495,12 @@
     "liters": "Liters",
     "productionEntries_one": "{{count}} entry",
     "productionEntries_other": "{{count}} entries",
-    "healthTab": "Health",
     "addHealth": "Log health event",
     "healthAdded": "Health entry logged",
     "noHealth": "Keep track of vaccinations, treatments and check-ups so nothing slips.",
     "healthType": "Type",
     "healthDesc": "Description",
-    "healthDescPlaceholder": "e.g. Newcastle vaccination, deworming with…",
+    "healthDescPlaceholder": "e.g. Newcastle vaccination",
     "editAnimal": "Edit animal",
     "updated": "Animal updated",
     "since": "since",
@@ -1522,7 +1519,9 @@
       "totalHoney": "Total honey",
       "totalMilk": "Total milk",
       "allProducts": "All products",
-      "subtitle": "Eggs, honey and other yields from your animals."
+      "subtitle": "Eggs, honey and other yields from your animals.",
+      "emptyText": "Add an animal first. Then you log eggs, honey or milk here and see weekly totals and the trend.",
+      "yearHint": "~{{amount}} expected to date"
     },
     "feed": {
       "title": "Feed",
@@ -1531,7 +1530,9 @@
       "perAnimal": "Cost per animal",
       "subtitle": "Feed amounts and costs per animal.",
       "perMonth": "Avg. per month",
-      "perMonthSince": "since {{date}}"
+      "perMonthSince": "since {{date}}",
+      "plusLiquid": "plus {{volume}} liquid feed",
+      "emptyText": "Add an animal first. Then you log feed here and see what it costs per month."
     },
     "health": {
       "title": "Health",
@@ -1560,7 +1561,8 @@
       "vaccCoverage": "Animal groups vaccinated",
       "vaccCoverageValue": "{{covered}} of {{total}}",
       "nextDue": "Next booster from {{date}}",
-      "dueNames": "Check vaccination: {{names}}"
+      "dueNames": "Check vaccination: {{names}}",
+      "emptyText": "Add an animal first. Then you log vaccinations, deworming and vet visits here and see what is due."
     },
     "healthTypes": {
       "vaccination": "Vaccination",
@@ -1594,7 +1596,6 @@
     "subtitle": "Herd, production, feed and health of your animals.",
     "emptyTitle": "No animals yet",
     "emptyText": "Add chickens, bees or other animals. Then log eggs, honey, feed and vet visits here.",
-    "toHerd": "Go to herd",
     "backToHerd": "Back to herd",
     "herd": "Herd",
     "deleted": "{{name}} deleted",
@@ -1633,8 +1634,7 @@
     "eggsThisYear": "Eggs this year",
     "feedEntriesCount_one": "{{count}} feed entry",
     "feedEntriesCount_other": "{{count}} feed entries",
-    "chartDesc": "Last 6 months, one chart per product.",
-    "chartDesc12": "Last 12 months, one chart per product.",
+    "chartDesc12": "Per month from the first entry, up to 12 months. Occasional harvests such as honey are listed below.",
     "chartUnit": "{{unit}}",
     "unitPerMonth": {
       "eggs": "pieces per month",
@@ -1694,11 +1694,15 @@
     "weekShort": "Week {{week}}",
     "showEntries": "show entries",
     "hideEntries": "hide entries",
-    "ofExpectedToDate": "of ~{{amount}} expected",
+    "ofExpectedToDate": "of ~{{amount}} expected to date",
     "productThisYear": "{{product}} this year",
     "eggWeeksLabel": "Eggs per week over the last 8 weeks, avg. {{avg}}",
     "eggWeeksAvg": "Avg. {{avg}} per week over the last 8 weeks",
-    "singleHarvests": "Individual entries (last {{months}} months)"
+    "singleHarvests": "Individual entries (last {{months}} months)",
+    "tabYields": "Yields",
+    "tabFeedings": "Feedings",
+    "tabTreatments": "Treatments",
+    "costPerUnit": "Cost per unit"
   },
   "seeds": {
     "title": "Seeds",

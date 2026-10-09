@@ -1,7 +1,11 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { Trash2 } from "lucide-react";
+import { Bird, Plus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import type { OpenAddState } from "@/hooks/useOpenAddOnNavigate";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useFormat } from "@/hooks/useFormat";
@@ -63,6 +67,9 @@ export function herdSummary(animals: Animal[], t: TFunction): string {
 }
 
 const parseNum = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
+
+/** A stored number back into a text field in the app's decimal style ("1,5"), no grouping. */
+const toField = (n: number | undefined, f: Formatter) => (n === undefined ? "" : new Intl.NumberFormat(f.locale, { maximumFractionDigits: 3, useGrouping: false }).format(n));
 
 // ------------------------------------------------------------------ dialog shell
 
@@ -155,7 +162,7 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
       const a = animals.find((x) => x.id === first);
       setAid(first);
       setType(entry?.type ?? (a ? PRODUCT_TYPES_BY_ANIMAL[a.type][0] : "eggs"));
-      setQty(entry ? String(entry.quantity) : "");
+      setQty(toField(entry?.quantity, f));
       setDate(entry?.date ?? todayISO());
       setNotes(entry?.notes ?? "");
     }
@@ -206,18 +213,16 @@ export function ProductDialog({ open, onClose, entry, animalId }: RecordDialogPr
             options={types.map((ty) => ({ value: ty, label: t(`livestock.products.${ty}`), icon: PRODUCT_ICON[ty] }))}
           />
         )}
+        {/* Text field with a number keypad: no spin arrows, and "1,5" works in every locale. */}
         <Input
           label={`${t("livestock.quantity")} (${unitLabel})`}
-          type="number"
-          inputMode="decimal"
-          min={0}
-          step={type === "eggs" ? 1 : 0.1}
+          inputMode={type === "eggs" ? "numeric" : "decimal"}
           value={qty}
           onChange={(e) => setQty(e.target.value)}
           autoFocus
         />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Input label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -229,6 +234,7 @@ type FeedUnit = FeedEntry["unit"];
 
 export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps<FeedEntry>) {
   const { t } = useTranslation();
+  const f = useFormat();
   const { toast } = useToast();
   const { animals, addFeedEntry, updateFeedEntry } = useStore(useShallow((s) => ({ animals: s.animals, addFeedEntry: s.addFeedEntry, updateFeedEntry: s.updateFeedEntry })));
   const { deleteFeed } = useRecordActions();
@@ -249,9 +255,9 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
     if (open) {
       setAid(animalId ?? entry?.animalId ?? animals[0]?.id ?? "");
       setFeedType(entry?.feedType ?? "");
-      setQty(entry ? String(entry.quantity) : "");
+      setQty(toField(entry?.quantity, f));
       setUnit(entry?.unit ?? "kg");
-      setCost(entry?.cost !== undefined ? String(entry.cost) : "");
+      setCost(toField(entry?.cost, f));
       setDate(entry?.date ?? todayISO());
       setNotes(entry?.notes ?? "");
     }
@@ -284,7 +290,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
         {!animalId && <Select label={t("livestock.selectAnimal")} value={aid} onChange={(e) => setAid(e.target.value)} options={animalOptions(animals, t)} />}
         <Input label={t("livestock.feedType")} value={feedType} onChange={(e) => setFeedType(e.target.value)} placeholder={t("livestock.feedTypePlaceholder")} autoFocus />
         <div className="grid grid-cols-2 gap-3">
-          <Input label={t("livestock.quantity")} type="number" inputMode="decimal" min={0} step={0.1} value={qty} onChange={(e) => setQty(e.target.value)} />
+          <Input label={t("livestock.quantity")} inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} />
           <Select
             label={t("livestock.unit")}
             value={unit}
@@ -296,9 +302,9 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
             ]}
           />
         </div>
-        <Input label={t("livestock.cost")} hint={t("livestock.costHint")} type="number" inputMode="decimal" min={0} step={0.01} value={cost} onChange={(e) => setCost(e.target.value)} />
+        <Input label={t("livestock.cost")} hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
-        <Input label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
     </Modal>
   );
@@ -308,6 +314,7 @@ export function FeedDialog({ open, onClose, entry, animalId }: RecordDialogProps
 
 export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, presetType }: RecordDialogProps<HealthEvent> & { presetAnimalId?: string; presetType?: HealthEventType }) {
   const { t } = useTranslation();
+  const f = useFormat();
   const { toast } = useToast();
   const { animals, addHealthEvent, updateHealthEvent } = useStore(useShallow((s) => ({ animals: s.animals, addHealthEvent: s.addHealthEvent, updateHealthEvent: s.updateHealthEvent })));
   const { deleteHealth } = useRecordActions();
@@ -328,7 +335,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
       setAid(animalId ?? entry?.animalId ?? presetAnimalId ?? animals[0]?.id ?? "");
       setType(entry?.type ?? presetType ?? "checkup");
       setDesc(entry?.description ?? "");
-      setCost(entry?.cost !== undefined ? String(entry.cost) : "");
+      setCost(toField(entry?.cost, f));
       setDate(entry?.date ?? todayISO());
       setNotes(entry?.notes ?? "");
     }
@@ -365,7 +372,7 @@ export function HealthDialog({ open, onClose, entry, animalId, presetAnimalId, p
           options={HEALTH_EVENT_TYPES.map((ty) => ({ value: ty, label: t(`livestock.healthTypes.${ty}`) }))}
         />
         <Input label={t("livestock.healthDesc")} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t("livestock.healthDescPlaceholder")} autoFocus />
-        <Input label={t("livestock.cost")} hint={t("livestock.costHint")} type="number" inputMode="decimal" min={0} step={0.01} value={cost} onChange={(e) => setCost(e.target.value)} />
+        <Input label={t("livestock.cost")} hint={t("livestock.costHint")} inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
         <DateField label={t("harvest.date")} value={date} onChange={setDate} />
         <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
       </div>
@@ -446,7 +453,7 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
         {!animal && (
           <fieldset>
             <legend className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{t("livestock.animalType")}</legend>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {ANIMAL_TYPES.map((ty) => {
                 const Icon = ANIMAL_ICON[ty];
                 const selected = type === ty;
@@ -456,14 +463,15 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
                     type="button"
                     aria-pressed={selected}
                     onClick={() => setType(ty)}
-                    className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                    className={`flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
                       selected
                         ? "border-garden-600 bg-garden-50 font-medium text-garden-800 dark:border-garden-400 dark:bg-garden-500/15 dark:text-garden-200"
                         : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
                     }`}
                   >
-                    <Icon size={16} aria-hidden="true" />
-                    {t(`livestock.types.${ty}`)}
+                    {/* Fixed icon box: every tile starts its label at the same x, whatever the glyph's width. */}
+                    <span className="inline-flex size-5 shrink-0 items-center justify-center" aria-hidden="true"><Icon size={18} /></span>
+                    <span className="min-w-0 truncate">{t(`livestock.types.${ty}`)}</span>
                   </button>
                 );
               })}
@@ -471,13 +479,39 @@ export function AnimalDialog({ open, onClose, animal, onDeleted }: { open: boole
           </fieldset>
         )}
         <Input label={t("livestock.animalName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("livestock.namePlaceholder")} />
-        <div className="grid grid-cols-2 gap-3">
-          <Input label={t("livestock.count")} type="number" inputMode="numeric" min={animal ? 0 : 1} step={1} value={count} onChange={(e) => setCount(e.target.value)} />
+        {/* The count is short, the date long ("9. Oktober 2026"): give the date the room. */}
+        <div className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-3">
+          <Input label={t("livestock.count")} inputMode="numeric" value={count} onChange={(e) => setCount(e.target.value)} />
           <DatePicker label={t("livestock.acquired")} value={acquired} onChange={(e) => setAcquired(e.target.value)} />
         </div>
         <Textarea label={t("harvest.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder={t("livestock.notesPlaceholder")} />
       </div>
     </Modal>
+  );
+}
+
+/**
+ * Empty state of the production, feed and health pages before any animal
+ * exists: the page's own sentence plus one action that opens the add-animal
+ * dialog on "Tiere" (useOpenAddOnNavigate), not a bare "go there" link.
+ */
+export function NoAnimalsYet({ text }: { text: string }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  return (
+    <Card>
+      <EmptyState
+        icon={Bird}
+        title={t("livestock.emptyTitle")}
+        description={text}
+        action={
+          <Button onClick={() => navigate("/livestock", { state: { openAdd: true } satisfies OpenAddState })}>
+            <Plus size={16} aria-hidden="true" />
+            {t("livestock.addAnimal")}
+          </Button>
+        }
+      />
+    </Card>
   );
 }
 
