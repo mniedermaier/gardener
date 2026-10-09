@@ -284,7 +284,10 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
     <List
       header={
         <span className="inline-flex items-center gap-2">
-          <RelationMark relation={kind} size={12} />
+          {/* Glossary tone as a plain icon: a boxed mark here read as a checkbox. */}
+          {kind === "good"
+            ? <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
+            : <TriangleAlert size={14} strokeWidth={2.5} aria-hidden="true" className="text-warning" />}
           {t(kind === "good" ? "companions.goodCount" : "companions.badCount", { count: items.length })}
         </span>
       }
@@ -297,9 +300,9 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
             key={p.id}
             leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={26} />}
             title={names.get(p.id)}
-            // Garden context beats the category: a good partner already in a bed is the actionable one.
-            badges={bedsByPlant.has(p.id) ? <Badge tone="brand" size="sm">{t("plants.inGarden")}</Badge> : undefined}
-            meta={bedsByPlant.get(p.id) ?? [t(`plants.category.${p.category}`)]}
+            // The meta slot always means the category; garden context (with its beds) is the badge.
+            badges={bedsByPlant.has(p.id) ? <Badge tone="brand" size="sm">{[t("plants.inGarden"), ...(bedsByPlant.get(p.id) ?? [])].join(" · ")}</Badge> : undefined}
+            meta={[t(`plants.category.${p.category}`)]}
             onClick={() => onSelect(p.id)}
           />
         ))
@@ -326,25 +329,18 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPl
         </div>
         {/* Quick picks: square-cornered outline chips, so they never look like the section-tab pills. */}
         <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("companions.quickPick")}>
-          {QUICK_PICKS.filter((id) => names.has(id)).map((id) => {
-            const active = id === selected.id;
-            return (
-              <button
-                key={id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => onSelect(id)}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition-colors sm:min-h-8 ${
-                  active
-                    ? "border-garden-600 text-garden-800 dark:border-garden-400 dark:text-garden-200"
-                    : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
-                }`}
-              >
-                <PlantIconDisplay plantId={id} emoji="" size={16} />
-                {names.get(id)}
-              </button>
-            );
-          })}
+          {/* The active plant is already in the select: no second, highlighted copy of it here. */}
+          {QUICK_PICKS.filter((id) => names.has(id) && id !== selected.id).map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onSelect(id)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:border-gray-300 sm:min-h-8 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
+            >
+              <PlantIconDisplay plantId={id} emoji="" size={16} />
+              {names.get(id)}
+            </button>
+          ))}
         </div>
       </Card>
       <div className="grid gap-4 lg:grid-cols-2">

@@ -98,17 +98,19 @@ const SOIL =
   "dark:bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255/0.07)_1px,transparent_0),radial-gradient(circle_at_4px_4px,rgb(255_255_255/0.04)_1px,transparent_0)]";
 
 type PinKind = "harvest" | "task" | "frost";
+// Solid discs in light mode; tinted with a tone ring in dark mode (no
+// full-saturation fills on dark surfaces, DESIGN_SYSTEM).
 const PIN: Record<PinKind, { icon: LucideIcon; className: string }> = {
-  harvest: { icon: Apple, className: "bg-positive" },
-  task: { icon: ClipboardCheck, className: "bg-warning" },
-  frost: { icon: Snowflake, className: "bg-info" },
+  harvest: { icon: Apple, className: "bg-positive dark:bg-positive/25 dark:text-positive dark:ring-positive/50" },
+  task: { icon: ClipboardCheck, className: "bg-warning dark:bg-warning/25 dark:text-warning dark:ring-warning/50" },
+  frost: { icon: Snowflake, className: "bg-info dark:bg-info/25 dark:text-info dark:ring-info/50" },
 };
 const PIN_ORDER: PinKind[] = ["frost", "task", "harvest"];
 
 function Pin({ kind, count }: { kind: PinKind; count?: number }) {
   const { icon: Icon, className } = PIN[kind];
   return (
-    <span className={`inline-flex h-6 min-w-6 items-center justify-center gap-0.5 rounded-full px-1 text-xs font-semibold text-white shadow-sm ring-2 ring-white dark:text-gray-950 dark:ring-gray-900 ${className}`}>
+    <span className={`inline-flex h-6 min-w-6 items-center justify-center gap-0.5 rounded-full px-1 text-xs font-semibold text-white shadow-sm ring-2 ring-white dark:shadow-none dark:ring-1 dark:backdrop-blur-sm ${className}`}>
       <Icon size={13} strokeWidth={2.25} aria-hidden="true" />
       {count !== undefined && count > 1 && <span className="tabular-nums">{count}</span>}
     </span>

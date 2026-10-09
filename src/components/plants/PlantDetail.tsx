@@ -322,12 +322,12 @@ export function PlantDetail({ plant, onBack, onSelectPlant, onEdit }: PlantDetai
         actions={
           // Phones: primary first, stacked at full width so no label breaks onto two lines.
           <>
-            {/* Off-season both actions are secondary and small, side by side: neither is the likely next step in October. */}
-            <Button variant={sowNote?.offSeason ? "secondary" : "primary"} size={sowNote?.offSeason ? "sm" : undefined} className={sowNote?.offSeason ? undefined : "w-full sm:w-auto"} onClick={goPlanner}>
+            {/* Off-season both actions are secondary and small; on phones both span the full width, so the edges line up. */}
+            <Button variant={sowNote?.offSeason ? "secondary" : "primary"} size={sowNote?.offSeason ? "sm" : undefined} className="w-full sm:w-auto" onClick={goPlanner}>
               {hasBeds ? <LayoutGrid size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
               {hasBeds ? t("plants.placeInPlanner") : t("planner.addBed")}
             </Button>
-            <Button variant="secondary" size={sowNote?.offSeason ? "sm" : undefined} className={sowNote?.offSeason ? undefined : "w-full sm:w-auto"} onClick={goSeeds}>
+            <Button variant="secondary" size={sowNote?.offSeason ? "sm" : undefined} className="w-full sm:w-auto" onClick={goSeeds}>
               <Package size={16} aria-hidden="true" />
               {t("plants.addSeeds")}
             </Button>

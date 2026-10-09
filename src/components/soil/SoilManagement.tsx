@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAddBed } from "@/hooks/useAddBed";
 import {
   Beaker, LayoutGrid, FlaskConical, Layers, Leaf, Lightbulb, Package, Pencil, Plus, Recycle, Sprout, Trash2, Mountain, Tractor, type LucideIcon,
@@ -263,20 +263,11 @@ export function SoilManagement() {
                           {bedName(s.bedId)}
                         </button>
                       </h2>
-                      <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         <time dateTime={s.date}>{formatDate(s.date)}</time>
-                        {/* Values drift over a season: an old test says so. */}
-                        {staleTest(s.date) && <Badge tone="warning" size="sm">{t("soil.staleTest")}</Badge>}
-                        {beds.byId.has(s.bedId) && (
-                          <>
-                            <span aria-hidden="true">·</span>
-                            <Link to={`/planner?bed=${encodeURIComponent(s.bedId)}`} className="relative z-10 inline-flex min-h-11 items-center gap-1 font-medium text-garden-700 hover:underline sm:min-h-0 dark:text-garden-300">
-                              <LayoutGrid size={12} aria-hidden="true" />
-                              {t("soil.openInPlanner")}
-                            </Link>
-                          </>
-                        )}
                       </p>
+                      {/* Values drift over a season: an old test says so, on its own line. */}
+                      {staleTest(s.date) && <Badge tone="warning" size="sm" className="mt-1">{t("soil.staleTest")}</Badge>}
                     </div>
                     <div className="relative z-10 -mt-1 -mr-2">
                       <Menu
@@ -339,19 +330,19 @@ export function SoilManagement() {
                       );
                     })}
                   </dl>
-                  {/* Two measures up front, the rest one tap away, so a card stays scannable. */}
+                  {/* One measure up front, the rest one tap away, so a card stays scannable. */}
                   {nutrientHints.length > 0 && (
                     <ul className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
-                      {nutrientHints.slice(0, 2).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                      {nutrientHints.slice(0, 1).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
                     </ul>
                   )}
-                  {nutrientHints.length > 2 && (
+                  {nutrientHints.length > 1 && (
                     <details className="relative z-10 mt-1 text-sm text-gray-700 dark:text-gray-300">
                       <summary className="inline-flex min-h-11 cursor-pointer items-center font-medium text-garden-700 hover:underline sm:min-h-0 sm:py-1 dark:text-garden-300">
-                        {t("soil.moreMeasures", { count: nutrientHints.length - 2 })}
+                        {t("soil.moreMeasures", { count: nutrientHints.length - 1 })}
                       </summary>
                       <ul className="mt-1 space-y-1">
-                        {nutrientHints.slice(2).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
+                        {nutrientHints.slice(1).map((line) => <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-gray-500">–</span><span>{line}</span></li>)}
                       </ul>
                     </details>
                   )}

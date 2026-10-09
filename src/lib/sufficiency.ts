@@ -431,22 +431,22 @@ export function calculateSufficiency(
     calories: {
       produced: totalCalories,
       needed: annualNeeds.calories,
-      percent: Math.min(100, Math.round((totalCalories / annualNeeds.calories) * 100)),
+      percent: Math.min(100, Math.round((totalCalories / annualNeeds.calories) * 1000) / 10),
     },
     protein: {
       produced: Math.round(totalProtein),
       needed: annualNeeds.protein,
-      percent: Math.min(100, Math.round((totalProtein / annualNeeds.protein) * 100)),
+      percent: Math.min(100, Math.round((totalProtein / annualNeeds.protein) * 1000) / 10),
     },
     vitaminC: {
       produced: totalVitC,
       needed: annualNeeds.vitaminC,
-      percent: Math.min(100, Math.round((totalVitC / annualNeeds.vitaminC) * 100)),
+      percent: Math.min(100, Math.round((totalVitC / annualNeeds.vitaminC) * 1000) / 10),
     },
     fiber: {
       produced: Math.round(totalFiber),
       needed: annualNeeds.fiber,
-      percent: Math.min(100, Math.round((totalFiber / annualNeeds.fiber) * 100)),
+      percent: Math.min(100, Math.round((totalFiber / annualNeeds.fiber) * 1000) / 10),
     },
   };
 

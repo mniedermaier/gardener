@@ -40,7 +40,7 @@ describe("self-sufficiency: one number everywhere", () => {
 
   it("nutrition card calories = headline forecast", () => {
     expect(card.nutrition.calories.produced).toBeCloseTo(ss.forecastKcal, -1);
-    expect(card.nutrition.calories.percent).toBe(Math.round(ss.forecastRatio * 100));
+    expect(card.nutrition.calories.percent).toBe(Math.round(ss.forecastRatio * 1000) / 10);
   });
 
   it("garden + animal parts add up to the forecast", () => {

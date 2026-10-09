@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Stethoscope, Syringe, Trash2 } from "lucide-react";
+import { AlertTriangle, Bird, ClipboardList, HeartPulse, Pencil, Plus, Stethoscope, Trash2 } from "lucide-react";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
@@ -161,7 +161,7 @@ export function HealthPage() {
                         <p className="mt-1 max-w-2xl text-xs text-gray-600 dark:text-gray-300">{t(`livestock.health.vaccContext.${VACC_GROUP[animal.type] ?? "other"}`)}</p>
                       </div>
                       <Button size="sm" variant="secondary" className="shrink-0 self-start sm:self-auto" onClick={() => setDialog({ open: true, animalId, type: "vaccination" })}>
-                        <Syringe size={14} aria-hidden="true" />
+                        <Plus size={14} aria-hidden="true" />
                         {t("livestock.health.logVaccination")}
                       </Button>
                     </li>
@@ -207,7 +207,7 @@ export function HealthPage() {
                         meta={[animal ? animalLabel(animal, t) : null, f.formatDate(h.date, "relative")]}
                         description={h.notes}
                         // Rows without a cost keep the column, so the menus line up.
-                        trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">–</span>}
+                        trailing={h.cost !== undefined ? f.formatCurrency(h.cost) : undefined}
                         onClick={() => setDialog({ open: true, entry: h })}
                         actions={
                           <Menu

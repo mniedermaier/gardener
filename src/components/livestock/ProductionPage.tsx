@@ -164,6 +164,7 @@ export function ProductionPage() {
               ) : (
                 <ProductWeekList
                   products={filtered}
+                  initialWeeks={4}
                   entryMeta={(p) => { const animal = animalMap.get(p.animalId); return animal && animals.length > 1 ? animalLabel(animal, t) : null; }}
                   onOpen={(p) => setDialog({ open: true, entry: p })}
                   renderActions={(p) => {

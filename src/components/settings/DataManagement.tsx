@@ -71,7 +71,10 @@ export function DataManagement() {
           {lastBackupDate
             ? (
               <>
-                {t("dataManagement.lastBackup")}: <time dateTime={lastBackupDate} className="font-medium">{formatDate(lastBackupDate, "relative")}</time>
+                {/* Same phrase as the reminder on "Heute"; the exact date on hover. */}
+                <time dateTime={lastBackupDate} title={formatDate(lastBackupDate, "date")} className="font-medium">
+                  {t("dashboard.backup.old", { count: Math.max(0, Math.round((today.getTime() - new Date(lastBackupDate).getTime()) / DAY)) })}
+                </time>
                 {stale && <span className="block text-xs text-gray-600 dark:text-gray-300">{t("dataManagement.backupStale")}</span>}
               </>
             )
