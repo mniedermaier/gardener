@@ -106,7 +106,7 @@ export function GardenPlanner() {
 
   const [bedDialog, setBedDialog] = useState<BedDialogState>({ open: false });
   // "Beet hinzufügen" from other pages (useAddBed) lands here with the dialog open.
-  useOpenAddOnNavigate(useCallback(() => setBedDialog({ open: true }), []));
+  useOpenAddOnNavigate(useCallback(() => setBedDialog({ open: true }), [setBedDialog]));
   const [autoFillBedId, setAutoFillBedId] = useState<string | null>(null);
   const [newGardenOpen, setNewGardenOpen] = useState(false);
   const [gardenName, setGardenName] = useState("");

@@ -73,7 +73,7 @@ export const PlantableNowRows = memo(function PlantableNowRows({ now, soon, limi
     if (groups.length <= 1) {
       const when = after
         ? t("calendar.afterFrostWindow", { range: formatDateRange(after, windowEnd(item)) })
-        : t(`calendar.${key}`, { date: formatDate(groups[0]?.date ?? new Date(), "short") });
+        : t(`calendar.${key}`, { date: formatDate(groups[0]?.date ?? windowEnd(item), "short") });
       // Bed first, as in every multi-group row on the page.
       return [bedLabel(allBeds), when].filter((x): x is string => !!x);
     }
