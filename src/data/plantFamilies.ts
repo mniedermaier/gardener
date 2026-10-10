@@ -12,6 +12,7 @@ export type PlantFamily =
   | "rosaceae"      // Rosengewächse: Erdbeere, Himbeere
   | "ericaceae"     // Heidekrautgewächse: Heidelbeere
   | "grossulariaceae" // Stachelbeergewächse: Johannisbeere, Stachelbeere
+  | "caprifoliaceae" // Geißblattgewächse (früher Baldriangewächse): Feldsalat
   | "other";
 
 export const plantFamilyMap: Record<string, PlantFamily> = {
@@ -58,6 +59,8 @@ export const plantFamilyMap: Record<string, PlantFamily> = {
   arugula: "brassicaceae",
   squash: "cucurbitaceae",
   asparagus: "other",
+  lambs_lettuce: "caprifoliaceae", // Feldsalat: Geißblattgewächse (früher Baldriangewächse), fruchtfolgeneutral
+  winter_purslane: "other", // Winterportulak: Quellkrautgewächse (Montiaceae), fruchtfolgeneutral
   pak_choi: "brassicaceae",
   endive: "asteraceae",
 };
@@ -81,6 +84,7 @@ export const familyColors: Record<PlantFamily, string> = {
   rosaceae: "#d0919b",
   ericaceae: "#6c7fb5",
   grossulariaceae: "#8b6a8f",
+  caprifoliaceae: "#7fa86a",
   other: "#a6a297",
 };
 
@@ -98,6 +102,7 @@ export const familyNameKeys: Record<PlantFamily, { de: string; en: string }> = {
   rosaceae: { de: "Rosengewächse", en: "Rose family" },
   ericaceae: { de: "Heidekrautgewächse", en: "Heathers" },
   grossulariaceae: { de: "Stachelbeergewächse", en: "Gooseberry family" },
+  caprifoliaceae: { de: "Geißblattgewächse (Feldsalat)", en: "Honeysuckle family (lamb's lettuce)" },
   other: { de: "Sonstige", en: "Other" },
 };
 
@@ -108,3 +113,11 @@ export const rotationGroups = [
   { families: ["chenopodiaceae", "amaryllidaceae"] as PlantFamily[], label: { de: "Schwachzehrer", en: "Light feeders" } },
   { families: ["fabaceae"] as PlantFamily[], label: { de: "Bodenverbesserer", en: "Soil improvers" } },
 ];
+
+/**
+ * Family of any plant: the catalogue mapping for built-in plants, the family a
+ * custom plant was given in its form, otherwise "other".
+ */
+export function familyOf(plantId: string, plant?: { family?: PlantFamily }): PlantFamily {
+  return plantFamilyMap[plantId] ?? plant?.family ?? "other";
+}

@@ -1,24 +1,23 @@
-import {
-  Bandage, Beef, Bird, ClipboardList, Droplet, Egg, Flame, HeartCrack, Hexagon, Milk, PawPrint, Pill,
-  PillBottle, Rabbit, Spool, Stethoscope, Syringe, Thermometer, type LucideIcon,
-} from "lucide-react";
+import { Bandage, Beef, Bird, ClipboardList, Egg, Feather, Flame, HeartCrack, Hexagon, Milk, Pill, Rabbit, Spool, Stethoscope, Syringe, Thermometer, Worm, type LucideIcon } from "lucide-react";
 import type { AnimalType, HealthEventType, ProductType } from "@/types/animal";
 import type { Tone } from "@/components/ui/tone";
 
 /** One icon language: Lucide for animals, products and health events (no UI emoji). */
 export const ANIMAL_ICON: Record<AnimalType, LucideIcon> = {
+  // One glyph per species so the tiles can be told apart; where lucide has no
+  // animal, the species' main product stands in (quail eggs, goat milk, wool).
   chicken: Bird,
-  duck: Bird,
-  quail: Bird,
+  duck: Feather,
+  quail: Egg,
   rabbit: Rabbit,
   bee: Hexagon,
-  goat: PawPrint,
-  sheep: PawPrint,
+  goat: Milk,
+  sheep: Spool,
 };
 
 export const PRODUCT_ICON: Record<ProductType, LucideIcon> = {
   eggs: Egg,
-  honey: Droplet,
+  honey: Hexagon, // honeycomb cell
   meat: Beef,
   wax: Flame, // candle wax
   milk: Milk,
@@ -27,11 +26,11 @@ export const PRODUCT_ICON: Record<ProductType, LucideIcon> = {
 
 export const HEALTH_ICON: Record<HealthEventType, LucideIcon> = {
   vaccination: Syringe,
-  deworming: Pill,
+  deworming: Worm,
   illness: Thermometer,
   injury: Bandage,
   checkup: Stethoscope,
-  treatment: PillBottle,
+  treatment: Pill, // PillBottle read as a trash can at 16 px
   death: HeartCrack,
   other: ClipboardList,
 };

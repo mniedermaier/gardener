@@ -15,6 +15,8 @@ interface TabsProps<T extends string> {
   label: string;
   /** If given, rendered as the tabpanel of the active tab. */
   children?: ReactNode;
+  /** Action for the active tab (e.g. "Ertrag erfassen"), at the right end of the tab row from sm on. */
+  actions?: ReactNode;
   className?: string;
 }
 
@@ -23,7 +25,7 @@ interface TabsProps<T extends string> {
  * ←/→/Home/End). Pass the active view as children; without children only the
  * tab list renders (e.g. inside PageHeader `tabs`) and you render the panel.
  */
-export function Tabs<T extends string>({ items, value, onChange, label, children, className = "" }: TabsProps<T>) {
+export function Tabs<T extends string>({ items, value, onChange, label, children, actions, className = "" }: TabsProps<T>) {
   const baseId = useId();
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const tabId = (v: string) => `${baseId}-tab-${v}`;
@@ -44,7 +46,8 @@ export function Tabs<T extends string>({ items, value, onChange, label, children
 
   return (
     <div className={className}>
-      <div ref={listRef} role="tablist" aria-label={label} className={`-mb-px flex gap-1 overflow-x-auto border-b border-gray-200 [scrollbar-width:none] dark:border-white/10 ${fadeClass}`}>
+      <div className={actions ? "flex flex-col-reverse gap-3 sm:flex-row sm:items-end sm:gap-4 sm:border-b sm:border-gray-200 sm:dark:border-white/10" : undefined}>
+      <div ref={listRef} role="tablist" aria-label={label} className={`-mb-px flex min-w-0 gap-1 overflow-x-auto border-b border-gray-200 [scrollbar-width:none] dark:border-white/10 ${actions ? "sm:flex-1 sm:border-b-0" : ""} ${fadeClass}`}>
         {items.map((item, i) => {
           const selected = item.value === value;
           return (
@@ -73,6 +76,8 @@ export function Tabs<T extends string>({ items, value, onChange, label, children
             </button>
           );
         })}
+      </div>
+      {actions && <div className="flex shrink-0 justify-end sm:pb-1.5">{actions}</div>}
       </div>
       {children !== undefined && (
         <div role="tabpanel" id={panelId} aria-labelledby={tabId(value)} tabIndex={0} className="pt-4 focus-visible:outline-none">

@@ -5,4 +5,6 @@ export { Sparkline } from "./Sparkline";
 export { RangeBar } from "./RangeBar";
 export { Legend, HatchPattern, type LegendItem } from "./Legend";
 export { HowCalculated } from "./HowCalculated";
+export { CompareBars, type CompareRow } from "./CompareBars";
+export { KeyFigures, type KeyFigure, type KeyFiguresProps } from "./KeyFigures";
 export { niceScale, useElementWidth, SERIES_BG, SERIES_FILL, type SeriesColor } from "./scale";

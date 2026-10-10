@@ -5,11 +5,14 @@ import { useDraggable } from "@dnd-kit/core";
 import { usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
 import { useFormat } from "@/hooks/useFormat";
+import { useFrostHold } from "@/hooks/useFrostHold";
+import { addDays } from "date-fns";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/cn";
-import type { PlantableNow } from "@/lib/advisor";
+import { groupAgendaBedsByDate, type PlantableNow } from "@/lib/advisor";
 import type { Plant } from "@/types/plant";
 
 type Category = "recommended" | "all" | "vegetable" | "herb" | "fruit";
@@ -67,12 +70,20 @@ const PaletteItem = memo(function PaletteItem({ plant, name, reason, isSelected,
  */
 export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bedFitIds, className = "" }: Props) {
   const { t } = useTranslation();
-  const { formatDate } = useFormat();
+  const { formatDate, formatDateRange } = useFormat();
+  const { lastFrostNight, holds } = useFrostHold();
   const plants = usePlants();
   const getPlantName = usePlantName();
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("recommended");
+  const categoryOptions: { value: Category; label: string }[] = [
+    { value: "recommended", label: t("palette.now") },
+    { value: "all", label: t("common.all") },
+    { value: "vegetable", label: t("plants.category.vegetable") },
+    { value: "herb", label: t("plants.category.herb") },
+    { value: "fruit", label: t("plants.category.berry") },
+  ];
 
   // Debounce the filter (200 ms) so typing stays smooth with many items.
   useEffect(() => {
@@ -86,14 +97,40 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
   const recommended = useMemo(() => {
     if (plantableNow.length > 0) {
       return plantableNow
-        .map((r) => ({ plant: plantById.get(r.plantId), reason: t(`palette.reason.${r.action}`, { date: formatDate(r.until, "short") }) }))
+        .map((r) => {
+          const plant = plantById.get(r.plantId);
+          // Same frost rule as the calendar: during a forecast frost spell the
+          // window starts after the last frost night (or waits for it).
+          const held = !!plant && !!lastFrostNight && holds(plant, [r.action]);
+          const after = lastFrostNight ? addDays(lastFrostNight, 1) : null;
+          // Beds whose windows close on different days (glass closes later): one part
+          // per bed group, latest first — the same split the calendar shows.
+          const groups = r.beds?.length ? [...groupAgendaBedsByDate({ date: r.until, beds: r.beds })].sort((x, y) => y.date.getTime() - x.date.getTime()) : [];
+          if (groups.length > 1) {
+            const shown = groups.length > 2 ? [groups[0], groups[groups.length - 1]] : groups;
+            const label = (bs: typeof r.beds) => (bs!.length <= 2 ? bs!.map((b) => b.name).join(", ") : t("advisor.bedCount", { count: bs!.length }));
+            const parts = shown.map((g) =>
+              held && after
+                ? t("calendar.bedRange", { beds: label(g.beds), range: formatDateRange(after, g.date) })
+                : t("calendar.bedUntil", { beds: label(g.beds), date: formatDate(g.date, "short") }),
+            );
+            return { plant, reason: [held && after ? t("calendar.afterFrostShort") : t(`advisor.actions.${r.action}`), ...parts].join(" · ") };
+          }
+          const when = held && after
+            ? after <= r.until
+              ? t("calendar.afterFrostWindow", { range: formatDateRange(after, r.until) })
+              : t("advisor.afterFrost", { date: formatDate(after, "short") })
+            : t(`palette.reason.${r.action}`, { date: formatDate(r.until, "short") });
+          // Garden level: name the beds it suits ("Herbstsaat bis 17. Okt. · Hochbeet Süd").
+          return { plant, reason: [when, r.beds?.length ? r.beds.map((b) => b.name).join(", ") : null].filter(Boolean).join(" · ") };
+        })
         .filter((r): r is { plant: Plant; reason: string } => !!r.plant);
     }
     return bedFitIds
       .map((id) => plantById.get(id))
       .filter((p): p is Plant => !!p)
       .map((plant) => ({ plant, reason: t("palette.reason.fitsBed") }));
-  }, [plantableNow, bedFitIds, plantById, t, formatDate]);
+  }, [plantableNow, bedFitIds, plantById, t, formatDate, formatDateRange, lastFrostNight, holds]);
 
   const items = useMemo(() => {
     let list: Array<{ plant: Plant; reason?: string }>;
@@ -122,19 +159,18 @@ export function PlantPalette({ selectedPlantId, onSelectPlant, plantableNow, bed
         />
       </div>
 
-      <div className="-mx-1 mb-3 overflow-x-auto px-1">
-        <SegmentedControl
-          size="sm"
-          label={t("palette.filter")}
+      {/* A container query decides, not the viewport: in a narrow side pane five
+          segments would clip ("Beeren"), so the same choice becomes a select there. */}
+      <div className="@container mb-3">
+        <div className="hidden @[22rem]:block">
+          <SegmentedControl size="sm" fullWidth label={t("palette.filter")} value={category} onChange={setCategory} options={categoryOptions} />
+        </div>
+        <Select
+          wrapperClassName="@[22rem]:hidden"
+          aria-label={t("palette.filter")}
           value={category}
-          onChange={setCategory}
-          options={[
-            { value: "recommended", label: t("palette.now") },
-            { value: "all", label: t("common.all") },
-            { value: "vegetable", label: t("plants.category.vegetable") },
-            { value: "herb", label: t("plants.category.herb") },
-            { value: "fruit", label: t("palette.fruitBerries") },
-          ]}
+          onChange={(e) => setCategory(e.target.value as Category)}
+          options={categoryOptions.map((o) => ({ value: o.value, label: o.label }))}
         />
       </div>
 

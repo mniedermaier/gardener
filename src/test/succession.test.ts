@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateSuccessionSchedule, isSuccessionCandidate, SUCCESSION_PRESETS } from "@/lib/succession";
+import { generateSuccessionSchedule, isSuccessionCandidate, successionSeason, SUCCESSION_PRESETS } from "@/lib/succession";
 import type { Plant } from "@/types/plant";
 
 const lettuce: Plant = {
@@ -47,5 +47,48 @@ describe("Succession planting", () => {
     const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
     expect(dates[1] - dates[0]).toBe(twoWeeksMs);
     expect(dates[2] - dates[1]).toBe(twoWeeksMs);
+  });
+});
+
+describe("successionSeason", () => {
+  const radish: Plant = { ...lettuce, id: "radish", sowIndoorsWeeks: null, sowOutdoorsWeeks: -4, transplantWeeks: null };
+  const tomato: Plant = { ...lettuce, id: "tomato" };
+
+  it("offers this year's candidates while a sowing is still ahead", () => {
+    // Frost 15 May; radish: 8 sowings every 2 weeks from 17 Apr → last on 24 Jul.
+    const s = successionSeason([lettuce, radish, tomato], "2026-05-15", new Date(2026, 5, 1));
+    expect(s.nextYear).toBe(false);
+    expect(s.frostISO).toBe("2026-05-15");
+    expect(s.open.map((p) => p.id).sort()).toEqual(["lettuce", "radish"]);
+  });
+
+  it("drops crops whose last sowing has passed", () => {
+    // 1 Aug: radish ended 24 Jul; lettuce (6 × 3 weeks from 17 Apr) runs to 31 Jul — both closed.
+    const s = successionSeason([lettuce, radish], "2026-05-15", new Date(2026, 7, 1));
+    expect(s.nextYear).toBe(true);
+  });
+
+  it("plans next spring in autumn instead of offering closed windows", () => {
+    const s = successionSeason([lettuce, radish], "2026-05-15", new Date(2026, 9, 9));
+    expect(s.nextYear).toBe(true);
+    expect(s.frostISO).toBe("2027-05-15");
+    expect(s.open).toHaveLength(2);
+  });
+
+  it("offers only spring sowings for next year", () => {
+    // Bush bean: first sowing 2 weeks after the frost (end of May) — not spring.
+    const bean: Plant = { ...lettuce, id: "bean", sowIndoorsWeeks: null, sowOutdoorsWeeks: 2, transplantWeeks: null };
+    const s = successionSeason([lettuce, radish, bean], "2026-05-15", new Date(2026, 9, 9));
+    expect(s.nextYear).toBe(true);
+    expect(s.open.map((p) => p.id).sort()).toEqual(["lettuce", "radish"]);
+  });
+
+  it("does not treat kale as a succession crop", () => {
+    expect(isSuccessionCandidate({ ...lettuce, id: "kale" })).toBe(false);
+  });
+
+  it("ignores a stale year in the stored frost date", () => {
+    const s = successionSeason([lettuce], "2023-05-15", new Date(2026, 5, 1));
+    expect(s.frostISO).toBe("2026-05-15");
   });
 });

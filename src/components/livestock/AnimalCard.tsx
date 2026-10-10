@@ -1,4 +1,4 @@
-import { expectedShareToDate } from "@/lib/metrics";
+import { expectationBasisDate, expectedShareToDate } from "@/lib/metrics";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2 } from "lucide-react";
@@ -15,6 +15,8 @@ interface AnimalCardProps {
   animal: Animal;
   /** Recorded this season, per product, in recording units. */
   recorded: Partial<Record<string, number>>;
+  /** Start of "expected so far": arrival or first recorded entry (`expectationStart`). */
+  expectedFrom: string;
   feedCost: number;
   lastHealth?: HealthEvent;
   onEdit: () => void;
@@ -23,13 +25,15 @@ interface AnimalCardProps {
 }
 
 /** One herd/colony. The whole card opens the detail page; actions sit in the menu. */
-export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost, lastHealth, onEdit, onDelete, onOpen }: AnimalCardProps) {
+export const AnimalCard = memo(function AnimalCard({ animal, recorded, expectedFrom, feedCost, lastHealth, onEdit, onDelete, onOpen }: AnimalCardProps) {
   const now = useToday();
   const { t } = useTranslation();
   const f = useFormat();
   const yields = ANNUAL_YIELD[animal.type];
   const HealthIcon = lastHealth ? HEALTH_ICON[lastHealth.type] : null;
 
+  // Same time basis as the recorded values: since arrival or the first entry.
+  const expectationBasis = expectationBasisDate(expectedFrom, now);
   return (
     <div className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-xs transition-colors hover:border-gray-300 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20">
       <div className="flex items-start gap-3">
@@ -43,7 +47,7 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {t(`livestock.typeCount.${animal.type}`, { count: animal.count })}
             {" · "}
-            {t("livestock.sinceDate", { date: f.formatDate(animal.acquiredDate, "monthYear") })}
+            {t("livestock.sinceDate", { date: f.formatDate(animal.acquiredDate, "monthYearShort") })}
           </p>
         </div>
         <div className="relative z-10 -mr-2 -mt-1">
@@ -61,8 +65,9 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm dark:border-white/5">
         {yields.slice(0, 2).map((y) => {
           const Icon = PRODUCT_ICON[y.product];
-          // Same time basis as the recorded value: expected so far this year (since the animal arrived).
-          const expected = formatProductAmount(y.product, y.quantity * animal.count * expectedShareToDate(y.product, now, animal.acquiredDate), f, t);
+          const expectedQty = y.quantity * animal.count * expectedShareToDate(y.product, now, expectedFrom);
+          // "225 Eier von ~1.019 bis heute erwartet": the unit is already in the value, count only.
+          const expected = y.product === "eggs" ? f.formatNumber(expectedQty, { maximumFractionDigits: 0 }) : formatProductAmount(y.product, expectedQty, f, t);
           return (
             <div key={y.product}>
               <dt className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -71,19 +76,21 @@ export const AnimalCard = memo(function AnimalCard({ animal, recorded, feedCost,
               </dt>
               <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">
                 {formatProductAmount(y.product, recorded[y.product] ?? 0, f, t)}
-                <span className="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-                  {t("livestock.ofExpectedToDate", { amount: expected })}
+                <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">
+                  {/* The basis date sits in the same hint, under the figure it qualifies. */}
+                  {expectationBasis
+                    ? t("livestock.ofExpectedSince", { amount: expected, date: f.formatDate(expectationBasis, "monthYearShort") })
+                    : t("livestock.ofExpectedToDate", { amount: expected })}
                 </span>
               </dd>
             </div>
           );
         })}
-        {yields.length < 2 && (
-          <div>
-            <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>
-            <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatCurrency(feedCost)}</dd>
-          </div>
-        )}
+        {/* Same slots on every card: products first, then the feed costs (bees too). */}
+        <div>
+          <dt className="text-xs text-gray-500 dark:text-gray-400">{t("livestock.feedTotal")}</dt>
+          <dd className="font-medium tabular-nums text-gray-900 dark:text-gray-100">{f.formatCurrency(feedCost)}</dd>
+        </div>
       </dl>
 
       {(lastHealth || animal.notes) && (

@@ -12,7 +12,8 @@ covered here, copy the pattern from the reference page
    everything, `garden-*` for the brand and primary actions, and semantic tones
    only for status: `positive` (good/done), `warning` (needs attention soon),
    `danger` (error/overdue/conflict, destructive actions), `info` (neutral
-   hint). Money, weights and counts stay neutral (`text-gray-900 tabular-nums`).
+   hint; also frost — the cold tone, on purpose: the frost warning carries its
+   urgency in the text and the action button, amber stays for "needs attention"). Money, weights and counts stay neutral (`text-gray-900 tabular-nums`).
    Never colour a whole number red or green. Put a `Badge` or trend chip next to it.
 3. **Numbers and dates go through `useFormat()`** (`src/lib/format.ts`). Never use
    `toFixed()`, never print raw `yyyy-MM-dd`, never hard-code `"kg"` or `"€"`.
@@ -29,7 +30,101 @@ covered here, copy the pattern from the reference page
 8. **No hover-only actions.** Row actions are always visible. Use at least
    `text-gray-500` and an `IconButton` with a `label`.
 9. **Forms use primitives only:** `Input`, `Select`, `Textarea`, `Checkbox`,
-   `SegmentedControl`. Each one gets a label (lint: `label-has-associated-control`).
+   `SegmentedControl`. Each one gets a label (lint: `label-has-associated-control`);
+   a `SegmentedControl` gets a visible `LABEL_CLASS` caption above it. Dialog rules:
+   - **Optional fields** pass `optional` to the primitive (`Input`, `Select`,
+     `Textarea`, `DatePicker`, `PlantCombobox`), which appends a muted
+     "(optional)" — or " · optional" when the label already ends in a bracket
+     ("Kosten (€) · optional"), so there are never two pairs of brackets. Never
+     write "(optional)" or "optional" into a label or hint; required fields
+     stay unmarked.
+   - **Units** sit in the label in parentheses: "Kosten (€)", "Menge (l)",
+     "Dauer (Min.)", "Ernte ab (Tage)". Placeholders are plain example numbers
+     ("z. B. 4,00"), never a currency string. Every numeric field shows such an
+     example. The unit is named exactly once: in the label when it is fixed,
+     otherwise by the picker beside the field — an inline `SegmentedControl`
+     for short units (harvest g/kg, feed kg/g/l, the label follows it:
+     "Gewicht (kg)"), a `Select` next to a plain "Menge" when the unit words are
+     long (seeds: Päckchen/Gramm/Samen).
+   - **Name fields:** "Titel" for records (journal, task, expense), "Name" for
+     things you keep or identify (bed, plant, animal, preserve, problem).
+   - **Costs** that feed the balance (seeds, pantry supplies, soil, feed, health)
+     carry the hint `common.costHint` ("Fließt in die Bilanz unter Kosten ein.").
+   - **Numbers** use a text field with `inputMode="decimal"`/`"numeric"`, not
+     `type="number"` (no spin arrows, the decimal comma works). Short pairs
+     (amount + unit, year + source, amount + category, method + duration) stay
+     side by side on phones.
+   - **Plant fields** are a `PlantCombobox` labelled "Pflanze" in every dialog.
+   - **Scales** (harvest quality, pest severity) show their two endpoint
+     captions under the control — short words that fit under the end
+     steps ("Schlecht" … "Top"); the full level name sits in the label.
+   - **Measurements** (soil test): only the value the record needs is
+     required (pH); every other reading is `optional`, with "z. B." examples.
+   - **Dates:** `DateField` — Heute/Gestern/Datum … for records,
+     `mode="future"` (Heute/Morgen/Datum …) for tasks; always three segments,
+     the last one "Datum …" with the calendar icon and its text. A native `DatePicker`
+     only for one-off dates such as "Im Bestand seit". The date field is
+     labelled "Datum" when it is simply when the record happened; a specific
+     "<Verb> am" only where a record has more than one date and the label
+     says which one ("Eingelagert am" vs. haltbar bis, "Bemerkt am" vs. the
+     treatment date).
+   - **Field order:** what the record is about first (Pflanze in harvest,
+     pantry, seeds and pests; the animal in livestock dialogs), then the
+     details, then Datum, then Notizen. Tasks are the exception: the due date
+     is the point of a task, so it comes right after the title.
+   - **Notizen** is an optional `Textarea` with a placeholder that fits the
+     record: `common.notesPlaceholder` for crops, otherwise the dialog's own key
+     (`livestock.{feed,health,production}.notesPlaceholder`, `calendar.`,
+     `water.`, `seeds.`, `pantry.`, `soil.notesPlaceholder`). Where the text is
+     the record itself (journal "Beobachtung") it is not marked optional.
+   - A full-width `SegmentedControl` never overflows: its segments shrink and
+     wrap to two lines; keep labels short so they don't have to.
+   - A required choice without an unambiguous default (e.g. the bed when
+     watering) starts empty ("Beet wählen …"); prefill only from a deep link,
+     the last entry or a single option. **Preselected on purpose** (the common
+     case, harmless if kept) — and only these: expense category "Saatgut",
+     task type "Sonstiges", health "Kontrolle", pest kind "Schädling", bed
+     environment "Freilandbeet", pantry method once a plant is chosen, watering
+     method "Manuell" (or the last entry's), production product (the chosen
+     animal's main product, e.g. "Eier" for hens). A wrong value that
+     would be a silent data error never starts preselected (the species of a new
+     animal; a custom plant's category, sun, water and sowing timing; the
+     source of seed). The plant symbol starts on the neutral sprout, shown as
+     the first, selected tile and named next to the label.
+     **Scales** (harvest quality, pest severity) start unset: a preset value
+     would be counted as an answer (it would inflate "Ø Qualität"). An unset
+     optional scale is simply not stored; a required one keeps Save disabled
+     until chosen. A choice that
+     depends on an earlier field appears only once that field is set (pantry
+     method after the plant).
+   - **Prefilled numbers** only for dimensions and calendar facts the user
+     usually keeps: a new bed 1,2 × 2,4 m, the seed purchase year, a seed
+     packet count of 1. Everything that describes the plant or the record
+     starts empty with a "z. B." placeholder (custom plant days and spacing,
+     animal count "z. B. 6", amounts, costs).
+   - Paired fields align on their inputs (`items-end`), so a label that wraps
+     never pushes its field below its neighbour.
+   - Placeholders that list examples end in a typographic ellipsis "…" (German
+     with a space before it): "z. B. Aussaat, Frost, Ernte …". A single example
+     value needs none: "z. B. Ingwer", "z. B. 4,00".
+   - An optional cost field sits on its own full-width row after the amounts,
+     with the shared hint `common.costHint` ("Fließt in die Bilanz …").
+   - Save stays disabled until the required fields are valid.
+   - **Choosing a type:** up to 3 options → `SegmentedControl` (a short
+     scale or interval may take 4, e.g. task "Wiederholen": Nie / Täglich /
+     Wöchentlich / 14-tägig, or the four app languages in onboarding, as long
+     as every label fits at 390 px); up to 8 →
+     `ui/ChoiceTiles` (animal species, health "Art", bed environment, pantry
+     method); more than 8 → `Select` (task type, plant). `ChoiceTiles` picks
+     the column count so no row ends with a lone tile (8 → 4 × 2, 7 → 4 + 3,
+     5 → 3 + 2) and spans an odd last tile on phones; from `sm` the icon sits
+     above the label and labels wrap whole words — never truncated, never
+     hyphenated. Each tile's icon must be distinct; if no fitting glyph exists,
+     use the species' main product. Don't hand-roll tile grids.
+   - **Empty option of a `Select`:** "X wählen …" when a value is still to be
+     chosen (required, or optional but "not specified yet": "Familie wählen …");
+     "Kein(e) X" when "none" is itself a valid answer ("Kein Beet", "Kein Tier").
+   - Scale endpoint captions are short single words ("Gering" … "Stark").
 10. **No `alert`/`prompt`.** Use a `Modal` or a `toast` instead.
 11. Write user-visible strings in all 4 locales. Microcopy has no exclamation
     marks and uses active phrasing ("3 Aufgaben überfällig").
@@ -41,7 +136,7 @@ covered here, copy the pattern from the reference page
 
     | Concept | de | en | es | fr |
     |---|---|---|---|---|
-    | record something that happened (harvest, watering, feed, product, soil test, expense, health event, preserves) | erfassen | Log … | Registrar … | Noter … |
+    | record something that happened (harvest, watering, feed, product, soil test, expense, health event, preserves, journal entry) | erfassen | Log … | Registrar … | Noter … |
     | add a thing you keep (bed, task, animal, plant, seeds, photo) | hinzufügen | Add … | Añadir … | Ajouter … |
     | report a problem (pests, diseases) | melden | Report … | Registrar … | Signaler … |
     | save a dialog | Speichern | Save | Guardar | Enregistrer |
@@ -49,7 +144,19 @@ covered here, copy the pattern from the reference page
     English uses sentence case ("Add task", not "Add Task"). French addresses
     the user with *vous*, German and Spanish with *du*/*tú*. Negative numbers
     and temperatures use the minus sign "−" (the formatters do this), ranges the
-    en dash without spaces ("60–85 Tage"), asides the spaced en dash (" – ").
+    en dash without spaces ("60–85 Tage"; date spans via `formatDateRange`:
+    "5.–11. Okt."), asides the spaced en dash (" – ").
+14. **Glossary.** One term per thing, in every place it appears (legend,
+    detail page, planner, warnings):
+
+    | Concept | de | en | es | fr | Tone |
+    |---|---|---|---|---|---|
+    | plants that help each other | Gute Nachbarn | Good neighbours | Buenos vecinos | Bons voisins | `positive`, `Check` |
+    | plants that should not stand together | Ungünstige Nachbarn | Unfavourable neighbours | Vecinos desfavorables | Voisins défavorables | `warning`, `TriangleAlert` (never red ✕: placing stays allowed) |
+    | a plant in a bed (free bed name) | „Tomate · Gewächshaus“ | "Tomato · Greenhouse" | | | – |
+
+    Bed names are free text, so never glue them into a sentence with a
+    preposition ("Tomate in Gewächshaus"); use the middle dot.
 
 `src/test/conventions.test.ts` is a ratchet: the counts of `toFixed(`, text
 below 11 px, raw `<select>`/`<textarea>` and `prompt/alert` may only go down.
@@ -62,6 +169,7 @@ When you migrate a page, **lower the baseline numbers** in that file.
 | `gray-50…950` | **Overridden**: warm stone neutrals with a slight moss tint at the dark end. Keep using `gray-*`. |
 | `garden-50…950` | Brand, deep sage/forest green. `garden-600` (#2f6b3a) = primary button, focus ring. Dark text: `garden-300/400`. |
 | `earth-50…700` | Warm accent (sparingly: illustrations, soil). |
+| `water-100…600` | Muted steel blue for water amounts (the `sky` chart series; its pale, dotted sibling `rain` for rain) and greenhouse glass on the garden map. Never a status colour. |
 | `positive` `warning` `danger` `info` | Semantic tones. **One variable each, swapped automatically in `.dark`**. So `bg-danger/10 text-danger` works in both themes without a `dark:` class. |
 | `focus` | Focus ring colour (`outline-focus`). |
 | `shadow-xs` | Default for surfaces. Use `shadow-lg` only for floating things (menus, toasts). |
@@ -129,7 +237,7 @@ import { List, ListRow } from "@/components/ui/List";
     leading={<PlantIconDisplay plantId={h.plantId} emoji={plant.icon} size={28} />}
     title={getPlantName(h.plantId)}
     badges={<Badge tone="warning">…</Badge>}
-    meta={[bedName, formatDate(h.date, "relative")].filter(Boolean).join(" · ")}
+    meta={[bedName, <time key="d" dateTime={h.date}>{formatDate(h.date, "relative")}</time>]}  // parts, not join(" · "): each part wraps as a unit, falsy parts skipped
     description={h.notes}                               // clamped to 2 lines
     trailing={formatWeight(h.grams)}                    // right-aligned value
     onClick={() => openEdit(h)}                         // whole row → edit dialog
@@ -193,6 +301,11 @@ row under its `h1`. Never put a pill row inside a page.
   { label: t("common.delete"), icon: Trash2, danger: true, onSelect: () => void remove(x) },
 ]} />                                                     // trigger defaults to "…"; pass trigger={<>Garten <ChevronDown/></>} for a labelled one
 ```
+The panel is portalled (into the surrounding `<dialog>`, else `<body>`) and
+shown as a popover in the top layer, so no row or sticky header can cover it.
+It opens below the trigger and flips above it when there is no room.
+`e2e/row-menus.spec.ts` clicks "Löschen" for real in every list (first and
+last row, desktop and phone); add new lists with a row menu there.
 
 ```tsx
 <IconButton icon={Check} label={t("pests.resolve")} tone="neutral|brand|danger" size="sm|md" />
@@ -219,7 +332,7 @@ if (await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") 
 Helpers: `cn(...)` in `src/lib/cn.ts`. Tone class maps (`TONE_SOFT`,
 `TONE_TEXT`, …) are in `ui/tone.ts`. Crop phases (Vorziehen, Direktsaat, Auspflanzen,
 Ernte) use `PhaseBadge`/`PhaseSwatch`/`PhaseLegend`/`phaseFill` from `ui/phase.tsx`
-(earth → green → earth, icon + hatching for "Vorziehen"); the windows come from
+(info blue → green → earth, icon + hatching for "Vorziehen"); the windows come from
 `lib/season.ts`. Plant-family colours are the muted set in `data/plantFamilies.ts`.
 Task rows everywhere use `calendar/TaskRow` with `groupTasksByDue()` (`lib/tasks.ts`). `CONTROL_CLASS` and `Field` in
 `ui/Field.tsx` are for the rare custom control.
@@ -234,9 +347,12 @@ const { formatDate, formatNumber, formatWeight, formatCurrency, formatVolume,
 | Function | Input | de | en (en-GB) |
 |---|---|---|---|
 | `formatDate(d, "short")` | Date \| ISO \| ms | `3. Okt.` (`3. Okt. 2025` for other years) | `3 Oct` |
-| `formatDate(d, "relative")` | | `Heute`, `Gestern`, `Vor 3 Tagen`, `In 2 Tagen`; beyond ±6 days → short | `Yesterday` |
+| `formatDate(d, "relative")` | | `Heute`, `Gestern`, `Vor 3 Tagen`, `In 2 Tagen`; beyond ±6 days → short. Only at the start of a text or cell | `Yesterday` |
+| `formatDate(d, "relativeInline")` | | the same in lower case for the middle of a sentence („erledigt: vor 3 Tagen“, ES „vencía hace 4 días“) | `due yesterday` |
+| `formatDate(d, "weekdayDate")` | | `Mo., 12. Okt.` — the coming week; one date format per list group | `Mon 12 Oct` |
 | `formatDate(d, "long")` | | `Montag, 5. Oktober 2026` | |
 | `formatDate(d, "numeric" \| "monthYear" \| "month" \| "weekday")` | | `03.10.2026` · `Oktober 2026` · `Okt.` · `Mo.` | |
+| `formatDateRange(from, to)` | two dates | `5.–11. Okt.` (month once), `10. Okt.–15. Nov.`; en dash without spaces, year only outside the current year. The one style for every date span (calendar, plant year plan, week rows) — never hand-join two dates with " – " | `5–11 Oct` |
 | `formatNumber(n, { maximumFractionDigits = 1, minimumFractionDigits })` | | `1.234,6` | `1,234.6` |
 | `formatWeight(grams, unit?)` | **grams** | `750 g`, `1,9 kg`, `252 kg` | `1.9 kg` |
 | `formatCurrency(euros, { currency, maximumFractionDigits })` | **euros** | `473,10 €` | `€473.10` |
@@ -278,12 +394,14 @@ theme-aware, use tabular figures and ship a text alternative.
 
 | Component | Use |
 |---|---|
-| `BarChart` | Vertical (optionally stacked) bars over months/weeks: y-grid with 3–4 nice ticks, `formatTick` for units, `marker={{ index, label: t("charts.today") }}`, optional `target` line, hover **and** ←/→ keyboard tooltip, legend for ≥ 2 series, visually hidden `<table>`. |
+| `BarChart` | Vertical (optionally stacked) bars over months/weeks: y-grid with 3–4 nice ticks, `formatTick` for units, `marker={{ index, label: t("charts.today") }}`, optional `target` line, hover **and** ←/→ keyboard tooltip, legend for ≥ 2 series, visually hidden `<table>`. Category labels thin out by their measured width (`axisLabelStep`), anchored on the marker, so "KW 34 KW 35" never collides on a phone. Pass only the series that have data — the legend lists every series. |
+| `KeyFigures` | Page-head metrics: **one hero figure** (large, optional `visual`: `Sparkline`, `Meter`, `CompareBars`) plus 1–3 secondary figures inline, divided by hairlines. `layout="row"` for page heads, `"stack"` for side columns (rows with chevron when `to` is set). |
+| `CompareBars` | 2–3 amounts of one unit as thin bars on one scale ("Ertragswert" vs "Kosten"); a hero visual, the numbers stay in text. |
 | `Meter` | Horizontal progress: `actual` solid, `forecast` hatched, `target` tick. Brand colour only, the number next to it says how good it is. |
 | `MonthStrip` | 12-month heatmap (one hue, 5 steps) with the value printed in each cell; outlines the current month. |
-| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are `earth`; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. |
+| `RangeBar` | Min–max on a shared domain (temperature per day) with a threshold tick. Neutral days are neutral gray; `emphasis` (frost night) switches to the semantic `info` tone (cold) and is always paired with a text badge ("Frost") and explained in the card description. A night only below the threshold ("Frostgefahr") is `neutral`, so emphasis rises with the danger. |
 | `Sparkline` | Tiny trend line for stat tiles (`label` = summary for screen readers). |
-| `Legend`, `HatchPattern` | Swatches: solid = recorded, hatched = forecast, line = target. |
+| `Legend`, `HatchPattern`, `DotPattern` | Swatches: solid = recorded, hatched = forecast, dotted = a second measured series of the same family (rain beside watering, `rain` colour), line = target. |
 | `HowCalculated` | `<details>` "Wie berechnet?" under a metric. Every KPI that is computed gets one. |
 
 ```tsx
@@ -300,6 +418,58 @@ Rules: one unit per chart (different units → small multiples, never one
 stacked axis); series colours in fixed order `brand → earth → sky`, `muted`
 for neutral shares; forecasts are hatched so meaning is not colour-only;
 the caption summarises the finding.
+
+### Key figures instead of a row of tiles
+
+A row of four equal `StatCard`s says "everything is equally important" and
+fills the page with boxes. Use it only when four numbers really are peers.
+Otherwise:
+
+```tsx
+<KeyFigures
+  hero={{ label: t("water.wateredThisWeek"), value: formatVolume(week), icon: Droplets, tone: "info",
+          visual: <Sparkline values={weeks} color="sky" width={160} height={32} label={…} />,
+          hint: t("water.plusRain", { amount }) }}
+  items={[{ label: t("water.wateredInMonth", { month }), value: formatVolume(month), hint: … },
+          { label: t("water.avgPerWeek"), value: formatVolume(avg), hint: … }]}
+/>
+```
+
+- The hero is the number the page is about; its visual shows the trend or
+  proportion (`visualPlacement="below"` for wide visuals like `CompareBars`).
+- Secondary figures qualify the hero. Never show a figure that cannot apply
+  (no "Milch 0 l" without goats — see `livestock/productFigures.ts`).
+- Label says exactly what is counted ("Gegossen im Oktober", rain separate).
+
+Used on: Heute (season, `stack`), Bewässerung, Tiere, Produktion, Gesundheit,
+Selbstversorgung, Ernährungsplan, Kosten.
+
+### Garden map (signature of "Heute")
+
+`dashboard/GardenMap.tsx` draws every bed of the active garden as a small plan:
+true proportions, one cell size for all beds (`packBeds`: shelf rows in planner
+order, centred, common baseline — beds have no real coordinates yet), crops as
+plant icons in their cells (family-colour dots below 18 px per cell), paths as
+light cells. Frames carry the environment: soil texture with an earth border
+(open bed), a thick wooden frame (raised bed), a `water` glass outline
+(greenhouse, polytunnel, cold frame), round pots (container).
+
+Pins (solid semantic tone, white icon, ring in the surface colour) mark what
+needs attention: `positive` Apple = ripe, `warning` clipboard (+count) = task due
+today/overdue, `info` snowflake = forecast frost reaches the bed (open beds at the
+frost threshold, unheated greenhouses below 0 °C inside). The legend lists only
+pins that occur. Every bed is a link to `/planner?bed=<id>` with a full
+accessible name ("Gewächshaus · 20 Pflanzen · erntereif: Tomate · 2 Aufgaben
+fällig").
+
+### Weather: one frost sentence
+
+`summarizeFrost()` (`lib/weatherAlerts.ts`) + `useFrostSummary()`
+(`weather/frost.tsx`) produce the frost summary for **both** "Heute" and the
+weather page: "3 Frostnächte, 2 weitere mit Frostgefahr – bis −6 °C (So)". `FrostTaskButton`
+next to it turns the warning into a "Vlies auflegen" task on the first frost
+night (with undo; once planned it opens the task). `DayArc` shows today's sun
+path (sunrise → sunset, sun position now) in the current-weather card.
 
 **Numbers:** analysis pages and the dashboard take their figures from
 `lib/metrics.ts` / `useGardenMetrics()` — never recompute totals in a

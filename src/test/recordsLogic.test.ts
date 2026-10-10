@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { assessPh, bedPhTarget, phAdvice, targetPh, DEFAULT_PH } from "@/lib/soil";
+import { assessPh, bedPhTarget, phAdvice, phStatus, targetPh, DEFAULT_PH } from "@/lib/soil";
 import { needsNewStock, propagation, seedViability } from "@/lib/seedViability";
 import plants from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
@@ -32,6 +32,11 @@ describe("crop-specific lime rules", () => {
     expect(a.advice).toBe("limeVeto");
     expect(a.limeAverse).toEqual(["potato"]);
     expect(a.target).toEqual({ min: 5.0, max: 6.0 });
+  });
+
+  it("shows the veto as in range: same badge as any bed inside its target", () => {
+    expect(phStatus(assessPh(5.6, potatoField).advice)).toBe("optimal");
+    expect(phStatus("noLime")).toBe("noLime");
   });
 
   it("a pure potato bed at 5.6 is simply optimal", () => {

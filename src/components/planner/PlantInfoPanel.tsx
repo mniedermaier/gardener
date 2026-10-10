@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Sun, Droplets, Ruler, Check, X, CalendarDays } from "lucide-react";
+import { Sun, Droplets, Ruler, Check, TriangleAlert, CalendarDays } from "lucide-react";
 import { addWeeks } from "date-fns";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import type { Plant } from "@/types/plant";
@@ -56,7 +56,7 @@ export const PlantInfoPanel = memo(function PlantInfoPanel({ plant, frostProtect
           <li key={id} className="inline-flex items-center gap-1 rounded-md bg-gray-100 py-0.5 pr-2 pl-1 text-xs text-gray-700 dark:bg-white/10 dark:text-gray-300">
             {good
               ? <Check size={12} aria-hidden="true" className="text-positive" />
-              : <X size={12} aria-hidden="true" className="text-danger" />}
+              : <TriangleAlert size={12} aria-hidden="true" className="text-warning" />}
             <PlantIconDisplay plantId={id} emoji={p.icon} size={14} />
             {getPlantName(id)}
           </li>

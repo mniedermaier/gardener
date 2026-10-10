@@ -1,20 +1,28 @@
-import { memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Check, X, Search, Info, ChevronRight, Grid3x3, ListTree } from "lucide-react";
+import { Check, TriangleAlert, Search, Info, ChevronLeft, ChevronRight, Grid3x3, ListTree } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
+import { useStore } from "@/store";
+import { IconButton } from "@/components/ui/IconButton";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Badge } from "@/components/ui/Badge";
 import { List, ListRow } from "@/components/ui/List";
 import { PlantIconDisplay } from "@/components/ui/PlantIconDisplay";
 import { usePlants } from "@/hooks/usePlants";
 import type { Plant } from "@/types/plant";
+import { familyOf } from "@/data/plantFamilies";
+import { PartnerChips } from "./PartnerChips";
+import { useScrollFade } from "@/components/ui/useScrollFade";
 
 type Relation = "good" | "bad" | null;
 type View = "matrix" | "plant";
+type Scope = "garden" | "all";
 
 const MD_QUERY = "(min-width: 768px)";
 function subscribeMd(cb: () => void) {
@@ -45,16 +53,16 @@ function RelationMark({ relation, size = 14 }: { relation: Exclude<Relation, nul
       <Check size={size} strokeWidth={3} aria-hidden="true" />
     </span>
   ) : (
-    <span className="inline-flex size-6 items-center justify-center rounded-md bg-danger/15 text-danger">
-      <X size={size} strokeWidth={3} aria-hidden="true" />
+    <span className="inline-flex size-6 items-center justify-center rounded-md bg-warning/15 text-warning">
+      <TriangleAlert size={size} strokeWidth={2.5} aria-hidden="true" />
     </span>
   );
 }
 
-function Legend() {
+function Legend({ vertical = false }: { vertical?: boolean }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600 dark:text-gray-300">
+    <div className={`flex text-sm text-gray-600 dark:text-gray-300 ${vertical ? "flex-col gap-2.5" : "flex-wrap items-center gap-x-5 gap-y-2"}`}>
       <span className="inline-flex items-center gap-2"><RelationMark relation="good" />{t("companions.companionsLabel")}</span>
       <span className="inline-flex items-center gap-2"><RelationMark relation="bad" />{t("companions.antagonistsLabel")}</span>
       <span className="inline-flex items-center gap-2">
@@ -140,11 +148,51 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
   onFocus: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  // Columns hidden on the right: a clear fade plus a footer line, so a half-cut
+  // column reads as "scroll for more" instead of the end of the matrix.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hiddenRight, setHiddenRight] = useState(false);
+  const [hiddenLeft, setHiddenLeft] = useState(false);
+  const [hiddenBottom, setHiddenBottom] = useState(false);
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    el?.scrollBy({ left: dir * Math.max(200, el.clientWidth * 0.6), behavior: "smooth" });
+  };
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const measure = () => {
+      setHiddenRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+      setHiddenLeft(el.scrollLeft > 2);
+      setHiddenBottom(el.scrollTop + el.clientHeight < el.scrollHeight - 2);
+    };
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    // The table itself too: filtering changes its width, not the scroller's.
+    if (el.firstElementChild) ro?.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      ro?.disconnect();
+    };
+  }, []);
   return (
-    <Card padding="none" className="relative overflow-hidden">
-      {/* Fade on the right edge: there are more columns to scroll to */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-40 w-8 bg-gradient-to-l from-white dark:from-gray-900" aria-hidden="true" />
-      <div className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable]">
+    // The card hugs its table (a small "Im Garten" matrix leaves no empty strip)
+    // and shrinks for a wide one; the legend and scroll controls sit beside it,
+    // in the room a narrow matrix leaves — always in view, never under the fold.
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <Card padding="none" className="relative min-w-0 max-w-full overflow-hidden">
+      {hiddenRight && (
+        <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-40 w-16 bg-gradient-to-l from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+      )}
+      {hiddenBottom && (
+        <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-40 h-12 bg-gradient-to-t from-white via-white/70 dark:from-gray-900 dark:via-gray-900/70" aria-hidden="true" />
+      )}
+      {/* Phones: an inner scroll box keeps the header row in view. Desktop: the
+          table grows with the page, so no rows hide behind a fade. */}
+      <div ref={scrollRef} className="max-h-[calc(100dvh-17rem)] min-h-96 overflow-auto [scrollbar-gutter:stable] lg:max-h-none lg:min-h-0">
+
         <table className="border-separate border-spacing-0">
           <caption className="sr-only">{t("companions.title")}</caption>
           <thead>
@@ -188,14 +236,35 @@ function MatrixView({ plants, names, relation, focusId, onFocus }: {
         </table>
       </div>
     </Card>
+    <aside className="shrink-0 space-y-4 lg:sticky lg:top-4 lg:w-52">
+      <Legend vertical />
+      {(hiddenRight || hiddenLeft) && (
+        <div className="space-y-2 border-t border-gray-200 pt-3 text-xs text-gray-500 dark:border-white/10 dark:text-gray-400">
+          <p>{t("companions.scrollForMore", { count: plants.length })}</p>
+          <div className="flex items-center gap-2">
+            <IconButton icon={ChevronLeft} label={t("companions.scrollLeft")} onClick={() => scrollBy(-1)} disabled={!hiddenLeft} />
+            <IconButton icon={ChevronRight} label={t("companions.scrollRight")} onClick={() => scrollBy(1)} disabled={!hiddenRight} />
+          </div>
+        </div>
+      )}
+    </aside>
+    </div>
   );
 }
 
 // ------------------------------------------------------------------ partner finder (mobile + desktop alt view)
 
-function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
+const DEFAULT_PLANT = "tomato";
+/** Quick picks above the full list: the crops people look up most. */
+const QUICK_PICKS = ["tomato", "potato", "carrot", "lettuce", "bean", "zucchini"];
+
+function PartnerFinder({ plants, names, relation, selectedId, onSelect, bedsByPlant, isExample }: {
+  /** Nothing picked yet: the default plant is shown as an example. */
+  isExample?: boolean;
   plants: Plant[];
   names: Map<string, string>;
+  /** Bed names per planted crop: partners already in the garden say where. */
+  bedsByPlant: Map<string, string[]>;
   relation: (a: string, b: string) => Relation;
   selectedId: string;
   onSelect: (id: string) => void;
@@ -203,6 +272,7 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const selected = plants.find((p) => p.id === selectedId) ?? plants[0];
+  const { ref: chipRowRef, fadeClass: chipFadeClass } = useScrollFade<HTMLDivElement>("", null);
 
   const { good, bad } = useMemo(() => {
     const g: Plant[] = [];
@@ -219,11 +289,26 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
 
   if (!selected) return null;
 
+  // Colour follows the meaning: an unfavourable neighbour in the same bed as
+  // the selected plant is a conflict (warning), elsewhere in the garden only a
+  // fact (neutral); good neighbours in the garden stay brand.
+  const selectedBeds = new Set(bedsByPlant.get(selected?.id ?? "") ?? []);
+  const gardenBadge = (id: string, kind: "good" | "bad") => {
+    const beds = bedsByPlant.get(id);
+    if (!beds) return undefined;
+    const shared = beds.filter((b) => selectedBeds.has(b));
+    if (shared.length > 0) return <Badge tone={kind === "bad" ? "warning" : "brand"} size="sm">{[t("companions.sameBed"), ...shared].join(" · ")}</Badge>;
+    return <Badge tone={kind === "good" ? "brand" : "neutral"} size="sm">{[t("plants.inGarden"), ...beds].join(" · ")}</Badge>;
+  };
+
   const group = (items: Plant[], kind: "good" | "bad") => (
     <List
       header={
         <span className="inline-flex items-center gap-2">
-          <RelationMark relation={kind} size={12} />
+          {/* Glossary tone as a plain icon: a boxed mark here read as a checkbox. */}
+          {kind === "good"
+            ? <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
+            : <TriangleAlert size={14} strokeWidth={2.5} aria-hidden="true" className="text-warning" />}
           {t(kind === "good" ? "companions.goodCount" : "companions.badCount", { count: items.length })}
         </span>
       }
@@ -236,7 +321,10 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
             key={p.id}
             leading={<PlantIconDisplay plantId={p.id} emoji={p.icon} size={26} />}
             title={names.get(p.id)}
-            meta={t(`plants.category.${p.category}`)}
+            // The meta slot gives the category, or for a bad neighbour of the same
+            // family the reason; garden context (with its beds) is the badge.
+            badges={gardenBadge(p.id, kind)}
+            meta={[t(`plants.category.${p.category}`), kind === "bad" && familyOf(p.id, p) === familyOf(selected.id, selected) ? t("companions.sameFamilyReason") : null]}
             onClick={() => onSelect(p.id)}
           />
         ))
@@ -247,32 +335,76 @@ function PartnerFinder({ plants, names, relation, selectedId, onSelect }: {
   return (
     <div className="space-y-4">
       <Card padding="sm">
-        <Select
-          label={t("companions.choosePlant")}
-          value={selected.id}
-          onChange={(e) => onSelect(e.target.value)}
-          options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
-        />
-        <div className="mt-4 flex items-center gap-3">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10" aria-hidden="true">
-            <PlantIconDisplay plantId={selected.id} emoji={selected.icon} size={30} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{names.get(selected.id)}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t("companions.goodCount", { count: good.length })} · {t("companions.badCount", { count: bad.length })}
-            </p>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
+        {/* The counts stand in the list headers below; the select row only picks and links. */}
+        <div className="flex items-end gap-3">
+          <Select
+            wrapperClassName="min-w-0 flex-1"
+            label={t("companions.choosePlant")}
+            value={selected.id}
+            onChange={(e) => onSelect(e.target.value)}
+            options={plants.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
+          />
+          <Button variant="ghost" size="sm" className="mb-0.5 shrink-0" onClick={() => navigate(`/plants?plant=${encodeURIComponent(selected.id)}`)}>
             {t("companions.openDetails")}
             <ChevronRight size={16} aria-hidden="true" />
           </Button>
         </div>
+        {/* The example hint sits under the whole row, so the link stays level with the select. */}
+        {isExample && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("companions.exampleHint")}</p>}
+        {/* Quick picks: the crops in the beds (common crops without beds), captioned so they
+            are not read as companion results. The active plant is already in the select. */}
+        <p className="mt-3 mb-1.5 text-overline font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          {t(bedsByPlant.size > 0 ? "companions.quickInGarden" : "companions.quickCommon")}
+        </p>
+        {/* One scrolling row (edge fade), so the partner lists start on the first screen. */}
+        <div ref={chipRowRef} className={`-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] ${chipFadeClass}`} role="group" aria-label={t("companions.quickPick")}>
+          {/* Every crop in the garden (a caption "Im Garten" must not silently drop some); common picks capped at 8. */}
+          {(bedsByPlant.size > 0 ? [...bedsByPlant.keys()] : QUICK_PICKS.slice(0, 8)).filter((id) => names.has(id) && id !== selected.id).map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onSelect(id)}
+              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:border-gray-300 sm:min-h-8 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/20"
+            >
+              <PlantIconDisplay plantId={id} emoji="" size={18} />
+              {names.get(id)}
+            </button>
+          ))}
+        </div>
       </Card>
-      <div className="grid gap-4 lg:grid-cols-2">
-        {group(good, "good")}
-        {group(bad, "bad")}
-      </div>
+      {bedsByPlant.size > 0 ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {group(good, "good")}
+          {group(bad, "bad")}
+        </div>
+      ) : (
+        // No beds, so no garden context per row: both groups as compact chips
+        // (as on the plant page), with the one known reason as a line below.
+        <Card className="space-y-4">
+          {(["good", "bad"] as const).map((kind) => {
+            const items = kind === "good" ? good : bad;
+            const sameFamily = kind === "bad" ? items.filter((p) => familyOf(p.id, p) === familyOf(selected.id, selected)) : [];
+            return (
+              <section key={kind}>
+                <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {kind === "good"
+                    ? <Check size={14} strokeWidth={3} aria-hidden="true" className="text-positive" />
+                    : <TriangleAlert size={14} strokeWidth={2.5} aria-hidden="true" className="text-warning" />}
+                  {t(kind === "good" ? "companions.goodCount" : "companions.badCount", { count: items.length })}
+                </h3>
+                {items.length === 0
+                  ? <p className="text-sm text-gray-500 dark:text-gray-400">{t("companions.noneKnown")}</p>
+                  : <PartnerChips ids={items.map((p) => p.id)} kind={kind} onSelect={onSelect} />}
+                {sameFamily.length > 0 && (
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    {sameFamily.map((p) => names.get(p.id)).join(", ")}: {t("companions.sameFamilyReason")}
+                  </p>
+                )}
+              </section>
+            );
+          })}
+        </Card>
+      )}
     </div>
   );
 }
@@ -303,6 +435,25 @@ export function CompanionMatrix() {
   );
   const relation = useRelations(allPlants);
 
+  // Crops standing in any bed. With a few of them, "Im Garten" is the useful
+  // default: 20 × 20 fits a wide screen, 47 × 47 never does.
+  const { gardens } = useStore(useShallow((s) => ({ gardens: s.gardens })));
+  // Which beds each crop stands in: the scope filter and the partner rows' garden context.
+  const bedsByPlant = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const g of gardens) for (const b of g.beds) for (const c of b.cells) {
+      if (!c.plantId) continue;
+      const list = map.get(c.plantId) ?? [];
+      if (!list.includes(b.name)) list.push(b.name);
+      map.set(c.plantId, list);
+    }
+    return map;
+  }, [gardens]);
+  const plantedIds = useMemo(() => new Set(bedsByPlant.keys()), [bedsByPlant]);
+  const canScope = plantedIds.size >= 2;
+  const [scopeChoice, setScope] = useState<Scope | null>(null);
+  const scope: Scope = scopeChoice ?? (canScope ? "garden" : "all");
+
   const focusParam = searchParams.get("plant");
   const focusId = focusParam && names.has(focusParam) ? focusParam : null;
   const setFocus = useCallback(
@@ -315,10 +466,11 @@ export function CompanionMatrix() {
   );
 
   const filtered = useMemo(() => {
-    if (!search) return sorted;
+    const inScope = scope === "garden" && canScope ? sorted.filter((p) => plantedIds.has(p.id) || p.id === focusId) : sorted;
+    if (!search) return inScope;
     // Keep the focused plant visible so its row/column stays as reference.
-    return sorted.filter((p) => p.id === focusId || (names.get(p.id) ?? "").toLowerCase().includes(search));
-  }, [sorted, search, names, focusId]);
+    return inScope.filter((p) => p.id === focusId || (names.get(p.id) ?? "").toLowerCase().includes(search));
+  }, [sorted, search, names, focusId, scope, canScope, plantedIds]);
 
   const showMatrix = isDesktop && view === "matrix";
 
@@ -356,6 +508,17 @@ export function CompanionMatrix() {
                 className="pl-9"
               />
             </div>
+            {canScope && (
+              <SegmentedControl
+                label={t("companions.scopeLabel")}
+                value={scope}
+                onChange={setScope}
+                options={[
+                  { value: "garden", label: t("companions.scopeGarden"), count: plantedIds.size },
+                  { value: "all", label: t("companions.scopeAll"), count: sorted.length },
+                ]}
+              />
+            )}
             <Select
               wrapperClassName="lg:w-60"
               aria-label={t("companions.focusLabel")}
@@ -364,7 +527,6 @@ export function CompanionMatrix() {
               placeholder={t("companions.focusNone")}
               options={sorted.map((p) => ({ value: p.id, label: names.get(p.id) ?? p.id }))}
             />
-            <div className="lg:ml-auto"><Legend /></div>
           </div>
           {filtered.length === 0 ? (
             <Card>
@@ -382,8 +544,11 @@ export function CompanionMatrix() {
           plants={sorted}
           names={names}
           relation={relation}
-          selectedId={focusId ?? sorted[0]?.id ?? ""}
+          // Tomato, not the alphabetical first (Aubergine): the crop most people look up first.
+          selectedId={focusId ?? (names.has(DEFAULT_PLANT) ? DEFAULT_PLANT : sorted[0]?.id ?? "")}
+          isExample={!focusId && !bedsByPlant.has(DEFAULT_PLANT)}
           onSelect={(id) => { setFocus(id); document.querySelector("main")?.scrollTo({ top: 0 }); }}
+          bedsByPlant={bedsByPlant}
         />
       )}
     </div>

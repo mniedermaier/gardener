@@ -1,10 +1,12 @@
 import type { Plant, PreservationMethod } from "@/types/plant";
 import type { Garden } from "@/types/garden";
 import type { Animal } from "@/types/animal";
+import type { PantryItem } from "@/types/pantry";
 import { PRODUCT_NUTRITION } from "@/types/animal";
-import { capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
+import { bedPlantAreas, capToConsumption, DAILY_KCAL_PER_PERSON, getForecastProductKg, PRODUCT_TYPES } from "@/lib/metrics";
 import { addWeeks, addDays, parseISO, getMonth } from "date-fns";
 import { getFrostProtectionWeeks } from "@/types/garden";
+import { plantedHarvestWindow } from "@/lib/season";
 
 // --- Types ---
 
@@ -22,10 +24,19 @@ export interface PlantYieldEstimate {
 
 export interface MonthlyFood {
   month: number; // 0-11
+  /** Garden produce eaten fresh in its harvest months (preserved surplus excluded). */
   freshKg: number;
+  /** Eggs, honey, meat — kept apart so the garden kg match the yield forecast. */
+  animalKg: number;
   storedKg: number;
   totalKg: number;
   calories: number;
+  /**
+   * Calories of a typical year: fresh produce plus the simulated preserved
+   * surplus, without today's real pantry stock — the basis of the annual
+   * forecast, so the month strip averages to the headline figure.
+   */
+  typicalCalories: number;
   caloriesNeeded: number;
   coveragePercent: number;
 }
@@ -130,18 +141,18 @@ const SUGGESTIONS: Record<string, string> = {
 
 // --- Core Functions ---
 
+/** Credited growing area of one crop over all beds (lib/metrics bedPlantAreas; one cell per plant without `plants`). */
 export function estimatePlantArea(
   gardens: Garden[],
   plantId: string,
   gridCellSizeCm: number,
+  plants?: Map<string, Plant>,
 ): number {
-  let cellCount = 0;
-  for (const g of gardens) {
-    for (const b of g.beds) {
-      cellCount += b.cells.filter((c) => c.plantId === plantId).length;
-    }
+  let area = 0;
+  for (const g of gardens) for (const b of g.beds) {
+    for (const r of bedPlantAreas(b, plants ?? null, gridCellSizeCm)) if (r.plantId === plantId) area += r.areaM2;
   }
-  return cellCount * (gridCellSizeCm / 100) ** 2;
+  return area;
 }
 
 export function calculatePlantYield(
@@ -194,6 +205,16 @@ function getHarvestMonths(
   return Array.from(months).sort((a, b) => a - b);
 }
 
+/** Months (0-11) of the harvest window from real planting dates (see plantedHarvestWindow). */
+function getPlantedHarvestMonths(plant: Plant, plantedDates: string[], season: { lastFrostDate: string; now: Date; protectionWeeks: number }): number[] {
+  const window = plantedHarvestWindow(plant, plantedDates, season);
+  if (!window) return [];
+  const months = new Set<number>();
+  for (let d = window.start; d <= window.end; d = addDays(d, 15)) months.add(getMonth(d));
+  months.add(getMonth(window.end));
+  return Array.from(months).sort((a, b) => a - b);
+}
+
 export function calculateSufficiency(
   gardens: Garden[],
   plants: Plant[],
@@ -201,31 +222,40 @@ export function calculateSufficiency(
   gridCellSizeCm: number,
   lastFrostDate: string = "2026-05-15",
   animals: Animal[] = [],
+  pantryItems: PantryItem[] = [],
+  now: Date = new Date(),
 ): SufficiencyResult {
   const plantMap = new Map(plants.map((p) => [p.id, p]));
 
   // Calculate yields with harvest months
   const plantYields: PlantYieldEstimate[] = [];
   // Aggregate by plant
-  const plantAreas = new Map<string, { area: number; protections: number[] }>();
+  const plantAreas = new Map<string, { area: number; protections: number[]; planted: Set<string> }>();
   for (const g of gardens) {
     for (const b of g.beds) {
       const protection = getFrostProtectionWeeks(b);
-      for (const c of b.cells) {
-        const existing = plantAreas.get(c.plantId) ?? { area: 0, protections: [] };
-        existing.area += (gridCellSizeCm / 100) ** 2;
+      // bedPlantAreas keeps the cell order, so index i is bed.cells[i].
+      bedPlantAreas(b, plantMap, gridCellSizeCm).forEach((r, i) => {
+        const existing = plantAreas.get(r.plantId) ?? { area: 0, protections: [], planted: new Set<string>() };
+        existing.area += r.areaM2;
         if (!existing.protections.includes(protection)) existing.protections.push(protection);
-        plantAreas.set(c.plantId, existing);
-      }
+        const plantedDate = b.cells[i]?.plantedDate;
+        if (plantedDate) existing.planted.add(plantedDate);
+        plantAreas.set(r.plantId, existing);
+      });
     }
   }
 
-  for (const [plantId, { area, protections }] of plantAreas) {
+  for (const [plantId, { area, protections, planted }] of plantAreas) {
     const plant = plantMap.get(plantId);
     if (!plant || area <= 0) continue;
     const yield_ = calculatePlantYield(plant, area);
-    // Use max frost protection for harvest months
-    yield_.harvestMonths = getHarvestMonths(plant, lastFrostDate, Math.max(...protections));
+    // Real planting dates win (an autumn sowing of lamb's lettuce is harvested
+    // in winter, as the calendar shows); otherwise the spring sowing from the
+    // frost date, with the bed's best frost protection.
+    yield_.harvestMonths = planted.size > 0
+      ? getPlantedHarvestMonths(plant, [...planted], { lastFrostDate, now, protectionWeeks: Math.max(...protections) })
+      : getHarvestMonths(plant, lastFrostDate, Math.max(...protections));
     plantYields.push(yield_);
   }
 
@@ -255,6 +285,7 @@ export function calculateSufficiency(
   // --- Monthly food availability ---
   const monthlyCalories = Array.from({ length: 12 }, () => 0);
   const monthlyKg = Array.from({ length: 12 }, () => 0);
+  const animalKg = Array.from({ length: 12 }, () => 0);
 
   // Distribute animal production across months
   // Eggs: year-round (all 12 months), honey: May-Sep, meat: spread across year
@@ -265,7 +296,7 @@ export function calculateSufficiency(
     const kgPerMonth = ay.quantityKg / months.length;
     const calPerMonth = ay.calories / months.length;
     for (const m of months) {
-      monthlyKg[m] += kgPerMonth;
+      animalKg[m] += kgPerMonth;
       monthlyCalories[m] += calPerMonth;
     }
   }
@@ -327,6 +358,12 @@ export function calculateSufficiency(
           storedCalories[m] += calPerStorageMonth;
           storedKg[m] += kgPerStorageMonth;
         }
+        // The preserved part is no longer eaten fresh: move it out of the
+        // harvest months, so no kilogram is counted twice.
+        for (const m of y.harvestMonths) {
+          monthlyKg[m] -= surplusKg / y.harvestMonths.length;
+          monthlyCalories[m] -= surplusCal / y.harvestMonths.length;
+        }
 
         storageRequirements.push({
           plantId: y.plantId,
@@ -339,16 +376,46 @@ export function calculateSufficiency(
     }
   }
 
+  // Real stock from the pantry (not yet consumed): spread evenly from this
+  // month until it expires (at most a year). Per month the larger of the
+  // simulated preservation and the real stock counts — the stock usually *is*
+  // this season's preserved surplus, so adding both would count it twice.
+  // The annual coverage below stays a pure forecast.
+  const pantryKg = Array.from({ length: 12 }, () => 0);
+  const pantryCalories = Array.from({ length: 12 }, () => 0);
+  const nowMonth = now.getFullYear() * 12 + now.getMonth();
+  for (const item of pantryItems) {
+    if (item.consumed || !(item.quantityKg > 0)) continue;
+    const exp = parseISO(item.expiresDate);
+    const expMonth = Number.isNaN(exp.getTime()) ? nowMonth + 11 : exp.getFullYear() * 12 + exp.getMonth();
+    const span = Math.max(1, Math.min(12, expMonth - nowMonth + 1));
+    const kcalPerKg = (plantMap.get(item.plantId)?.caloriesPer100g ?? 0) * 10;
+    for (let i = 0; i < span; i++) {
+      const m = (now.getMonth() + i) % 12;
+      pantryKg[m] += item.quantityKg / span;
+      pantryCalories[m] += (item.quantityKg * kcalPerKg) / span;
+    }
+  }
+  const simulatedStoredCal = storedCalories.slice();
+  for (let m = 0; m < 12; m++) {
+    if (pantryKg[m] > storedKg[m]) {
+      storedKg[m] = pantryKg[m];
+      storedCalories[m] = pantryCalories[m];
+    }
+  }
+
   // Build monthly food array
   const monthlyFood: MonthlyFood[] = Array.from({ length: 12 }, (_, month) => {
     const freshCal = monthlyCalories[month];
     const storedCal = storedCalories[month];
     return {
       month,
-      freshKg: Math.round(monthlyKg[month] * 10) / 10,
+      freshKg: Math.round(Math.max(0, monthlyKg[month]) * 10) / 10,
+      animalKg: Math.round(animalKg[month] * 10) / 10,
       storedKg: Math.round(storedKg[month] * 10) / 10,
-      totalKg: Math.round((monthlyKg[month] + storedKg[month]) * 10) / 10,
+      totalKg: Math.round((Math.max(0, monthlyKg[month]) + animalKg[month] + storedKg[month]) * 10) / 10,
       calories: Math.round(freshCal + storedCal),
+      typicalCalories: Math.round(freshCal + simulatedStoredCal[month]),
       caloriesNeeded: Math.round(monthlyCalNeed),
       coveragePercent: Math.min(100, Math.round(((freshCal + storedCal) / monthlyCalNeed) * 100)),
     };
@@ -366,7 +433,7 @@ export function calculateSufficiency(
     : null;
 
   // Annual coverage
-  const totalProducedCal = monthlyFood.reduce((s, m) => s + m.calories, 0);
+  const totalProducedCal = monthlyCalories.reduce((s, c, m) => s + c + simulatedStoredCal[m], 0);
   const totalNeededCal = monthlyFood.reduce((s, m) => s + m.caloriesNeeded, 0);
   const annualCoveragePercent = Math.min(100, Math.round((totalProducedCal / totalNeededCal) * 100));
 
@@ -389,22 +456,22 @@ export function calculateSufficiency(
     calories: {
       produced: totalCalories,
       needed: annualNeeds.calories,
-      percent: Math.min(100, Math.round((totalCalories / annualNeeds.calories) * 100)),
+      percent: Math.min(100, Math.round((totalCalories / annualNeeds.calories) * 1000) / 10),
     },
     protein: {
       produced: Math.round(totalProtein),
       needed: annualNeeds.protein,
-      percent: Math.min(100, Math.round((totalProtein / annualNeeds.protein) * 100)),
+      percent: Math.min(100, Math.round((totalProtein / annualNeeds.protein) * 1000) / 10),
     },
     vitaminC: {
       produced: totalVitC,
       needed: annualNeeds.vitaminC,
-      percent: Math.min(100, Math.round((totalVitC / annualNeeds.vitaminC) * 100)),
+      percent: Math.min(100, Math.round((totalVitC / annualNeeds.vitaminC) * 1000) / 10),
     },
     fiber: {
       produced: Math.round(totalFiber),
       needed: annualNeeds.fiber,
-      percent: Math.min(100, Math.round((totalFiber / annualNeeds.fiber) * 100)),
+      percent: Math.min(100, Math.round((totalFiber / annualNeeds.fiber) * 1000) / 10),
     },
   };
 
@@ -432,4 +499,19 @@ export function calculateSufficiency(
     lowMonths,
     annualCoveragePercent,
   };
+}
+
+/**
+ * Logged harvest per calendar month of `year`, in kg (index 0 = January).
+ * The monthly chart shows these for months that are over or running, so past
+ * months never contradict the harvest log; the forecast covers the rest.
+ */
+export function loggedKgByMonth(harvests: { date: string; weightGrams?: number }[], year: number): number[] {
+  const out: number[] = Array.from({ length: 12 }, () => 0);
+  for (const h of harvests) {
+    if (!h.weightGrams || Number(h.date.slice(0, 4)) !== year) continue;
+    const m = Number(h.date.slice(5, 7)) - 1;
+    if (m >= 0 && m < 12) out[m] += h.weightGrams / 1000;
+  }
+  return out;
 }

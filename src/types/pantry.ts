@@ -1,5 +1,9 @@
 import type { PreservationMethod } from "./plant";
 
+/** Container units offered in the form; "other" keeps a free-text label. */
+export const PANTRY_UNITS = ["jar", "bottle", "bag", "can", "pack", "piece"] as const;
+export type PantryUnit = (typeof PANTRY_UNITS)[number] | "other";
+
 export interface PantryItem {
   id: string;
   plantId: string;
@@ -7,6 +11,9 @@ export interface PantryItem {
   quantityKg: number;
   /** Number of units (jars, bags, etc.) */
   units?: number;
+  /** Kind of unit; translated with plural forms. Older entries only have `unitLabel`. */
+  unitKind?: PantryUnit;
+  /** Free-text unit, only for unitKind "other" (and legacy entries). */
   unitLabel?: string;
   date: string;
   expiresDate: string;

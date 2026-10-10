@@ -7,4 +7,5 @@ export interface Expense {
   category: ExpenseCategory;
   description: string;
   amountCents: number;
+  notes?: string;
 }

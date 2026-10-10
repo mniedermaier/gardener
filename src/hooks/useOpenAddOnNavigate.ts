@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 /** Context handed to an "add" dialog from a deep link (e.g. a planner cell). */
@@ -35,4 +35,17 @@ export function useOpenAddOnNavigate(open: (prefill?: AddPrefill) => void): void
     open(prefill);
     navigate(location.pathname, { replace: true, state: null });
   }, [shouldOpen, open, navigate, location.pathname, prefill]);
+}
+
+/**
+ * Variant for pages whose add dialog takes query-style parameters
+ * (`{ plant, bed }`, see `useAddFromUrl`): translates the navigation prefill
+ * so "Ernte erfassen: Tomate" opens the dialog with plant and bed filled in.
+ */
+export function useOpenAddParamsOnNavigate(open: (params: { plant?: string; bed?: string }) => void): void {
+  const openWithPrefill = useCallback(
+    (prefill?: AddPrefill) => open({ plant: prefill?.plantId, bed: prefill?.bedId }),
+    [open],
+  );
+  useOpenAddOnNavigate(openWithPrefill);
 }

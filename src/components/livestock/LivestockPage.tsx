@@ -1,24 +1,25 @@
 import { useCallback, useMemo, useState } from "react";
+import { EggWeekHint } from "./EggWeekHint";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Bird, Egg, Droplet, Plus, Coins } from "lucide-react";
-import { endOfWeek, startOfWeek } from "date-fns";
+import { Bird, Egg, Plus, Coins } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
+import { daysSince } from "@/lib/format";
 import { useFormat } from "@/hooks/useFormat";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
-import { todayISO, toISODate } from "@/lib/format";
-import { getActualProducts, getFeedCostStats, type ProductTotals } from "@/lib/metrics";
+import { todayISO } from "@/lib/format";
+import { expectationStart, getActualProducts, getFeedCostStats, type ProductTotals } from "@/lib/metrics";
 import { EGG_LAYERS, type Animal } from "@/types/animal";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { KeyFigures, Sparkline } from "@/components/ui/charts";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { AnimalCard } from "./AnimalCard";
-import { ProductionChart } from "./ProductionChart";
-import { AnimalDialog, animalLabel, herdSummary } from "./shared";
+import { AnimalDialog, animalLabel, formatProductAmount, herdSummary } from "./shared";
+import { herdProductTypes, weeklyEggs } from "./productFigures";
 import { useToday } from "@/hooks/useToday";
 
 const QUICK_EGGS = [1, 2, 3, 5, 10];
@@ -28,7 +29,8 @@ export function LivestockPage() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { animals, animalProducts, feedEntries, healthEvents, addProduct, deleteProduct, deleteAnimal, restoreAnimal } = useStore(
     useShallow((s) => ({
       animals: s.animals, animalProducts: s.animalProducts, feedEntries: s.feedEntries, healthEvents: s.healthEvents,
@@ -45,16 +47,30 @@ export function LivestockPage() {
   const eggAnimal = animals.find((a) => EGG_LAYERS.includes(a.type));
 
   const stats = useMemo(() => {
-    const ws = toISODate(startOfWeek(now, { weekStartsOn: 1 }));
-    const we = toISODate(endOfWeek(now, { weekStartsOn: 1 }));
     const eggs = animalProducts.filter((p) => p.type === "eggs");
+    const eggWeeks = weeklyEggs(animalProducts, now);
     return {
       eggsToday: eggs.filter((p) => p.date === today).reduce((s, p) => s + p.quantity, 0),
-      eggsWeek: eggs.filter((p) => p.date >= ws && p.date <= we).reduce((s, p) => s + p.quantity, 0),
+      // Last 7 days (the newest rolling window), not the calendar week.
+      eggsWeek: eggWeeks[eggWeeks.length - 1],
       year: getActualProducts(animalProducts, year),
       feed: getFeedCostStats(feedEntries, now),
+      eggWeeks,
     };
   }, [now, animalProducts, feedEntries, today, year]);
+
+  // Key figures only for what this herd yields (no "Honig 0 kg" without bees).
+  const herdTypes = herdProductTypes(animals, stats.year).slice(0, eggAnimal ? 2 : 3);
+  const eggAvg = stats.eggWeeks.reduce((s, n) => s + n, 0) / stats.eggWeeks.length;
+  const lastEggEntry = animalProducts.reduce<string | null>((max, p) => (p.type === "eggs" && (max === null || p.date > max) ? p.date : max), null);
+  // A log gap is not a drop: the sparkline stops at the last logged week, like the hint.
+  const sparkWeeks = lastEggEntry && daysSince(lastEggEntry) >= 3 ? stats.eggWeeks.slice(0, -1) : stats.eggWeeks;
+  const feedFigure = {
+    label: t("livestock.feedCost30"),
+    value: f.formatCurrency(stats.feed.last30Days),
+    hint: stats.feed.total > 0 ? t("livestock.feedPerMonthHint", { amount: f.formatCurrency(stats.feed.perMonth) }) : t("livestock.feedEntriesCount", { count: 0 }),
+    to: "/livestock/feed",
+  };
 
   const perAnimal = useMemo(() => {
     const map = new Map<string, { recorded: Partial<ProductTotals>; feedCost: number; lastHealth?: (typeof healthEvents)[number] }>();
@@ -82,7 +98,7 @@ export function LivestockPage() {
   };
 
   const removeAnimal = async (animal: Animal) => {
-    if (!(await confirm(t("livestock.confirmDeleteAnimal"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("animal", animalLabel(animal, t), t("livestock.confirmDeleteAnimal")))) return;
     const snapshot = {
       animal,
       products: animalProducts.filter((p) => p.animalId === animal.id),
@@ -121,7 +137,7 @@ export function LivestockPage() {
                 <div>
                   <p id="quick-eggs-label" className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("livestock.quickEggs")}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {t("livestock.eggsSoFarToday", { count: stats.eggsToday })} · {animalLabel(eggAnimal, t)}
+                    {stats.eggsToday === 0 ? t("livestock.noEggsToday") : t("livestock.eggsSoFarToday", { count: stats.eggsToday })} · {animalLabel(eggAnimal, t)}
                   </p>
                 </div>
               </div>
@@ -135,23 +151,27 @@ export function LivestockPage() {
             </Card>
           )}
 
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label={t("livestock.eggsThisWeek")} value={f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.eggsThisYear")} value={f.formatNumber(stats.year.eggs, { maximumFractionDigits: 0 })} icon={Egg} tone="neutral" />
-            <StatCard label={t("livestock.honeyThisYear")} value={f.formatWeight(stats.year.honey * 1000)} icon={Droplet} tone="neutral" />
-            <StatCard
-              label={t("livestock.feedCost30")}
-              value={f.formatCurrency(stats.feed.last30Days)}
-              icon={Coins}
-              tone="neutral"
-              hint={stats.feed.total > 0 ? t("livestock.feedPerMonthHint", { amount: f.formatCurrency(stats.feed.perMonth) }) : t("livestock.feedEntriesCount", { count: 0 })}
-            />
-          </div>
-
-          <Card>
-            <CardHeader title={t("livestock.chartTitle")} description={t("livestock.chartDesc")} />
-            <ProductionChart animalProducts={animalProducts} />
-          </Card>
+          <KeyFigures
+            hero={eggAnimal ? {
+              label: t("livestock.eggsThisWeek"),
+              value: f.formatNumber(stats.eggsWeek, { maximumFractionDigits: 0 }),
+              icon: Egg,
+              visual: <Sparkline values={sparkWeeks} color="brand" width={160} height={32} label={t("livestock.eggWeeksLabel", { avg: f.formatNumber(eggAvg, { maximumFractionDigits: 0 }) })} />,
+              hint: <EggWeekHint week={stats.eggsWeek} avg={eggAvg} lastEntry={lastEggEntry} />,
+              to: "/livestock/production",
+            } : { ...feedFigure, icon: Coins }}
+            // A short summary that links on: the year totals and the monthly
+            // chart live on "Produktion", so this page does not repeat them.
+            items={[
+              ...herdTypes.filter((ty) => ty !== "eggs").map((ty) => ({
+                label: t("livestock.productThisYear", { product: t(`livestock.products.${ty}`) }),
+                value: formatProductAmount(ty, stats.year[ty], f, t),
+                hint: t("livestock.entriesHint", { count: animalProducts.filter((p) => p.type === ty && p.date.startsWith(String(year))).length }),
+                to: "/livestock/production",
+              })),
+              ...(eggAnimal ? [feedFigure] : []),
+            ].slice(-2)}
+          />
 
           <section aria-labelledby="herd-heading">
             <h2 id="herd-heading" className="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{t("livestock.herd")}</h2>
@@ -163,6 +183,7 @@ export function LivestockPage() {
                     key={animal.id}
                     animal={animal}
                     recorded={d?.recorded ?? {}}
+                    expectedFrom={expectationStart(animal, animalProducts)}
                     feedCost={d?.feedCost ?? 0}
                     lastHealth={d?.lastHealth}
                     onOpen={() => navigate(`/livestock/${animal.id}`)}

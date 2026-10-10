@@ -10,6 +10,8 @@ export interface SelectOption {
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
+  /** Marks the field optional: "(optional)" after the label. */
+  optional?: boolean;
   hint?: ReactNode;
   error?: ReactNode;
   /** Shortcut for simple lists; `children` (<option>/<optgroup>) also works. */
@@ -20,12 +22,12 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 /** Native <select> with the Input look and a label tied via useId. */
-export function Select({ label, hint, error, options, placeholder, wrapperClassName, className = "", id, "aria-describedby": ariaDescribedBy, children, ...props }: SelectProps) {
+export function Select({ label, optional, hint, error, options, placeholder, wrapperClassName, className = "", id, "aria-describedby": ariaDescribedBy, children, ...props }: SelectProps) {
   const generatedId = useId();
   const selectId = id ?? generatedId;
 
   return (
-    <Field id={selectId} label={label} hint={hint} error={error} className={wrapperClassName}>
+    <Field id={selectId} label={label} optional={optional} hint={hint} error={error} className={wrapperClassName}>
       <div className="relative">
         <select
           id={selectId}

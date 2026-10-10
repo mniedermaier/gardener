@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
  * - the element matching `activeSelector` is scrolled into view whenever
  *   `activeKey` changes (e.g. a deep link opens the fourth tab).
  */
-export function useScrollFade<T extends HTMLElement>(activeSelector: string, activeKey: unknown): { ref: RefObject<T | null>; fadeClass: string } {
+export function useScrollFade<T extends HTMLElement>(activeSelector: string, activeKey: unknown): { ref: RefObject<T | null>; fadeClass: string; moreEnd: boolean } {
   const ref = useRef<T | null>(null);
   const [edges, setEdges] = useState({ start: false, end: false });
 
@@ -24,9 +24,16 @@ export function useScrollFade<T extends HTMLElement>(activeSelector: string, act
     if (!el) return;
     const frame = requestAnimationFrame(measure);
     el.addEventListener("scroll", measure, { passive: true });
+    // The row keeps its own size while its content grows (labels arriving with
+    // the translations, web fonts, counts): observe the items too, and measure
+    // again once the fonts are in, or the fade would never appear.
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
     ro?.observe(el);
+    for (const child of Array.from(el.children)) ro?.observe(child);
+    let alive = true;
+    void document.fonts?.ready.then(() => { if (alive) measure(); });
     return () => {
+      alive = false;
       cancelAnimationFrame(frame);
       el.removeEventListener("scroll", measure);
       ro?.disconnect();
@@ -44,11 +51,11 @@ export function useScrollFade<T extends HTMLElement>(activeSelector: string, act
   }, [activeSelector, activeKey]);
 
   const fadeClass = edges.start && edges.end
-    ? "[mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)]"
+    ? "[mask-image:linear-gradient(to_right,transparent,#000_32px,#000_calc(100%-48px),transparent)]"
     : edges.end
-      ? "[mask-image:linear-gradient(to_right,#000_calc(100%-32px),transparent)]"
+      ? "[mask-image:linear-gradient(to_right,#000_calc(100%-72px),transparent_calc(100%-8px))]"
       : edges.start
         ? "[mask-image:linear-gradient(to_right,transparent,#000_32px)]"
         : "";
-  return { ref, fadeClass };
+  return { ref, fadeClass, moreEnd: edges.end };
 }

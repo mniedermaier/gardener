@@ -6,12 +6,14 @@ import type { Phase } from "@/lib/season";
 
 /**
  * Crop phases, one look everywhere (Kalender, Pflanzendetail, Dashboard,
- * Palette). Calm earth → green → earth ramp from the design tokens, plus a
+ * Palette). Info blue (under glass) → green → earth ramp from the design tokens, plus a
  * second carrier that is not colour: an icon, and hatching for "under glass"
  * (Vorziehen). Rows in timelines keep a fixed phase order as a third cue.
  */
 export const PHASE_META: Record<Phase, { icon: LucideIcon; bar: string; text: string; hatched: boolean }> = {
-  sowIndoors: { icon: House, bar: "bg-earth-300 dark:bg-earth-300/80", text: "text-earth-600 dark:text-earth-300", hatched: true },
+  // Under glass: the cool info hue, so it never reads as the earth-coloured harvest at small sizes.
+  // Dark: a near-solid fill, so the hatch reads as texture and not as an empty bar.
+  sowIndoors: { icon: House, bar: "bg-info/40 dark:bg-info/80", text: "text-info", hatched: true },
   sowOutdoors: { icon: Sprout, bar: "bg-garden-300 dark:bg-garden-400/70", text: "text-garden-600 dark:text-garden-300", hatched: false },
   transplant: { icon: Shovel, bar: "bg-garden-600 dark:bg-garden-300", text: "text-garden-700 dark:text-garden-300", hatched: false },
   harvest: { icon: Apple, bar: "bg-earth-500 dark:bg-earth-400", text: "text-earth-600 dark:text-earth-300", hatched: false },
@@ -33,13 +35,12 @@ export const PhaseSwatch = memo(function PhaseSwatch({ phase, className = "h-2.5
   return <span aria-hidden="true" className={`inline-block shrink-0 rounded-sm ${fill.className} ${className}`} style={fill.style} />;
 });
 
-/** Phase as a neutral badge with its icon and swatch (text carries the meaning). */
+/** Phase as a neutral badge with its icon (text carries the meaning; one cue, no extra swatch). */
 export const PhaseBadge = memo(function PhaseBadge({ phase, label }: { phase: Phase; label?: string }) {
   const { t } = useTranslation();
   const Icon = PHASE_META[phase].icon;
   return (
     <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-gray-700 dark:bg-white/10 dark:text-gray-300">
-      <PhaseSwatch phase={phase} className="h-2 w-2.5" />
       <Icon size={12} aria-hidden="true" className={`shrink-0 ${PHASE_META[phase].text}`} />
       <span className="truncate">{label ?? t(`plants.details.${phase}`)}</span>
     </span>

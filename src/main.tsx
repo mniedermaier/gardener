@@ -24,7 +24,7 @@ initTheme();
 installNativeMirror();
 installNativeHandlers();
 
-const loading = <div className="flex h-screen items-center justify-center text-gray-400">Loading...</div>;
+const loading = <div className="flex h-screen items-center justify-center text-gray-400">Loading…</div>;
 
 /**
  * In the browser the store hydrates synchronously and this renders App at

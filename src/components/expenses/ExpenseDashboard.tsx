@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import {
-  Coins, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, Receipt, Scale, Sprout, Stethoscope, Trash2, TrendingUp, Wheat,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Droplet, Fence, Hammer, Layers, Leaf, Package, Pencil, Plus, ReceiptText, Scale, Sprout, Stethoscope, Trash2, Wheat, type LucideIcon, HeartPulse } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/store";
 import { useAnalysisPrefs } from "@/store/analysisPrefs";
@@ -12,23 +9,24 @@ import { useFormat } from "@/hooks/useFormat";
 import { useGardenMetrics } from "@/hooks/useGardenMetrics";
 import { useOpenAddOnNavigate } from "@/hooks/useOpenAddOnNavigate";
 import { todayISO } from "@/lib/format";
-import { DEFAULT_PRODUCT_PRICES, PRODUCT_TYPES, type Period } from "@/lib/metrics";
+import { DEFAULT_PRODUCT_PRICES, PRODUCT_TYPES, type CostLogEntry, type Period } from "@/lib/metrics";
 import type { Expense, ExpenseCategory } from "@/types/expense";
 import type { ProductType } from "@/types/animal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { Badge } from "@/components/ui/Badge";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { List, ListRow } from "@/components/ui/List";
 import { Menu } from "@/components/ui/Menu";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import { TONE_SOFT } from "@/components/ui/tone";
-import { HowCalculated, Meter } from "@/components/ui/charts";
+import { CompareBars, HowCalculated, KeyFigures, Meter } from "@/components/ui/charts";
 import { DateField } from "@/components/ui/DateField";
 import { useToday } from "@/hooks/useToday";
 
@@ -55,8 +53,8 @@ function CategoryTile({ category }: { category: ExpenseCategory }) {
   );
 }
 
-interface Draft { description: string; amount: string; category: ExpenseCategory; date: string }
-const emptyDraft = (): Draft => ({ description: "", amount: "", category: "seeds", date: todayISO() });
+interface Draft { description: string; amount: string; category: ExpenseCategory; date: string; notes: string }
+const emptyDraft = (): Draft => ({ description: "", amount: "", category: "seeds", date: todayISO(), notes: "" });
 const parseAmount = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
 
 export function ExpenseDashboard() {
@@ -64,7 +62,8 @@ export function ExpenseDashboard() {
   const { t } = useTranslation();
   const f = useFormat();
   const navigate = useNavigate();
-  const { toast, confirm } = useToast();
+  const { toast } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { expenses, harvests, addExpense, updateExpense, deleteExpense } = useStore(
     useShallow((s) => ({ expenses: s.expenses, harvests: s.harvests, addExpense: s.addExpense, updateExpense: s.updateExpense, deleteExpense: s.deleteExpense })),
   );
@@ -90,7 +89,7 @@ export function ExpenseDashboard() {
 
   const openEdit = (e: Expense) => {
     setEditingId(e.id);
-    setDraft({ description: e.description, amount: String(e.amountCents / 100), category: e.category, date: e.date });
+    setDraft({ description: e.description, amount: (e.amountCents / 100).toLocaleString(f.locale, { useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2 }), category: e.category, date: e.date, notes: e.notes ?? "" });
     setDialogOpen(true);
   };
 
@@ -99,7 +98,7 @@ export function ExpenseDashboard() {
 
   const save = () => {
     if (!canSave) return;
-    const fields = { description: draft.description.trim(), amountCents: Math.round(amount * 100), category: draft.category, date: draft.date };
+    const fields = { description: draft.description.trim(), amountCents: Math.round(amount * 100), category: draft.category, date: draft.date, notes: draft.notes.trim() || undefined };
     if (editingId) {
       updateExpense(editingId, fields);
       toast(t("expenses.updated"), "success");
@@ -111,7 +110,7 @@ export function ExpenseDashboard() {
   };
 
   const remove = async (e: Expense) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("expense", `${e.description} · ${f.formatCurrency(e.amountCents / 100)}`))) return;
     deleteExpense(e.id);
     setDialogOpen(false);
     const { id: _id, ...rest } = e;
@@ -122,24 +121,31 @@ export function ExpenseDashboard() {
     () => expenses.filter((e) => period === null || e.date.startsWith(`${period}-`)).sort((a, b) => b.date.localeCompare(a.date)),
     [expenses, period],
   );
+  // Costs from the feed and health logs count in the KPI, so they appear in the
+  // list too (read-only, marked with their source): month sums add up to the total.
+  type Row = { kind: "expense"; date: string; expense: Expense } | { kind: "log"; date: string; entry: CostLogEntry };
   const groups = useMemo(() => {
-    const out: { key: string; items: Expense[]; sum: number }[] = [];
-    for (const e of visible) {
-      const key = e.date.slice(0, 7);
+    const rows: Row[] = [
+      ...visible.map((e) => ({ kind: "expense" as const, date: e.date, expense: e })),
+      ...balance.costs.logEntries.map((entry) => ({ kind: "log" as const, date: entry.date, entry })),
+    ].sort((a, b) => b.date.localeCompare(a.date));
+    const out: { key: string; items: Row[]; sum: number }[] = [];
+    for (const r of rows) {
+      const key = r.date.slice(0, 7);
+      const amount = r.kind === "expense" ? r.expense.amountCents / 100 : r.entry.cost;
       const last = out[out.length - 1];
-      if (last?.key === key) { last.items.push(e); last.sum += e.amountCents / 100; }
-      else out.push({ key, items: [e], sum: e.amountCents / 100 });
+      if (last?.key === key) { last.items.push(r); last.sum += amount; }
+      else out.push({ key, items: [r], sum: amount });
     }
     return out;
-  }, [visible]);
+  }, [visible, balance.costs.logEntries]);
 
   // One breakdown (metrics.getCosts): livestock feed/vet logs are part of
-  // the animal_feed/veterinary categories, with their origin as a note.
+  // the animal_feed/veterinary categories (their rows carry the log badge).
   const categoryRows = useMemo(() => {
-    const fromLog: Partial<Record<ExpenseCategory, number>> = { animal_feed: balance.costs.feed, veterinary: balance.costs.veterinary };
     return CATEGORIES
       .filter((c) => (balance.costs.byCategory[c] ?? 0) > 0)
-      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0, fromLog: fromLog[c] ?? 0 }))
+      .map((c) => ({ key: c, label: t(`expenses.categories.${c}`), icon: CATEGORY_ICON[c], amount: balance.costs.byCategory[c] ?? 0 }))
       .sort((a, b) => b.amount - a.amount);
   }, [balance.costs, t]);
 
@@ -159,7 +165,7 @@ export function ExpenseDashboard() {
 
       {!hasAnything ? (
         <Card>
-          <EmptyState icon={Receipt} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest")}>{t("expenses.toHarvest")}</Button>} />
+          <EmptyState icon={ReceiptText} title={t("expenses.emptyTitle")} description={t("expenses.emptyText")} action={addButton} secondaryAction={<Button variant="ghost" onClick={() => navigate("/harvest", { state: { openAdd: true } })}>{t("expenses.toHarvest")}</Button>} />
         </Card>
       ) : (
         <div className="space-y-6">
@@ -173,71 +179,78 @@ export function ExpenseDashboard() {
             ]}
           />
 
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              label={t("expenses.totalCosts")}
-              value={f.formatCurrency(balance.costs.total)}
-              icon={Coins}
-              tone="neutral"
-              hint={balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined}
+          {/* The disclosure explains the figures: attached below them, not a section of its own. */}
+          <div>
+            <KeyFigures
+              hero={{
+                label: t("expenses.net"),
+                value: f.formatCurrency(net),
+                icon: Scale,
+                visualPlacement: "below",
+                visual: (
+                  <CompareBars
+                    rows={[
+                      { label: t("expenses.yieldValue"), value: balance.totalValue, color: "brand" },
+                      { label: t("expenses.totalCosts"), value: balance.costs.total, color: "earth" },
+                    ]}
+                  />
+                ),
+                hint: (
+                  <span className="inline-flex flex-wrap items-center gap-2">
+                    <Badge tone={net >= 0 ? "positive" : "warning"} icon={net > 0 ? ArrowUpRight : net < 0 ? ArrowDownRight : undefined}>{net >= 0 ? t("expenses.surplus") : t("expenses.deficit")}</Badge>
+                    {balance.roi === null ? t("expenses.roiNoCosts") : t("dashboard.roiValue", { value: f.formatPercent(balance.roi) })}
+                  </span>
+                ),
+              }}
+              items={[
+                {
+                  label: t("expenses.totalCosts"),
+                  value: f.formatCurrency(balance.costs.total),
+                  hint: balance.costs.animals > 0 ? t("expenses.inclAnimals", { amount: f.formatCurrency(balance.costs.animals) }) : undefined,
+                },
+                {
+                  label: t("expenses.yieldValue"),
+                  value: f.formatCurrency(balance.totalValue),
+                  hint: t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) }),
+                },
+              ]}
             />
-            <StatCard
-              label={t("expenses.yieldValue")}
-              value={f.formatCurrency(balance.totalValue)}
-              icon={TrendingUp}
-              tone="neutral"
-              hint={t("expenses.valueSplit", { harvest: f.formatCurrency(balance.produceValue), animals: f.formatCurrency(balance.animalValue) })}
-            />
-            <StatCard
-              label={t("expenses.net")}
-              value={f.formatCurrency(net)}
-              icon={Scale}
-              tone="neutral"
-              trend={{ label: net >= 0 ? t("expenses.surplus") : t("expenses.deficit"), direction: net > 0 ? "up" : net < 0 ? "down" : "flat", tone: net >= 0 ? "positive" : "warning" }}
-            />
-            <StatCard
-              label={t("expenses.roi")}
-              value={balance.roi === null ? "–" : f.formatPercent(balance.roi)}
-              icon={TrendingUp}
-              tone="neutral"
-              hint={balance.roi === null ? t("expenses.roiNoCosts") : t("expenses.roiHint")}
-            />
-          </div>
 
-          <HowCalculated>
-              <p>{t("expenses.howCosts")}</p>
-              {balance.costs.animals > 0 && (
-                <p>
-                  {t("expenses.howAnimals", {
-                    total: f.formatCurrency(balance.costs.animals),
-                    expenses: f.formatCurrency((balance.costs.expenseByCategory.animal_feed ?? 0) + (balance.costs.expenseByCategory.veterinary ?? 0)),
-                    log: f.formatCurrency(balance.costs.feed + balance.costs.veterinary),
-                  })}
-                  {balance.costs.duplicatesSkipped > 0 && <> {t("expenses.duplicatesSkipped", { count: balance.costs.duplicatesSkipped })}</>}
-                </p>
-              )}
-              <p>{t("expenses.howValue")}</p>
-              <p>{t("expenses.howRoi")}</p>
-              <div>
-                <p className="mb-2 font-medium text-gray-800 dark:text-gray-200">{t("expenses.productPrices")}</p>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {PRODUCT_TYPES.map((type: ProductType) => (
-                    <Input
-                      key={type}
-                      label={t(`expenses.pricePer.${type}`)}
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      step={0.05}
-                      value={productPrices[type] ?? ""}
-                      placeholder={f.formatNumber(DEFAULT_PRODUCT_PRICES[type], { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      onChange={(e) => setProductPrice(type, e.target.value === "" ? null : Number(e.target.value))}
-                    />
-                  ))}
+            <HowCalculated className="mt-1">
+                <p>{t("expenses.howCosts")}</p>
+                {balance.costs.animals > 0 && (
+                  <p>
+                    {t("expenses.howAnimals", {
+                      total: f.formatCurrency(balance.costs.animals),
+                      expenses: f.formatCurrency((balance.costs.expenseByCategory.animal_feed ?? 0) + (balance.costs.expenseByCategory.veterinary ?? 0)),
+                      log: f.formatCurrency(balance.costs.feed + balance.costs.veterinary),
+                    })}
+                    {balance.costs.duplicatesSkipped > 0 && <> {t("expenses.duplicatesSkipped", { count: balance.costs.duplicatesSkipped })}</>}
+                  </p>
+                )}
+                <p>{t("expenses.howValue")}</p>
+                <p>{t("expenses.howRoi")}</p>
+                <div>
+                  <p className="mb-2 font-medium text-gray-800 dark:text-gray-200">{t("expenses.productPrices")}</p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {PRODUCT_TYPES.map((type: ProductType) => (
+                      <Input
+                        key={type}
+                        label={t(`expenses.pricePer.${type}`)}
+                        type="number"
+                        inputMode="decimal"
+                        min={0}
+                        step={0.05}
+                        value={productPrices[type] ?? ""}
+                        placeholder={f.formatNumber(DEFAULT_PRODUCT_PRICES[type], { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        onChange={(e) => setProductPrice(type, e.target.value === "" ? null : Number(e.target.value))}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-2">{t("expenses.priceHint")}</p>
                 </div>
-                <p className="mt-2">{t("expenses.priceHint")}</p>
-              </div>
-          </HowCalculated>
+            </HowCalculated>
+          </div>
 
           {categoryRows.length > 0 && (
             <Card>
@@ -257,12 +270,7 @@ export function ExpenseDashboard() {
                           <span className="ml-1 text-gray-500 dark:text-gray-400">· {f.formatPercent(r.amount / balance.costs.total)}</span>
                         </span>
                       </div>
-                      <Meter actual={r.amount} max={categoryRows[0].amount} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
-                      {r.fromLog > 0 && (
-                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {t(r.key === "veterinary" ? "expenses.fromHealthLog" : "expenses.fromFeedLog", { amount: f.formatCurrency(r.fromLog) })}
-                        </p>
-                      )}
+                      <Meter actual={r.amount} max={balance.costs.total} color="muted" label={`${r.label}: ${f.formatCurrency(r.amount)}`} />
                     </li>
                   );
                 })}
@@ -272,18 +280,58 @@ export function ExpenseDashboard() {
 
           <section aria-labelledby="expense-list" className="space-y-3">
             <h2 id="expense-list" className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("expenses.entries")}</h2>
-            {visible.length === 0 ? (
+            {groups.length === 0 ? (
               <Card>
-                <EmptyState compact icon={Receipt} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
+                <EmptyState compact icon={ReceiptText} title={t("expenses.noEntriesTitle")} description={t("expenses.noEntries")} action={addButton} />
               </Card>
             ) : groups.map((g) => (
-              <List key={g.key} header={`${f.formatDate(`${g.key}-01`, "monthYear")} · ${f.formatCurrency(g.sum)}`}>
-                {g.items.map((e) => (
+              <List
+                key={g.key}
+                // Month total right-aligned like Ernte and Bewässerung: it reads as a column.
+                header={
+                  <span className="flex items-center justify-between gap-2">
+                    <span>{f.formatDate(`${g.key}-01`, "monthYear")}</span>
+                    <span className="font-medium tabular-nums">{f.formatCurrency(g.sum)}</span>
+                  </span>
+                }
+              >
+                {g.items.map((r) => {
+                  if (r.kind === "log") {
+                    const { entry } = r;
+                    return (
+                      <ListRow
+                        key={`${entry.source}-${entry.id}`}
+                        leading={<CategoryTile category={entry.source === "feed" ? "animal_feed" : "veterinary"} />}
+                        title={entry.label}
+                        // Category first like every other row; the source as one badge pattern.
+                        meta={[t(`expenses.categories.${entry.source === "feed" ? "animal_feed" : "veterinary"}`), f.formatDate(entry.date, "relative")]}
+                        badges={<SourceBadge source={entry.source} />}
+                        trailing={f.formatCurrency(entry.cost)}
+                        onClick={() => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health")}
+                        clickLabel={`${entry.label} · ${t(entry.source === "feed" ? "expenses.sourceFeed" : "expenses.sourceHealth")}`}
+                        // Same menu slot as the expense rows, so every amount lines up.
+                        actions={
+                          <Menu
+                            label={t("common.moreActions")}
+                            items={[{
+                              label: t(entry.source === "feed" ? "expenses.openFeedBook" : "expenses.openHealthBook"),
+                              icon: ArrowUpRight,
+                              onSelect: () => navigate(entry.source === "feed" ? "/livestock/feed" : "/livestock/health"),
+                            }]}
+                          />
+                        }
+                      />
+                    );
+                  }
+                  const e = r.expense;
+                  return (
                   <ListRow
                     key={e.id}
                     leading={<CategoryTile category={e.category} />}
                     title={e.description}
-                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")].join(" · ")}
+                    meta={[t(`expenses.categories.${e.category}`), f.formatDate(e.date, "relative")]}
+                    // Same bill also in a livestock log: counted once, marked with the same source badge.
+                    badges={balance.costs.matchedExpenses[e.id] ? <SourceBadge source={balance.costs.matchedExpenses[e.id]} /> : undefined}
                     trailing={f.formatCurrency(e.amountCents / 100)}
                     onClick={() => openEdit(e)}
                     actions={
@@ -297,7 +345,8 @@ export function ExpenseDashboard() {
                       />
                     }
                   />
-                ))}
+                  );
+                })}
               </List>
             ))}
           </section>
@@ -317,14 +366,15 @@ export function ExpenseDashboard() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={save} disabled={!canSave}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={save} disabled={!canSave}>{t("common.save")}</Button>
           </>
         }
       >
         <div className="space-y-4">
           <Input label={t("expenses.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} placeholder={t("expenses.descriptionPlaceholder")} autoFocus />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input label={t("expenses.amount")} type="number" inputMode="decimal" step="0.01" min={0} value={draft.amount} onChange={(e) => patch({ amount: e.target.value })} />
+          {/* Amount and category stay side by side on phones; a text field with a decimal keypad accepts "12,50". */}
+          <div className="grid grid-cols-2 gap-4">
+            <Input label={t("expenses.amount")} inputMode="decimal" value={draft.amount} onChange={(e) => patch({ amount: e.target.value })} placeholder={t("common.examplePlaceholder", { value: f.formatNumber(12.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })} />
             <Select
               label={t("expenses.category")}
               value={draft.category}
@@ -333,8 +383,19 @@ export function ExpenseDashboard() {
             />
           </div>
           <DateField label={t("harvest.date")} value={draft.date} onChange={(date) => patch({ date })} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("expenses.notesPlaceholder")} value={draft.notes} onChange={(e) => patch({ notes: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>
   );
+}
+
+/**
+ * The other log a cost also lives in, one badge for both cases (booked there,
+ * or a manual expense matched to it — counted once either way, see "Wie
+ * berechnet?"): two near-identical badges read as two kinds of feed.
+ */
+function SourceBadge({ source }: { source: "feed" | "health" }) {
+  const { t } = useTranslation();
+  return <Badge variant="outline" size="sm" icon={source === "feed" ? Wheat : HeartPulse}>{t(source === "feed" ? "expenses.sourceFeed" : "expenses.sourceHealth")}</Badge>;
 }

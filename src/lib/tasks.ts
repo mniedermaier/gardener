@@ -15,7 +15,9 @@ export function taskGroup(task: Task, today: Date): TaskGroup {
   const due = toDate(task.dueDate.slice(0, 10));
   if (!due) return "later";
   const diff = differenceInCalendarDays(due, startOfDay(today));
-  if (diff < 0) return "overdue";
+  // A daily task is simply today's again: missing yesterday's watering does
+  // not make it "4 Tage überfällig" (it would inflate the overdue count).
+  if (diff < 0) return task.recurring?.interval === "daily" ? "today" : "overdue";
   if (diff === 0) return "today";
   if (diff === 1) return "tomorrow";
   if (diff <= 7) return "next7";

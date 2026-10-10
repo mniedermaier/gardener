@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import plantsJson from "@/data/plants.json";
 import {
-  capToConsumption, expectedShareToDate, getActualProductKg, getCosts, getFeedCostStats, getForecastProductKg, getForecastProducts,
+  capToConsumption, expectationStart, expectedShareToDate, getActualProductKg, getCosts, getFeedCostStats, getForecastProductKg, getForecastProducts,
   getSelfSufficiency, productKgCalories,
 } from "@/lib/metrics";
 import { calculateSufficiency } from "@/lib/sufficiency";
@@ -40,7 +40,7 @@ describe("self-sufficiency: one number everywhere", () => {
 
   it("nutrition card calories = headline forecast", () => {
     expect(card.nutrition.calories.produced).toBeCloseTo(ss.forecastKcal, -1);
-    expect(card.nutrition.calories.percent).toBe(Math.round(ss.forecastRatio * 100));
+    expect(card.nutrition.calories.percent).toBe(Math.round(ss.forecastRatio * 1000) / 10);
   });
 
   it("garden + animal parts add up to the forecast", () => {
@@ -129,6 +129,13 @@ describe("expected production to date", () => {
     expect(expectedShareToDate("eggs", oct, "2026-09-05")).toBeLessThan(0.1);
     expect(expectedShareToDate("honey", oct)).toBe(1);
     expect(expectedShareToDate("honey", new Date(2026, 2, 1))).toBe(0);
+  });
+
+  it("starts at the first recorded entry when recording began after arrival", () => {
+    const hens = { id: "h", acquiredDate: "2025-08-31" };
+    expect(expectationStart(hens, [{ animalId: "h", date: "2026-08-04" }, { animalId: "x", date: "2026-01-02" }])).toBe("2026-08-04");
+    expect(expectationStart(hens, [])).toBe("2025-08-31");
+    expect(expectationStart({ id: "h", acquiredDate: "2026-09-01" }, [{ animalId: "h", date: "2026-08-04" }])).toBe("2026-09-01");
   });
 
   it("herd forecast in units matches the kg forecast for hens", () => {

@@ -9,36 +9,64 @@ interface MonthStripProps {
   monthNames?: string[];
   /** Value text inside each cell ("25 %"). */
   formatValue: (ratio: number) => string;
-  /** Month index to outline (current month). */
+  /** Month index marked like the charts' "Jetzt" line (current month). */
   current?: number;
+  /** Text above the current month, e.g. t("charts.today"). */
+  currentLabel?: string;
   /** Accessible name / table caption. */
   caption: string;
+  /**
+   * Ratio from which a month counts as covered (e.g. 0.25). Below it the tints
+   * stay muted, so 6 % never looks "well covered"; only months that reach it
+   * get the bright fill.
+   */
+  threshold?: number;
+  /** No month reaches the threshold: plain tiles, the numbers carry it (colour would mean nothing). */
+  neutral?: boolean;
   className?: string;
 }
 
 /** Sequential single-hue ramp, light → dark; text switches for contrast. */
 const STEPS = [
   "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300",
-  "bg-garden-100 text-garden-900 dark:bg-garden-900/60 dark:text-garden-100",
-  "bg-garden-200 text-garden-900 dark:bg-garden-800 dark:text-garden-50",
-  "bg-garden-400 text-white dark:bg-garden-600 dark:text-white",
-  "bg-garden-600 text-white dark:bg-garden-500 dark:text-gray-950",
+  // Steps 1–3: below the threshold, muted tints that still tell 3 % from 7 %.
+  "bg-garden-50 text-garden-900 dark:bg-garden-500/[0.10] dark:text-garden-200",
+  "bg-garden-100 text-garden-900 dark:bg-garden-500/[0.22] dark:text-garden-100",
+  "bg-garden-200 text-garden-900 dark:bg-garden-500/[0.38] dark:text-garden-50",
+  // Steps 4–5: the threshold is reached — bright fill, dark text on the top step in dark mode.
+  "bg-garden-400 text-white dark:bg-garden-500 dark:text-gray-950",
+  "bg-garden-600 text-white dark:bg-garden-300 dark:text-gray-950",
 ];
-const step = (v: number) => (v <= 0.02 ? 0 : v < 0.25 ? 1 : v < 0.5 ? 2 : v < 0.85 ? 3 : 4);
+/**
+ * Step of a value on an absolute scale: the threshold splits muted (below)
+ * from bright (reached), so the colour agrees with the note under the strip.
+ * The printed value carries the exact number.
+ */
+const step = (raw: number, threshold: number) => {
+  // Step from the shown (rounded) percentage: two tiles that print "6 %" share a tint.
+  const v = Math.round(raw * 100) / 100;
+  if (v <= 0.005) return 0;
+  if (v < threshold) return v < threshold / 4 ? 1 : v < threshold / 2 ? 2 : 3;
+  return v < Math.min(1, threshold * 2.5) ? 4 : 5;
+};
 
 /**
  * 12-month heatmap strip (one hue, five steps). The value is printed in each
  * cell, so the colour only reinforces it. Wraps to 2 rows of 6 on phones.
  */
-export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthNames, formatValue, current, caption, className = "" }: MonthStripProps) {
+export const MonthStrip = memo(function MonthStrip({ values, monthLabels, monthNames, formatValue, current, currentLabel, caption, threshold = 0.25, neutral = false, className = "" }: MonthStripProps) {
   return (
     <figure className={className}>
       <ol className="grid grid-cols-6 gap-1 sm:grid-cols-12" aria-hidden="true">
         {values.map((v, i) => (
           <li key={i} className="flex flex-col items-center gap-1">
+            {/* Same marker as the charts: "Jetzt" above, dashed outline instead of a heavy ring. */}
+            {currentLabel !== undefined && (
+              <span className="h-4 text-[11px] leading-4 font-semibold text-gray-900 dark:text-gray-100">{i === current ? currentLabel : ""}</span>
+            )}
             <span
-              className={`flex h-10 w-full items-center justify-center rounded-md text-xs font-medium tabular-nums ${STEPS[step(v)]} ${
-                i === current ? "ring-2 ring-gray-900 ring-offset-1 ring-offset-white dark:ring-gray-100 dark:ring-offset-gray-900" : ""
+              className={`flex h-10 w-full items-center justify-center rounded-md text-xs font-medium tabular-nums ${STEPS[neutral ? 0 : step(v, threshold)]} ${
+                i === current ? "outline-1 outline-offset-2 outline-dashed outline-gray-900/50 dark:outline-white/50" : ""
               }`}
             >
               {formatValue(v)}

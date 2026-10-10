@@ -70,6 +70,14 @@ export function estimateLastFrost(latitude: number, elevation = 0, year = new Da
   return `${y}-${m}-${d}`;
 }
 
+/**
+ * Year of the next spring frost: from July on, this year's has passed, and a
+ * date five months ago looks like a mistake in the first-run wizard.
+ */
+export function upcomingFrostYear(now: Date = new Date()): number {
+  return now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
+}
+
 /** Fallback without a location: the traditional mid-May "Eisheiligen" date. */
 export function defaultLastFrost(year = new Date().getFullYear()): string {
   return `${year}-05-15`;

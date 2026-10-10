@@ -6,6 +6,7 @@ export interface HarvestEntry {
   date: string;
   weightGrams?: number;
   count?: number;
-  quality: 1 | 2 | 3 | 4 | 5;
+  /** Optional: unrated harvests do not pull the average (no preset "Sehr gut"). */
+  quality?: 1 | 2 | 3 | 4 | 5;
   notes?: string;
 }

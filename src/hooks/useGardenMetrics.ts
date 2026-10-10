@@ -8,7 +8,7 @@ import {
   getActualYield,
   getBalance,
   getForecastProducts,
-  getForecastYield,
+  getForecastYield, floorByActual,
   getSelfSufficiency,
   resolveProductPrices,
   type Balance,
@@ -64,12 +64,13 @@ export function useGardenMetrics(opts: { period?: Period } = {}): GardenMetrics 
 
   return useMemo(() => {
     const prices = resolveProductPrices(productPrices);
+    const actual = getActualYield(s.harvests, period);
     return {
       period,
       householdSize,
       harvest: {
-        actual: getActualYield(s.harvests, period),
-        forecast: getForecastYield(s.gardens, plantMap, s.gridCellSizeCm),
+        actual,
+        forecast: floorByActual(getForecastYield(s.gardens, plantMap, s.gridCellSizeCm), actual),
         entryCount: s.harvests.filter((h) => period === null || h.date.startsWith(`${period}-`)).length,
       },
       animalProducts: { actual: getActualProducts(s.animalProducts, period), forecast: getForecastProducts(s.animals) },

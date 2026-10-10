@@ -1,6 +1,6 @@
 import type { Plant } from "@/types/plant";
 import type { Bed, CellPlanting } from "@/types/garden";
-import { plantFamilyMap, type PlantFamily } from "@/data/plantFamilies";
+import { familyOf, type PlantFamily } from "@/data/plantFamilies";
 import { differenceInWeeks, parseISO, addWeeks } from "date-fns";
 import { suitsEnvironment } from "@/lib/season";
 
@@ -118,8 +118,8 @@ function scorePlant(
 
   // Crop rotation
   if (config.excludeFamilies) {
-    const family = plantFamilyMap[plant.id];
-    if (family && config.excludeFamilies.includes(family)) {
+    const family = familyOf(plant.id, plant);
+    if (family !== "other" && config.excludeFamilies.includes(family)) {
       score -= 30; reasons.push("rotation_avoid");
     }
   }
@@ -214,7 +214,7 @@ function selectDiversePlants(scored: ScoredPlant[], count: number, strategy: Pla
 
   for (const s of scored) {
     if (selected.length >= count) break;
-    const family = plantFamilyMap[s.plant.id] ?? "other";
+    const family = familyOf(s.plant.id, s.plant);
 
     if (!allowDuplicateFamilies && usedFamilies.has(family) && selected.length < count - 1) {
       continue;

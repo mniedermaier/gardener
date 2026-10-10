@@ -17,7 +17,7 @@ export function HowCalculated({ children, summary, className = "" }: HowCalculat
   const { t } = useTranslation();
   return (
     <details className={`group text-sm ${className}`}>
-      <summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-1.5 rounded-md text-xs font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 [&::-webkit-details-marker]:hidden">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none sm:min-h-8 items-center gap-1.5 rounded-md text-xs font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 [&::-webkit-details-marker]:hidden">
         <Info size={14} aria-hidden="true" />
         {summary ?? t("metrics.howCalculated")}
         <ChevronDown size={14} aria-hidden="true" className="transition-transform group-open:rotate-180" />

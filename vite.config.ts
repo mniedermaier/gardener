@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 import { fileURLToPath, URL } from "url";
+import { readFileSync } from "fs";
 
 export default defineConfig({
   plugins: [
@@ -63,6 +64,10 @@ export default defineConfig({
       },
     }),
   ],
+  // Shown under Settings → "Über Gardener" (the stores ask for a visible version).
+  define: {
+    __APP_VERSION__: JSON.stringify((JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")) as { version: string }).version),
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

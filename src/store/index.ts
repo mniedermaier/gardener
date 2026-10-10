@@ -35,7 +35,7 @@ const PERSISTED_KEYS = [
   "animalProducts", "feedEntries", "healthEvents", "pantryItems",
   "customPlants", "seasonArchives", "weatherHistory", "activeGardenId",
   // Einstellungen
-  "locale", "weatherApiKey", "locationLat", "locationLon", "locationName",
+  "locale", "weatherApiKey", "locationLat", "locationLon", "locationName", "locationRegion",
   "lastFrostDate", "gridCellSizeCm", "backendUrl", "theme", "alerts",
   "lastBackupDate", "lastSyncedAt",
 ] as const satisfies ReadonlyArray<keyof AppStore>;

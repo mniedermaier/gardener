@@ -1,11 +1,14 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks } from "lucide-react";
-import { addWeeks, parseISO, startOfDay } from "date-fns";
+import { Plus, CalendarDays, Download, Trash2, Pencil, CircleCheck, ListChecks, LayoutGrid } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAddBed } from "@/hooks/useAddBed";
+import { parseISO, startOfDay } from "date-fns";
 import { useStore } from "@/store";
 import { useShallow } from "zustand/react/shallow";
-import { usePlants, usePlantMap } from "@/hooks/usePlants";
+import { usePlantMap, usePlants } from "@/hooks/usePlants";
 import { usePlantName } from "@/hooks/usePlantName";
+import { PlantCombobox } from "@/components/records/PlantCombobox";
 import { useOpenAddOnNavigate, type AddPrefill } from "@/hooks/useOpenAddOnNavigate";
 import { useOpenFromParam } from "@/hooks/useOpenFromParam";
 import { toISODate, todayISO } from "@/lib/format";
@@ -13,7 +16,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { DatePicker } from "@/components/ui/DatePicker";
+import { DateField } from "@/components/ui/DateField";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Menu } from "@/components/ui/Menu";
@@ -21,10 +24,11 @@ import { List } from "@/components/ui/List";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, useConfirmDelete } from "@/components/ui/Toast";
 import type { Task, TaskType } from "@/types/task";
 import { getFrostProtectionWeeks } from "@/types/garden";
 import { downloadIcal } from "@/lib/ical";
+import { getPlantingTaskDates } from "@/lib/advisor";
 import { groupTasksByDue, type TaskGroup } from "@/lib/tasks";
 import { useTaskActions } from "@/hooks/useTaskActions";
 import { TaskRow } from "./TaskRow";
@@ -47,7 +51,10 @@ interface Draft {
 
 export function TaskCalendar() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const addBed = useAddBed();
   const { toast, confirm } = useToast();
+  const confirmDelete = useConfirmDelete();
   const { tasks, gardens, lastFrostDate, addTask, updateTask, deleteTask, generateTasks } = useStore(
     useShallow((s) => ({
       tasks: s.tasks, gardens: s.gardens, lastFrostDate: s.lastFrostDate,
@@ -113,7 +120,8 @@ export function TaskCalendar() {
   );
   const openCount = typed.filter((x) => !x.completedDate).length;
   const doneCount = typed.length - openCount;
-  const overdueCount = tasks.filter((x) => !x.completedDate && x.dueDate.slice(0, 10) < todayKey).length;
+  // Same rule as the groups (lib/tasks): a missed daily task is today's, not overdue.
+  const overdueCount = tasks.filter((x) => !x.completedDate && x.dueDate.slice(0, 10) < todayKey && x.recurring?.interval !== "daily").length;
   const totalOpen = tasks.filter((x) => !x.completedDate).length;
 
   const groups = useMemo(() => {
@@ -129,18 +137,16 @@ export function TaskCalendar() {
     for (const garden of gardens) {
       const plantings: Array<{ plantId: string; bedId: string; type: TaskType; title: string; dueDate: string }> = [];
       for (const bed of garden.beds) {
-        const effectiveFrostDate = addWeeks(frostDate, -getFrostProtectionWeeks(bed));
+        // Same windows as the bed's palette "Jetzt" (lib/advisor), incl. autumn sowing and planting.
+        const context = { environmentType: bed.environmentType ?? "outdoor_bed", frostProtectionWeeks: getFrostProtectionWeeks(bed) };
         for (const plantId of new Set(bed.cells.map((c) => c.plantId))) {
           const plant = plantMap.get(plantId);
           if (!plant) continue;
           const name = getPlantName(plantId);
-          const add = (type: TaskType, weeks: number | null) => {
-            if (weeks === null) return;
-            plantings.push({ plantId, bedId: bed.id, type, title: t("calendar.generatedTitle", { action: t(`calendar.taskTypes.${type}`), plant: name }), dueDate: toISODate(addWeeks(effectiveFrostDate, weeks)) });
-          };
-          add("sow_indoors", plant.sowIndoorsWeeks);
-          add("sow_outdoors", plant.sowOutdoorsWeeks);
-          add("transplant", plant.transplantWeeks);
+          for (const { type, action, date } of getPlantingTaskDates(plant, frostDate, context)) {
+            const label = action === type ? t(`calendar.taskTypes.${type}`) : t(`advisor.actions.${action}`);
+            plantings.push({ plantId, bedId: bed.id, type, title: t("calendar.generatedTitle", { action: label, plant: name }), dueDate: toISODate(date) });
+          }
         }
       }
       if (plantings.length > 0) {
@@ -181,7 +187,7 @@ export function TaskCalendar() {
   };
 
   const handleDelete = async (task: Task) => {
-    if (!(await confirm(t("common.confirmDelete"), { confirmLabel: t("common.delete") }))) return;
+    if (!(await confirmDelete("task", task.title))) return;
     deleteTask(task.id);
     setDialogOpen(false);
     toast(t("calendar.taskDeleted"), "success", { action: { label: t("common.undo"), onClick: () => restore(task) } });
@@ -215,7 +221,8 @@ export function TaskCalendar() {
       <PageHeader
         title={t("nav.tasks")}
         description={description}
-        actions={
+        // While the empty state shows, it carries both actions; the header stays quiet.
+        actions={tasks.length === 0 ? undefined : (
           <>
             {hasPlantedBeds && (
               <span className="hidden sm:contents">
@@ -242,7 +249,7 @@ export function TaskCalendar() {
               />
             )}
           </>
-        }
+        )}
       />
 
       {tasks.length === 0 ? (
@@ -250,11 +257,17 @@ export function TaskCalendar() {
           <EmptyState
             icon={ListChecks}
             title={t("calendar.emptyTitle")}
-            description={t("calendar.emptyText")}
+            description={t(gardens.every((g) => g.beds.length === 0) ? "calendar.emptyTextNoBeds" : "calendar.emptyText")}
             action={<Button onClick={() => openAdd()}><Plus size={16} aria-hidden="true" />{t("calendar.addTask")}</Button>}
+            // The text promises dates from the bed plan: with planted beds generate them, else go plant some.
             secondaryAction={hasPlantedBeds ? (
-              <Button variant="secondary" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
-            ) : undefined}
+              <Button variant="ghost" onClick={handleGenerateTasks}><CalendarDays size={16} aria-hidden="true" />{t("calendar.generate")}</Button>
+            ) : gardens.every((g) => g.beds.length === 0) ? (
+              // No bed at all: the next step is one, with the planner's dialog already open.
+              <Button variant="ghost" onClick={addBed}>{t("planner.addBed")}</Button>
+            ) : (
+              <Button variant="ghost" onClick={() => navigate("/planner")}><LayoutGrid size={16} aria-hidden="true" />{t("importPage.toPlanner")}</Button>
+            )}
           />
         </Card>
       ) : (
@@ -292,7 +305,7 @@ export function TaskCalendar() {
           ) : (
             <div className="space-y-4">
               {groups.map(({ group, tasks: list }) => (
-                <List key={group} header={<span className={group === "overdue" ? "text-danger" : undefined}>{groupLabel(group, list.length)}</span>}>
+                <List key={group} headingLevel={2} header={<span className={group === "overdue" ? "text-danger" : undefined}>{groupLabel(group, list.length)}</span>}>
                   {list.map((task) => (
                     <TaskRow
                       key={task.id}
@@ -336,7 +349,7 @@ export function TaskCalendar() {
               </Button>
             )}
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleSave} disabled={!draft.title.trim() || !draft.dueDate}>{editingId ? t("common.save") : t("common.add")}</Button>
+            <Button onClick={handleSave} disabled={!draft.title.trim() || !draft.dueDate}>{t("common.save")}</Button>
           </>
         }
       >
@@ -349,40 +362,43 @@ export function TaskCalendar() {
             placeholder={t("calendar.titlePlaceholder")}
             autoFocus
           />
-          <div className="grid gap-4 sm:grid-cols-2">
+          {/* Rule 9 task exception: the due date follows the title — "when" is the
+              first thing a task answers. Heute / Morgen / Datum …. */}
+          <DateField mode="future" label={t("calendar.taskDate")} value={draft.dueDate} onChange={(dueDate) => patch({ dueDate })} />
+          <Select
+            label={t("calendar.taskType")}
+            value={draft.type}
+            onChange={(e) => patch({ type: e.target.value as TaskType })}
+            options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
+          />
+          {gardens.length > 1 && (
             <Select
-              label={t("calendar.taskType")}
-              value={draft.type}
-              onChange={(e) => patch({ type: e.target.value as TaskType })}
-              options={TASK_TYPES.map((type) => ({ value: type, label: t(`calendar.taskTypes.${type}`) }))}
+              label={t("calendar.garden")}
+              value={draft.gardenId}
+              onChange={(e) => patch({ gardenId: e.target.value, bedId: "" })}
+              options={gardens.map((g) => ({ value: g.id, label: g.name }))}
             />
-            <DatePicker label={t("calendar.taskDate")} value={draft.dueDate} onChange={(e) => patch({ dueDate: e.target.value })} />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {gardens.length > 1 && (
-              <Select
-                label={t("calendar.garden")}
-                value={draft.gardenId}
-                onChange={(e) => patch({ gardenId: e.target.value, bedId: "" })}
-                options={gardens.map((g) => ({ value: g.id, label: g.name }))}
-              />
-            )}
+          )}
+          {/* Plant and bed share one row (plant first, as in every record dialog); the plant takes the full width when there is no bed to pick. */}
+          <div className={bedOptions.length > 0 ? "grid gap-4 sm:grid-cols-2" : undefined}>
+            {/* The searchable plant field of every other dialog, not a 47-entry select. */}
+            <PlantCombobox
+              label={t("harvest.plant")}
+              plants={plants}
+              optional
+              value={draft.plantId}
+              onChange={({ plantId }) => patch({ plantId })}
+            />
             {bedOptions.length > 0 && (
               <Select
                 label={t("harvest.bed")}
+                optional
                 value={draft.bedId}
                 onChange={(e) => patch({ bedId: e.target.value })}
-                placeholder="–"
+                placeholder={t("harvest.noBed")}
                 options={bedOptions}
               />
             )}
-            <Select
-              label={t("harvest.plant")}
-              value={draft.plantId}
-              onChange={(e) => patch({ plantId: e.target.value })}
-              placeholder="–"
-              options={plants.map((p) => ({ value: p.id, label: getPlantName(p.id) }))}
-            />
           </div>
           <div>
             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{t("calendar.recurrence")}</p>
@@ -394,7 +410,7 @@ export function TaskCalendar() {
               options={(["none", "daily", "weekly", "biweekly"] as const).map((r) => ({ value: r, label: t(`calendar.recurring.${r}`) }))}
             />
           </div>
-          <Textarea label={t("calendar.description")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
+          <Textarea label={t("harvest.notes")} optional placeholder={t("calendar.notesPlaceholder")} value={draft.description} onChange={(e) => patch({ description: e.target.value })} rows={2} />
         </div>
       </Modal>
     </div>

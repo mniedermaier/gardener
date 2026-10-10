@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import plantsData from "@/data/plants.json";
 import type { Plant } from "@/types/plant";
 import type { Bed, Garden } from "@/types/garden";
-import { getPhaseWindows, getHarvestReady, seasonFrost, suitsEnvironment } from "@/lib/season";
-import { getPlantableNow, getSowingAgenda } from "@/lib/advisor";
+import { getPhaseWindows, getHarvestReady, plantedHarvestWindow, seasonFrost, suitsEnvironment } from "@/lib/season";
+import { agendaRowsByPlant, autumnPhaseWindows, getGardenSowingAgenda, getPlantableNow, getPlantingTaskDates, getSowingAgenda, groupAgendaBedsByDate } from "@/lib/advisor";
 import { recommendBedPlanting } from "@/lib/bedRecommendation";
 import { groupTasksByDue, nextDue, taskGroup } from "@/lib/tasks";
 import type { Task } from "@/types/task";
@@ -119,6 +119,11 @@ describe("task groups (dashboard and task page)", () => {
     expect(taskGroup(task("d", "2026-10-06"), monday)).toBe("tomorrow");
   });
 
+  it("files a missed daily task under today, not overdue", () => {
+    expect(taskGroup(task("g", "2026-10-01", { recurring: { interval: "daily" } }), monday)).toBe("today");
+    expect(taskGroup(task("h", "2026-10-01", { recurring: { interval: "weekly" } }), monday)).toBe("overdue");
+  });
+
   it("orders groups and sorts by due date", () => {
     const groups = groupTasksByDue([task("x", "2026-10-09"), task("y", "2026-10-05"), task("z", "2026-10-07")], monday);
     expect(groups.map((g) => g.group)).toEqual(["today", "next7"]);
@@ -129,5 +134,210 @@ describe("task groups (dashboard and task page)", () => {
     expect(nextDue(task("w", "2026-10-05", { recurring: { interval: "weekly" } }), monday)).toBe("2026-10-12");
     expect(nextDue(task("d", "2026-09-20", { recurring: { interval: "daily" } }), monday)).toBe("2026-10-06");
     expect(nextDue(task("u", "2026-10-05", { recurring: { interval: "weekly", until: "2026-10-10" } }), monday)).toBeNull();
+  });
+});
+
+describe("autumn season: tasks, palette, garden agenda agree", () => {
+  const OCT_9 = new Date(2026, 9, 9);
+  const FROST = "2026-05-15";
+  const ids = (items: { plantId: string }[]) => items.map((i) => i.plantId);
+  const raised = { environmentType: "raised_bed" as const, frostProtectionWeeks: 1 };
+  const glass = { environmentType: "greenhouse" as const, frostProtectionWeeks: 4 };
+
+  it("offers winter spinach, lamb's lettuce, winter lettuce, garlic and onion sets for a raised bed in early October", () => {
+    const palette = ids(getPlantableNow(plants, FROST, { now: OCT_9, ...raised }));
+    expect(palette).toEqual(expect.arrayContaining(["spinach", "lambs_lettuce", "lettuce", "garlic", "onion"]));
+    for (const shrub of ["currant", "raspberry"]) expect(palette).not.toContain(shrub);
+  });
+
+  it("keeps winter salads going under glass, but no garlic or onion sets there", () => {
+    const palette = ids(getPlantableNow(plants, FROST, { now: new Date(2026, 9, 25), ...glass }));
+    expect(palette).toEqual(expect.arrayContaining(["spinach", "lambs_lettuce", "lettuce", "winter_purslane"]));
+    expect(palette).not.toContain("garlic");
+    expect(palette).not.toContain("onion");
+  });
+
+  it("closes the open-ground autumn sowing in mid-October; frost protection extends it", () => {
+    const late = new Date(2026, 9, 14);
+    expect(ids(getPlantableNow(plants, FROST, { now: late, environmentType: "outdoor_bed" }))).not.toContain("spinach");
+    expect(ids(getPlantableNow(plants, FROST, { now: late, ...raised }))).toContain("spinach");
+    expect(ids(getPlantableNow(plants, FROST, { now: new Date(2026, 10, 10), ...glass }))).toContain("spinach");
+    // Winter purslane: open ground until the end of September, under glass until the end of October.
+    expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...raised }))).not.toContain("winter_purslane");
+    expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...glass }))).toContain("winter_purslane");
+  });
+
+  it("garden agenda skips full beds and beds where the crop already stands", () => {
+    const beds = [
+      { id: "full", name: "Voll", ...raised, freeCells: 0 },
+      { id: "has", name: "Feldsalat steht", ...raised, freeCells: 4, plantIds: ["lambs_lettuce"] },
+      { id: "free", name: "Frei", ...raised, freeCells: 4 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    const row = agenda.now.find((r) => r.plantId === "lambs_lettuce");
+    expect(row?.beds?.map((b) => b.id)).toEqual(["free"]);
+  });
+
+  it("garden agenda is exactly the union of the bed palettes, with the beds named", () => {
+    const beds = [
+      { id: "hb", name: "Hochbeet", ...raised },
+      { id: "gh", name: "Gewächshaus", ...glass },
+      { id: "kk", name: "Kübel", environmentType: "container" as const, frostProtectionWeeks: 0 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    for (const bed of beds) {
+      for (const p of getPlantableNow(plants, FROST, { now: OCT_9, ...bed })) {
+        const row = agenda.now.find((r) => r.plantId === p.plantId && r.action === p.action);
+        expect(row, `${p.plantId} in ${bed.name}`).toBeDefined();
+        expect(row!.beds!.map((b) => b.id)).toContain(bed.id);
+      }
+    }
+    for (const row of agenda.now) {
+      if (row.action === "sow_indoors") continue;
+      for (const b of row.beds!) {
+        const bed = beds.find((x) => x.id === b.id)!;
+        expect(ids(getPlantableNow(plants, FROST, { now: OCT_9, ...bed }))).toContain(row.plantId);
+      }
+    }
+    expect(agenda.now.find((r) => r.plantId === "spinach")!.beds!.map((b) => b.id)).toEqual(["hb", "gh", "kk"]);
+    expect(agenda.now.find((r) => r.plantId === "garlic")!.beds!.map((b) => b.id)).toEqual(["hb", "kk"]);
+  });
+
+  it("garden agenda never promises a date that is wrong for a bed it names", () => {
+    const beds = [
+      { id: "hb", name: "Hochbeet", ...raised },
+      { id: "gh", name: "Gewächshaus", ...glass },
+      { id: "kk", name: "Kübel", environmentType: "container" as const, frostProtectionWeeks: 0 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    // Every row's date holds for every bed it names: the earliest close.
+    for (const row of agenda.now) {
+      for (const b of row.beds!) {
+        const bed = beds.find((x) => x.id === b.id)!;
+        const own = getPlantableNow(plants, FROST, { now: OCT_9, ...bed }).find((p) => p.plantId === row.plantId && p.action === row.action)!;
+        expect(b.date, `${row.plantId} ${b.name}`).toEqual(own.until);
+        expect(row.until <= own.until, `${row.plantId} ${b.name}`).toBe(true);
+      }
+    }
+    // Lamb's lettuce: open beds until Oct 10/17, the greenhouse until Oct 31.
+    const lambs = agenda.now.find((r) => r.plantId === "lambs_lettuce")!;
+    expect(lambs.until).toEqual(new Date(2026, 9, 10));
+    const [row] = agendaRowsByPlant("now", agenda.now.filter((r) => r.plantId === "lambs_lettuce"));
+    // One group per date, earliest first: each bed is named with its own date.
+    expect(groupAgendaBedsByDate(row).map((g) => [g.date.getDate(), g.beds.map((b) => b.id)])).toEqual([[10, ["kk"]], [17, ["hb"]], [31, ["gh"]]]);
+  });
+
+  it("one row per plant keeps each bed's latest close over its actions", () => {
+    const beds = [
+      { id: "hb", name: "Hochbeet", ...raised },
+      { id: "gh", name: "Gewächshaus", ...glass },
+      { id: "kk", name: "Kübel", environmentType: "container" as const, frostProtectionWeeks: 0 },
+    ];
+    const agenda = getGardenSowingAgenda(plants, FROST, beds, { now: OCT_9 });
+    // Lettuce: planted out until Oct 22 (raised bed) / Oct 15 (container), sown and planted under glass until Oct 31.
+    const [lettuce] = agendaRowsByPlant("now", agenda.now.filter((r) => r.plantId === "lettuce"));
+    expect(lettuce.date).toEqual(new Date(2026, 9, 15));
+    expect(Object.fromEntries(lettuce.beds.map((b) => [b.id, b.date!.getDate()]))).toEqual({ hb: 22, gh: 31, kk: 15 });
+    expect(groupAgendaBedsByDate(lettuce).map((g) => [g.date.getDate(), g.beds.map((b) => b.id)])).toEqual([[15, ["kk"]], [22, ["hb"]], [31, ["gh"]]]);
+  });
+
+  it("groups beds by their own date, also for soon rows and indoor sowing", () => {
+    const d = (day: number) => new Date(2026, 10, day);
+    const groups = groupAgendaBedsByDate({
+      date: d(1),
+      beds: [{ id: "hb", name: "Hochbeet", date: d(8) }, { id: "gh", name: "Gewächshaus", date: d(1) }, { id: "kk", name: "Kübel", date: d(8) }],
+    });
+    expect(groups.map((g) => [g.date.getDate(), g.beds.map((b) => b.id)])).toEqual([[1, ["gh"]], [8, ["hb", "kk"]]]);
+    // Indoor sowing: no beds, the row's own date.
+    expect(groupAgendaBedsByDate({ date: d(3), beds: [] })).toEqual([{ date: d(3), beds: [] }]);
+    // Soon rows open at the earliest opening.
+    const soon = agendaRowsByPlant("soon", [
+      { plantId: "x", action: "sow_outdoors", from: d(5), beds: [{ id: "a", name: "A", date: d(9) }, { id: "b", name: "B", date: d(5) }] },
+    ]);
+    expect(soon[0].date).toEqual(d(5));
+  });
+
+  it("a sowing task the bed is due for is offered by that bed's palette on its due date", () => {
+    // "Wintersalat & Spinat säen · Hochbeet" due on Oct 10.
+    const due = new Date(2026, 9, 10);
+    expect(ids(getPlantableNow(plants, FROST, { now: due, ...raised }))).toEqual(expect.arrayContaining(["spinach", "lettuce"]));
+  });
+
+  it("generated planting tasks fall inside a window the bed's palette offers", () => {
+    const frost = new Date(2026, 4, 15);
+    const cases: Array<[string, typeof raised | typeof glass]> = [
+      ["spinach", raised], ["lambs_lettuce", raised], ["garlic", raised], ["onion", raised], ["carrot", raised],
+      ["tomato", glass], ["lettuce", glass], ["spinach", glass],
+    ];
+    for (const [id, bed] of cases) {
+      const dates = getPlantingTaskDates(P(id), frost, bed);
+      expect(dates.length, id).toBeGreaterThan(0);
+      for (const d of dates) {
+        if (d.type === "sow_indoors") continue; // not an in-bed action
+        expect(ids(getPlantableNow(plants, FROST, { now: d.date, ...bed })), `${id} ${d.action} ${d.date.toDateString()}`).toContain(id);
+      }
+    }
+    expect(getPlantingTaskDates(P("garlic"), frost, glass)).toHaveLength(0);
+    expect(getPlantingTaskDates(P("spinach"), frost, raised).some((d) => d.action === "sow_autumn")).toBe(true);
+  });
+});
+
+describe("autumn harvest window", () => {
+  it("gives an autumn sowing its own harvest, wrapping into next year", async () => {
+    const { autumnPhaseWindows } = await import("@/lib/advisor");
+    const ws = autumnPhaseWindows("lambs_lettuce", 2026, 0, "outdoor_bed", { harvestDaysMin: 60, harvestDaysMax: 90 });
+    const harvest = ws.find((w) => w.phase === "harvest")!;
+    expect(harvest).toBeDefined();
+    // Sowing 15 Jul–10 Oct: harvest from mid-September into January.
+    expect(harvest.start.getMonth()).toBe(8);
+    expect(harvest.end.getFullYear()).toBe(2027);
+  });
+
+  it("adds no harvest without plant data or for long-lived crops", async () => {
+    const { autumnPhaseWindows } = await import("@/lib/advisor");
+    expect(autumnPhaseWindows("lambs_lettuce", 2026, 0).some((w) => w.phase === "harvest")).toBe(false);
+    expect(autumnPhaseWindows("garlic", 2026, 0, "outdoor_bed", { harvestDaysMin: 240, harvestDaysMax: 270 }).some((w) => w.phase === "harvest")).toBe(false);
+  });
+});
+
+describe("plantedHarvestWindow", () => {
+  const carrot = (plantsData as Plant[]).find((p) => p.id === "carrot")!;
+  it("runs from the earliest planting + min days to the latest + max days", () => {
+    const w = plantedHarvestWindow(carrot, ["2026-07-20", "2026-07-10"]);
+    expect([w?.start.getMonth(), w?.start.getDate()]).toEqual([8, 8]); // 10 Jul + 60 days = 8 Sep
+    expect(w?.end.getMonth()).toBe(9); // 20 Jul + 80 days = 8 Oct
+  });
+  it("is null without planting dates", () => {
+    expect(plantedHarvestWindow(carrot, [])).toBeNull();
+  });
+});
+
+describe("plantedHarvestWindow with the season", () => {
+  const tomato = (plantsData as Plant[]).find((p) => p.id === "tomato")!;
+  it("keeps a continuous cropper open until the autumn frost (+ protection)", () => {
+    const plain = plantedHarvestWindow(tomato, ["2026-05-08"])!;
+    const season = plantedHarvestWindow(tomato, ["2026-05-08"], { lastFrostDate: "2026-05-15", now: new Date(2026, 9, 9), protectionWeeks: 3 })!;
+    expect(season.end.getTime()).toBeGreaterThan(plain.end.getTime());
+    expect(season.end.getMonth()).toBeGreaterThanOrEqual(9);
+  });
+});
+
+describe("autumnPhaseWindows", () => {
+  const byId = (id: string) => (plantsData as Plant[]).find((p) => p.id === id)!;
+  it("gives autumn-planted onions no harvest this season (they overwinter)", () => {
+    expect(autumnPhaseWindows("onion", 2026, 0, "outdoor_bed", byId("onion")).some((w) => w.phase === "harvest")).toBe(false);
+  });
+  it("keeps the winter harvest of an autumn sowing", () => {
+    expect(autumnPhaseWindows("lambs_lettuce", 2026, 0, "outdoor_bed", byId("lambs_lettuce")).some((w) => w.phase === "harvest")).toBe(true);
+  });
+});
+
+describe("continuous croppers end at the autumn frost", () => {
+  const byId = (id: string) => (plantsData as Plant[]).find((p) => p.id === id)!;
+  it("rosemary does not outlast thyme planted the same day", () => {
+    const season = { lastFrostDate: "2026-05-15", now: new Date(2026, 9, 9), protectionWeeks: 0 };
+    const rosemary = plantedHarvestWindow(byId("rosemary"), ["2026-05-08"], season)!;
+    const thyme = plantedHarvestWindow(byId("thyme"), ["2026-05-08"], season)!;
+    expect(rosemary.end.getTime()).toBe(thyme.end.getTime());
   });
 });

@@ -27,13 +27,17 @@ const MINUS = "\u2212";
 function withMinus(text: string): string {
   return text.replace(/-/g, MINUS);
 }
+/** Number and unit stay on one line ("1 °C", "1,9 kg", "473,10 €"): non-breaking space. */
+function keepTogether(text: string): string {
+  return text.replace(/ /g, "\u00a0");
+}
 /** Values that round to 0 must not keep their sign. */
 function noNegativeZero(value: number, maximumFractionDigits: number): number {
   const f = 10 ** maximumFractionDigits;
   return Math.round(value * f) === 0 ? 0 : value;
 }
 /**
- * - short:     "3. Okt." (current year) / "3. Okt. 2025" — lists, compact
+ * - short:     "3. Okt." (current year) / "3. Okt. 2025" — lists, compact (non-breaking spaces)
  * - numeric:   "03.10.2026"                              — tables, exports
  * - long:      "Samstag, 3. Oktober 2026"                — headers, details
  * - relative:  "Heute", "Gestern", "Vor 3 Tagen", "In 2 Tagen"; beyond ±6 days falls back to short
@@ -41,8 +45,9 @@ function noNegativeZero(value: number, maximumFractionDigits: number): number {
  * - monthYear: "Oktober 2026"                            — group headers
  * - month:     "Okt."                                    — chart axes
  * - weekday:   "Sa."                                     — weather strips
+ * - weekdayDate: "Mo., 12. Okt."                          — the coming week (one format per group)
  */
-export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday";
+export type DateStyle = "short" | "numeric" | "long" | "relative" | "relativeInline" | "monthYear" | "month" | "weekday" | "weekdayDate" | "dayMonth" | "date" | "monthYearShort";
 
 export interface FormatOptions {
   locale?: string;
@@ -86,18 +91,52 @@ export function formatDate(value: DateInput, style: DateStyle = "short", opts: F
       return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
     case "long":
       return new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(d);
+    case "date":
+      // Form fields: "9. Oktober 2026" — no weekday, so it fits a half-width field on a phone.
+      return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(d));
+    case "dayMonth":
+      // A date that recurs every year (last frost): "15. Mai", no weekday or year.
+      return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(d));
+    case "monthYearShort":
+      // Compact "since" dates in card subtitles: "Dez. 2025".
+      return nonBreaking(new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(d));
     case "monthYear":
       return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(d);
     case "month":
       return new Intl.DateTimeFormat(locale, { month: "short" }).format(d);
     case "weekday":
       return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(d);
+    case "weekdayDate":
+      return nonBreaking(new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }).format(d));
     case "short":
     default: {
       const sameYear = d.getFullYear() === now.getFullYear();
-      return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }) }).format(d);
+      return nonBreaking(new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }) }).format(d));
     }
   }
+}
+
+/**
+ * A date span in one style everywhere (calendar, plant year plan, week rows):
+ * a repeated month is written once ("15.–31. Okt.", "Oct 15–31"), otherwise
+ * "10. Okt.–15. Nov."; the en dash without spaces (DESIGN_SYSTEM §13). The
+ * year appears only when the span is not in `now`'s year.
+ */
+export function formatDateRange(from: DateInput, to: DateInput, opts: FormatOptions & { now?: Date; month?: "short" | "long" } = {}): string {
+  const a = toDate(from);
+  const b = toDate(to);
+  if (!a || !b) return a ? formatDate(a, "short", opts) : b ? formatDate(b, "short", opts) : "";
+  const [start, end] = a <= b ? [a, b] : [b, a];
+  const now = opts.now ?? new Date();
+  const sameYear = start.getFullYear() === now.getFullYear() && end.getFullYear() === now.getFullYear();
+  const fmt = new Intl.DateTimeFormat(intlLocale(opts.locale), { day: "numeric", month: opts.month ?? "short", ...(sameYear ? {} : { year: "numeric" }) });
+  // formatRange spaces the dash (" – ", often with thin spaces); the design system wants it tight.
+  return nonBreaking(fmt.formatRange(start, end).replace(/[\s  ]*[–-][\s  ]*/u, "–"));
+}
+
+/** Compact dates wrap as a whole ("15. Sept."), never between day and month. */
+function nonBreaking(text: string): string {
+  return text.replace(/ /g, "\u00a0");
 }
 
 /** "heute" at the start of a sentence/cell reads better as "Heute". */
@@ -132,32 +171,32 @@ export function formatWeight(grams: number, opts: FormatOptions & { unit?: "g" |
   const locale = intlLocale(opts.locale);
   const useKg = opts.unit === "kg" || (opts.unit !== "g" && Math.abs(grams) >= 1000);
   if (!useKg) {
-    return withMinus(new Intl.NumberFormat(locale, { style: "unit", unit: "gram", maximumFractionDigits: 0 }).format(noNegativeZero(grams, 0)));
+    return keepTogether(withMinus(new Intl.NumberFormat(locale, { style: "unit", unit: "gram", maximumFractionDigits: 0 }).format(noNegativeZero(grams, 0))));
   }
   const kg = grams / 1000;
-  return withMinus(new Intl.NumberFormat(locale, {
+  return keepTogether(withMinus(new Intl.NumberFormat(locale, {
     style: "unit",
     unit: "kilogram",
     maximumFractionDigits: Math.abs(kg) >= 100 ? 0 : 1,
-  }).format(kg));
+  }).format(kg)));
 }
 
 /** Amount in **euros** (not cents): 473.1 → "473,10 €" (de) / "€473.10" (en). */
 export function formatCurrency(amount: number, opts: FormatOptions & { currency?: string; maximumFractionDigits?: number } = {}): string {
   if (!Number.isFinite(amount)) return "–";
   const max = opts.maximumFractionDigits ?? 2;
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), {
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), {
     style: "currency",
     currency: opts.currency ?? "EUR",
     maximumFractionDigits: max,
     minimumFractionDigits: Math.min(2, max),
-  }).format(noNegativeZero(amount, max)));
+  }).format(noNegativeZero(amount, max))));
 }
 
 /** Volume in **litres**: 10 → "10 l"; up to one decimal. */
 export function formatVolume(liters: number, opts: FormatOptions = {}): string {
   if (!Number.isFinite(liters)) return "–";
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "liter", maximumFractionDigits: 1 }).format(noNegativeZero(liters, 1)));
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "liter", maximumFractionDigits: 1 }).format(noNegativeZero(liters, 1))));
 }
 
 /** Area in m²: 13.5 → "13,5 m²". */
@@ -169,7 +208,27 @@ export function formatArea(squareMeters: number, opts: FormatOptions = {}): stri
 /** Temperature in °C: -1.4 → "−1 °C" (true minus sign), -0.3 → "0 °C". */
 export function formatTemperature(celsius: number, opts: FormatOptions = {}): string {
   if (!Number.isFinite(celsius)) return "–";
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "celsius", maximumFractionDigits: 0 }).format(noNegativeZero(celsius, 0)));
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "unit", unit: "celsius", maximumFractionDigits: 0 }).format(noNegativeZero(celsius, 0))));
+}
+
+/**
+ * Rounds ratios that make up one whole (garden + animals = total) to `digits`
+ * percent decimals so the rounded parts add up to the rounded sum (largest
+ * remainder): "0,8 % + 3,5 %" never stands next to a total of "4,2 %".
+ */
+export function roundShares(ratios: number[], digits = 0): number[] {
+  const unit = 100 * 10 ** digits;
+  const scaled = ratios.map((r) => r * unit);
+  const target = Math.round(scaled.reduce((a, b) => a + b, 0));
+  const parts = scaled.map((v) => Math.floor(v + 1e-9));
+  let rest = target - parts.reduce((a, b) => a + b, 0);
+  const order = scaled.map((v, i) => ({ i, frac: v - parts[i] })).sort((a, b) => b.frac - a.frac);
+  for (const { i } of order) {
+    if (rest <= 0) break;
+    parts[i]++;
+    rest--;
+  }
+  return parts.map((v) => v / unit);
 }
 
 /**
@@ -179,7 +238,7 @@ export function formatTemperature(celsius: number, opts: FormatOptions = {}): st
 export function formatPercent(ratio: number, opts: FormatOptions & { maximumFractionDigits?: number } = {}): string {
   if (!Number.isFinite(ratio)) return "–";
   const max = opts.maximumFractionDigits ?? 0;
-  return withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "percent", maximumFractionDigits: max }).format(noNegativeZero(ratio, max + 2)));
+  return keepTogether(withMinus(new Intl.NumberFormat(intlLocale(opts.locale), { style: "percent", maximumFractionDigits: max }).format(noNegativeZero(ratio, max + 2))));
 }
 
 /** All formatters bound to one language — what useFormat() returns. */
@@ -188,6 +247,7 @@ export function createFormatter(lang?: string) {
   return {
     locale,
     formatDate: (value: DateInput, style: DateStyle = "short", now?: Date) => formatDate(value, style, { locale, now }),
+    formatDateRange: (from: DateInput, to: DateInput, o: { now?: Date; month?: "short" | "long" } = {}) => formatDateRange(from, to, { ...o, locale }),
     formatNumber: (value: number, o: Omit<NumberOptions, "locale"> = {}) => formatNumber(value, { ...o, locale }),
     formatWeight: (grams: number, unit?: "g" | "kg") => formatWeight(grams, { locale, unit }),
     formatCurrency: (amount: number, o: { currency?: string; maximumFractionDigits?: number } = {}) => formatCurrency(amount, { ...o, locale }),
@@ -199,3 +259,9 @@ export function createFormatter(lang?: string) {
 }
 
 export type Formatter = ReturnType<typeof createFormatter>;
+
+/** Whole calendar days from an ISO date to `now` (never negative) — one count for every "vor n Tagen". */
+export function daysSince(iso: string, now: Date = new Date()): number {
+  const d = toDate(iso);
+  return d ? Math.max(0, differenceInCalendarDays(now, d)) : 0;
+}

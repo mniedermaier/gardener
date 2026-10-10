@@ -151,6 +151,15 @@ export function assessPh(ph: number, plantIds: Iterable<string>): PhAssessment {
   return { advice, target, limeAverse, limeLoving };
 }
 
+/**
+ * The status badge for an advice. "limeVeto" is inside the range the bed is
+ * managed towards (the lime-averse crop decides), so it reads "Im Zielbereich"
+ * like any other in-range bed; the veto itself belongs in the advice text.
+ */
+export function phStatus(advice: PhAdvice): PhAdvice {
+  return advice === "limeVeto" ? "optimal" : advice;
+}
+
 export type NutrientLevel = "low" | "optimal" | "high";
 export type Nutrient = "nitrogen" | "phosphorus" | "potassium" | "organicMatter";
 

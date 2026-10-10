@@ -1,4 +1,4 @@
-export type PlantCategory = "vegetable" | "fruit" | "berry" | "herb";
+export type PlantCategory = "vegetable" | "fruit" | "berry" | "herb" | "flower";
 export type SunRequirement = "full" | "partial" | "shade";
 export type WaterNeed = "low" | "medium" | "high";
 export type PreservationMethod = "canning" | "freezing" | "fermenting" | "drying" | "root_cellar";
@@ -12,6 +12,8 @@ export interface SeedSavingInfo {
 export interface Plant {
   id: string;
   displayName?: string; // for custom plants (built-in use i18n)
+  /** Botanical family of a custom plant (built-in plants: data/plantFamilies). Feeds crop rotation. */
+  family?: import("@/data/plantFamilies").PlantFamily;
   category: PlantCategory;
   sowIndoorsWeeks: number | null;
   sowOutdoorsWeeks: number | null;

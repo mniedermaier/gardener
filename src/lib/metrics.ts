@@ -14,7 +14,7 @@
  * All money values are **euros** (expenses are stored in cents and converted
  * here), all weights **grams** unless the name says Kg.
  */
-import type { Garden } from "@/types/garden";
+import type { Bed, Garden } from "@/types/garden";
 import type { Plant } from "@/types/plant";
 import type { HarvestEntry } from "@/types/harvest";
 import type { Expense, ExpenseCategory } from "@/types/expense";
@@ -89,11 +89,57 @@ export interface SeasonYield {
   byPlant: Record<string, number>;
 }
 
-/** Planted area per plant id in m² (all gardens, all beds). */
-export function plantedAreaByPlant(gardens: Garden[], gridCellSizeCm: number): Record<string, number> {
-  const cellArea = (gridCellSizeCm / 100) ** 2;
+/**
+ * Growing area one placed plant stands for, in m². A planner cell holds one
+ * plant, so a tomato (50 × 70 cm spacing) yields like 0,35 m², not like a
+ * 30 cm cell; small crops never count less than their cell. The one formula
+ * behind every forecast and the plant detail's "≈ x kg pro Pflanze".
+ */
+export function plantAreaM2(plant: Pick<Plant, "spacingCm" | "rowSpacingCm"> | undefined, gridCellSizeCm: number): number {
+  const cell = (gridCellSizeCm / 100) ** 2;
+  if (!plant) return cell;
+  return Math.max(cell, (plant.spacingCm / 100) * ((plant.rowSpacingCm || plant.spacingCm) / 100));
+}
+
+/** Expected yield of one plant at its recommended spacing, in kg (plantAreaM2 × expected kg/m²). */
+export function plantYieldKg(plant: Pick<Plant, "spacingCm" | "rowSpacingCm" | "expectedYieldKgPerM2"> | undefined, gridCellSizeCm: number): number {
+  return plant ? plantAreaM2(plant, gridCellSizeCm) * (plant.expectedYieldKgPerM2 ?? 0) : 0;
+}
+
+/**
+ * Credited growing area of every plant in a bed (m²): its plantAreaM2, scaled
+ * down evenly when the bed is planted denser than the spacing allows — a bed
+ * never yields from more area than it has (usable cells, paths excluded).
+ * 8 tomatoes in a 2 m² greenhouse therefore forecast ~2 m² of tomato, not 2,8 m².
+ */
+export function bedPlantAreas(
+  bed: Pick<Bed, "width" | "height" | "paths" | "cells">,
+  plantMap: Map<string, Plant> | null,
+  gridCellSizeCm: number,
+): Array<{ plantId: string; areaM2: number }> {
+  const cell = (gridCellSizeCm / 100) ** 2;
+  const raw = bed.cells.map((c) => ({ plantId: c.plantId, areaM2: plantAreaM2(plantMap?.get(c.plantId), gridCellSizeCm) }));
+  const usable = Math.max(1, bed.width * bed.height - new Set(bed.paths ?? []).size) * cell;
+  const sum = raw.reduce((s, r) => s + r.areaM2, 0);
+  const factor = sum > usable ? usable / sum : 1;
+  return factor === 1 ? raw : raw.map((r) => ({ plantId: r.plantId, areaM2: r.areaM2 * factor }));
+}
+
+/** Expected yield of a bed in kg (bedPlantAreas × expected kg/m²). */
+export function bedForecastKg(bed: Pick<Bed, "width" | "height" | "paths" | "cells">, plantMap: Map<string, Plant>, gridCellSizeCm: number): number {
+  return bedPlantAreas(bed, plantMap, gridCellSizeCm).reduce((s, r) => s + r.areaM2 * (plantMap.get(r.plantId)?.expectedYieldKgPerM2 ?? 0), 0);
+}
+
+/**
+ * Credited growing area per plant id in m² (all gardens, all beds), see
+ * bedPlantAreas. Without `plants` every plant counts as one cell.
+ */
+export function plantedAreaByPlant(gardens: Garden[], gridCellSizeCm: number, plants?: Plant[] | Map<string, Plant>): Record<string, number> {
+  const plantMap = plants ? (plants instanceof Map ? plants : new Map(plants.map((p) => [p.id, p]))) : null;
   const area: Record<string, number> = {};
-  for (const g of gardens) for (const b of g.beds) for (const c of b.cells) area[c.plantId] = (area[c.plantId] ?? 0) + cellArea;
+  for (const g of gardens) for (const b of g.beds) for (const r of bedPlantAreas(b, plantMap, gridCellSizeCm)) {
+    area[r.plantId] = (area[r.plantId] ?? 0) + r.areaM2;
+  }
   return area;
 }
 
@@ -110,12 +156,23 @@ export function getActualYield(harvests: HarvestEntry[], period: Period): Season
   return { source: "actual", totalGrams: total, byPlant };
 }
 
-/** Expected season yield of the current planting plan: area × expected kg/m². */
+/**
+ * A forecast never below what was already harvested: per crop the larger of
+ * forecast and logged amount — the same rule as the food plan's coverage, so
+ * "Ertrag (Prognose)" and the food plan agree.
+ */
+export function floorByActual(forecast: SeasonYield, actual: SeasonYield): SeasonYield {
+  const byPlant: Record<string, number> = { ...forecast.byPlant };
+  for (const [id, g] of Object.entries(actual.byPlant)) if (g > (byPlant[id] ?? 0)) byPlant[id] = g;
+  return { source: "forecast", totalGrams: Object.values(byPlant).reduce((a, b) => a + b, 0), byPlant };
+}
+
+/** Expected season yield of the current planting plan: growing area (plantAreaM2 per plant) × expected kg/m². */
 export function getForecastYield(gardens: Garden[], plants: Plant[] | Map<string, Plant>, gridCellSizeCm: number): SeasonYield {
   const plantMap = plants instanceof Map ? plants : new Map(plants.map((p) => [p.id, p]));
   const byPlant: Record<string, number> = {};
   let total = 0;
-  for (const [plantId, area] of Object.entries(plantedAreaByPlant(gardens, gridCellSizeCm))) {
+  for (const [plantId, area] of Object.entries(plantedAreaByPlant(gardens, gridCellSizeCm, plantMap))) {
     const kgPerM2 = plantMap.get(plantId)?.expectedYieldKgPerM2 ?? 0;
     const g = area * kgPerM2 * 1000;
     byPlant[plantId] = g;
@@ -179,6 +236,23 @@ export function getActualProductKg(products: AnimalProduct[], animals: Animal[],
     kg[p.type] += p.type === "eggs" ? q * eggWeight(byId.get(p.animalId)) : q;
   }
   return kg;
+}
+
+/**
+ * Recorded food products (eggs, honey, meat, milk — not wax or wool) as edible
+ * kg per month of `year`: the logged counterpart of the monthly forecast.
+ */
+export function getActualProductKgByMonth(products: AnimalProduct[], animals: Animal[], year: number): number[] {
+  const byId = new Map(animals.map((a) => [a.id, a]));
+  const out = Array.from({ length: 12 }, () => 0);
+  for (const p of products) {
+    if (!inPeriod(p.date, year) || PRODUCT_NUTRITION[p.type].caloriesPer100g <= 0) continue;
+    const m = Number(p.date.slice(5, 7)) - 1;
+    if (m < 0 || m > 11) continue;
+    const q = p.unit === "g" ? p.quantity / 1000 : p.quantity;
+    out[m] += p.type === "eggs" ? q * eggWeight(byId.get(p.animalId)) : q;
+  }
+  return out;
 }
 
 /** Expected annual products of the herd as edible kg. */
@@ -259,6 +333,16 @@ export function animalProductValue(totals: ProductTotals, prices: Record<Product
   return total;
 }
 
+/** A cost from the livestock logs that counts in the breakdown (shown read-only in the expense list). */
+export interface CostLogEntry {
+  source: "feed" | "health";
+  id: string;
+  date: string;
+  /** € */
+  cost: number;
+  label: string;
+}
+
 export interface CostBreakdown {
   /** Expenses logged on the cost page, € */
   expenses: number;
@@ -280,6 +364,10 @@ export interface CostBreakdown {
   animals: number;
   /** Livestock log entries skipped because the same bill is already an expense. */
   duplicatesSkipped: number;
+  /** The livestock log entries counted in `feed`/`veterinary` (after de-duplication). */
+  logEntries: CostLogEntry[];
+  /** Expenses that absorbed a log entry (same bill): expense id → the log it is also in. */
+  matchedExpenses: Record<string, CostLogEntry["source"]>;
 }
 
 /** A log entry within this many days of an expense with the same amount is the same bill. */
@@ -298,8 +386,9 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
   // a log entry is skipped when an animal_feed/veterinary expense with the
   // same amount lies within ±3 days. Each expense absorbs at most one entry.
   const used = new Set<string>();
+  const matchedExpenses: Record<string, CostLogEntry["source"]> = {};
   let duplicatesSkipped = 0;
-  const isDuplicate = (category: ExpenseCategory, date: string, cost: number) => {
+  const isDuplicate = (category: ExpenseCategory, date: string, cost: number, source: CostLogEntry["source"]) => {
     const cents = Math.round(cost * 100);
     const t = Date.parse(date);
     const match = input.expenses.find(
@@ -307,15 +396,20 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
     );
     if (!match) return false;
     used.add(match.id);
+    matchedExpenses[match.id] = source;
     duplicatesSkipped++;
     return true;
   };
-  const sumLog = (entries: { date: string; cost?: number }[], category: ExpenseCategory) =>
+  const logEntries: CostLogEntry[] = [];
+  const sumLog = (entries: { id: string; date: string; cost?: number; label: string }[], category: ExpenseCategory, source: CostLogEntry["source"]) =>
     entries
-      .filter((x) => inPeriod(x.date, input.period) && (x.cost ?? 0) > 0 && !isDuplicate(category, x.date, x.cost ?? 0))
-      .reduce((s, x) => s + (x.cost ?? 0), 0);
-  const feed = sumLog(input.feedEntries ?? [], "animal_feed");
-  const veterinary = sumLog(input.healthEvents ?? [], "veterinary");
+      .filter((x) => inPeriod(x.date, input.period) && (x.cost ?? 0) > 0 && !isDuplicate(category, x.date, x.cost ?? 0, source))
+      .reduce((s, x) => {
+        logEntries.push({ source, id: x.id, date: x.date, cost: x.cost ?? 0, label: x.label });
+        return s + (x.cost ?? 0);
+      }, 0);
+  const feed = sumLog((input.feedEntries ?? []).map((e) => ({ id: e.id, date: e.date, cost: e.cost, label: e.feedType })), "animal_feed", "feed");
+  const veterinary = sumLog((input.healthEvents ?? []).map((e) => ({ id: e.id, date: e.date, cost: e.cost, label: e.description })), "veterinary", "health");
 
   const byCategory = { ...expenseByCategory };
   if (feed > 0) byCategory.animal_feed = (byCategory.animal_feed ?? 0) + feed;
@@ -329,6 +423,8 @@ export function getCosts(input: { expenses: Expense[]; feedEntries?: FeedEntry[]
     expenseByCategory,
     animals: (byCategory.animal_feed ?? 0) + (byCategory.veterinary ?? 0),
     duplicatesSkipped,
+    logEntries,
+    matchedExpenses,
   };
 }
 
@@ -348,6 +444,8 @@ export interface FeedCostStats {
   perMonth: number;
   /** Months the average spans (≥ 1). */
   months: number;
+  /** Date of the first entry (YYYY-MM-DD), the start of the `perMonth` span. */
+  since: string | null;
   /** Entries in the last 30 days. */
   entriesLast30Days: number;
 }
@@ -371,7 +469,7 @@ export function getFeedCostStats(feedEntries: FeedEntry[], now: Date = new Date(
   }
   const span = first ? (now.getTime() - Date.parse(first)) / (30.44 * 86_400_000) : 1;
   const months = Math.max(1, span);
-  return { thisMonth, lastMonth, last30Days, total, perMonth: total / months, months, entriesLast30Days };
+  return { thisMonth, lastMonth, last30Days, total, perMonth: total / months, months, since: first, entriesLast30Days };
 }
 
 export interface Balance {
@@ -418,6 +516,29 @@ export function expectedShareToDate(type: ProductType, asOf: Date = new Date(), 
   const full = end.getTime() - start.getTime();
   const covered = Math.max(0, Math.min(asOf.getTime(), end.getTime()) - from.getTime());
   return Math.min(1, covered / full);
+}
+
+/**
+ * The date "expected so far" is counted from, when it is not simply 1 January:
+ * a later arrival or first entry this year. The UI names it ("seit 6. Aug."),
+ * so a herd kept for years does not seem to be judged by a few weeks.
+ */
+export function expectationBasisDate(since: string | undefined, asOf: Date = new Date()): string | null {
+  if (!since) return null;
+  const yearStart = `${asOf.getFullYear()}-01-01`;
+  return since > yearStart ? since : null;
+}
+
+/**
+ * Where "expected so far" starts for one animal group: when it arrived, or —
+ * if recording began later — the first entry logged for it. An animal kept
+ * since last year but recorded only from August must not look like it lays at
+ * a fifth of the usual rate.
+ */
+export function expectationStart(animal: { id: string; acquiredDate: string }, products: Pick<AnimalProduct, "animalId" | "date">[]): string {
+  let first: string | null = null;
+  for (const p of products) if (p.animalId === animal.id && (first === null || p.date < first)) first = p.date;
+  return first !== null && first > animal.acquiredDate ? first : animal.acquiredDate;
 }
 
 // ------------------------------------------------------------------ self-sufficiency
@@ -515,7 +636,11 @@ export function getSelfSufficiency(input: {
   const actualAnimalKcal = productKgCalories(
     capToConsumption(getActualProductKg(input.animalProducts, input.animals, input.period), input.householdSize).counted,
   );
-  const forecastPlantKcal = harvestCalories(getForecastYield(input.gardens, plantMap, input.gridCellSizeCm).byPlant, plantMap);
+  // Never below what is already harvested (floorByActual), like "Ertrag (Prognose)".
+  const forecastPlantKcal = harvestCalories(
+    floorByActual(getForecastYield(input.gardens, plantMap, input.gridCellSizeCm), getActualYield(input.harvests, input.period)).byPlant,
+    plantMap,
+  );
   const herd = capToConsumption(getForecastProductKg(input.animals), input.householdSize);
   const forecastAnimalKcal = productKgCalories(herd.counted);
 
@@ -523,16 +648,15 @@ export function getSelfSufficiency(input: {
   if (input.period !== null && input.period === asOf.getFullYear()) {
     const year = input.period;
     const frost = input.lastFrostDate ?? `${year}-05-15`;
-    const cellArea = (input.gridCellSizeCm / 100) ** 2;
     let kcal = 0;
     for (const g of input.gardens)
       for (const b of g.beds) {
         const protection = getFrostProtectionWeeks(b);
-        for (const c of b.cells) {
-          const p = plantMap.get(c.plantId);
+        for (const r of bedPlantAreas(b, plantMap, input.gridCellSizeCm)) {
+          const p = plantMap.get(r.plantId);
           if (!p) continue;
           const [start, end] = harvestWindow(p, frost, protection, year);
-          kcal += cellArea * (p.expectedYieldKgPerM2 ?? 0) * 10 * (p.caloriesPer100g ?? 0) * elapsedShare(start, end, asOf);
+          kcal += r.areaM2 * (p.expectedYieldKgPerM2 ?? 0) * 10 * (p.caloriesPer100g ?? 0) * elapsedShare(start, end, asOf);
         }
       }
     for (const type of PRODUCT_TYPES) {
@@ -609,7 +733,7 @@ export function getCropPlan(input: {
   targets?: Record<string, number>;
 }): CropPlan {
   const plantMap = input.plants instanceof Map ? input.plants : new Map(input.plants.map((p) => [p.id, p]));
-  const area = plantedAreaByPlant(input.gardens, input.gridCellSizeCm);
+  const area = plantedAreaByPlant(input.gardens, input.gridCellSizeCm, plantMap);
   const actual = getActualYield(input.harvests, input.period).byPlant;
   const rows: CropPlanRow[] = [];
   for (const [plantId, perPerson] of Object.entries(input.targets ?? ANNUAL_KG_TARGETS)) {
@@ -619,11 +743,13 @@ export function getCropPlan(input: {
     const targetKg = perPerson * input.householdSize;
     const areaM2 = area[plantId] ?? 0;
     const forecastKg = areaM2 * kgPerM2;
-    const deficitKg = Math.max(0, targetKg - forecastKg);
+    const actualKg = (actual[plantId] ?? 0) / 1000;
+    // What is already harvested counts even when it beats the (bed-capped) forecast.
+    const deficitKg = Math.max(0, targetKg - Math.max(forecastKg, actualKg));
     rows.push({
       plantId,
       targetKg,
-      actualKg: (actual[plantId] ?? 0) / 1000,
+      actualKg,
       forecastKg,
       areaM2,
       neededAreaM2: kgPerM2 > 0 ? targetKg / kgPerM2 : 0,
@@ -641,7 +767,7 @@ export function getCropPlan(input: {
     forecastKg: sum((r) => r.forecastKg),
     areaM2: sum((r) => r.areaM2),
     neededAreaM2: sum((r) => r.neededAreaM2),
-    forecastCoverage: targetKg > 0 ? sum((r) => Math.min(r.forecastKg, r.targetKg)) / targetKg : 0,
+    forecastCoverage: targetKg > 0 ? sum((r) => Math.min(Math.max(r.forecastKg, r.actualKg), r.targetKg)) / targetKg : 0,
     actualCoverage: targetKg > 0 ? sum((r) => Math.min(r.actualKg, r.targetKg)) / targetKg : 0,
   };
 }

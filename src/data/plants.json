@@ -167,7 +167,8 @@
     "companions": [
       "cucumber",
       "potato",
-      "zucchini"
+      "zucchini",
+      "beetroot"
     ],
     "antagonists": [
       "onion",
@@ -786,11 +787,10 @@
       "onion",
       "garlic",
       "lettuce",
-      "kale"
-    ],
-    "antagonists": [
+      "kale",
       "bean"
     ],
+    "antagonists": [],
     "color": "#881337",
     "icon": "🟣",
     "caloriesPer100g": 43,
@@ -1032,7 +1032,7 @@
   },
   {
     "id": "sunflower",
-    "category": "vegetable",
+    "category": "flower",
     "sowIndoorsWeeks": null,
     "sowOutdoorsWeeks": 0,
     "transplantWeeks": null,
@@ -1635,6 +1635,70 @@
       "difficulty": "moderate",
       "isolationDistanceM": 100,
       "seedViabilityYears": 5
+    }
+  },
+  {
+    "id": "lambs_lettuce",
+    "category": "vegetable",
+    "sowIndoorsWeeks": null,
+    "sowOutdoorsWeeks": -6,
+    "transplantWeeks": null,
+    "harvestDaysMin": 60,
+    "harvestDaysMax": 90,
+    "spacingCm": 5,
+    "rowSpacingCm": 15,
+    "sunRequirement": "partial",
+    "waterNeed": "medium",
+    "companions": [
+      "onion",
+      "radish",
+      "strawberry"
+    ],
+    "antagonists": [],
+    "color": "#65a30d",
+    "icon": "🌱",
+    "caloriesPer100g": 21,
+    "proteinPer100g": 2,
+    "vitaminCPer100g": 38,
+    "fiberPer100g": 1.5,
+    "expectedYieldKgPerM2": 0.8,
+    "preservationMethods": [],
+    "seedSaving": {
+      "difficulty": "easy",
+      "isolationDistanceM": 50,
+      "seedViabilityYears": 4
+    }
+  },
+  {
+    "id": "winter_purslane",
+    "category": "vegetable",
+    "sowIndoorsWeeks": null,
+    "sowOutdoorsWeeks": -6,
+    "transplantWeeks": null,
+    "harvestDaysMin": 42,
+    "harvestDaysMax": 70,
+    "spacingCm": 10,
+    "rowSpacingCm": 20,
+    "sunRequirement": "partial",
+    "waterNeed": "medium",
+    "companions": [
+      "lambs_lettuce",
+      "spinach",
+      "radish"
+    ],
+    "antagonists": [],
+    "color": "#4d7c0f",
+    "icon": "🌱",
+    "caloriesPer100g": 20,
+    "proteinPer100g": 2,
+    "vitaminCPer100g": 33,
+    "fiberPer100g": 1,
+    "expectedYieldKgPerM2": 1,
+    "preservationMethods": [],
+    "seedSaving": {
+      "difficulty": "easy",
+      "isolationDistanceM": 10,
+      "seedViabilityYears": 3
     }
   }
 ]
